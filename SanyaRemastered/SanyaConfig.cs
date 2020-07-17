@@ -1,0 +1,231 @@
+﻿using Exiled.API.Features;
+using Exiled.API.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+
+namespace SanyaRemastered
+{
+	public sealed class Configs : IConfig
+	{
+		public Configs()
+		{
+			DataDirectory = Path.Combine(Paths.Plugins, "SanyaPlugin");
+		}
+		[Description("Activation du SanyaPlugin")]
+		public bool IsEnabled { get; set; } = true;
+
+
+		
+		[Description("ClassD Contain")]
+		public bool classd_container_locked { get; set; } = true;
+		public float classd_container_Unlocked { get; set; } = 10f;
+
+		[Description("WIP")]
+		public bool Scp106PortalExtensionEnabled { get; set; } = false;
+		public bool scp079_spot { get; set; } = false;
+		public bool Coroding106 { get; set; } = false;
+		public bool PainEffect { get; set; } = false;
+		public float PainEffectStart { get; set; } = 20f;
+			
+		[Description("Activation des données des joueurs")]
+		public bool DataEnabled { get; set; } = false;
+
+		[Description("Localisation des données des joueurs")]
+		public string DataDirectory { get; private set; } = string.Empty;
+
+		[Description("Informations sur le serveur Adresse IP de destination")]
+		public string InfosenderIp { get; set; } = "none";
+
+		[Description("Port UDP vers lequel les informations du serveur sont envoyées")]
+		public int InfosenderPort { get; set; } = -1;
+
+		[Description("Liens Webhook discord")]
+		public string ReportWebhook { get; set; } = String.Empty;
+
+		[Description("Config Player level")]
+		public bool LevelEnabled { get; set; } = false;
+		public int LevelExpKill { get; set; } = 3;
+		public int LevelExpDeath { get; set; } = 1;
+		public int LevelExpWin { get; set; } = 10;
+		public int LevelExpLose { get; set; } = 1;
+		public int level_exp_other { get; set; } = 0;
+		[Description("Event Du Sanya")]
+		public List<int> EventModeWeight { get; set; } = new List<int>() { 0, 0, 0 };
+		public List<ItemType> ClassdInsurgentInventoryClassd { get; set; } = new List<ItemType>();
+		public List<ItemType> ClassdInsurgentInventoryScientist { get; set; } = new List<ItemType>();
+
+		[Description("Tesla Config")]
+		public float TeslaRange { get; set; } = 5.5f;
+		public List<Team> TeslaTriggerableTeams { get; set; } = new List<Team>();
+		public bool TeslaTriggerableDisarmed { get; set; } = false;
+
+		[Description("ItemCleanup Config")]
+		public int ItemCleanup { get; set; } = -1;
+		public List<ItemType> ItemCleanupIgnore { get; set; } = new List<ItemType>();
+
+		[Description("Kick Player")]
+		public bool KickSteamLimited { get; set; } = false;
+		public bool KickVpn { get; set; } = false;
+
+		[Description("Message de Bienvenue")]
+		public string MotdMessage { get; set; } = string.Empty;
+		
+		[Description("Generator Config")]
+		public bool GeneratorUnlockOpen { get; set; } = false;
+		public bool GeneratorFinishLock { get; set; } = true;
+		public bool GeneratorActivatingClose { get; set; } = true;
+		
+		[Description("Game Config")]
+		public bool item_shoot_move { get; set; } = true;
+		public bool grenade_shoot_fuse { get; set; } = true;
+		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
+		public bool StopRespawnAfterDetonated { get; set; } = true;
+		public bool GodmodeAfterEndround { get; set; } = true;
+		public bool AnticheatKillDisable { get; set; } = true;
+		public bool InventoryKeycardActivation { get; set; } = true;
+		public bool CassieSubtitle { get; set; } = true;
+		public bool IntercomInformation { get; set; } = true;
+		public bool CloseDoorsOnNukecancel { get; set; } = true;
+
+		[Description("Disable Chat")]
+		public bool DisableAllChat { get; set; } = false;
+		public bool DisableSpectatorChat { get; set; } = false;
+		public bool DisableChatBypassWhitelist { get; set; } = false;
+
+		[Description("Stamina Add")]
+		public bool StaminaEffect { get; set; } = true;
+		public float StaminaLostJump { get; set; } = 0.05f;
+		public float StaminaLostLogicer { get; set; } = 0.001f;
+
+		[Description("Hitmark Add")]
+		public bool HitmarkGrenade { get; set; } = true;
+		public bool HitmarkKilled { get; set; } = true;
+
+		[Description("Dégats Usp")]
+		public int TraitorLimit { get; set; } = -1;
+		public int TraitorChancePercent { get; set; } = 50;
+
+		/*
+				[Description("各ロールの初期装備")]
+				public Dictionary<RoleType, List<ItemType>> Defaultitems { get; set; } = new Dictionary<RoleType, List<ItemType>>()
+				{
+					{ RoleType.ClassD, new List<ItemType>() },
+					{ RoleType.Scientist, new List<ItemType>() },
+					{ RoleType.FacilityGuard, new List<ItemType>() },
+					{ RoleType.NtfCadet, new List<ItemType>() },
+					{ RoleType.NtfLieutenant, new List<ItemType>() },
+					{ RoleType.NtfCommander, new List<ItemType>() },
+					{ RoleType.NtfScientist,new List<ItemType>() },
+					{ RoleType.ChaosInsurgency, new List<ItemType>() },
+					{ RoleType.Tutorial, new List<ItemType>() }
+				};*/
+		[Description("Dégats Usp")]
+		public float UspDamageMultiplierHuman { get; set; } = 1f;
+		public float UspDamageMultiplierScp { get; set; } = 1f;
+
+		[Description("Multiplication des dommages quand la personne est désarmé")]
+		public float CuffedDamageMultiplier { get; set; } = 1f;
+
+		[Description("SCP-914 = Dead")]
+		public bool Scp914IntakeDeath { get; set; } = true;
+
+		[Description("Config de SCP-018")]
+		public float Scp018DamageMultiplier { get; set; } = 1f;
+		public bool Scp018FriendlyFire { get; set; } = true;
+		public bool Scp018CantDestroyObject { get; set; } = false;
+
+		[Description("% de chance de blink quand on lui tire dessus")]
+		public int Scp173ForceBlinkPercent { get; set; } = -1;
+
+		[Description("SCP-939 effet d'hémoragie")]
+		public bool Scp939AttackBleeding { get; set; } = true;
+		public float Scp939AttackBleedingTime { get; set; } = 60f;
+
+		[Description("Recovery Amount")]
+		public int Scp096RecoveryAmount { get; set; } = 0;
+		public int Scp106RecoveryAmount { get; set; } = 0;
+		public int Scp049RecoveryAmount { get; set; } = 0;
+		public int Scp0492RecoveryAmount { get; set; } = 0;
+		public int Scp173RecoveryAmount { get; set; } = 0;
+		public int Scp939RecoveryAmount { get; set; } = 0;
+
+		[Description("Multiplicateur de dégats")]
+		public float Scp096DamageMultiplier { get; set; } = 1f;
+		public float Scp173DamageMultiplier { get; set; } = 1f;
+		public float Scp049DamageMultiplier { get; set; } = 1f;
+		public float Scp0492DamageMultiplier { get; set; } = 1f;
+		public float Scp939DamageMultiplier { get; set; } = 1f;
+
+		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
+		public float Scp106DamageMultiplier { get; set; } = 1f;
+		public float Scp106GrenadeMultiplier { get; set; } = 1f;
+		
+
+		[Description("SCP-079 Activé le mode Etendue de 079")]
+		public bool Scp079ExtendEnabled { get; set; } = true;
+		[Description("Exp gagné par mort du gaz")]
+		
+		public bool scp049_add_time_res_success { get; set; } = true;
+		
+		[Description("SCP-079 Config Plugin \n# Pour désactivé une capacité Scp079ExtendLevel = 6")]
+		public int Scp079ExtendLevelFindscp { get; set; } = 1;
+		public float Scp079ExtendCostFindscp { get; set; } = 10f;
+		public int Scp079ExtendLevelDoorbeep { get; set; } = 1;
+		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
+		[Description("Gas Config")]
+		public string[] gazBlacklistRooms { get; set; } = new string[0];
+		public int TimerWaitGas { get; set; } = 20;
+		public int GasDuration { get; set; } = 60;
+		public int GasExpGain { get; set; } = 2;
+		public float scp079_ex_cost_gaz { get; set; } = 150;
+		public int scp079_ex_level_gaz { get; set; } = 3;
+
+		[Description("SCP-079 Config")]
+		public float Scp079CostCamera { get; set; } = 1f;
+		public float Scp079CostLock { get; set; } = 4f;
+		public float Scp079CostLockStart { get; set; } = 5f;
+		public float Scp079RequiredLockStart { get; set; } = 10f;
+		public float Scp079CostDoorDefault { get; set; } = 5f;
+		public float Scp079CostDoorContlv1 { get; set; } = 50f;
+		public float Scp079CostDoorContlv2 { get; set; } = 40f;
+		public float Scp079CostDoorContlv3 { get; set; } = 110f;
+		public float Scp079CostDoorArmlv1 { get; set; } = 50f;
+		public float Scp079CostDoorArmlv2 { get; set; } = 60f;
+		public float Scp079CostDoorArmlv3 { get; set; } = 70f;
+		public float Scp079CostDoorGate { get; set; } = 60f;
+		public float Scp079CostDoorIntercom { get; set; } = 30f;
+		public float Scp079CostDoorCheckpoint { get; set; } = 10f;
+		public float Scp079CostLockDown { get; set; } = 60f;
+		public float Scp079CostTesla { get; set; } = 50f;
+		public float Scp079CostElevatorTeleport { get; set; } = 30f;
+		public float Scp079CostElevatorUse { get; set; } = 10f;
+		public float Scp079CostSpeakerStart { get; set; } = 10f;
+		public float Scp079CostSpeakerUpdate { get; set; } = 0.8f;
+
+		[Description("Ticket Gain Config")]
+		public int tickets_ci_classd_died_count { get; set; } = 0;
+		public int tickets_mtf_scientist_died_count { get; set; } = 0;
+		public int tickets_mtf_killed_by_scp_count { get; set; } = 0;
+		public int tickets_mtf_classd_killed_count { get; set; } = 0;
+		public int tickets_ci_killed_by_scp_count { get; set; } = 0;
+		public int tickets_ci_scientist_killed_count { get; set; } = 0;
+
+		public string GetConfigs()
+		{
+			string returned = "\n";
+
+			PropertyInfo[] infoArray = typeof(Configs).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+			foreach (PropertyInfo info in infoArray)
+			{
+				returned += $"{info.Name}: {info.GetValue(this)}\n";
+			}
+
+			return returned;
+		}
+	}
+}
+
