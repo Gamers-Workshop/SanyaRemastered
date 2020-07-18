@@ -128,5 +128,6 @@ C:\Users\Corentin\Downloads\SanyaRemastered (1)\SanyaRemastered\SanyaRemastered\
 C:\Users\Corentin\Downloads\SanyaRemastered (1)\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.dll
 C:\Users\Corentin\Downloads\SanyaRemastered (1)\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.pdb
 D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.dll
-D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Updater.dll
 D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.csprojAssemblyReference.cache
+D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Loader.dll
+D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered\SanyaRemastered\bin\Debug\YamlDotNet.dll

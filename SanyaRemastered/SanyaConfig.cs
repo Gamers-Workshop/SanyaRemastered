@@ -17,12 +17,6 @@ namespace SanyaRemastered
 		[Description("Activation du SanyaPlugin")]
 		public bool IsEnabled { get; set; } = true;
 
-
-		
-		[Description("ClassD Contain")]
-		public bool classd_container_locked { get; set; } = true;
-		public float classd_container_Unlocked { get; set; } = 10f;
-
 		[Description("WIP")]
 		public bool Scp106PortalExtensionEnabled { get; set; } = false;
 		public bool scp079_spot { get; set; } = false;
@@ -52,6 +46,7 @@ namespace SanyaRemastered
 		public int LevelExpWin { get; set; } = 10;
 		public int LevelExpLose { get; set; } = 1;
 		public int level_exp_other { get; set; } = 0;
+
 		[Description("Event Du Sanya")]
 		public List<int> EventModeWeight { get; set; } = new List<int>() { 0, 0, 0 };
 		public List<ItemType> ClassdInsurgentInventoryClassd { get; set; } = new List<ItemType>();
@@ -84,11 +79,15 @@ namespace SanyaRemastered
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
 		public bool StopRespawnAfterDetonated { get; set; } = true;
 		public bool GodmodeAfterEndround { get; set; } = true;
-		public bool AnticheatKillDisable { get; set; } = true;
 		public bool InventoryKeycardActivation { get; set; } = true;
 		public bool CassieSubtitle { get; set; } = true;
 		public bool IntercomInformation { get; set; } = true;
 		public bool CloseDoorsOnNukecancel { get; set; } = true;
+		public bool scp049_add_time_res_success { get; set; } = true;
+
+		[Description("ClassD Contain")]
+		public bool classd_container_locked { get; set; } = true;
+		public float classd_container_Unlocked { get; set; } = 10f;
 
 		[Description("Disable Chat")]
 		public bool DisableAllChat { get; set; } = false;
@@ -166,9 +165,6 @@ namespace SanyaRemastered
 
 		[Description("SCP-079 Activé le mode Etendue de 079")]
 		public bool Scp079ExtendEnabled { get; set; } = true;
-		[Description("Exp gagné par mort du gaz")]
-		
-		public bool scp049_add_time_res_success { get; set; } = true;
 		
 		[Description("SCP-079 Config Plugin \n# Pour désactivé une capacité Scp079ExtendLevel = 6")]
 		public int Scp079ExtendLevelFindscp { get; set; } = 1;
@@ -177,11 +173,11 @@ namespace SanyaRemastered
 		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
 		[Description("Gas Config")]
 		public string[] gazBlacklistRooms { get; set; } = new string[0];
-		public int TimerWaitGas { get; set; } = 20;
-		public int GasDuration { get; set; } = 60;
+		public int GasDuration  { get; set; } = 60;
+		public int TimerWaitGas { get; set; } = 60;
 		public int GasExpGain { get; set; } = 2;
 		public float scp079_ex_cost_gaz { get; set; } = 150;
-		public int scp079_ex_level_gaz { get; set; } = 3;
+		public int scp079_ex_level_gaz { get; set; } = 4;
 
 		[Description("SCP-079 Config")]
 		public float Scp079CostCamera { get; set; } = 1f;

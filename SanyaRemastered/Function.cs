@@ -478,6 +478,20 @@ namespace SanyaPlugin.Functions
 				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
 			}
 		}
+		public static void SendSubtitle(Player player, string text, ushort time, ReferenceHub target = null)
+		{
+			Broadcast brd = player.GameObject.GetComponent<Broadcast>();
+			if (target != null)
+			{
+				brd.TargetClearElements(target.characterClassManager.connectionToClient);
+				brd.TargetAddElement(target.characterClassManager.connectionToClient, text, time, Broadcast.BroadcastFlags.Normal);
+			}
+			else
+			{
+				brd.RpcClearElements();
+				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
+			}
+		}
 
 		public static void PlayAmbientSound(int id)
 		{
@@ -592,12 +606,12 @@ namespace SanyaPlugin.Functions
 
 		public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
 		{
-			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-			CharacterClassManager ccm = gameObject.GetComponent<CharacterClassManager>();
+			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs[0]);
+			CharacterClassManager ccm = gameObject.GetComponentInChildren<CharacterClassManager>();
 			ccm.CurClass = role;
 			ccm.RefreshPlyModel();
-			gameObject.GetComponent<NicknameSync>().Network_myNickSync = "Yamato";
-			gameObject.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+			gameObject.GetComponentInChildren<NicknameSync>().Network_myNickSync = "Yamato";
+			gameObject.GetComponentInChildren<QueryProcessor>().NetworkPlayerId = 9999;
 			gameObject.transform.position = pos;
 			gameObject.transform.rotation = rot;
 			NetworkServer.Spawn(gameObject);
@@ -667,6 +681,35 @@ namespace SanyaPlugin.Functions
 				ArraySegment<byte> arraySegment = owner.ToArraySegment();
 				observer.WriteBytes(arraySegment.Array, position, owner.Position - position);
 			}
+		}
+		public static void RpcCassieAnnouncement(RespawnEffectsController resp, NetworkConnection conn, string words, bool makeHold, bool makeNoise)
+		{
+			NetworkWriter writer = NetworkWriterPool.GetWriter();
+			writer.WriteString(words);
+			writer.WriteBoolean(makeHold);
+			writer.WriteBoolean(makeNoise);
+			SendTargetRPCInternal(conn, typeof(RespawnEffectsController), "RpcCassieAnnouncement", writer, 0, resp.netId, resp.ComponentIndex);
+			NetworkWriterPool.Recycle(writer);
+		}
+		public static void SendTargetRPCInternal(NetworkConnection conn, Type invokeClass, string rpcName, NetworkWriter writer, int channelId, uint netid, int componentindex)
+		{
+			if (!NetworkServer.active)
+			{
+				Debug.LogError("TargetRPC Function " + rpcName + " called on client.");
+				return;
+			}
+			RpcMessage msg = new RpcMessage
+			{
+				netId = netid,
+				componentIndex = componentindex,
+				functionHash = GetMethodHash(invokeClass, rpcName),
+				payload = writer.ToArraySegment()
+			};
+			conn.Send<RpcMessage>(msg, channelId);
+		}
+		private static int GetMethodHash(Type invokeClass, string methodName)
+		{
+			return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
 		}
 	}
 	internal static class Extensions

@@ -82,10 +82,10 @@ namespace SanyaPlugin
 			harmony.PatchAll();
 
 			EventHandlers.sendertask = EventHandlers.SenderAsync().StartSender();
-
+			/*
 			ServerConsole.singleton.NameFormatter.Commands.Add("mtf_tickets", (List<string> args) => Methods.GetMTFTickets().ToString());
 			ServerConsole.singleton.NameFormatter.Commands.Add("ci_tickets", (List<string> args) => Methods.GetCITickets().ToString());
-
+			*/
 			Log.Info($"[OnEnabled] SanyaPlugin({Version}) Enabled.");
 			base.OnEnabled();
 		}

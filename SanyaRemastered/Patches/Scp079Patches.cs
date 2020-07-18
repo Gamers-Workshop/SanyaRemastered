@@ -149,12 +149,12 @@ public static class Scp079InteractPatch
 			foreach (GameObject Player in PlayerManager.players)
 		{
 			{
-			if (player.ReferenceHub.scp079PlayerScript.NetworkcurLvl < SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_level_gaz - 1)
+			if (player.ReferenceHub.scp079PlayerScript.NetworkcurLvl <= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_level_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
 				break;
 			}
-			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana < SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz)
+			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana <= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
 				break;
@@ -174,14 +174,48 @@ public static class Scp079InteractPatch
 			Room room = SCP079room(hub);
 			bool locked = false;
 
-			foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
+				foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
 					{
-						if (!locked)
-						locked = door.destroyed;
-						if (!locked)
-						locked = door.locked;
-					}
-		if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
+						if (!locked &&
+							door._prevDestroyed 
+							|| door.destroyed 
+							|| door.lockdown 
+							|| door.locked 
+							|| door._isLockedBy079 
+							|| door._wasLocked 
+							|| door.warheadlock
+							|| door._checkpointLockOpen 
+							|| door._checkpointLockOpenDecont 
+							|| door._checkpointLockOpenWarhead) 
+							locked = true;
+						if(locked && door._prevDestroyed
+							&& !door.destroyed
+							&& !door.lockdown
+							&& !door.locked
+							&& !door._isLockedBy079
+							&& !door._wasLocked
+							&& !door.warheadlock
+							&& !door._checkpointLockOpen
+							&& !door._checkpointLockOpenDecont
+							&& !door._checkpointLockOpenWarhead)
+							locked = false;
+                    }
+				/*
+				foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
+					{
+						if (!locked) locked = door._prevDestroyed;
+						if (!locked) locked = door.destroyed;
+						if (!locked) locked = door.locked;
+						if (!locked) locked = door.lockdown;
+						if (!locked) locked = door._isLockedBy079;
+						if (!locked) locked = door._wasLocked;
+						if (!locked) locked = door.warheadlock;
+						if (!locked) locked = door._checkpointLockOpen;
+						if (!locked) locked = door._checkpointLockOpenDecont;
+						if (!locked) locked = door._checkpointLockOpenWarhead;
+					}*/
+
+					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
 			if (room == null || room.Name.StartsWith("EZ") || locked)
 
 			{
@@ -202,9 +236,9 @@ public static class Scp079InteractPatch
 		}
 		return false;
 	}
-	else if (command.Contains("DOOR:"))
+	if (command.Contains("DOOR:"))
 	{
-			if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelDoorbeep)
+			if (__instance.curLvl + 1 <= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelDoorbeep)
 			{
 				if (SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelDoorbeep > __instance.curMana)
 				{
@@ -223,21 +257,34 @@ public static class Scp079InteractPatch
 		}
 		return true;
 	}
-
+	
 	private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
-	{
+	{/*
 		string str = ".g4 ";
 		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
 		{
 			str += ". .g4 ";
 		}
+		foreach (var ply in PlayerManager.players)
+		{
+			var player = Exiled.API.Features.Player.Dictionary[ply];
+			if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+			{
+				foreach (RespawnEffectsController respawnEffectsController in RespawnEffectsController.AllControllers)
+				{
+					if (respawnEffectsController != null)
+					{
+						Methods.RpcCassieAnnouncement(respawnEffectsController, player.ReferenceHub.characterClassManager.Connection, .g4, false, false);
+					}
+				}
+			}
+		}*/
 
-		RespawnEffectsController.PlayCassieAnnouncement(str, false, false);
-		List<Door> doors = Exiled.API.Features.Map.Doors.FindAll((d) => Vector3.Distance(d.transform.position, room.Position) <= 20f);
+		List<Door> doors = Exiled.API.Features.Map.Doors.FindAll((d) => Vector3.Distance(d.transform.position, room.Position) <= 0.5f);
 		foreach (var item in doors)
 		{
-			item.NetworkisOpen = true;
 			item.Networklocked = true;
+			item.NetworkisOpen = true;
 		}
 		
 		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
@@ -249,15 +296,21 @@ public static class Scp079InteractPatch
 				{
 					player.ClearBroadcasts();
 					player.Broadcast(1, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
-					RespawnEffectsController.PlayCassieAnnouncement(".g3", false, false);
+					foreach (RespawnEffectsController respawnEffectsController in RespawnEffectsController.AllControllers)
+					{
+						if (respawnEffectsController != null)
+						{
+							Methods.RpcCassieAnnouncement(respawnEffectsController, player.ReferenceHub.characterClassManager.Connection," .g4 ", false, false);
+						}
+					}
 				}
 			}
-			yield return Timing.WaitForSeconds(1f);
+			yield return Timing.WaitForSeconds(0.5f);
 		}
 		foreach (var item in doors)
 		{
-			item.NetworkisOpen = false;
 			item.Networklocked = true;
+			item.NetworkisOpen = false;
 		}
 		foreach (var ply in PlayerManager.players)
 		{
@@ -281,11 +334,12 @@ public static class Scp079InteractPatch
 					}
 				}
 			}
-			yield return Timing.WaitForSeconds(0.5f);
+			yield return Timing.WaitForSeconds(1);
 		}
 		foreach (var item in doors)
 		{
 			item.Networklocked = false;
+			item.NetworkisOpen = true;
 		}
 	}
 

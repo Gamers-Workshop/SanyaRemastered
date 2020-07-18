@@ -20,6 +20,9 @@ using Exiled.Events.EventArgs;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System.Linq;
+using Exiled.API.Extensions;
+using Assets._Scripts.Dissonance;
+using Exiled.API.Enums;
 
 namespace SanyaPlugin
 {
@@ -464,32 +467,54 @@ namespace SanyaPlugin
 			
 			if (SanyaPlugin.instance.Config.CassieSubtitle)
 			{
+				
 				ev.IsGlobal = true;
+
 				switch (ev.Id)
 				{
 					case 0:
 						{
-							Methods.SendSubtitle(Subtitles.DecontaminationInit, 20);
+							foreach(Player player in Player.List)
+							{
+								if (player.CurrentRoom.Name.StartsWith("LCZ"))
+								Methods.SendSubtitle(player,Subtitles.DecontaminationInit, 20);
+							}
 							break;
 						}
 					case 1:
 						{
-							Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15);
+							foreach (Player player in Player.List)
+							{
+								if (player.CurrentRoom.Name.StartsWith("LCZ"))
+									Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15);
+							}
 							break;
 						}
 					case 2:
 						{
-							Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15);
+							foreach (Player player in Player.List)
+							{
+								if (player.CurrentRoom.Name.StartsWith("LCZ"))
+									Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15);
+							}
 							break;
 						}
 					case 3:
 						{
-							Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15);
+							foreach (Player player in Player.List)
+							{
+								if (player.CurrentRoom.Name.StartsWith("LCZ"))
+									Methods.SendSubtitle(Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15);
+							}
 							break;
 						}
 					case 4:
 						{
-							Methods.SendSubtitle(Subtitles.Decontamination30s, 45);
+							foreach (Player player in Player.List)
+							{
+								if (player.CurrentRoom.Name.StartsWith("LCZ"))
+									Methods.SendSubtitle(Subtitles.Decontamination30s, 45);
+							}
 							break;
 						}
 					case 5:
@@ -690,17 +715,6 @@ namespace SanyaPlugin
 						}
 						break;
 					}
-			}
-		}
-		
-		public void OnPlayerChangeAnim(PlayerStats ev)
-		{
-			if (SanyaPlugin.instance.Config.PainEffect)
-			{
-				var Hp = 100*(ev._health / ev.maxHP);
-				if (Hp > SanyaPlugin.instance.Config.PainEffectStart) 
-				; 
-					
 			}
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
@@ -1272,7 +1286,7 @@ namespace SanyaPlugin
 			if (args[0].ToLower() == "sanya")
 			{
 				ReferenceHub player = ev.CommandSender.SenderId == "SERVER CONSOLE" || ev.CommandSender.SenderId == "GAME CONSOLE" ? Player.Dictionary[PlayerManager.localPlayer].ReferenceHub : ev.Sender.ReferenceHub;
-				Player test = Player.Dictionary[player.gameObject];
+				Player perm = Player.Dictionary[player.gameObject];
 				if (args.Length > 1)
 				{
 					string ReturnStr;
@@ -1281,13 +1295,12 @@ namespace SanyaPlugin
 					{
 						case "test":
 							{
-
 								ReturnStr = "test ok.";
 								break;
 							}
 						case "resynceffect":
 							{
-								if (!test.CheckPermission("sanya.resynceffect"))
+								if (!perm.CheckPermission("sanya.resynceffect"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1301,12 +1314,12 @@ namespace SanyaPlugin
 							}
 						case "check":
 							{
-								if (!test.CheckPermission("sanya.check"))
+								if (!perm.CheckPermission("sanya.check"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								ReturnStr = $"Players List ({PlayerManager.players.Count})\n";
+								ReturnStr = $"\nPlayers List ({PlayerManager.players.Count})\n";
 								foreach (var i in Player.List)
 								{
 									ReturnStr += $"{i.Nickname} {i.Position}\n";
@@ -1324,7 +1337,7 @@ namespace SanyaPlugin
 							}
 						case "reload":
 							{
-								if (!test.CheckPermission("sanya.reload"))
+								if (!perm.CheckPermission("sanya.reload"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1336,7 +1349,7 @@ namespace SanyaPlugin
 							}
 						case "list":
 							{
-								if (!test.CheckPermission("sanya.list"))
+								if (!perm.CheckPermission("sanya.list"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1351,7 +1364,7 @@ namespace SanyaPlugin
 							}
 						case "startair":
 							{
-								if (!test.CheckPermission("sanya.airbomb"))
+								if (!perm.CheckPermission("sanya.airbomb"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1411,7 +1424,7 @@ namespace SanyaPlugin
 							}
 						case "stopair":
 							{
-								if (!test.CheckPermission("sanya.airbomb"))
+								if (!perm.CheckPermission("sanya.airbomb"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1420,28 +1433,10 @@ namespace SanyaPlugin
 								Coroutines.isAirBombGoing = false;
 								break;
 							}
-						case "dummy":
-							{
-								if (!test.CheckPermission("sanya.dummy"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (test != null)
-								{
-									var gameObject = Methods.SpawnDummy(test.Role, test.Position, player.transform.rotation);
-									ReturnStr = $"{test.Role}'s Dummy Created. pos:{gameObject.transform.position} rot:{gameObject.transform.rotation}";
-								}
-								else
-								{
-									isSuccess = false;
-									ReturnStr = "sender should be Player.";
-								}
-								break;
-							}
+
 						case "914":
 							{
-								if (!test.CheckPermission("sanya.914"))
+								if (!perm.CheckPermission("sanya.914"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1482,7 +1477,7 @@ namespace SanyaPlugin
 							}
 						case "nukecap":
 							{
-								if (!test.CheckPermission("sanya.nukecap"))
+								if (!perm.CheckPermission("sanya.nukecap"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1494,7 +1489,7 @@ namespace SanyaPlugin
 							}
 						case "blackout":
 							{
-								if (!test.CheckPermission("sanya.blackout"))
+								if (!perm.CheckPermission("sanya.blackout"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1517,7 +1512,7 @@ namespace SanyaPlugin
 							}
 						case "femur":
 							{
-								if (!test.CheckPermission("sanya.femur"))
+								if (!perm.CheckPermission("sanya.femur"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1528,7 +1523,7 @@ namespace SanyaPlugin
 							}
 						case "explode":
 							{
-								if (!test.CheckPermission("sanya.explode"))
+								if (!perm.CheckPermission("sanya.explode"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1540,11 +1535,22 @@ namespace SanyaPlugin
 									{
 										Methods.SpawnGrenade(target.Position, false, 0.1f, target.ReferenceHub);
 										ReturnStr = $"success. target:{target.Nickname}";
+										break;
+									}
+									if (args[2] == "all")
+									{
+										foreach (var ply in Player.List)
+										{
+											Methods.SpawnGrenade(ply.Position, false, 0.1f, ply.ReferenceHub);
+										}
+										ReturnStr = "success spawn grenade on all player";
+										break;
 									}
 									else
 									{
 										isSuccess = false;
 										ReturnStr = "[explode] missing target.";
+										break;
 									}
 								}
 								else
@@ -1553,126 +1559,19 @@ namespace SanyaPlugin
 									{
 										Methods.SpawnGrenade(player.transform.position, false, 0.1f, player);
 										ReturnStr = $"success. target:{Player.Get(player.gameObject).Nickname}";
+										break;
 									}
 									else
 									{
 										isSuccess = false;
 										ReturnStr = "[explode] missing target.";
+										break;
 									}
 								}
-								break;
-							}
-						case "grenade":
-							{
-								if (!test.CheckPermission("sanya.grenade"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.SpawnGrenade(target.Position, false, -1, target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[grenade] missing target.";
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.SpawnGrenade(player.transform.position, false, -1, player);
-										ReturnStr = $"success. target:{Player.Get(player).Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[grenade] missing target.";
-									}
-								}
-								break;
-							}
-						case "flash":
-							{
-								if (!test.CheckPermission("sanya.flash"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.SpawnGrenade(target.Position, true, -1, target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[flash] missing target.";
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.SpawnGrenade(player.transform.position, true, -1, player);
-										ReturnStr = $"success. target:{Player.Get(player).Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[flash] missing target.";
-									}
-								}
-								break;
-							}
-						case "ball":
-							{
-								if (!test.CheckPermission("sanya.ball"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.Spawn018(target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[ball] missing target.";
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.Spawn018(player);
-										ReturnStr = $"success. target:{Player.Get(player).Nickname}";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[ball] missing target.";
-									}
-								}
-								break;
 							}
 						case "ammo":
 							{
-								if (!test.CheckPermission("sanya.ammo"))
+								if (!perm.CheckPermission("sanya.ammo"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1682,33 +1581,103 @@ namespace SanyaPlugin
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
 									{
-										player.ammoBox.amount[2] = 200U;
-										ReturnStr = "Ammo set 200:200:200.";
+										if (uint.TryParse(args[3], out uint Nato556) && 
+											uint.TryParse(args[4], out uint Nato762) &&
+											uint.TryParse(args[5], out uint Nato9))
+										{
+											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, Nato556);
+											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, Nato762);
+											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, Nato9);
+											ReturnStr = $"{target.Nickname}  {Nato556}:{Nato762}:{Nato9}";
+											break;
+										}
+										else
+										{ 
+											ReturnStr = "sanya ammo {player} (5.56) (7.62) (9mm).";
+											break;
+										}
+									}
+									if (args[2] == "all")
+									{		
+										if (uint.TryParse(args[3], out uint Nato556)
+											&& uint.TryParse(args[4], out uint Nato762)
+											&& uint.TryParse(args[5], out uint Nato9))
+										{
+											foreach (var ply in Player.List)
+											{
+												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato556 , Nato556);
+												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, Nato762);
+												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, Nato9);
+											}
+											ReturnStr = $"ammo set {Nato556}:{Nato762}:{Nato9}";
+											break;
+										}
+										else
+										{ 
+											ReturnStr = "sanya ammo all (5.56) (7.62) (9mm)";
+											break;
+										}
 									}
 									else
 									{
 										isSuccess = false;
-										ReturnStr = "Failed to set.";
+										ReturnStr = "sanya (player id ou all) ";
+										break;
 									}
-								}
-								if (player != null)
-								{
-									for (int i = 0; i < player.ammoBox.amount.Count; i++)
-									{
-										player.ammoBox.amount[i] = 200U;
-									}
-									ReturnStr = "Ammo set 200:200:200.";
 								}
 								else
 								{
 									ReturnStr = "Failed to set. (cant use from SERVER)";
+									break;
 								}
-
-								break;
+							}
+						case "clearinv":
+							{
+								if (!perm.CheckPermission("sanya.clearinv"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
+								if (args.Length > 2)
+								{
+									Player target = Player.UserIdsCache[args[2]];
+									if (target != null && target.Role != RoleType.Spectator)
+									{
+										target.ClearInventory();
+										ReturnStr = $"Clear Inventory: {target.Nickname}";
+										break;
+									}
+									if (args[2] == "all")
+									{
+										foreach (var ply in Player.List)
+										{
+											ply.ClearInventory();
+										}
+										ReturnStr = "INVENTORY OF ALL PLAYER AS BEEN CLEAR";
+										break;
+									}
+									else
+									{
+										isSuccess = false;
+										ReturnStr = "Fail";
+										break;
+									}
+								}
+								if (player != null)
+								{
+									ev.Sender.ClearInventory();
+									ReturnStr = "Your Inventory as been clear";
+									break;
+								}
+								else
+								{
+									ReturnStr = $"sanya clearinv {Player.Get(player).Nickname}";
+									break;
+								}
 							}
 						case "cleareffect":
 							{
-								if (!test.CheckPermission("sanya.cleareffect"))
+								if (!perm.CheckPermission("sanya.cleareffect"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1719,18 +1688,19 @@ namespace SanyaPlugin
 									Player target = Player.UserIdsCache[args[2]];
 									if (target != null && target.Role != RoleType.Spectator)
 									{
-
 										foreach(KeyValuePair<Type, PlayerEffect> keyValuePair in target.ReferenceHub.playerEffectsController.AllEffects.ToArray())
                                         {
 											PlayerEffect effect = keyValuePair.Value;
 											effect.ServerDisable();
 										}
 										ReturnStr = $"ALL EFFECT AS BEEN CLEAR FOR {target.Nickname}";
+										break;
 									}
 									else
 									{
 										isSuccess = false;
 										ReturnStr = "Fail";
+										break;
 									}
 								}
 								if (player != null)
@@ -1741,6 +1711,7 @@ namespace SanyaPlugin
 										effect.ServerDisable();
 									}
 									ReturnStr = "ALL YOUR EFFECT AS BEEN CLEAR";
+									break;
 								}
 								if (args[2] == "all")
 								{
@@ -1753,14 +1724,63 @@ namespace SanyaPlugin
 										}
 									}
 									ReturnStr = "ALL EFFECT OF ALL PLAYER AS BEEN CLEAR";
+									break;
 								}
 								else
 								{
-									ReturnStr = "Failed to set.";
+									ReturnStr = "Failed to set."; 
+									break;
 								}
-
-								break;
-							}
+							}/*
+						case "dummy":
+							{
+								if (!perm.CheckPermission("sanya.dummy"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
+								if (args.Length > 2)
+								{
+									Player target = Player.Get(args[2]);
+									var roletype = target.Role;
+									if (target != null && target.Role != RoleType.Spectator)
+									{
+									Methods.SpawnDummy(target.Role , target.Position, target.ReferenceHub.transform.rotation);
+									ReturnStr = $"{target.Role}'s Dummy Created. pos:{target.Position} rot:{target.ReferenceHub.transform.rotation}";
+									break;
+									}
+									if (args[2] == "all")
+									{
+										foreach (var ply in Player.List)
+										{
+											Methods.SpawnDummy(ply.Role,ply.Position,ply.ReferenceHub.transform.rotation);
+										}
+										ReturnStr = "success spawn grenade on all player";
+										break;
+									}
+									else
+									{
+										isSuccess = false;
+										ReturnStr = "[explode] missing target.";
+										break;
+									}
+								}
+								else
+								{
+									if (player != null)
+									{
+										Methods.SpawnDummy(RoleType.ClassD , perm.Position, player.transform.rotation);
+										ReturnStr = $"{perm.Role}'s Dummy Created. pos:{perm.Position} rot:{player.transform.rotation}";
+										break;
+									}
+									else
+									{
+										isSuccess = false;
+										ReturnStr = "[explode] missing target.";
+										break;
+									}
+								}
+							}*/
 						case "ev":
 							{
 								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.ev"))
@@ -1925,13 +1945,13 @@ namespace SanyaPlugin
 								{
 									if (args[2] == "ci" || args[2] == "ic")
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.ChaosInsurgency);
+										mtfRespawn.Spawn();
 										ReturnStr = $"force spawn ChaosInsurgency";
 										break;
 									}
 								else if (args[2] == "mtf" || args[2] == "ntf")
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.NineTailedFox);
+										mtfRespawn.Spawn();
 										ReturnStr = $"force spawn NineTailedFox";
 										break;
 									}
@@ -1945,18 +1965,18 @@ namespace SanyaPlugin
 								{
 									if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.ChaosInsurgency);
+										mtfRespawn.Spawn();
 										ReturnStr = $"spawn soon. Chaos Insurgency";
 										break;
 									}
 									else
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.NineTailedFox);
+										mtfRespawn.Spawn();
 										ReturnStr = $"spawn soon. Nine Tailed Fox";
 										break;
 									}
 								}
-							}
+							}/*
 						case "next":
 							{
 								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.next"))
@@ -1975,13 +1995,12 @@ namespace SanyaPlugin
 									}
 									if (args[2] == "ci" || args[2] == "ic")
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.ChaosInsurgency);
 										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency}";
 										break;
 									}
 									else if (args[2] == "mtf" || args[2] == "ntf")
 									{
-										mtfRespawn.ForceSpawnTeam(SpawnableTeamType.NineTailedFox);
+										RespawnTickets.Singleton.
 										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox}";
 										break;
 									}
@@ -2005,12 +2024,20 @@ namespace SanyaPlugin
 										break;
 									}
 									else
-									{ 
-										ReturnStr = $"No Respawn set";
-										break;
+									{
+										if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
+										{
+											ReturnStr = $"Next spawn is Chaos Insurgency";
+											break;
+										}
+										else
+										{
+											ReturnStr = $"Next spawn is Nine Tailed Fox";
+											break;
+										}
 									}
 								}								
-							}/*
+							}
 						case "van":
 							{
 								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.van"))

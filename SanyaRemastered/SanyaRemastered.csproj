@@ -45,7 +45,6 @@
     <Compile Include="Patches\ItemCleanupPatch.cs" />
     <Compile Include="Patches\Scp018Patches.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
-    <Compile Include="Patches\StaminaPatches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\MTFRespawnPatches.cs" />
     <Compile Include="Patches\PlayerMovementPatches.cs" />
@@ -82,12 +81,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Exiled.Events.dll</HintPath>
     </Reference>
+    <Reference Include="Exiled.Loader, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\CreativeToolbox-master\CreativeToolbox\bin\Debug\Exiled.Loader.dll</HintPath>
+    </Reference>
     <Reference Include="Exiled.Permissions, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Exiled.Permissions.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Updater">
-      <HintPath>C:\Users\louismonneyronpc\Desktop\CreativeToolbox-master\CreativeToolbox\bin\Debug\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
