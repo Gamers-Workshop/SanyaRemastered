@@ -235,6 +235,11 @@
 			"《Danger ! Le site vas recevoir un bombardement aérien dans t-moins {0} minutes !》\n",
 			"</size></color>"
 		);
+		internal static readonly string AirbombStop = string.Concat(
+			"<color=#ff0000><size=25>",
+			"《Le bombardement a été annulé !》\n",
+			"</size></color>"
+		);
 		internal static readonly string AirbombEnded = string.Concat(
 			"<color=#ff0000><size=25>",
 			"《Le bombardement de l'ensemble du site à été effectué et c'est terminé avec succès !》\n",

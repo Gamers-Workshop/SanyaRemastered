@@ -473,7 +473,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke != 0)
 			{ 
-			roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke)));
+			roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke)));
 			}
 		}
 		public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
@@ -1419,13 +1419,13 @@ namespace SanyaPlugin
 									{
 										if (int.TryParse(args[3], out int duration2))
 										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration, duration2)));
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration, duration2)));
 											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60} and stop in {duration2 / 60}:{duration2 % 60:00}";
 											break;
 										}
 										else
 										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration)));
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration)));
 											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 											break;
 										}
@@ -1451,8 +1451,9 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								ReturnStr = $"Stop ok. now:{Coroutines.isAirBombGoing}";
+								roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
 								Coroutines.isAirBombGoing = false;
+								ReturnStr = $"Stop ok. now:{Coroutines.isAirBombGoing}";
 								break;
 							}
 						case "914":
