@@ -1,6 +1,5 @@
 ﻿using Exiled.API.Features;
 using HarmonyLib;
-using SanyaPlugin;
 using SanyaPlugin.Functions;
 
 namespace SanyaRemastered.Patches
@@ -17,7 +16,6 @@ namespace SanyaRemastered.Patches
 			if (!string.IsNullOrEmpty(SanyaPlugin.SanyaPlugin.instance.Config.ReportWebhook)
 				&& !string.IsNullOrEmpty(reporter.UserId)
 				&& !string.IsNullOrEmpty(reported.UserId)
-				&& reported.Id != reporter.Id
 				&& !notifyGm)
 			{
 				Log.Warn($"[Report] {reporter.Nickname} -> {reported.Nickname} Reason:{reason}");

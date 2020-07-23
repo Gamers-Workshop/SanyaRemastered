@@ -34,7 +34,6 @@
   <ItemGroup>
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Data.cs" />
-    <Compile Include="Config.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
@@ -48,6 +47,7 @@
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\MTFRespawnPatches.cs" />
     <Compile Include="Patches\PlayerMovementPatches.cs" />
+    <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\VoicePatches.cs" />
     <Compile Include="Patches\WarheadPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -242,6 +242,29 @@ namespace SanyaPlugin
 						Log.Debug($"[Blackouter] Fired.");
 						Generator079.mainGenerator.RpcCustomOverchargeForOurBeautifulModCreators(10f, false);
 					}
+					//SCP-939VoiceChatVision
+					if (plugin.Config.Scp939CanSeeVoiceChatting)
+					{
+						List<ReferenceHub> scp939 = null;
+						List<ReferenceHub> humans = new List<ReferenceHub>();
+						foreach (var player in ReferenceHub.GetAllHubs().Values)
+						{
+							if (player.characterClassManager.CurRole.team != Team.RIP && player.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
+							{
+								player.footstepSync._visionController.MakeNoise(25f);
+							}
+
+							if (player.characterClassManager.CurRole.roleId.Is939())
+							{
+								if (scp939 == null)
+									scp939 = new List<ReferenceHub>();
+								scp939.Add(player);
+							}
+
+							if (player.characterClassManager.IsHuman())
+								humans.Add(player);
+						}
+					}
 				}
 				catch (Exception e)
 				{
@@ -256,8 +279,7 @@ namespace SanyaPlugin
 		private int detonatedDuration = -1;
 		private Vector3 espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 		private readonly int grenade_pickup_mask = 1049088;
-		private readonly int surfacemask = 1208303617;
-
+		private int prevMaxAHP = 0;
 		/** RoundVar **/
 		private FlickerableLight flickerableLight = null;
 		private bool IsEnableBlackout = false;
@@ -671,6 +693,7 @@ namespace SanyaPlugin
 			}
 		}
 		*/
+
 #endregion A regler
 		public void OnPlayerSetClass(ChangingRoleEventArgs ev)
 		{
@@ -698,7 +721,22 @@ namespace SanyaPlugin
 						Methods.AddDeathTimeForScp049(Exiledspec.ReferenceHub);
 				}
 			}
+			//Scp939Extend
+			if (ev.NewRole.Is939())
+			{
+				if (prevMaxAHP == 0) prevMaxAHP = ev.Player.ReferenceHub.playerStats.maxArtificialHealth;
+				ev.Player.ReferenceHub.playerStats.NetworkmaxArtificialHealth = 0;
+				ev.Player.ReferenceHub.playerStats.NetworkartificialHpDecay = 0f;
+				ev.Player.ReferenceHub.playerStats.NetworkartificialNormalRatio = 1f;
+			}
+			else if (ev.Player.ReferenceHub.characterClassManager._prevId.Is939())
+			{
+				ev.Player.ReferenceHub.playerStats.NetworkmaxArtificialHealth = this.prevMaxAHP;
+				ev.Player.ReferenceHub.playerStats.NetworkartificialHpDecay = 0.75f;
+				ev.Player.ReferenceHub.playerStats.NetworkartificialNormalRatio = 0.7f;
+			}
 		}
+	
 
 		public void OnPlayerSpawn(SpawningEventArgs ev)
 		{
@@ -856,8 +894,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.instance.Config.CassieSubtitle
 				&& ev.Target.Team == Team.SCP
-				&& ev.Target.Role != RoleType.Scp0492
-				&& ev.Target.Role != RoleType.Scp079)
+				&& ev.Target.Role != RoleType.Scp0492)
 			{
 				string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
 				string str;
@@ -998,16 +1035,30 @@ namespace SanyaPlugin
 		{
 			Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item}");
 
-			if (ev.Item == ItemType.Medkit || ev.Item == ItemType.SCP500)
+			if (ev.Item == ItemType.Medkit)
+			{
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+			}
+			if (ev.Item == ItemType.Adrenaline)
+			{
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Panic>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
+			}
+			if (ev.Item == ItemType.SCP500)
 			{
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Poisoned>();
 			}
 		}
 
 		public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
 		{
+			Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}");
 			if (SanyaPlugin.instance.Config.TeslaTriggerableTeams.Count == 0
 				|| SanyaPlugin.instance.Config.TeslaTriggerableTeams.Contains(ev.Player.Team))
 			{
@@ -1184,11 +1235,11 @@ namespace SanyaPlugin
 		}
 	public void On079LevelGain(GainingLevelEventArgs ev)
 		{
-			Log.Debug($"[On079LevelGain] {ev.Player.Nickname}");
+			Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}");
 
 			if (SanyaPlugin.instance.Config.Scp079ExtendEnabled)
 			{
-				switch (ev.OldLevel)
+				switch (ev.NewLevel)
 				{
 					case 1:
 						ev.Player.ReferenceHub.SendTextHint(Subtitles.Extend079Lv2, 10);
@@ -1377,33 +1428,15 @@ namespace SanyaPlugin
 										{
 											int seconds = (int)Mathf.RoundToInt(duration % 60);
 											int minutes = (int)Mathf.RoundToInt(duration / 60);
-											if (seconds == 0)
-											{ 
-											RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence activated in t minus {duration / 60} minutes", false, false);
-											}
-											else if (minutes == 0)
-											{
-											RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence activated in t minus {duration % 60} seconds", false, false);
-											}
-											else
-											{
-											RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence activated in t minus {duration / 60} minutes and {duration % 60} seconds", false, false);
-											}
-											ReturnStr = $"The AirBombing Start in {duration} and the AirBombing stop in {duration2}";
-											Timing.WaitForSeconds(duration);
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
-											ReturnStr = $"The AirBombing start and stop in {duration2}";
-											Timing.WaitForSeconds(duration2);
-											Coroutines.isAirBombGoing = false;
-											ReturnStr = "The AirBombing has been stop!";
+
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration, duration2)));
+											ReturnStr = $"The AirBombing start in {minutes} : {seconds} and stop in {duration2}";
 											break;
 										}
 										else
 										{
 											RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence activated in t minus {duration / 60} minutes", false, false);
-											ReturnStr = $"The AirBombing Start in {duration}";
-											Timing.WaitForSeconds(duration);
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration, -1)));
 											ReturnStr = "Started!";
 											break;
 										}

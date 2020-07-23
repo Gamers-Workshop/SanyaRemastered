@@ -139,9 +139,12 @@ namespace SanyaRemastered
 		[Description("% de chance de blink quand on lui tire dessus")]
 		public int Scp173ForceBlinkPercent { get; set; } = -1;
 
-		[Description("SCP-939 effet d'hémoragie")]
+		[Description("SCP-939 Patches")]
 		public bool Scp939AttackBleeding { get; set; } = true;
 		public float Scp939AttackBleedingTime { get; set; } = 60f;
+		public int Scp939SeeingAhpAmount { get; set; } = -1;
+		public bool Scp939CanSeeVoiceChatting { get; set; } = false;
+
 
 		[Description("Recovery Amount")]
 		public int Scp096RecoveryAmount { get; set; } = 0;

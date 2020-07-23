@@ -358,9 +358,10 @@ namespace SanyaPlugin.Functions
 			yield break;
 		}
 
-		public static IEnumerator<float> AirSupportBomb(int waitforready = 5, int limit = -1)
+		public static IEnumerator<float> AirSupportBomb(float waitforready = 5,float TimeEnd = -1,int limit = -1)
 		{
 			Log.Info($"[AirSupportBomb] booting...");
+
 			if (isAirBombGoing)
 			{
 				Log.Info($"[Airbomb] already booted, cancel.");
@@ -370,11 +371,10 @@ namespace SanyaPlugin.Functions
 			{
 				isAirBombGoing = true;
 			}
-
+			RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
 			if (SanyaPlugin.instance.Config.CassieSubtitle)
 			{
 				Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
-				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
 				yield return Timing.WaitForSeconds(5f);
 			}
 
@@ -388,6 +388,7 @@ namespace SanyaPlugin.Functions
 
 			Log.Info($"[AirSupportBomb] throwing...");
 			int throwcount = 0;
+			float TimeBombing = 0f;
 			while (isAirBombGoing)
 			{
 				List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
@@ -397,8 +398,24 @@ namespace SanyaPlugin.Functions
 					yield return Timing.WaitForSeconds(0.1f);
 				}
 				throwcount++;
+				if (TimeEnd != -1)
+				{
+					{
+						int d = 0;
+						while (true)
+						{
+							d++;
+							Console.WriteLine(d);
+						}
+					}
+				}
 				Log.Info($"[AirSupportBomb] throwcount:{throwcount}");
 				if (limit != -1 && limit <= throwcount)
+				{
+					isAirBombGoing = false;
+					break;
+				}
+				if (TimeEnd != -1 && TimeEnd < TimeBombing)
 				{
 					isAirBombGoing = false;
 					break;
@@ -409,9 +426,8 @@ namespace SanyaPlugin.Functions
 			if (SanyaPlugin.instance.Config.CassieSubtitle)
 			{
 				Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
-				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 			}
-
+			RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 			Log.Info($"[AirSupportBomb] Ended.");
 			yield break;
 		}

@@ -129,7 +129,7 @@ public static class Scp079CameraPatch
 		return true;
 	}
 }
-
+/*
 //SCP-079Extend Sprint 
 [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 public static class Scp079InteractPatch
@@ -213,7 +213,7 @@ public static class Scp079InteractPatch
 						if (!locked) locked = door._checkpointLockOpen;
 						if (!locked) locked = door._checkpointLockOpenDecont;
 						if (!locked) locked = door._checkpointLockOpenWarhead;
-					}*/
+					}*//*
 
 					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
 			if (room == null || room.Name.StartsWith("EZ") || locked)
@@ -278,7 +278,7 @@ public static class Scp079InteractPatch
 					}
 				}
 			}
-		}*/
+		}*//*
 
 		List<Door> doors = Exiled.API.Features.Map.Doors.FindAll((d) => Vector3.Distance(d.transform.position, room.Position) <= 0.5f);
 		foreach (var item in doors)
@@ -363,4 +363,4 @@ public static class Scp079InteractPatch
 
 		return new Room(transform.name, transform, transform.position);
 	}
-}
+}*/
