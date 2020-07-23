@@ -225,7 +225,16 @@
 			"《Danger ! Le site est compromis, lancement d'un bombardement sur lancement du site, \n le bombardement est inévitable !》\n",
 			"</size></color>"
 		);
-
+		internal static readonly string AirbombStartingWait30s = string.Concat(
+			"<color=#ff0000><size=25>",
+			"《Danger ! Le site vas recevoir un bombardement aérien dans t-moins 30 seconds !》\n",
+			"</size></color>"
+		);
+		internal static readonly string AirbombStartingWaitMinutes = string.Concat(
+			"<color=#ff0000><size=25>",
+			"《Danger ! Le site vas recevoir un bombardement aérien dans t-moins {0} minutes !》\n",
+			"</size></color>"
+		);
 		internal static readonly string AirbombEnded = string.Concat(
 			"<color=#ff0000><size=25>",
 			"《Le bombardement de l'ensemble du site à été effectué et c'est terminé avec succès !》\n",

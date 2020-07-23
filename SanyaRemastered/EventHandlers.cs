@@ -117,16 +117,7 @@ namespace SanyaPlugin
 			{
 				try
 				{
-					//自動空爆
-					if (SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke > 0
-						&& detonatedDuration != -1
-						&& RoundSummary.roundTime > (SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke+ detonatedDuration))
-					{
-						roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
-						detonatedDuration = -1;
-					}
-
-					//寝返り
+					//Traitre
 					if (SanyaPlugin.instance.Config.TraitorLimit > 0)
 					{
 						foreach (var player in Player.List)
@@ -480,9 +471,11 @@ namespace SanyaPlugin
 		{
 			Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}");
 
-			detonatedDuration = RoundSummary.roundTime;
+			if (SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke != 0)
+			{ 
+			roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(SanyaPlugin.instance.Config.OutsidezoneTerminationTimeAfterNuke)));
+			}
 		}
-
 		public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
 		{
 			Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}");
@@ -1422,22 +1415,18 @@ namespace SanyaPlugin
 								}
 								if (args.Length > 2)
 								{
-									if (float.TryParse(args[2], out float duration))
+									if (int.TryParse(args[2], out int duration))
 									{
-										if (float.TryParse(args[3], out float duration2))
+										if (int.TryParse(args[3], out int duration2))
 										{
-											int seconds = (int)Mathf.RoundToInt(duration % 60);
-											int minutes = (int)Mathf.RoundToInt(duration / 60);
-
 											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration, duration2)));
-											ReturnStr = $"The AirBombing start in {minutes} : {seconds} and stop in {duration2}";
+											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60} and stop in {duration2 / 60}:{duration2 % 60:00}";
 											break;
 										}
 										else
 										{
-											RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence activated in t minus {duration / 60} minutes", false, false);
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration, -1)));
-											ReturnStr = "Started!";
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(duration)));
+											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 											break;
 										}
 									}
@@ -1466,7 +1455,6 @@ namespace SanyaPlugin
 								Coroutines.isAirBombGoing = false;
 								break;
 							}
-
 						case "914":
 							{
 								if (!perm.CheckPermission("sanya.914"))

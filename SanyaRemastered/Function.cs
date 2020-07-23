@@ -21,6 +21,7 @@ using Utf8Json;
 using Respawning;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
+using System.Threading;
 
 namespace SanyaPlugin.Functions
 {
@@ -358,78 +359,81 @@ namespace SanyaPlugin.Functions
 			yield break;
 		}
 
-		public static IEnumerator<float> AirSupportBomb(float waitforready = 5,float TimeEnd = -1,int limit = -1)
+		public static IEnumerator<float> AirSupportBomb(float timewait = 0,float TimeEnd = -1, int waitforready = 5)
 		{
-			Log.Info($"[AirSupportBomb] booting...");
-
-			if (isAirBombGoing)
+			while (timewait >= 0)
 			{
-				Log.Info($"[Airbomb] already booted, cancel.");
-				yield break;
-			}
-			else
-			{
-				isAirBombGoing = true;
-			}
-			RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
-			if (SanyaPlugin.instance.Config.CassieSubtitle)
-			{
-				Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
-				yield return Timing.WaitForSeconds(5f);
-			}
-
-			Log.Info($"[AirSupportBomb] charging...");
-			while (waitforready > 0)
-			{
-				Methods.PlayAmbientSound(7);
-				waitforready--;
-				yield return Timing.WaitForSeconds(1f);
-			}
-
-			Log.Info($"[AirSupportBomb] throwing...");
-			int throwcount = 0;
-			float TimeBombing = 0f;
-			while (isAirBombGoing)
-			{
-				List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
-				foreach (var pos in randampos)
+				if (timewait == 60f || timewait == 120f || timewait == 300f || timewait == 600f || timewait == 1800f || timewait == 3600f)
 				{
-					Methods.SpawnGrenade(pos, false, 0.1f);
-					yield return Timing.WaitForSeconds(0.1f);
-				}
-				throwcount++;
-				if (TimeEnd != -1)
-				{
+					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {(int)timewait / 60} minutes .", false, true);
+					if (SanyaPlugin.instance.Config.CassieSubtitle)
 					{
-						int d = 0;
-						while (true)
-						{
-							d++;
-							Console.WriteLine(d);
-						}
+						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", ((int)timewait / 60).ToString()), 10);
 					}
 				}
-				Log.Info($"[AirSupportBomb] throwcount:{throwcount}");
-				if (limit != -1 && limit <= throwcount)
+				if (timewait == 30f)
 				{
-					isAirBombGoing = false;
-					break;
+					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", false, true);
+					if (SanyaPlugin.instance.Config.CassieSubtitle)
+					{
+						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
+					}
 				}
-				if (TimeEnd != -1 && TimeEnd < TimeBombing)
+				yield return Timing.WaitForSeconds(timewait);
+				Log.Info($"[AirSupportBomb] booting...");
+				if (isAirBombGoing)
 				{
-					isAirBombGoing = false;
-					break;
+					Log.Info($"[Airbomb] already booted, cancel.");
+					yield break;
 				}
-				yield return Timing.WaitForSeconds(0.25f);
-			}
+				else
+				{
+					isAirBombGoing = true;
+				}
+				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
+				if (SanyaPlugin.instance.Config.CassieSubtitle)
+				{
+					Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
+				}
+				yield return Timing.WaitForSeconds(5f);
+				Log.Info($"[AirSupportBomb] charging...");
+				while (waitforready >= 0)
+				{
+					Methods.PlayAmbientSound(7);
+					waitforready--;
+					yield return Timing.WaitForSeconds(1f);
+				}
 
-			if (SanyaPlugin.instance.Config.CassieSubtitle)
-			{
-				Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
+				Log.Info($"[AirSupportBomb] throwing...");
+				while (isAirBombGoing)
+				{
+					List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
+					foreach (var pos in randampos)
+					{
+						Methods.SpawnGrenade(pos, false, 0.1f);
+						yield return Timing.WaitForSeconds(0.05f);
+					}
+					if (TimeEnd != -1)
+					{
+						float TimeBombing = 0;
+						TimeBombing += Time.deltaTime;
+						if (TimeBombing <= TimeEnd)
+						{
+							Log.Info($"[AirSupportBomb] TimeBombing:{TimeBombing}");
+							isAirBombGoing = false;
+							break;
+						}
+					}
+					yield return Timing.WaitForSeconds(0.25f);
+				}
+				if (SanyaPlugin.instance.Config.CassieSubtitle)
+				{
+					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
+				}
+				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
+				Log.Info($"[AirSupportBomb] Ended.");
+				yield break;
 			}
-			RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
-			Log.Info($"[AirSupportBomb] Ended.");
-			yield break;
 		}
 	}
 	internal static class Methods
