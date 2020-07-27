@@ -69,31 +69,31 @@ namespace SanyaRemastered
 		
 		[Description("Generator Config")]
 		public bool GeneratorUnlockOpen { get; set; } = false;
-		public bool GeneratorFinishLock { get; set; } = true;
-		public bool GeneratorActivatingClose { get; set; } = true;
+		public bool GeneratorFinishLock { get; set; } = false;
+		public bool GeneratorActivatingClose { get; set; } = false;
 		
 		[Description("Game Config")]
-		public bool Item_shoot_move { get; set; } = true;
+		public bool Item_shoot_move { get; set; } = false;
 		public bool Grenade_shoot_fuse { get; set; } = true;
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
-		public bool StopRespawnAfterDetonated { get; set; } = true;
-		public bool GodmodeAfterEndround { get; set; } = true;
-		public bool InventoryKeycardActivation { get; set; } = true;
-		public bool CassieSubtitle { get; set; } = true;
-		public bool IntercomInformation { get; set; } = true;
-		public bool CloseDoorsOnNukecancel { get; set; } = true;
-		public bool Scp049_add_time_res_success { get; set; } = true;
-		public bool Scp049_2DontOpenDoorAnd106 { get; set; } = true;
-		public bool Scp939And096DontOpenlockerAndGenerator { get; set; } = true;
-		public bool GrenadeEffect { get; set; } = true;
+		public bool StopRespawnAfterDetonated { get; set; } = false;
+		public bool GodmodeAfterEndround { get; set; } = false;
+		public bool InventoryKeycardActivation { get; set; } = false;
+		public bool CassieSubtitle { get; set; } = false;
+		public bool IntercomInformation { get; set; } = false;
+		public bool CloseDoorsOnNukecancel { get; set; } = false;
+		public bool Scp049_add_time_res_success { get; set; } = false;
+		public bool Scp049_2DontOpenDoorAnd106 { get; set; } = false;
+		public bool Scp939And096DontOpenlockerAndGenerator { get; set; } = false;
+		public bool GrenadeEffect { get; set; } = false;
 
 		[Description("Corosion sur les tache de SCP-106 WIP")]
-		public bool Coroding106 { get; set; } = true;
+		public bool Coroding106 { get; set; } = false;
 		[Description("SCP-914 = Effect")]
-		public bool Scp914Effect { get; set; } = true;
+		public bool Scp914Effect { get; set; } = false;
 
 		[Description("ClassD Contain")]
-		public bool ClassD_container_locked { get; set; } = true;
+		public bool ClassD_container_locked { get; set; } = false;
 		public float ClassD_container_Unlocked { get; set; } = 10f;
 
 		[Description("Disable Chat")]
@@ -102,13 +102,13 @@ namespace SanyaRemastered
 		public bool DisableChatBypassWhitelist { get; set; } = false;
 
 		[Description("Stamina Add")]
-		public bool StaminaEffect { get; set; } = true;
+		public bool StaminaEffect { get; set; } = false;
 		public float StaminaLostJump { get; set; } = 0.05f;
 		public float StaminaLostLogicer { get; set; } = 0.001f;
 
 		[Description("Hitmark Add")]
-		public bool HitmarkGrenade { get; set; } = true;
-		public bool HitmarkKilled { get; set; } = true;
+		public bool HitmarkGrenade { get; set; } = false;
+		public bool HitmarkKilled { get; set; } = false;
 
 		[Description("Dégats Usp")]
 		public int TraitorLimit { get; set; } = -1;
@@ -137,14 +137,14 @@ namespace SanyaRemastered
 
 		[Description("Config de SCP-018")]
 		public float Scp018DamageMultiplier { get; set; } = 1f;
-		public bool Scp018FriendlyFire { get; set; } = true;
+		public bool Scp018FriendlyFire { get; set; } = false;
 		public bool Scp018CantDestroyObject { get; set; } = false;
 
 		[Description("% de chance de blink quand on lui tire dessus")]
 		public int Scp173ForceBlinkPercent { get; set; } = -1;
 
 		[Description("SCP-939 Patches")]
-		public bool Scp939AttackBleeding { get; set; } = true;
+		public bool Scp939AttackBleeding { get; set; } = false;
 		public float Scp939AttackBleedingTime { get; set; } = 60f;
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
 		
@@ -169,7 +169,7 @@ namespace SanyaRemastered
 		
 
 		[Description("SCP-079 Activé le mode Etendue de 079")]
-		public bool Scp079ExtendEnabled { get; set; } = true;
+		public bool Scp079ExtendEnabled { get; set; } = false;
 		
 		[Description("SCP-079 Config Plugin \n# Pour désactivé une capacité Scp079ExtendLevel = 6")]
 		public int Scp079ExtendLevelFindscp { get; set; } = 1;

@@ -129,14 +129,14 @@ public static class Scp079CameraPatch
 		return true;
 	}
 }
-/*
+
 //SCP-079Extend Sprint 
-[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 public static class Scp079InteractPatch
 {
 	public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
 	{
-		if (!SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendEnabled) return true;
+		if (!SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendEnabled) return true;
 
 		var player = Player.Dictionary[__instance.gameObject];
 		Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command}");
@@ -145,23 +145,23 @@ public static class Scp079InteractPatch
 		
 		if (command.Contains("LOCKDOWN:"))
 		{
-		__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz, __instance.curMana);
+		__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz, __instance.curMana);
 			foreach (GameObject Player in PlayerManager.players)
 		{
 			{
-			if (player.ReferenceHub.scp079PlayerScript.NetworkcurLvl <= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_level_gaz)
+			if (player.ReferenceHub.scp079PlayerScript.NetworkcurLvl <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
 				break;
 			}
-			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana <= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz)
+			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
 				break;
 			}
-			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana >= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz)
+			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
 			{
-				player.ReferenceHub.scp079PlayerScript.NetworkcurMana -= SanyaPlugin.SanyaPlugin.instance.Config.scp079_ex_cost_gaz;
+				player.ReferenceHub.scp079PlayerScript.NetworkcurMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
 			}
 			else
 			{
@@ -200,7 +200,7 @@ public static class Scp079InteractPatch
 							&& !door._checkpointLockOpenWarhead)
 							locked = false;
                     }
-				/*
+				*//*
 				foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
 					{
 						if (!locked) locked = door._prevDestroyed;
@@ -238,11 +238,11 @@ public static class Scp079InteractPatch
 	}
 	if (command.Contains("DOOR:"))
 	{
-			if (__instance.curLvl + 1 <= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelDoorbeep)
+			if (__instance.curLvl + 1 <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
 			{
-				if (SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelDoorbeep > __instance.curMana)
+				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep > __instance.curMana)
 				{
-					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
+					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
 					return false;
 				}
 				var door = target.GetComponent<Door>();
@@ -250,7 +250,7 @@ public static class Scp079InteractPatch
 				{
 					player.ReferenceHub.playerInteract.RpcDenied(target);
 					door.curCooldown = 0.5f;
-					__instance.Mana -= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendCostDoorbeep;
+					__instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
 				}
 				return false;
 			}
@@ -259,7 +259,7 @@ public static class Scp079InteractPatch
 	}
 	
 	private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
-	{/*
+	{*//*
 		string str = ".g4 ";
 		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
 		{
@@ -287,7 +287,7 @@ public static class Scp079InteractPatch
 			item.NetworkisOpen = true;
 		}
 		
-		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
+		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i--)
 		{
 			foreach (var ply in PlayerManager.players)
 			{
@@ -320,7 +320,7 @@ public static class Scp079InteractPatch
 				player.Broadcast(5, Subtitles.ExtendGazActive, Broadcast.BroadcastFlags.Normal);
 			}
 		}
-		for (int i = 0; i < SanyaPlugin.SanyaPlugin.instance.Config.TimerWaitGas * 2; i++)
+		for (int i = 0; i < SanyaPlugin.SanyaPlugin.Instance.Config.TimerWaitGas * 2; i++)
 		{
 			foreach (var ply in PlayerManager.players)
 			{
@@ -330,7 +330,7 @@ public static class Scp079InteractPatch
 					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(20f, "GAS", DamageTypes.Poison, 0), player.GameObject);
 					if (player.Role == RoleType.Spectator)
 					{
-						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.instance.Config.GasExpGain);
+						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.Instance.Config.GasExpGain);
 					}
 				}
 			}

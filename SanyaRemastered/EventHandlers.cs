@@ -34,7 +34,7 @@ namespace SanyaPlugin
 		/** Infosender **/
 		private readonly UdpClient udpClient = new UdpClient();
 		internal Task sendertask;
-		private bool senderdisabled = false;
+		private bool Senderdisabled = false;
 		internal async Task SenderAsync()
 		{
 			Log.Debug($"[Infosender_Task] Started.");
@@ -46,7 +46,7 @@ namespace SanyaPlugin
 					if (SanyaPlugin.Instance.Config.InfosenderIp == "none")
 					{
 						Log.Info($"[Infosender_Task] Disabled(config:({SanyaPlugin.Instance.Config.InfosenderIp}). breaked.");
-						senderdisabled = true;
+						Senderdisabled = true;
 						break;
 					}
 
@@ -302,9 +302,31 @@ namespace SanyaPlugin
 					tesla.sizeOfTrigger = SanyaPlugin.Instance.Config.TeslaRange;
 				}
 			}
-
-			if (ReferenceHub.Hubs.ContainsKey(PlayerManager.localPlayer)) ReferenceHub.Hubs.Remove(PlayerManager.localPlayer);
-
+		
+			switch (eventmode)
+			{
+				case SANYA_GAME_MODE.NIGHT:
+					{
+						break;
+					}
+				case SANYA_GAME_MODE.CLASSD_INSURGENCY:
+					{
+						foreach (var room in Map.Rooms)
+						{
+							if (room.Name == "LCZ_Armory")
+							{
+								LCZArmoryPos = room.Position + new Vector3(0, 2, 0);
+							}
+						}
+						break;
+					}
+				default:
+					{
+						eventmode = SANYA_GAME_MODE.NORMAL;
+						break;
+					}
+			}
+			
 			Log.Info($"[OnWaintingForPlayers] Waiting for Players... EventMode:{eventmode}");
 		}
 
@@ -312,19 +334,16 @@ namespace SanyaPlugin
 		{
 			Log.Info($"[OnRoundStart] Round Start!");
 
-			switch (eventmode)
-			{
-				case SANYA_GAME_MODE.NIGHT:
-					{
-						IsEnableBlackout = true;
-						roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartNightMode()));
-						break;
-					}
-			}
 			if (SanyaPlugin.Instance.Config.ClassD_container_locked)
 			{
 				Coroutines.StartContainClassD();
 			}
+			if (eventmode == SANYA_GAME_MODE.NIGHT)
+			{
+				IsEnableBlackout = true;
+				roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartNightMode()));					
+			}
+
 		}
 
 		public void OnRoundEnd(RoundEndedEventArgs ev)
@@ -1530,7 +1549,7 @@ namespace SanyaPlugin
 								}
 								else 
 								{
-									IsEnableBlackout = false;
+									IsEnableBlackout = true;
 								}
 								ReturnStr = $"IsEnableBlackout :{IsEnableBlackout}";
 								break;

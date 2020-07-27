@@ -23,25 +23,9 @@ namespace SanyaPlugin
 		public static Random random = new Random();
 		public Dictionary<ReferenceHub, DateTime> cooldowngaz = new Dictionary<ReferenceHub, DateTime>();
 		public SanyaPlugin() => Instance = this;
-		/*public override string Name => "SanyaPlugin";
-		public override string Prefix => "sanya";
-		public override string Author => "sanyae2439";
-		public override PluginPriority Priority => PluginPriority.Default;
-		public override Version Version => new Version(2, 3, 0);
-		public override Version RequiredExiledVersion => new Version(2, 0, 7);
 
-		public static SanyaPlugin instance { get; private set; }
-		public EventHandlers Handlers { get; private set; }
-		public Harmony Harmony { get; private set; }
-		public Random Random { get; } = new Random();
-		private int patchCounter;
-
-		public SanyaPlugin() => instance = this;*/
 		public override void OnEnabled()
 		{
-
-			
-
 			//Config = new SanyaRemastered.Configs();
 			if (Config.KickVpn) ShitChecker.LoadLists();
 
