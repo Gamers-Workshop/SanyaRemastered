@@ -14,10 +14,10 @@ namespace SanyaRemastered.Patches
 		public static bool draw = true;
 		public static bool Prefix(Intercom __instance)
 		{	
-		if (!SanyaPlugin.SanyaPlugin.instance.Config.IntercomInformation) return true;
+		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return true;
 			{
 				RespawnManager respawn = RespawnManager.Singleton;
-				int nextRespawn = (int)Math.Truncate(-1f);
+				int nextRespawn = (int)Math.Truncate(respawn._timeForNextSequence);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
 				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
@@ -50,40 +50,40 @@ namespace SanyaRemastered.Patches
 				{
 					if (isAlreadyUsed)
 					{
-						contentfix = contentfix + string.Concat($"Statut du briseur de fémur : Utilisé\n");
+						contentfix += string.Concat($"Statut du briseur de fémur : Utilisé\n");
 					}
 					else
 					{
-						contentfix = contentfix + string.Concat($"<color=#ff0000>Statut du briseur de fémur : Prêt</color>\n");
+						contentfix += string.Concat($"<color=#ff0000>Statut du briseur de fémur : Prêt</color>\n");
 					}
 				}
 				else
 				{
-					contentfix = contentfix + string.Concat($"Statut du briseur de fémur : Vide\n");
+					contentfix += string.Concat($"Statut du briseur de fémur : Vide\n");
 				}
 
 				//warhead
 				if (TimeWarhead < 10)
 				{
-					contentfix = contentfix + string.Concat($"<color=#ff0000>Détonation inévitable : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
+					contentfix += string.Concat($"<color=#ff0000>Détonation inévitable : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
 				}
 				else if (AlphaWarheadOutsitePanel._host.inProgress)
 				{
-					contentfix = contentfix + string.Concat($"<color=#ff0000>Explosion de l'Alpha Warhead : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
+					contentfix += string.Concat($"<color=#ff0000>Explosion de l'Alpha Warhead : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
 				}
 				else
 				{
 					if (!AlphaWarheadOutsitePanel.nukeside.Networkenabled)
 					{
-						contentfix = contentfix + string.Concat($"Statut de l'Alpha Warhead : DÉSACTIVÉE\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : DÉSACTIVÉE\n");
 					}
 					else if (isresumed)
 					{
-						contentfix = contentfix + string.Concat($"Statut de l'Alpha Warhead : Redémarrage du Système\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : Redémarrage du Système\n");
 					}
 					else
 					{
-						contentfix = contentfix + string.Concat($"Statut de l'Alpha Warhead : PRÊTE\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : PRÊTE\n");
 					}
 				}
 
@@ -100,7 +100,7 @@ namespace SanyaRemastered.Patches
 					else
 					{ 
 					IntercomUpdateTextPatches.time -= Time.deltaTime;
-					contentfix = contentfix + string.Concat($"<color=#ff0000>Surcharge du site : "+minutes+":"+seconds+"</color>\n");
+					contentfix += string.Concat($"<color=#ff0000>Surcharge du site : "+minutes+":"+seconds+"</color>\n");
 					}
 				}
 				else
@@ -111,19 +111,19 @@ namespace SanyaRemastered.Patches
 				if (totalvoltagefloat == 5000 && IntercomUpdateTextPatches.draw == true)
 				{
 
-					contentfix = contentfix + string.Concat("Tous les générateurs du site sont activés\n");
+					contentfix += string.Concat("Tous les générateurs du site sont activés\n");
 					IntercomUpdateTextPatches.draw = false;
 				}
 				else if (totalvoltagefloat != 5000)
 				{
-					contentfix = contentfix + string.Concat($"Puissance des générateurs : {totalvoltagefloat:0000}KVA\n");
+					contentfix += string.Concat($"Puissance des générateurs : {totalvoltagefloat:0000}KVA\n");
 				}
 
 				//décontamination
 				if (!DecontaminationController.Singleton._decontaminationBegun)
 				{
 					{
-						contentfix = contentfix + string.Concat($"La décontamination de la LCZ vas étre effectué\n");
+						contentfix += string.Concat($"La décontamination de la LCZ vas étre effectué\n");
 					}
 					/*if (decont >= 30)
 						{
@@ -136,19 +136,19 @@ namespace SanyaRemastered.Patches
 				}
 				else if (DecontaminationController.Singleton._decontaminationBegun)
 				{
-					contentfix = contentfix + string.Concat($"La décontamination de la LCZ a été effectué\n");
+					contentfix += string.Concat($"La décontamination de la LCZ a été effectué\n");
 				}
 
 				//Prochain spawn + durée MTF
 
 				if (!SpawnCI)
-					contentfix = contentfix + string.Concat($"Prochains renforts MTF : {nextRespawn / 60:00}:{nextRespawn % 60:00}\n");
+					contentfix += string.Concat($"Prochains renforts MTF : {nextRespawn / 60:00}:{nextRespawn % 60:00}\n");
 
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
-					contentfix = contentfix + string.Concat($"Aucun renforts prévus pour le site\n");
+					contentfix += string.Concat($"Aucun renforts prévus pour le site\n");
 
 				else
-					contentfix = contentfix + string.Concat($"Les renforts se préparent\n");
+					contentfix += string.Concat($"Les renforts se préparent\n");
 			
 				//Voice intercom
 				if (__instance.Muted)

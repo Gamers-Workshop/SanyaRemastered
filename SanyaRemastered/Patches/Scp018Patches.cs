@@ -13,7 +13,7 @@ namespace SanyaRemastered.Patches
 		public static void Prefix(Grenade __instance, ref Team value)
 		{
 			Log.Debug($"[GrenadeThrowerPatch] value:{value} isscp018:{__instance is Scp018Grenade}");
-			if (SanyaPlugin.SanyaPlugin.instance.Config.Scp018FriendlyFire&& __instance is Scp018Grenade) value = Team.TUT;
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp018FriendlyFire&& __instance is Scp018Grenade) value = Team.TUT;
 		}
 	}
 	[HarmonyPatch(typeof(Scp018Grenade), nameof(Scp018Grenade.OnSpeedCollisionEnter))]
@@ -44,7 +44,7 @@ namespace SanyaRemastered.Patches
 				Collider collider = collision.collider;
 				int num2 = 1 << collider.gameObject.layer;
 
-				if (!SanyaPlugin.SanyaPlugin.instance.Config.Scp018CantDestroyObject)
+				if (!SanyaPlugin.SanyaPlugin.Instance.Config.Scp018CantDestroyObject)
 				{
 					if (num2 == __instance.layerGlass)
 					{
@@ -78,7 +78,7 @@ namespace SanyaRemastered.Patches
 					ReferenceHub componentInParent2 = collider.GetComponentInParent<ReferenceHub>();
 					if (componentInParent2 != null && (ServerConsole.FriendlyFire || componentInParent2.gameObject == __instance.thrower.gameObject || componentInParent2.weaponManager.GetShootPermission(__instance.throwerTeam)))
 					{
-						float num3 = relativeSpeed * __instance.damageHurt * SanyaPlugin.SanyaPlugin.instance.Config.Scp018DamageMultiplier;
+						float num3 = relativeSpeed * __instance.damageHurt * SanyaPlugin.SanyaPlugin.Instance.Config.Scp018DamageMultiplier;
 
 						//componentInParent2.playerStats.ccm.CurClass != RoleType.Scp106 && 
 						if (componentInParent2.playerStats.ccm.Classes.SafeGet(componentInParent2.playerStats.ccm.CurClass).team == Team.SCP)

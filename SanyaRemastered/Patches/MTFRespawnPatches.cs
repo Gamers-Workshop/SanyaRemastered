@@ -16,7 +16,7 @@ namespace SanyaRemastered.Patches
 			if (PlayerManager.localPlayer == null || PlayerManager.localPlayer?.GetComponent<RandomSeedSync>().seed == 0) return;
 			Log.Debug($"[NTFUnitPatch] unit:{regular}");
 
-			if (SanyaPlugin.SanyaPlugin.instance.Config.CassieSubtitle)
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.CassieSubtitle)
 			{
 				int SCPCount = 0;
 				foreach (Player i in Player.List)
@@ -44,7 +44,7 @@ namespace SanyaRemastered.Patches
 		public static bool Prefix(RespawnEffectsController.EffectType type, SpawnableTeamType team)
 		{
 			Log.Debug($"[RespawnEffectPatch] {type}:{team}");
-			if (SanyaPlugin.SanyaPlugin.instance.Config.StopRespawnAfterDetonated&& AlphaWarheadController.Host.detonated && type == RespawnEffectsController.EffectType.Selection) return false;
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated && type == RespawnEffectsController.EffectType.Selection) return false;
 			else return true;
 		}
 	}

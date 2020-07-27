@@ -19,11 +19,10 @@ namespace SanyaRemastered
 
 		[Description("WIP")]
 		public bool Scp106PortalExtensionEnabled { get; set; } = false;
-		public bool scp079_spot { get; set; } = false;
-		public bool Coroding106 { get; set; } = false;
-		public bool PainEffect { get; set; } = false;
+		public bool Scp079_spot { get; set; } = false;
 		public float PainEffectStart { get; set; } = 20f;
-			
+		public bool Scp939CanSeeVoiceChatting { get; set; } = false;
+
 		[Description("Activation des données des joueurs")]
 		public bool DataEnabled { get; set; } = false;
 
@@ -45,7 +44,7 @@ namespace SanyaRemastered
 		public int LevelExpDeath { get; set; } = 1;
 		public int LevelExpWin { get; set; } = 10;
 		public int LevelExpLose { get; set; } = 1;
-		public int level_exp_other { get; set; } = 0;
+		public int Level_exp_other { get; set; } = 0;
 
 		[Description("Event Du Sanya")]
 		public List<int> EventModeWeight { get; set; } = new List<int>() { 0, 0, 0 };
@@ -74,8 +73,8 @@ namespace SanyaRemastered
 		public bool GeneratorActivatingClose { get; set; } = true;
 		
 		[Description("Game Config")]
-		public bool item_shoot_move { get; set; } = true;
-		public bool grenade_shoot_fuse { get; set; } = true;
+		public bool Item_shoot_move { get; set; } = true;
+		public bool Grenade_shoot_fuse { get; set; } = true;
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
 		public bool StopRespawnAfterDetonated { get; set; } = true;
 		public bool GodmodeAfterEndround { get; set; } = true;
@@ -83,11 +82,19 @@ namespace SanyaRemastered
 		public bool CassieSubtitle { get; set; } = true;
 		public bool IntercomInformation { get; set; } = true;
 		public bool CloseDoorsOnNukecancel { get; set; } = true;
-		public bool scp049_add_time_res_success { get; set; } = true;
+		public bool Scp049_add_time_res_success { get; set; } = true;
+		public bool Scp049_2DontOpenDoorAnd106 { get; set; } = true;
+		public bool Scp939And096DontOpenlockerAndGenerator { get; set; } = true;
+		public bool GrenadeEffect { get; set; } = true;
+
+		[Description("Corosion sur les tache de SCP-106 WIP")]
+		public bool Coroding106 { get; set; } = true;
+		[Description("SCP-914 = Effect")]
+		public bool Scp914Effect { get; set; } = true;
 
 		[Description("ClassD Contain")]
-		public bool classd_container_locked { get; set; } = true;
-		public float classd_container_Unlocked { get; set; } = 10f;
+		public bool ClassD_container_locked { get; set; } = true;
+		public float ClassD_container_Unlocked { get; set; } = 10f;
 
 		[Description("Disable Chat")]
 		public bool DisableAllChat { get; set; } = false;
@@ -125,11 +132,8 @@ namespace SanyaRemastered
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
 
-		[Description("Multiplication des dommages quand la personne est désarmé")]
-		public float CuffedDamageMultiplier { get; set; } = 1f;
-
-		[Description("SCP-914 = Dead")]
-		public bool Scp914IntakeDeath { get; set; } = true;
+		[Description("Division des dommages quand la personne est désarmé")]
+		public float CuffedDamageDivisor { get; set; } = 1f;
 
 		[Description("Config de SCP-018")]
 		public float Scp018DamageMultiplier { get; set; } = 1f;
@@ -143,9 +147,7 @@ namespace SanyaRemastered
 		public bool Scp939AttackBleeding { get; set; } = true;
 		public float Scp939AttackBleedingTime { get; set; } = 60f;
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
-		public bool Scp939CanSeeVoiceChatting { get; set; } = false;
-
-
+		
 		[Description("Recovery Amount")]
 		public int Scp096RecoveryAmount { get; set; } = 0;
 		public int Scp106RecoveryAmount { get; set; } = 0;
@@ -174,13 +176,14 @@ namespace SanyaRemastered
 		public float Scp079ExtendCostFindscp { get; set; } = 10f;
 		public int Scp079ExtendLevelDoorbeep { get; set; } = 1;
 		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
+
 		[Description("Gas Config")]
-		public string[] gazBlacklistRooms { get; set; } = new string[0];
+		public string[] GazBlacklistRooms { get; set; } = new string[0];
 		public int GasDuration  { get; set; } = 60;
 		public int TimerWaitGas { get; set; } = 60;
 		public int GasExpGain { get; set; } = 2;
-		public float scp079_ex_cost_gaz { get; set; } = 150;
-		public int scp079_ex_level_gaz { get; set; } = 4;
+		public float Scp079_ex_cost_gaz { get; set; } = 150;
+		public int Scp079_ex_level_gaz { get; set; } = 4;
 
 		[Description("SCP-079 Config")]
 		public float Scp079CostCamera { get; set; } = 1f;
@@ -205,12 +208,12 @@ namespace SanyaRemastered
 		public float Scp079CostSpeakerUpdate { get; set; } = 0.8f;
 
 		[Description("Ticket Gain Config")]
-		public int tickets_ci_classd_died_count { get; set; } = 0;
-		public int tickets_mtf_scientist_died_count { get; set; } = 0;
-		public int tickets_mtf_killed_by_scp_count { get; set; } = 0;
-		public int tickets_mtf_classd_killed_count { get; set; } = 0;
-		public int tickets_ci_killed_by_scp_count { get; set; } = 0;
-		public int tickets_ci_scientist_killed_count { get; set; } = 0;
+		public int Tickets_ci_classd_died_count { get; set; } = 0;
+		public int Tickets_mtf_scientist_died_count { get; set; } = 0;
+		public int Tickets_mtf_killed_by_scp_count { get; set; } = 0;
+		public int Tickets_mtf_classd_killed_count { get; set; } = 0;
+		public int Tickets_ci_killed_by_scp_count { get; set; } = 0;
+		public int Tickets_ci_scientist_killed_count { get; set; } = 0;
 
 		public string GetConfigs()
 		{

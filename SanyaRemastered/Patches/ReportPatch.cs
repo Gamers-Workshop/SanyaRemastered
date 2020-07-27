@@ -13,7 +13,7 @@ namespace SanyaRemastered.Patches
 			Player reporter = Player.Dictionary[__instance.gameObject];
 			Log.Debug($"[ReportPatch] Reported:{reported.Nickname} Reason:{reason} Reporter:{reporter.Nickname}");
 
-			if (!string.IsNullOrEmpty(SanyaPlugin.SanyaPlugin.instance.Config.ReportWebhook)
+			if (!string.IsNullOrEmpty(SanyaPlugin.SanyaPlugin.Instance.Config.ReportWebhook)
 				&& !string.IsNullOrEmpty(reporter.UserId)
 				&& !string.IsNullOrEmpty(reported.UserId)
 				&& !notifyGm)

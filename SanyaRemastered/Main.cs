@@ -17,13 +17,26 @@ namespace SanyaPlugin
 		public static readonly string TargetVersion = "1.12.20";
 		public static readonly string DataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Plugins", "SanyaPlugin");
 		//public static SanyaRemastered.Configs Config;
-		public static SanyaPlugin instance { get; private set; }
+		public static SanyaPlugin Instance { get; private set; }
 		public EventHandlers EventHandlers;
 		public Harmony harmony;
 		public static Random random = new Random();
 		public Dictionary<ReferenceHub, DateTime> cooldowngaz = new Dictionary<ReferenceHub, DateTime>();
-		public SanyaPlugin() => instance = this;
+		public SanyaPlugin() => Instance = this;
+		/*public override string Name => "SanyaPlugin";
+		public override string Prefix => "sanya";
+		public override string Author => "sanyae2439";
+		public override PluginPriority Priority => PluginPriority.Default;
+		public override Version Version => new Version(2, 3, 0);
+		public override Version RequiredExiledVersion => new Version(2, 0, 7);
 
+		public static SanyaPlugin instance { get; private set; }
+		public EventHandlers Handlers { get; private set; }
+		public Harmony Harmony { get; private set; }
+		public Random Random { get; } = new Random();
+		private int patchCounter;
+
+		public SanyaPlugin() => instance = this;*/
 		public override void OnEnabled()
 		{
 
@@ -33,7 +46,6 @@ namespace SanyaPlugin
 			if (Config.KickVpn) ShitChecker.LoadLists();
 
 			EventHandlers = new EventHandlers(this);
-			//Events.CustomEventHandler<Exiled.Events.EventArgs.SendingRemoteAdminCommandEventArgs> += EventHandlers.OnCommand;
 			Handlers.Server.SendingRemoteAdminCommand += EventHandlers.OnRACommand;
 			Handlers.Server.SendingConsoleCommand += EventHandlers.OnCommand;
 			Handlers.Server.WaitingForPlayers += EventHandlers.OnWaintingForPlayers;
@@ -41,19 +53,20 @@ namespace SanyaPlugin
 			Handlers.Server.RoundEnded += EventHandlers.OnRoundEnd;
 			Handlers.Server.RestartingRound += EventHandlers.OnRoundRestart;
 			Handlers.Server.RespawningTeam += EventHandlers.OnTeamRespawn;
-
+			
 			Handlers.Warhead.Starting += EventHandlers.OnWarheadStart;
 			Handlers.Warhead.Stopping += EventHandlers.OnWarheadCancel;
 			Handlers.Warhead.Detonated += EventHandlers.OnDetonated;
-
+			
 			Handlers.Map.AnnouncingDecontamination += EventHandlers.OnAnnounceDecont;
 			Handlers.Map.PlacingDecal += EventHandlers.OnPlacingDecal;
+			Handlers.Map.ExplodingGrenade += EventHandlers.OnExplodingGrenade;
 			Handlers.Map.GeneratorActivated += EventHandlers.OnGeneratorFinish;
-
+			
+			Handlers.Player.InteractingElevator += EventHandlers.OnInteractingElevator;
 			Handlers.Player.PreAuthenticating += EventHandlers.OnPreAuth;
 			Handlers.Player.Joined += EventHandlers.OnPlayerJoin;
 			Handlers.Player.Left += EventHandlers.OnPlayerLeave;
-			//Events.StartItemsEvent += EventHandlers.OnStartItems;
 			Handlers.Player.ChangingRole += EventHandlers.OnPlayerSetClass;
 			Handlers.Player.Spawning += EventHandlers.OnPlayerSpawn;
 			Handlers.Player.Hurting += EventHandlers.OnPlayerHurt;
@@ -64,17 +77,20 @@ namespace SanyaPlugin
 			Handlers.Player.InteractingDoor += EventHandlers.OnPlayerDoorInteract;
 			Handlers.Player.InteractingLocker += EventHandlers.OnPlayerLockerInteract;
 			Handlers.Player.SyncingData += EventHandlers.OnPlayerChangeAnim;
+			
 			Handlers.Player.Shooting += EventHandlers.OnShoot;
 			Handlers.Player.UnlockingGenerator += EventHandlers.OnGeneratorUnlock;
+			Handlers.Player.EjectingGeneratorTablet += EventHandlers.OnEjectingGeneratorTablet;
 			Handlers.Player.OpeningGenerator  += EventHandlers.OnGeneratorOpen;
 			Handlers.Player.ClosingGenerator += EventHandlers.OnGeneratorClose;
 			Handlers.Player.InsertingGeneratorTablet += EventHandlers.OnGeneratorInsert;
+			Handlers.Player.ActivatingWarheadPanel += EventHandlers.OnActivatingWarheadPanel;
 
 			Handlers.Scp106.CreatingPortal += EventHandlers.On106MakePortal;
 			Handlers.Scp106.Teleporting += EventHandlers.On106Teleport;
 			Handlers.Scp079.GainingLevel += EventHandlers.On079LevelGain;
 			Handlers.Scp914.UpgradingItems += EventHandlers.On914Upgrade;
-			
+			Handlers.Scp096.Enraging += EventHandlers.OnEnraging;
 
 			harmony = new HarmonyLib.Harmony(harmonyId);
 			harmony.PatchAll();
@@ -103,15 +119,17 @@ namespace SanyaPlugin
 			Handlers.Server.RoundEnded -= EventHandlers.OnRoundEnd;
 			Handlers.Server.RestartingRound -= EventHandlers.OnRoundRestart;
 			Handlers.Server.RespawningTeam -= EventHandlers.OnTeamRespawn;
-
+			
 			Handlers.Warhead.Starting -= EventHandlers.OnWarheadStart;
 			Handlers.Warhead.Stopping -= EventHandlers.OnWarheadCancel;
 			Handlers.Warhead.Detonated -= EventHandlers.OnDetonated;
-
+			
 			Handlers.Map.AnnouncingDecontamination -= EventHandlers.OnAnnounceDecont;
 			Handlers.Map.PlacingDecal -= EventHandlers.OnPlacingDecal;
+			Handlers.Map.ExplodingGrenade -= EventHandlers.OnExplodingGrenade;
 			Handlers.Map.GeneratorActivated -= EventHandlers.OnGeneratorFinish;
-
+			
+			Handlers.Player.InteractingElevator -= EventHandlers.OnInteractingElevator;
 			Handlers.Player.PreAuthenticating -= EventHandlers.OnPreAuth;
 			Handlers.Player.Joined -= EventHandlers.OnPlayerJoin;
 			Handlers.Player.Left -= EventHandlers.OnPlayerLeave;
@@ -123,19 +141,22 @@ namespace SanyaPlugin
 			Handlers.Player.MedicalItemUsed -= EventHandlers.OnPlayerUsedMedicalItem;
 			Handlers.Player.TriggeringTesla -= EventHandlers.OnPlayerTriggerTesla;
 			Handlers.Player.InteractingDoor -= EventHandlers.OnPlayerDoorInteract;
-			Handlers.Player.Shooting -= EventHandlers.OnShoot;
 			Handlers.Player.InteractingLocker -= EventHandlers.OnPlayerLockerInteract;
+			
+			Handlers.Player.Shooting -= EventHandlers.OnShoot;
 			Handlers.Player.SyncingData -= EventHandlers.OnPlayerChangeAnim;
 			Handlers.Player.UnlockingGenerator -= EventHandlers.OnGeneratorUnlock;
 			Handlers.Player.OpeningGenerator -= EventHandlers.OnGeneratorOpen;
 			Handlers.Player.ClosingGenerator -= EventHandlers.OnGeneratorClose;
 			Handlers.Player.InsertingGeneratorTablet -= EventHandlers.OnGeneratorInsert;
-
+			Handlers.Player.ActivatingWarheadPanel -= EventHandlers.OnActivatingWarheadPanel;
+			
 			Handlers.Scp106.CreatingPortal -= EventHandlers.On106MakePortal;
 			Handlers.Scp106.Teleporting -= EventHandlers.On106Teleport;
 			Handlers.Scp079.GainingLevel -= EventHandlers.On079LevelGain;
 			Handlers.Scp914.UpgradingItems -= EventHandlers.On914Upgrade;
-			
+			Handlers.Scp096.Enraging -= EventHandlers.OnEnraging;
+
 			EventHandlers = null;
 
 			Log.Info($"[OnDisable] SanyaPlugin({Version}) Disabled.");

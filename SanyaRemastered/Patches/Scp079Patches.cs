@@ -18,64 +18,64 @@ public static class Scp079ManaPatch
 			switch (ability.label)
 			{
 				case "Camera Switch":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostCamera;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostCamera;
 					break;
 				case "Door Lock":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostLock;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLock;
 					break;
 				case "Door Lock Start":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostLockStart;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLockStart;
 					break;
 				case "Door Lock Minimum":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079RequiredLockStart;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079RequiredLockStart;
 					break;
 				case "Door Interaction DEFAULT":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorDefault;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorDefault;
 					break;
 				case "Door Interaction CONT_LVL_1":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorContlv1;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv1;
 					break;
 				case "Door Interaction CONT_LVL_2":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorContlv2;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv2;
 					break;
 				case "Door Interaction CONT_LVL_3":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorContlv3;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv3;
 					break;
 				case "Door Interaction ARMORY_LVL_1":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorArmlv1;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv1;
 					break;
 				case "Door Interaction ARMORY_LVL_2":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorArmlv2;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv2;
 					break;
 				case "Door Interaction ARMORY_LVL_3":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorArmlv3;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv3;
 					break;
 				case "Door Interaction EXIT_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorGate;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorGate;
 					break;
 				case "Door Interaction INCOM_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorIntercom;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorIntercom;
 					break;
 				case "Door Interaction CHCKPOINT_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostDoorCheckpoint;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorCheckpoint;
 					break;
 				case "Room Lockdown":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostLockDown;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLockDown;
 					break;
 				case "Tesla Gate Burst":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostTesla;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostTesla;
 					break;
 				case "Elevator Teleport":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostElevatorTeleport;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostElevatorTeleport;
 					break;
 				case "Elevator Use":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostElevatorUse;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostElevatorUse;
 					break;
 				case "Speaker Start":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostSpeakerStart;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostSpeakerStart;
 					break;
 				case "Speaker Update":
-					ability.mana = SanyaPlugin.SanyaPlugin.instance.Config.Scp079CostSpeakerUpdate;
+					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostSpeakerUpdate;
 					break;
 			}
 		}
@@ -88,13 +88,13 @@ public static class Scp079CameraPatch
 {
 	public static bool Prefix(Scp079PlayerScript __instance, ref ushort cameraId, bool lookatRotation)
 	{
-		if (!SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendEnabled) return true;
+		if (!SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendEnabled) return true;
 
 		Log.Debug($"[Scp079CameraPatch] {cameraId}:{lookatRotation}");
 
 		if (__instance.GetComponent<AnimationController>().curAnim != 1) return true;
 
-		if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendLevelFindscp)
+		if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelFindscp)
 		{
 			List<Camera079> cams = new List<Camera079>();
 			foreach (var ply in Player.List)
@@ -114,14 +114,14 @@ public static class Scp079CameraPatch
 
 			if (target != null)
 			{
-				if (SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendCostFindscp > __instance.curMana)
+				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp > __instance.curMana)
 				{
-					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendCostFindscp, __instance.curMana);
+					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp, __instance.curMana);
 					return false;
 				}
 
 				__instance.RpcSwitchCamera(target.cameraId, lookatRotation);
-				__instance.Mana -= SanyaPlugin.SanyaPlugin.instance.Config.Scp079ExtendCostFindscp;
+				__instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp;
 				__instance.currentCamera = target;
 				return false;
 			}

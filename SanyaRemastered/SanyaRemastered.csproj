@@ -55,51 +55,41 @@
     <Compile Include="Subtitles.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties\NewFile1.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core">
-      <HintPath>..\..\..\CommandSystem.Core.dll</HintPath>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Exiled.API.dll</HintPath>
+    <Reference Include="Exiled.API">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Exiled.Events.dll</HintPath>
+    <Reference Include="Exiled.Events">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Loader, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\CreativeToolbox-master\CreativeToolbox\bin\Debug\Exiled.Loader.dll</HintPath>
+    <Reference Include="Exiled.Loader">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Exiled.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Permissions, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Exiled.Permissions.dll</HintPath>
+    <Reference Include="Exiled.Permissions">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\Exiled.Permissions.dll</HintPath>
     </Reference>
-    <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Mirror.dll</HintPath>
+    <Reference Include="Exiled.Updater">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
-    <Reference Include="Mirror.Authenticators, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Mirror.Authenticators.dll</HintPath>
+    <Reference Include="Mirror">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Mirror.dll</HintPath>
     </Reference>
-    <Reference Include="Mirror.Components, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Mirror.Components.dll</HintPath>
+    <Reference Include="Mirror.Authenticators">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Mirror.Authenticators.dll</HintPath>
+    </Reference>
+    <Reference Include="Mirror.Components">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Mirror.Components.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -121,165 +111,125 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Mathematics, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Unity.Mathematics.dll</HintPath>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Unity.Mathematics.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Unity.TextMeshPro.dll</HintPath>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AccessibilityModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AccessibilityModule.dll</HintPath>
+    <Reference Include="UnityEngine.AccessibilityModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AccessibilityModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AIModule.dll</HintPath>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AndroidJNIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AndroidJNIModule.dll</HintPath>
+    <Reference Include="UnityEngine.AndroidJNIModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AnimationModule.dll</HintPath>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ARModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ARModule.dll</HintPath>
+    <Reference Include="UnityEngine.ARModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ARModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AssetBundleModule.dll</HintPath>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.AudioModule.dll</HintPath>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ClothModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ClothModule.dll</HintPath>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ClusterInputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ClusterInputModule.dll</HintPath>
+    <Reference Include="UnityEngine.ClusterInputModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ClusterInputModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ClusterRendererModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ClusterRendererModule.dll</HintPath>
+    <Reference Include="UnityEngine.ClusterRendererModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ClusterRendererModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CrashReportingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.CrashReportingModule.dll</HintPath>
+    <Reference Include="UnityEngine.CrashReportingModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.CrashReportingModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.DirectorModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.DirectorModule.dll</HintPath>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.DSPGraphModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.DSPGraphModule.dll</HintPath>
+    <Reference Include="UnityEngine.DSPGraphModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.DSPGraphModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.GameCenterModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.GameCenterModule.dll</HintPath>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.GameCenterModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.GridModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.GridModule.dll</HintPath>
+    <Reference Include="UnityEngine.GridModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.GridModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.HotReloadModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.HotReloadModule.dll</HintPath>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.HotReloadModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ImageConversionModule.dll</HintPath>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.IMGUIModule.dll</HintPath>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.InputLegacyModule.dll</HintPath>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.InputModule.dll</HintPath>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.JSONSerializeModule.dll</HintPath>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.LocalizationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.LocalizationModule.dll</HintPath>
+    <Reference Include="UnityEngine.LocalizationModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.LocalizationModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ParticleSystemModule.dll</HintPath>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PerformanceReportingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.PerformanceReportingModule.dll</HintPath>
+    <Reference Include="UnityEngine.PerformanceReportingModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.PerformanceReportingModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.Physics2DModule.dll</HintPath>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.PhysicsModule.dll</HintPath>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ProfilerModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ProfilerModule.dll</HintPath>
+    <Reference Include="UnityEngine.ProfilerModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ProfilerModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.ScreenCaptureModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.ScreenCaptureModule.dll</HintPath>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.SharedInternalsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.SharedInternalsModule.dll</HintPath>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.SpriteMaskModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.SpriteMaskModule.dll</HintPath>
+    <Reference Include="UnityEngine.SpriteMaskModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.SpriteMaskModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.SpriteShapeModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.SpriteShapeModule.dll</HintPath>
+    <Reference Include="UnityEngine.SpriteShapeModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.SpriteShapeModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.StreamingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.StreamingModule.dll</HintPath>
+    <Reference Include="UnityEngine.StreamingModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.StreamingModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.SubstanceModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.SubstanceModule.dll</HintPath>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.SubstanceModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.SubsystemsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.SubsystemsModule.dll</HintPath>
+    <Reference Include="UnityEngine.SubsystemsModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.SubsystemsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TerrainModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.TerrainModule.dll</HintPath>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.TerrainPhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    <Reference Include="YamlDotNet">
+      <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

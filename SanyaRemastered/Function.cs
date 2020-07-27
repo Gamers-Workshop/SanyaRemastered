@@ -143,7 +143,7 @@ namespace SanyaPlugin.Functions
 		public static IEnumerator<float> CheckIsLimitedSteam(string userid)
 		{
 			PlayerData data = null;
-			if (SanyaPlugin.instance.Config.DataEnabled && PlayerDataManager.playersData.TryGetValue(userid, out data) && !data.limited)
+			if (SanyaPlugin.Instance.Config.DataEnabled && PlayerDataManager.playersData.TryGetValue(userid, out data) && !data.limited)
 			{
 				Log.Debug($"[SteamCheck] Already Checked:{userid}");
 				yield break;
@@ -305,7 +305,7 @@ namespace SanyaPlugin.Functions
 				badge = $"Level{level} : {rolestr}";
 			}
 
-			if (SanyaPlugin.instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(Player.Dictionary[player.gameObject].UserId))
+			if (SanyaPlugin.Instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(Player.Dictionary[player.gameObject].UserId))
 			{
 				badge += " : 認証済み";
 			}
@@ -343,7 +343,7 @@ namespace SanyaPlugin.Functions
 		{
 			Log.Debug($"[StartNightMode] Started. Wait for {60}s...");
 			yield return Timing.WaitForSeconds(60f);
-			if (SanyaPlugin.instance.Config.CassieSubtitle)
+			if (SanyaPlugin.Instance.Config.CassieSubtitle)
 			{
 				Methods.SendSubtitle(Subtitles.StartNightMode, 20);
 			}
@@ -358,15 +358,27 @@ namespace SanyaPlugin.Functions
 			microHID.TargetSendHitmarker(false);
 			yield break;
 		}
-
-		public static IEnumerator<float> AirSupportBomb(bool stop = false,float timewait = 0,float TimeEnd = -1, int waitforready = 5)
+		public static IEnumerator<float> StartContainClassD()
+		{
+			foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
+			{
+				if (door.name.Contains("PrisonDoor"))
+				{
+					door.lockdown = true;
+					yield return Timing.WaitForSeconds(SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
+					door.lockdown = false;
+					break;
+				}
+			}
+		}
+		public static IEnumerator<float> AirSupportBomb(bool stop = false,float timewait = 0,float TimeEnd = -1)
 		{
 			while (timewait >= 0)
 			{
 				if (timewait == 60f || timewait == 120f || timewait == 300f || timewait == 600f || timewait == 1800f || timewait == 3600f)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {(int)timewait / 60} minutes .", false, true);
-					if (SanyaPlugin.instance.Config.CassieSubtitle)
+					if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", ((int)timewait / 60).ToString()), 10);
 					}
@@ -374,7 +386,7 @@ namespace SanyaPlugin.Functions
 				if (timewait == 30f)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", false, true);
-					if (SanyaPlugin.instance.Config.CassieSubtitle)
+					if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
@@ -382,7 +394,7 @@ namespace SanyaPlugin.Functions
 				if (stop)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been cancel .", false, true);
-					if (SanyaPlugin.instance.Config.CassieSubtitle)
+					if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStop, 10);
 					}
@@ -402,19 +414,21 @@ namespace SanyaPlugin.Functions
 					isAirBombGoing = true;
 				}
 				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
-				if (SanyaPlugin.instance.Config.CassieSubtitle)
+				if (SanyaPlugin.Instance.Config.CassieSubtitle)
 				{
 					Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
 				}
 				yield return Timing.WaitForSeconds(5f);
 				Log.Info($"[AirSupportBomb] charging...");
-				while (waitforready >= 0)
 				{
-					Methods.PlayAmbientSound(7);
-					waitforready--;
-					yield return Timing.WaitForSeconds(1f);
+					int waitforready = 5;
+					while (waitforready >= 0)
+					{
+						Methods.PlayAmbientSound(7);
+						waitforready--;
+						yield return Timing.WaitForSeconds(1f);
+					}
 				}
-
 				Log.Info($"[AirSupportBomb] throwing...");
 				while (isAirBombGoing)
 				{
@@ -437,7 +451,7 @@ namespace SanyaPlugin.Functions
 					}
 					yield return Timing.WaitForSeconds(0.25f);
 				}
-				if (SanyaPlugin.instance.Config.CassieSubtitle)
+				if (SanyaPlugin.Instance.Config.CassieSubtitle)
 				{
 					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
 				}
@@ -554,7 +568,7 @@ namespace SanyaPlugin.Functions
 
 			var json = Utf8Json.JsonSerializer.ToJsonString<WebhookData>(hookdata);
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
-			var result = httpClient.PostAsync(SanyaPlugin.instance.Config.ReportWebhook, data).Result;
+			var result = httpClient.PostAsync(SanyaPlugin.Instance.Config.ReportWebhook, data).Result;
 
 			Log.Debug($"{json}");
 
@@ -634,7 +648,6 @@ namespace SanyaPlugin.Functions
 				scp173.RpcBlinkTime();
 			}
 		}
-
 		public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
 		{
 			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs[0]);
