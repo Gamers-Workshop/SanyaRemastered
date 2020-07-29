@@ -17,12 +17,13 @@ namespace SanyaRemastered.Patches
 		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return true;
 			{
 				RespawnManager respawn = RespawnManager.Singleton;
-				int nextRespawn = (int)Math.Truncate(respawn._timeForNextSequence);
+				int leftdecont = (int)Math.Truncate(15f * 60 - DecontaminationController.GetServerTime);
+				int nextRespawn = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
 				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
 				bool SpawnCI = respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
-				bool isresumed = AlphaWarheadController._resumeScenario != -1;
+				bool CanDetonate = AlphaWarheadController.Host.CanDetonate;
 				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
@@ -50,7 +51,7 @@ namespace SanyaRemastered.Patches
 				{
 					if (isAlreadyUsed)
 					{
-						contentfix += string.Concat($"Statut du briseur de fémur : Utilisé\n");
+						contentfix += string.Concat($"Statut du briseur de fémur : <color=#228B22>Utilisé</color>\n");
 					}
 					else
 					{
@@ -75,15 +76,15 @@ namespace SanyaRemastered.Patches
 				{
 					if (!AlphaWarheadOutsitePanel.nukeside.Networkenabled)
 					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : DÉSACTIVÉE\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#ff0000>DÉSACTIVÉE</color>\n");
 					}
-					else if (isresumed)
+					else if (CanDetonate)
 					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : Redémarrage du Système\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#228B22>PRÊTE</color>\n");
 					}
 					else
 					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : PRÊTE\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#ff0000>Redémarrage du Système</color>\n");
 					}
 				}
 
@@ -125,14 +126,14 @@ namespace SanyaRemastered.Patches
 					{
 						contentfix += string.Concat($"La décontamination de la LCZ vas étre effectué\n");
 					}
-					/*if (decont >= 30)
+					if (leftdecont >= 30)
 						{
-							contentfix = contentfix + string.Concat($"Temps restant avant la décontamination de la LCZ :  {decont / 60:00}:{decont % 60:00}\n");
+							contentfix += string.Concat($"Temps restant avant la décontamination de la LCZ :  {leftdecont / 60:00}:{leftdecont % 60:00}\n");
 						}
-						else if (decont <= 30)
+					else if (leftdecont >= 15)
 						{
-							contentfix = contentfix + string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {decont / 60:00}:{decont % 60:00}</color>\n");
-						}*/
+							contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
+						}
 				}
 				else if (DecontaminationController.Singleton._decontaminationBegun)
 				{
@@ -153,11 +154,11 @@ namespace SanyaRemastered.Patches
 				//Voice intercom
 				if (__instance.Muted)
 				{
-					__instance._content = contentfix + "Accréditation insuffisante.";
+					__instance._content = contentfix + "<color=#ff0000>Accréditation insuffisante.</color>";
 				}
 				else if (Intercom.AdminSpeaking)
 				{
-					__instance._content = contentfix + "L'administrateur a la priorité sur les équipements de diffusion.";
+					__instance._content = contentfix + "<color=#ff0000>L'administrateur a la priorité sur les équipements de diffusion.</color>";
 				}
 				else if (__instance.remainingCooldown > 0f)
 				{

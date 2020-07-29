@@ -307,7 +307,7 @@ namespace SanyaPlugin.Functions
 
 			if (SanyaPlugin.Instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(Player.Dictionary[player.gameObject].UserId))
 			{
-				badge += " : 認証済み";
+				badge += " : Certifié";
 			}
 
 			if (group == null)
@@ -338,20 +338,6 @@ namespace SanyaPlugin.Functions
 
 			yield break;
 		}
-
-		public static IEnumerator<float> StartNightMode()
-		{
-			Log.Debug($"[StartNightMode] Started. Wait for {60}s...");
-			yield return Timing.WaitForSeconds(60f);
-			if (SanyaPlugin.Instance.Config.CassieSubtitle)
-			{
-				Methods.SendSubtitle(Subtitles.StartNightMode, 20);
-			}
-			RespawnEffectsController.PlayCassieAnnouncement("warning . facility power system has been attacked . all most containment zones light does not available until generator activated .", false, true);
-			Generator079.mainGenerator.RpcCustomOverchargeForOurBeautifulModCreators(10f, false);
-			yield break;
-		}
-
 		public static IEnumerator<float> BigHitmark(MicroHID microHID)
 		{
 			yield return Timing.WaitForSeconds(0.1f);
@@ -548,48 +534,7 @@ namespace SanyaPlugin.Functions
 			PlayAmbientSound(UnityEngine.Random.Range(0, 32));
 		}
 
-		public static void SendReport(ReferenceHub reported, string reason, ReferenceHub reporter)
-		{
-			var hookdata = new WebhookData();
-			var embed = new Embed
-			{
-				Title = "ゲームサーバーからの報告",
-				Timestamp = DateTime.Now.ToString("yyyy-MM-ddThh:mm:ss.fffZ")
-			};
-			Player player = Player.Dictionary[reporter.gameObject];
-			Player player2 = Player.Dictionary[reported.gameObject];
 
-			embed.Footer.Text = $"報告者:{player.Nickname} [{player.UserId}]";
-			embed.Fields.Add(new EmbedField() { Name = "発見サーバー", Value = $"{FormatServerName()}" });
-			embed.Fields.Add(new EmbedField() { Name = "対象プレイヤー名", Value = $"{player2.Nickname}", Inline = true });
-			embed.Fields.Add(new EmbedField() { Name = "対象プレイヤーID", Value = $"{player2.UserId}", Inline = true });
-			embed.Fields.Add(new EmbedField() { Name = "内容", Value = $"{reason}" });
-			hookdata.Embeds.Add(embed);
-
-			var json = Utf8Json.JsonSerializer.ToJsonString<WebhookData>(hookdata);
-			var data = new StringContent(json, Encoding.UTF8, "application/json");
-			var result = httpClient.PostAsync(SanyaPlugin.Instance.Config.ReportWebhook, data).Result;
-
-			Log.Debug($"{json}");
-
-			if (result.IsSuccessStatusCode)
-			{
-				Log.Info($"[SendReport] Send Report.");
-			}
-			else
-			{
-				Log.Error($"[SendReport] Error. {result.StatusCode}");
-			}
-		}
-
-		public static string FormatServerName()
-		{
-			string result = ServerConsole.singleton.RefreshServerName();
-			result = Regex.Replace(result, @"SM119.\d+.\d+.\d+ \(EXILED\)", string.Empty);
-			result = Regex.Replace(result, @"\[.+?\]", string.Empty);
-			result = Regex.Replace(result, @"\<.+?\>", string.Empty);
-			return result.Trim();
-		}
 
 		public static void TargetShake(this ReferenceHub target, bool achieve)
 		{

@@ -20,8 +20,8 @@ namespace SanyaRemastered
 		[Description("WIP")]
 		public bool Scp106PortalExtensionEnabled { get; set; } = false;
 		public bool Scp079_spot { get; set; } = false;
-		public float PainEffectStart { get; set; } = 20f;
-		public bool Scp939CanSeeVoiceChatting { get; set; } = false;
+		public float PainEffectStart { get; set; } = 20;
+		public float Scp939CanSeeVoiceChatting { get; set; } = 0;
 
 		[Description("Activation des données des joueurs")]
 		public bool DataEnabled { get; set; } = false;
@@ -35,9 +35,6 @@ namespace SanyaRemastered
 		[Description("Port UDP vers lequel les informations du serveur sont envoyées")]
 		public int InfosenderPort { get; set; } = -1;
 
-		[Description("Liens Webhook discord")]
-		public string ReportWebhook { get; set; } = String.Empty;
-
 		[Description("Config Player level")]
 		public bool LevelEnabled { get; set; } = false;
 		public int LevelExpKill { get; set; } = 3;
@@ -45,11 +42,6 @@ namespace SanyaRemastered
 		public int LevelExpWin { get; set; } = 10;
 		public int LevelExpLose { get; set; } = 1;
 		public int Level_exp_other { get; set; } = 0;
-
-		[Description("Event Du Sanya")]
-		public List<int> EventModeWeight { get; set; } = new List<int>() { 0, 0, 0 };
-		public List<ItemType> ClassdInsurgentInventoryClassd { get; set; } = new List<ItemType>();
-		public List<ItemType> ClassdInsurgentInventoryScientist { get; set; } = new List<ItemType>();
 
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
@@ -110,7 +102,7 @@ namespace SanyaRemastered
 		public bool HitmarkGrenade { get; set; } = false;
 		public bool HitmarkKilled { get; set; } = false;
 
-		[Description("Dégats Usp")]
+		[Description("Traitre")]
 		public int TraitorLimit { get; set; } = -1;
 		public int TraitorChancePercent { get; set; } = 50;
 
@@ -131,9 +123,6 @@ namespace SanyaRemastered
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
-
-		[Description("Division des dommages quand la personne est désarmé")]
-		public float CuffedDamageDivisor { get; set; } = 1f;
 
 		[Description("Config de SCP-018")]
 		public float Scp018DamageMultiplier { get; set; } = 1f;
@@ -156,22 +145,22 @@ namespace SanyaRemastered
 		public int Scp173RecoveryAmount { get; set; } = 0;
 		public int Scp939RecoveryAmount { get; set; } = 0;
 
-		[Description("Multiplicateur de dégats")]
-		public float Scp096DamageMultiplier { get; set; } = 1f;
-		public float Scp173DamageMultiplier { get; set; } = 1f;
-		public float Scp049DamageMultiplier { get; set; } = 1f;
-		public float Scp0492DamageMultiplier { get; set; } = 1f;
-		public float Scp939DamageMultiplier { get; set; } = 1f;
+		[Description("Diviseur de dégats")]
+		public float Scp096DamageDivisor { get; set; } = 1f;
+		public float Scp173DamageDivisor { get; set; } = 1f;
+		public float Scp049DamageDivisor { get; set; } = 1f;
+		public float Scp0492DamageDivisor { get; set; } = 1f;
+		public float Scp939DamageDivisor { get; set; } = 1f;
 
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
-		public float Scp106DamageMultiplier { get; set; } = 1f;
-		public float Scp106GrenadeMultiplier { get; set; } = 1f;
+		public float Scp106DamageDivisor { get; set; } = 1f;
+		public float Scp106GrenadeDivisor { get; set; } = 1f;
 		
 
 		[Description("SCP-079 Activé le mode Etendue de 079")]
 		public bool Scp079ExtendEnabled { get; set; } = false;
 		
-		[Description("SCP-079 Config Plugin \n# Pour désactivé une capacité Scp079ExtendLevel = 6")]
+		[Description("SCP-079 Config Plugin \n  # Pour désactivé une capacité Scp079ExtendLevel = 6")]
 		public int Scp079ExtendLevelFindscp { get; set; } = 1;
 		public float Scp079ExtendCostFindscp { get; set; } = 10f;
 		public int Scp079ExtendLevelDoorbeep { get; set; } = 1;

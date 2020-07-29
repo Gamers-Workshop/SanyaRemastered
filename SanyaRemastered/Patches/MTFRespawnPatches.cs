@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using SanyaRemastered.Data;
-using SanyaPlugin;
 using Respawning.NamingRules;
 using SanyaPlugin.Functions;
 using Respawning;

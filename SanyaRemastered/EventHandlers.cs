@@ -63,7 +63,6 @@ namespace SanyaPlugin
 					cinfo.Gameversion = CustomNetworkManager.CompatibleVersions[0];
 					cinfo.Modversion = "Coucou sa n'existe plus";
 					cinfo.Sanyaversion = "SanyaRemastered";
-					cinfo.Gamemode = eventmode.ToString();
 					cinfo.Name = ServerConsole.singleton.RefreshServerName();
 					cinfo.Ip = ServerConsole.Ip;
 					cinfo.Port = ServerConsole.Port;
@@ -115,47 +114,6 @@ namespace SanyaPlugin
 			{
 				try
 				{
-					//Traitre
-					if (SanyaPlugin.Instance.Config.TraitorLimit > 0)
-					{
-						foreach (var player in Player.List)
-						{
-							if ((player.Team == Team.MTF || player.Team == Team.CHI)
-								&& player.IsCuffed
-								&& Vector3.Distance(espaceArea, player.Position) <= Escape.radius
-								&& RoundSummary.singleton.CountTeam(player.Team) <= SanyaPlugin.Instance.Config.TraitorLimit)
-							{
-								switch (player.Team)
-								{
-									case Team.MTF:
-										if (UnityEngine.Random.Range(0, 100) <= SanyaPlugin.Instance.Config.TraitorChancePercent)
-										{
-											Log.Info($"[_EverySecond:Traitor] {player.Nickname} : MTF->CHI");
-											player.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.ChaosInsurgency, player.ReferenceHub.gameObject);
-										}
-										else
-										{
-											Log.Info($"[_EverySecond:Traitor] {player.Nickname} : Traitor Failed(by percent)");
-											player.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.Spectator, player.GameObject);
-										}
-										break;
-									case Team.CHI:
-										if (UnityEngine.Random.Range(0, 100) <= SanyaPlugin.Instance.Config.TraitorChancePercent)
-										{
-											Log.Info($"[_EverySecond:Traitor] {player.Nickname} : CHI->MTF");
-											player.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.NtfCadet, player.GameObject);
-										}
-										else
-										{
-											Log.Info($"[_EverySecond:Traitor] {player.Nickname} : Traitor Failed(by percent)");
-											player.ReferenceHub.characterClassManager.SetPlayersClass(RoleType.Spectator, player.GameObject);
-										}
-										break;
-								}
-							}
-						}
-					}
-
 					//ItemCleanup
 					if (SanyaPlugin.Instance.Config.ItemCleanup > 0)
 					{
@@ -180,35 +138,6 @@ namespace SanyaPlugin
 							}
 						}
 					}
-
-					//Rétablissement du courant lors d'une panne de courant
-					if (eventmode == SANYA_GAME_MODE.NIGHT && IsEnableBlackout && Generator079.mainGenerator.forcedOvercharge)
-					{
-						IsEnableBlackout = false;
-					}
-
-					//SCP-079's Spot Humans
-					if (SanyaPlugin.Instance.Config.Scp079_spot)
-					{
-						foreach (var scp079 in Scp079PlayerScript.instances)
-						{
-							if (scp079.iAm079)
-							{
-								foreach (var player in Player.List)
-								{
-									if (player.ReferenceHub.characterClassManager.IsHuman() && scp079.currentCamera.CanLookToPlayer(player.ReferenceHub))
-									{
-										player.ReferenceHub.playerStats.TargetBloodEffect(player.ReferenceHub.playerStats.connectionToClient, Vector3.zero, 0.1f);
-										foreach (var scp in Player.List.Where(n => n.Team == Team.SCP))
-										{
-
-											// NEXT
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 				catch (Exception e)
 				{
@@ -224,32 +153,23 @@ namespace SanyaPlugin
 			{
 				try
 				{
-					//Blackouter
-					if (flickerableLight != null && IsEnableBlackout && flickerableLight.remainingFlicker < 0f && !flickerableLight.IsDisabled())
-					{
-						Log.Debug($"{UnityEngine.Object.FindObjectOfType<FlickerableLight>().remainingFlicker}");
-						Log.Debug($"[Blackouter] Fired.");
-						Generator079.mainGenerator.RpcCustomOverchargeForOurBeautifulModCreators(10f, false);
-					}
 					//SCP-939VoiceChatVision
-					if (plugin.Config.Scp939CanSeeVoiceChatting)
+					if (plugin.Config.Scp939CanSeeVoiceChatting != 0)
 					{
 						List<ReferenceHub> scp939 = null;
 						List<ReferenceHub> humans = new List<ReferenceHub>();
 						foreach (var player in ReferenceHub.GetAllHubs().Values)
 						{
-							if (player.characterClassManager.CurRole.team != Team.RIP && player.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
+							if (player.characterClassManager.CurRole.team != Team.RIP && player.TryGetComponent(out Radio radio) && (radio.g_voice))
 							{
-								player.footstepSync._visionController.MakeNoise(25f);
+								player.footstepSync._visionController.MakeNoise(radio.noiseSource.volume * plugin.Config.Scp939CanSeeVoiceChatting);
 							}
-
 							if (player.characterClassManager.CurRole.roleId.Is939())
 							{
 								if (scp939 == null)
 									scp939 = new List<ReferenceHub>();
 								scp939.Add(player);
 							}
-
 							if (player.characterClassManager.IsHuman())
 								humans.Add(player);
 						}
@@ -265,16 +185,8 @@ namespace SanyaPlugin
 		}
 
 		/** Flag Params **/
-		private Vector3 espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 		private readonly int grenade_pickup_mask = 1049088;
 		private int prevMaxAHP = 0;
-		/** RoundVar **/
-		private FlickerableLight flickerableLight = null;
-		private bool IsEnableBlackout = false;
-
-		/** EventModeVar **/
-		internal static SANYA_GAME_MODE eventmode = SANYA_GAME_MODE.NULL;
-		private Vector3 LCZArmoryPos;
 
 		public void OnWaintingForPlayers()
 		{
@@ -291,9 +203,6 @@ namespace SanyaPlugin
 			ItemCleanupPatch.items.Clear();
 			Coroutines.isAirBombGoing = false;
 
-			IsEnableBlackout = false;
-
-			flickerableLight = UnityEngine.Object.FindObjectOfType<FlickerableLight>();
 
 			if (SanyaPlugin.Instance.Config.TeslaRange != 5.5f)
 			{
@@ -302,32 +211,8 @@ namespace SanyaPlugin
 					tesla.sizeOfTrigger = SanyaPlugin.Instance.Config.TeslaRange;
 				}
 			}
-		
-			switch (eventmode)
-			{
-				case SANYA_GAME_MODE.NIGHT:
-					{
-						break;
-					}
-				case SANYA_GAME_MODE.CLASSD_INSURGENCY:
-					{
-						foreach (var room in Map.Rooms)
-						{
-							if (room.Name == "LCZ_Armory")
-							{
-								LCZArmoryPos = room.Position + new Vector3(0, 2, 0);
-							}
-						}
-						break;
-					}
-				default:
-					{
-						eventmode = SANYA_GAME_MODE.NORMAL;
-						break;
-					}
-			}
 			
-			Log.Info($"[OnWaintingForPlayers] Waiting for Players... EventMode:{eventmode}");
+			Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
 		}
 
 		public void OnRoundStart()
@@ -338,17 +223,11 @@ namespace SanyaPlugin
 			{
 				Coroutines.StartContainClassD();
 			}
-			if (eventmode == SANYA_GAME_MODE.NIGHT)
-			{
-				IsEnableBlackout = true;
-				roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartNightMode()));					
-			}
-
 		}
 
 		public void OnRoundEnd(RoundEndedEventArgs ev)
 		{
-			Log.Info($"[OnRoundEnd] Round Ended.");
+			Log.Info($"[OnRoundEnd] Round Ended.{ev.TimeToRestart}");
 
 			if (SanyaPlugin.Instance.Config.DataEnabled)
 			{
@@ -386,7 +265,6 @@ namespace SanyaPlugin
 					referenceHub.characterClassManager.GodMode = true;
 				}
 			}
-
 			Coroutines.isAirBombGoing = false;
 		}
 
@@ -716,18 +594,7 @@ namespace SanyaPlugin
 		{
 			if (ev.Player.IsHost) return;
 			Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}");
-
-			switch (eventmode)
-			{
-				case SANYA_GAME_MODE.CLASSD_INSURGENCY:
-					{
-						if (ev.RoleType == RoleType.ClassD)
-						{
-							ev.Position = LCZArmoryPos;
-						}
-						break;
-					}
-			}
+			ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
 		{
@@ -776,12 +643,6 @@ namespace SanyaPlugin
 					Methods.Blink();
 				}
 
-				//CuffedDivisor
-				if (ev.Target.IsCuffed)
-				{
-					ev.Amount /= SanyaPlugin.Instance.Config.CuffedDamageDivisor;
-				}
-
 				//SCPsDivisor
 				if (ev.DamageType != DamageTypes.Wall
 					&& ev.DamageType != DamageTypes.Nuke
@@ -790,26 +651,26 @@ namespace SanyaPlugin
 					switch (ev.Target.Role)
 					{
 						case RoleType.Scp173:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp173DamageMultiplier;
+							ev.Amount /= SanyaPlugin.Instance.Config.Scp173DamageDivisor;
 							break;
 						case RoleType.Scp106:
-							if (ev.DamageType == DamageTypes.Grenade) ev.Amount /= SanyaPlugin.Instance.Config.Scp106GrenadeMultiplier;
+							if (ev.DamageType == DamageTypes.Grenade) ev.Amount /= SanyaPlugin.Instance.Config.Scp106GrenadeDivisor;
 							if (ev.DamageType != DamageTypes.MicroHid
 								&& ev.DamageType != DamageTypes.Tesla)
-								ev.Amount /= SanyaPlugin.Instance.Config.Scp106DamageMultiplier;
+								ev.Amount /= SanyaPlugin.Instance.Config.Scp106DamageDivisor;
 							break;
 						case RoleType.Scp049:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp049DamageMultiplier;
+							ev.Amount /= SanyaPlugin.Instance.Config.Scp049DamageDivisor;
 							break;
 						case RoleType.Scp096:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp096DamageMultiplier;
+							ev.Amount /= SanyaPlugin.Instance.Config.Scp096DamageDivisor;
 							break;
 						case RoleType.Scp0492:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp0492DamageMultiplier;
+							ev.Amount /= SanyaPlugin.Instance.Config.Scp0492DamageDivisor;
 							break;
 						case RoleType.Scp93953:
 						case RoleType.Scp93989:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp939DamageMultiplier;
+							ev.Amount /= SanyaPlugin.Instance.Config.Scp939DamageDivisor;
 							break;
 					}
 				}
@@ -1273,11 +1134,6 @@ namespace SanyaPlugin
 					Methods.SendSubtitle(Subtitles.GeneratorComplete, 20);
 				}
 			}
-
-			if (eventmode == SANYA_GAME_MODE.NIGHT && curgen >= 3 && IsEnableBlackout)
-			{
-				IsEnableBlackout = false;
-			}
 		}
 		public void OnInteractingElevator(InteractingElevatorEventArgs ev)
 		{
@@ -1420,7 +1276,8 @@ namespace SanyaPlugin
 					case Scp914Knob.Fine:
 						foreach (var player in ev.Players)
 						{
-						//	player.ReferenceHub.playerEffectsController.hub.;
+							player.ReferenceHub.fpc.sprintToggle = true;
+							player.ReferenceHub.fpc.effectScp207.Intensity += 4;
 						}
 						break;
 					case Scp914Knob.VeryFine:
@@ -1461,7 +1318,7 @@ namespace SanyaPlugin
 					}
 				}
 			}
-			if (SanyaPlugin.Instance.Config.StaminaLostLogicer != -1f
+			if (SanyaPlugin.Instance.Config.StaminaLostLogicer > 0f
 				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman()
 				&& ItemType.GunLogicer == ev.Shooter.CurrentItem.id
 				&& ev.IsAllowed
@@ -1469,8 +1326,7 @@ namespace SanyaPlugin
 				&& !ev.Shooter.ReferenceHub.fpc.staminaController._scp207.Enabled
 				)
 			{
-				ev.Shooter.ReferenceHub.fpc.staminaController.RemainingStamina -= SanyaPlugin.Instance.Config.StaminaLostLogicer;
-				ev.Shooter.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
+
 			}
 		}
 		public void OnCommand(SendingConsoleCommandEventArgs ev)
@@ -1534,24 +1390,6 @@ namespace SanyaPlugin
 									ply.ReferenceHub.playerEffectsController.Resync();
 								}
 								ReturnStr = "Resync ok.";
-								break;
-							}
-						case "event":
-							{
-								if (!perm.CheckPermission("sanya.event"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (IsEnableBlackout)
-								{ 
-									IsEnableBlackout = false; 
-								}
-								else 
-								{
-									IsEnableBlackout = true;
-								}
-								ReturnStr = $"IsEnableBlackout :{IsEnableBlackout}";
 								break;
 							}
 						case "check":

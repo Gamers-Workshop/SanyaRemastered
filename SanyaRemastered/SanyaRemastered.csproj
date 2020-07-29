@@ -37,7 +37,6 @@
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
-    <Compile Include="Patches\ReportPatch.cs" />
     <Compile Include="Patches\InfiniteAmmoPatches.cs" />
     <Compile Include="Patches\DecontaminationPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
