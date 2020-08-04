@@ -131,7 +131,7 @@ public static class Scp079CameraPatch
 }
 
 //SCP-079Extend Sprint 
-/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 public static class Scp079InteractPatch
 {
 	public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -200,20 +200,6 @@ public static class Scp079InteractPatch
 							&& !door._checkpointLockOpenWarhead)
 							locked = false;
                     }
-				*//*
-				foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
-					{
-						if (!locked) locked = door._prevDestroyed;
-						if (!locked) locked = door.destroyed;
-						if (!locked) locked = door.locked;
-						if (!locked) locked = door.lockdown;
-						if (!locked) locked = door._isLockedBy079;
-						if (!locked) locked = door._wasLocked;
-						if (!locked) locked = door.warheadlock;
-						if (!locked) locked = door._checkpointLockOpen;
-						if (!locked) locked = door._checkpointLockOpenDecont;
-						if (!locked) locked = door._checkpointLockOpenWarhead;
-					}*//*
 
 					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
 			if (room == null || room.Name.StartsWith("EZ") || locked)
@@ -222,7 +208,7 @@ public static class Scp079InteractPatch
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
 				break;
 			}
-		foreach (var blackroom in SanyaPlugin.SanyaPlugin.instance.Config.gazBlacklistRooms)
+		foreach (var blackroom in SanyaPlugin.SanyaPlugin.Instance.Config.GazBlacklistRooms)
 			{
 				if (room.Name.ToLower().Contains(blackroom.ToLower()))
 					{
@@ -259,7 +245,7 @@ public static class Scp079InteractPatch
 	}
 	
 	private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
-	{*//*
+	{/*
 		string str = ".g4 ";
 		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
 		{
@@ -278,9 +264,11 @@ public static class Scp079InteractPatch
 					}
 				}
 			}
-		}*//*
-
-		List<Door> doors = Exiled.API.Features.Map.Doors.FindAll((d) => Vector3.Distance(d.transform.position, room.Position) <= 0.5f);
+		}*/
+		foreach (var test in Exiled.API.Features.Map.Doors)
+		{ 
+		List<Door> doors = test.transform; 
+			
 		foreach (var item in doors)
 		{
 			item.Networklocked = true;
@@ -342,6 +330,7 @@ public static class Scp079InteractPatch
 			item.NetworkisOpen = true;
 		}
 	}
+	}
 
 	private static Room SCP079room(ReferenceHub player)
 	{
@@ -363,4 +352,4 @@ public static class Scp079InteractPatch
 
 		return new Room(transform.name, transform, transform.position);
 	}
-}*/
+}

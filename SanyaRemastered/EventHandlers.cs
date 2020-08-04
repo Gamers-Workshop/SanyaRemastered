@@ -918,16 +918,16 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.ReferenceHub.serverRoles.BypassMode && !ev.Door.locked)
 			{
-				foreach (var item in ev.Player.ReferenceHub.inventory.items)
+			/*	foreach (var item in ev.Player.ReferenceHub.inventory.items)
 				{
 					foreach (var permission in ev.Player.ReferenceHub.inventory.GetItemByID(item.id).permissions)
 					{
-						if (ev.Door.backwardsCompatPermissions.TryGetValue(permission, out var flag) && ev.Door.PermissionLevels.HasPermission(flag))
+						if (ev.Door._permissionLevels.HasPermission == item.id.)
 						{
 							ev.IsAllowed = true;
 						}
 					}
-				}
+				}*/
 			}
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
@@ -1326,7 +1326,8 @@ namespace SanyaPlugin
 				&& !ev.Shooter.ReferenceHub.fpc.staminaController._scp207.Enabled
 				)
 			{
-
+				ev.Shooter.ReferenceHub.fpc.staminaController.StaminaUse = SanyaPlugin.Instance.Config.StaminaLostLogicer;
+				ev.Shooter.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
 			}
 		}
 		public void OnCommand(SendingConsoleCommandEventArgs ev)
@@ -1555,13 +1556,13 @@ namespace SanyaPlugin
 								if (args.Length > 2 && args[2] == "hcz")
 								{
 									if (float.TryParse(args[3], out float duration))
-										Generator079.mainGenerator.RpcCustomOverchargeForOurBeautifulModCreators(duration, true);
+									{ }
 									ReturnStr = "HCZ blackout!";
 								}
 								if (args.Length > 2 && args[2] == "all")
 								{
 									if (float.TryParse(args[3], out float duration))
-										Generator079.mainGenerator.RpcCustomOverchargeForOurBeautifulModCreators(duration, false);
+										{ }
 									ReturnStr = "ALL blackout!";
 								}
 								else

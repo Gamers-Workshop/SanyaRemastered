@@ -31,7 +31,7 @@ namespace SanyaRemastered.Patches
 			GameObject gameObject = UnityEngine.Object.Instantiate(__instance.pickupPrefab);
 			NetworkServer.Spawn(gameObject);
 			items.Add(gameObject, Time.time);
-			gameObject.GetComponent<Pickup>().SetupPickup(new Pickup.PickupInfo
+			/*gameObject.GetComponent<Pickup>().SetupPickup(new Pickup.PickupInfo
 			{
 				itemId = droppedItemId,
 				durability = dur,
@@ -43,7 +43,7 @@ namespace SanyaRemastered.Patches
 				},
 				ownerPlayer = __instance.gameObject
 			}, pos, rot);
-			__result = gameObject.GetComponent<Pickup>();
+			__result = gameObject.GetComponent<Pickup>();*/
 			return false;
 		}
 	}
