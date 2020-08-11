@@ -422,7 +422,7 @@ namespace SanyaPlugin.Functions
 					foreach (var pos in randampos)
 					{
 						Methods.SpawnGrenade(pos, false, 0.1f);
-						yield return Timing.WaitForSeconds(0.05f);
+						yield return Timing.WaitForSeconds(0.075f);
 					}
 					if (TimeEnd != -1)
 					{

@@ -19,6 +19,7 @@ namespace SanyaRemastered
 
 		[Description("WIP")]
 		public bool Scp106PortalExtensionEnabled { get; set; } = false;
+		public bool ContainCommand { get; set; } = false;
 		public bool Scp079_spot { get; set; } = false;
 		public float PainEffectStart { get; set; } = 20;
 		public float Scp939CanSeeVoiceChatting { get; set; } = 0;
@@ -66,7 +67,8 @@ namespace SanyaRemastered
 		
 		[Description("Game Config")]
 		public bool Item_shoot_move { get; set; } = false;
-		public bool Grenade_shoot_fuse { get; set; } = true;
+		public bool Grenade_shoot_fuse { get; set; } = false;
+		public bool GrenadeChainSametiming { get; set; } = false;
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
 		public bool StopRespawnAfterDetonated { get; set; } = false;
 		public bool GodmodeAfterEndround { get; set; } = false;

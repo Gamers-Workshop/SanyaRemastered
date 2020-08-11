@@ -18,12 +18,11 @@ namespace SanyaRemastered.Patches
 			{
 				RespawnManager respawn = RespawnManager.Singleton;
 				int leftdecont = (int)Math.Truncate(15f * 60 - DecontaminationController.GetServerTime);
-				int nextRespawn = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence : 0);
+			//	int nextRespawn = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
 				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
-				bool SpawnCI = respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
-				bool CanDetonate = AlphaWarheadController.Host.CanDetonate;
+			//	bool SpawnCI = respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
 				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
@@ -78,13 +77,9 @@ namespace SanyaRemastered.Patches
 					{
 						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#ff0000>DÉSACTIVÉE</color>\n");
 					}
-					else if (CanDetonate)
+					else 
 					{
 						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#228B22>PRÊTE</color>\n");
-					}
-					else
-					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#ff0000>Redémarrage du Système</color>\n");
 					}
 				}
 
@@ -142,14 +137,14 @@ namespace SanyaRemastered.Patches
 
 				//Prochain spawn + durée MTF
 
-				if (!SpawnCI)
+				/*if (!SpawnCI)
 					contentfix += string.Concat($"Prochains renforts MTF : {nextRespawn / 60:00}:{nextRespawn % 60:00}\n");
 
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
 					contentfix += string.Concat($"Aucun renforts prévus pour le site\n");
 
 				else
-					contentfix += string.Concat($"Les renforts se préparent\n");
+					contentfix += string.Concat($"Les renforts se préparent\n");*/
 			
 				//Voice intercom
 				if (__instance.Muted)

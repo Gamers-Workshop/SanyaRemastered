@@ -21,6 +21,7 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System.Linq;
 using Scp914;
+using Assets._Scripts.RemoteAdmin;
 
 namespace SanyaPlugin
 {
@@ -34,7 +35,6 @@ namespace SanyaPlugin
 		/** Infosender **/
 		private readonly UdpClient udpClient = new UdpClient();
 		internal Task sendertask;
-		private bool Senderdisabled = false;
 		internal async Task SenderAsync()
 		{
 			Log.Debug($"[Infosender_Task] Started.");
@@ -46,7 +46,6 @@ namespace SanyaPlugin
 					if (SanyaPlugin.Instance.Config.InfosenderIp == "none")
 					{
 						Log.Info($"[Infosender_Task] Disabled(config:({SanyaPlugin.Instance.Config.InfosenderIp}). breaked.");
-						Senderdisabled = true;
 						break;
 					}
 
@@ -712,7 +711,7 @@ namespace SanyaPlugin
 			if (ev.HitInformations.GetDamageType() == DamageTypes.Scp939 && (ev.Killer.Role == RoleType.Scp93953 || ev.Killer.Role == RoleType.Scp93989) && SanyaPlugin.Instance.Config.Scp939RecoveryAmount > 0)
 			{
 				ev.Killer.ReferenceHub.playerStats.HealHPAmount(SanyaPlugin.Instance.Config.Scp939RecoveryAmount);
-				ev.Target.ReferenceHub.inventory.Clear();
+				ev.Target.Inventory.Clear();
 			}
 			if (ev.HitInformations.GetDamageType() == DamageTypes.Scp0492 && ev.Killer.Role == RoleType.Scp0492 && SanyaPlugin.Instance.Config.Scp0492RecoveryAmount > 0)
 			{
@@ -811,7 +810,7 @@ namespace SanyaPlugin
 
 			if (ev.HitInformations.GetDamageType() == DamageTypes.Tesla || ev.HitInformations.GetDamageType() == DamageTypes.Nuke)
 			{
-				ev.Target.ReferenceHub.inventory.Clear();
+				ev.Target.Inventory.Clear();
 			}
 
 			//Ticket Extend a revoir
@@ -916,19 +915,12 @@ namespace SanyaPlugin
 		{
 			Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door.DoorName}:{ev.Door.doorType}");
 
-			if (SanyaPlugin.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.ReferenceHub.serverRoles.BypassMode && !ev.Door.locked)
-			{
-			/*	foreach (var item in ev.Player.ReferenceHub.inventory.items)
-				{
-					foreach (var permission in ev.Player.ReferenceHub.inventory.GetItemByID(item.id).permissions)
-					{
-						if (ev.Door._permissionLevels.HasPermission == item.id.)
-						{
+			if (plugin.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled && !ev.Door.locked)
+				foreach (var item in ev.Player.Inventory.items)
+					foreach (var permission in ev.Player.Inventory.GetItemByID(item.id).permissions)
+						if (Door.backwardsCompatPermissions.TryGetValue(permission, out var flag) && ev.Door.PermissionLevels.HasPermission(flag))
 							ev.IsAllowed = true;
-						}
-					}
-				}*/
-			}
+
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;			
@@ -946,9 +938,9 @@ namespace SanyaPlugin
 			Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
 			if (SanyaPlugin.Instance.Config.InventoryKeycardActivation)
 			{
-				foreach (var item in ev.Player.ReferenceHub.inventory.items)
+				foreach (var item in ev.Player.Inventory.items)
 				{
-					if (ev.Player.ReferenceHub.inventory.GetItemByID(item.id).permissions.Contains("PEDESTAL_ACC"))
+					if (ev.Player.Inventory.GetItemByID(item.id).permissions.Contains("PEDESTAL_ACC"))
 					{
 						ev.IsAllowed = true;
 					}
@@ -975,7 +967,7 @@ namespace SanyaPlugin
 					ev.Player.ReferenceHub.SendTextHint(Subtitles.ExtendDisabled, 3);
 			}
 
-			if (SanyaPlugin.Instance.Config.StaminaLostJump != -1f
+			if (SanyaPlugin.Instance.Config.StaminaLostJump >= 0f
 				&& ev.CurrentAnimation == 2
 				&& ev.Player.ReferenceHub.characterClassManager.IsHuman()
 				&& !ev.Player.ReferenceHub.fpc.staminaController._invigorated.Enabled
@@ -1014,7 +1006,7 @@ namespace SanyaPlugin
 		}
 		public void OnExplodingGrenade (ExplodingGrenadeEventArgs ev)
 		{
-			Log.Debug($"[OnExplodingGrenade]  : {ev.Grenade.transform.position}");
+			Log.Debug($"[OnExplodingGrenade] {ev.Grenade.transform.position}");
 			if (SanyaPlugin.Instance.Config.GrenadeEffect)
 			{
 				foreach (var ply in Player.List)
@@ -1041,20 +1033,21 @@ namespace SanyaPlugin
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
-			Log.Debug($"[OnGeneratorUnlock] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
-			if (SanyaPlugin.Instance.Config.InventoryKeycardActivation && !ev.Player.ReferenceHub.serverRoles.BypassMode)
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled)
 			{
-				foreach (var item in ev.Player.ReferenceHub.inventory.items)
+				foreach (var item in ev.Player.Inventory.items)
 				{
-					if (ev.Player.ReferenceHub.inventory.GetItemByID(item.id).permissions.Contains("ARMORY_LVL_2"))
-					{
-						ev.IsAllowed = true;
+					if (ev.Player.Inventory.GetItemByID(item.id).permissions.Contains("ARMORY_LVL_2"))
+					{ 
+						ev.IsAllowed = true; 
 					}
 				}
+					
 			}
+
 			if (ev.IsAllowed && SanyaPlugin.Instance.Config.GeneratorUnlockOpen)
 			{
-				ev.Generator._doorAnimationCooldown = 1.5f;
+				ev.Generator._doorAnimationCooldown = 2f;
 				ev.Generator.NetworkisDoorOpen = true;
 				ev.Generator.RpcDoSound(true);
 			}
@@ -1070,12 +1063,12 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
 
@@ -1089,27 +1082,26 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
-		public void OnEjectingGeneratorTablet(InsertingGeneratorTabletEventArgs ev)
+		public void OnEjectingGeneratorTablet(EjectingGeneratorTabletEventArgs ev)
 		{
 			Log.Debug($"[OnEjectingGeneratorTablet] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
-
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Fait pas ça stp", 3);
+				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
 		public void OnGeneratorInsert(InsertingGeneratorTabletEventArgs ev)
@@ -1146,7 +1138,7 @@ namespace SanyaPlugin
 		public void OnPlacingDecal(PlacingDecalEventArgs ev)
 		{
 			Log.Debug($"[OnPlacingDecal] position : {ev.Position} Owner: {ev.Owner} Type: {ev.Type}");
-			if (SanyaPlugin.Instance.Config.Coroding106)
+			if (SanyaPlugin.Instance.Config.Coroding106 && ev.Type == 6)
 			{
 				List<Vector3> DecalList = new List<Vector3>{ev.Position};
 				while (SanyaPlugin.Instance.Config.Coroding106)
@@ -1316,9 +1308,14 @@ namespace SanyaPlugin
 					{
 						grenade.NetworkfuseTime = 0.1f;
 					}
+					var Flashgrenade = raycastHit.transform.GetComponentInParent<FlashGrenade>();
+					if (Flashgrenade != null)
+					{
+						Flashgrenade.NetworkfuseTime = 0.1f;
+					}
 				}
 			}
-			if (SanyaPlugin.Instance.Config.StaminaLostLogicer > 0f
+			if (SanyaPlugin.Instance.Config.StaminaLostLogicer >= 0f
 				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman()
 				&& ItemType.GunLogicer == ev.Shooter.CurrentItem.id
 				&& ev.IsAllowed
@@ -1339,24 +1336,153 @@ namespace SanyaPlugin
 				effort += $"{s} ";
 
 			args = effort.Split(' ');
-			if (args[0] == "nuke")
+			if (SanyaPlugin.Instance.Config.ContainCommand && ev.Player.Team == Team.SCP && args[0] == "contain")
 			{
-				
-				/*
-				if (RoundSummary.singleton.CountRole(RoleType.Scp106) != 0)
+				switch(ev.Player.Role)
 				{
-					ev.Player.Broadcast(10, "SCP-106");
+					case RoleType.Scp173:
+						{
+							foreach (var ply in Player.List)
+							{
+								if (ply.Role == RoleType.Scp079)
+								{
+									ev.Player.SendConsoleMessage("SCP-079 est toujours présent", "default");
+									ply.ReferenceHub.BroadcastMessage($"SCP-173 a fait la commande .contain dans la salle {ev.Player.CurrentRoom.Name}");
+									return;
+								}
+							}
+							switch (ev.Player.CurrentRoom.Name.ToLower())
+							{
+								case "LCZ_914":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								case "LCZ_012":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								case "HCZ_Room3ar":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Heavy containment Zone", true, true);
+										ev.Player.SendConsoleMessage("Armory HCZ room 049", "default");
+										break;
+									}
+								case "LCZ_Armory":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Light Containment Zone", true, true);
+										ev.Player.SendConsoleMessage("Armory LCZ room 049", "default");
+										break;
+									}
+								case "HCZ_Nuke":
+									{
+										if (ev.Player.Position.y < -600) break;
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of NATO_A Warhead", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								case "HCZ_Hid":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Storage of Micro H I D", true, true);
+										ev.Player.SendConsoleMessage("HID room 049", "default");
+										break;
+									}
+								case "HCZ_049":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of SCP 0 4 9", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								case "HCZ_106":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in Containment chamber of SCP 1 0 6", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								case "HCZ_079":
+									{
+										ev.Player.SetRole(RoleType.Spectator);
+										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
+										ev.Player.SendConsoleMessage("173 room 049", "default");
+										break;
+									}
+								default:
+									{
+										break;
+									}
+							}
+							break;
+						}
+					case RoleType.Scp096:
+						{
+							if (ev.Player.CurrentRoom.Name.Contains("HCZ_457"))
+							{
+								ev.Player.SetRole(RoleType.Spectator);
+								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
+								ev.Player.SendConsoleMessage("096 room 096","default");
+							}
+							else if (ev.Player.CurrentRoom.Name.Contains("HCZ_Nuke") && ev.Player.Position.y >= -600)
+							{
+								ev.Player.SetRole(RoleType.Spectator);
+								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the  Armory of Heavy containment Zone", true, true);
+								ev.Player.SendConsoleMessage("096 room nuke", "default");
+							}
+							else
+							{
+								ev.Player.SendConsoleMessage("Tu n'est pas confiné", "default");
+							}
+							break;
+						}
+					case RoleType.Scp049:
+						{
+							if (ev.Player.CurrentRoom.Name.Contains("HCZ_049"))
+							{
+								ev.Player.SetRole(RoleType.Spectator);
+								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
+								ev.Player.SendConsoleMessage("096 room 096", "default");
+							}
+							break;
+						}
+					case RoleType.Scp93953:
+					case RoleType.Scp93989:
+						{
+							if (ev.Player.CurrentRoom.Name.Contains("HCZ_106") && ev.Player.Position.y < -1000)
+							{
+								ev.Player.SetRole(RoleType.Spectator);
+								RespawnEffectsController.PlayCassieAnnouncement("SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6", true, true);
+								ev.Player.SendConsoleMessage("939 confiné", "default");
+							}
+							break;
+						}
+					case RoleType.Scp0492:
+						{
+							if (ev.Player.CurrentRoom.Name.Contains("HCZ_106") && ev.Player.Position.y < -1000)
+							{
+								ev.Player.SetRole(RoleType.Spectator);
+								ev.Player.SendConsoleMessage("049-2 confiné", "default");
+							}
+							break;
+						}
+					default:
+						{
+							break;
+						}
 				}
-				if (RoundSummary.singleton.CountRole(RoleType.Scientist) != 0)
-				{
-					ev.Player.Broadcast(10, "Scientifique");
-				}
-				if (player)*/
 			}
 		}
 		public void OnRACommand(SendingRemoteAdminCommandEventArgs ev)
 		{
-			
 			string[] args = ev.Arguments.ToArray();
 			Log.Debug($"[OnCommand] sender:{ev.CommandSender.SenderId} command:{ev.Name} args:{args.Length}");
 			string effort = $"{ev.Name} ";
@@ -1364,7 +1490,7 @@ namespace SanyaPlugin
 				effort += $"{s} ";
 
 			args = effort.Split(' ');
-			if (args[0].ToLower() == "sanya")
+			if (args[0].ToLower() == "sanya" || args[0].ToLower() == "sn")
 			{
 				ReferenceHub player = ev.CommandSender.SenderId == "SERVER CONSOLE" || ev.CommandSender.SenderId == "GAME CONSOLE" ? Player.Dictionary[PlayerManager.localPlayer].ReferenceHub : ev.Sender.ReferenceHub;
 				Player perm = Player.Dictionary[player.gameObject];
@@ -1376,12 +1502,22 @@ namespace SanyaPlugin
 					{
 						case "test":
 							{
-								ReturnStr = "test ok.";
+								ReturnStr = $"test ok.{ev.Sender.Position.x} {ev.Sender.Position.y} {ev.Sender.Position.z}:{ev.Sender.Role}";
+								break;
+							}
+						case "room":
+							{
+								ReturnStr = $"RoomList";
+								foreach (var rooms in Map.Rooms)
+								{
+									ev.Sender.RemoteAdminMessage($"");
+									ReturnStr += $"{rooms.Name} {rooms.Position}\n";
+								}
 								break;
 							}
 						case "resynceffect":
 							{
-								if (!perm.CheckPermission("sanya.resynceffect"))
+								if (!ev.Sender.CheckPermission("sanya.resynceffect"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1395,7 +1531,7 @@ namespace SanyaPlugin
 							}
 						case "check":
 							{
-								if (!perm.CheckPermission("sanya.check"))
+								if (!ev.Sender.CheckPermission("sanya.check"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1418,7 +1554,7 @@ namespace SanyaPlugin
 							}
 						case "reload":
 							{
-								if (!perm.CheckPermission("sanya.reload"))
+								if (!ev.Sender.CheckPermission("sanya.reload"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1430,7 +1566,7 @@ namespace SanyaPlugin
 							}
 						case "list":
 							{
-								if (!perm.CheckPermission("sanya.list"))
+								if (!ev.Sender.CheckPermission("sanya.list"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1445,7 +1581,7 @@ namespace SanyaPlugin
 							}
 						case "startair":
 							{
-								if (!perm.CheckPermission("sanya.airbomb"))
+								if (!ev.Sender.CheckPermission("sanya.airbomb"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1483,7 +1619,7 @@ namespace SanyaPlugin
 							}
 						case "stopair":
 							{
-								if (!perm.CheckPermission("sanya.airbomb"))
+								if (!ev.Sender.CheckPermission("sanya.airbomb"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1495,7 +1631,7 @@ namespace SanyaPlugin
 							}
 						case "914":
 							{
-								if (!perm.CheckPermission("sanya.914"))
+								if (!ev.Sender.CheckPermission("sanya.914"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1536,7 +1672,7 @@ namespace SanyaPlugin
 							}
 						case "nukecap":
 							{
-								if (!perm.CheckPermission("sanya.nukecap"))
+								if (!ev.Sender.CheckPermission("sanya.nukecap"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1548,7 +1684,7 @@ namespace SanyaPlugin
 							}
 						case "blackout":
 							{
-								if (!perm.CheckPermission("sanya.blackout"))
+								if (!ev.Sender.CheckPermission("sanya.blackout"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1571,7 +1707,7 @@ namespace SanyaPlugin
 							}
 						case "femur":
 							{
-								if (!perm.CheckPermission("sanya.femur"))
+								if (!ev.Sender.CheckPermission("sanya.femur"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1582,7 +1718,7 @@ namespace SanyaPlugin
 							}
 						case "explode":
 							{
-								if (!perm.CheckPermission("sanya.explode"))
+								if (!ev.Sender.CheckPermission("sanya.explode"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1630,7 +1766,7 @@ namespace SanyaPlugin
 							}
 						case "ammo":
 							{
-								if (!perm.CheckPermission("sanya.ammo"))
+								if (!ev.Sender.CheckPermission("sanya.ammo"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1692,7 +1828,7 @@ namespace SanyaPlugin
 							}
 						case "clearinv":
 							{
-								if (!perm.CheckPermission("sanya.clearinv"))
+								if (!ev.Sender.CheckPermission("sanya.clearinv"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1736,7 +1872,7 @@ namespace SanyaPlugin
 							}
 						case "cleareffect":
 							{
-								if (!perm.CheckPermission("sanya.cleareffect"))
+								if (!ev.Sender.CheckPermission("sanya.cleareffect"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1793,7 +1929,7 @@ namespace SanyaPlugin
 							}/*
 						case "dummy":
 							{
-								if (!perm.CheckPermission("sanya.dummy"))
+								if (!ev.Sender.CheckPermission("sanya.dummy"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1842,7 +1978,7 @@ namespace SanyaPlugin
 							}*/
 						case "ev":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.ev"))
+								if (!ev.Sender.CheckPermission("sanya.ev"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1856,7 +1992,7 @@ namespace SanyaPlugin
 							}
 						case "roompos":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.roompos"))
+								if (!ev.Sender.CheckPermission("sanya.roompos"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1871,7 +2007,7 @@ namespace SanyaPlugin
 							}
 						case "tppos":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.tppos"))
+								if (!ev.Sender.CheckPermission("sanya.tppos"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1911,7 +2047,7 @@ namespace SanyaPlugin
 							}
 						case "gen":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.gen"))
+								if (!ev.Sender.CheckPermission("sanya.gen"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -1994,7 +2130,7 @@ namespace SanyaPlugin
 							}
 						case "spawn":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.spawn"))
+								if (!ev.Sender.CheckPermission("sanya.spawn"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2038,7 +2174,7 @@ namespace SanyaPlugin
 							}/*
 						case "next":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.next"))
+								if (!ev.Sender.CheckPermission("sanya.next"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2099,7 +2235,7 @@ namespace SanyaPlugin
 							}
 						case "van":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.van"))
+								if (!ev.Sender.CheckPermission("sanya.van"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2111,7 +2247,7 @@ namespace SanyaPlugin
 							}
 						case "heli":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.heli"))
+								if (!ev.Sender.CheckPermission("sanya.heli"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2121,7 +2257,7 @@ namespace SanyaPlugin
 							}*/
 						case "now":
 							{
-								if (!Player.Dictionary[player.gameObject].CheckPermission("sanya.now"))
+								if (!ev.Sender.CheckPermission("sanya.now"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2131,7 +2267,7 @@ namespace SanyaPlugin
 							}
 						case "help":
 							{
-								ReturnStr = " Sanya Commands\nsanya showconfig    =Config du plugin\nsanya list          =liste de tout les joueur connecté \nsanya startair      =Bombardement Aérien Démarage \nsanya stopair       =Bombardement Aérien Arrét \nsanya 914(knob / use) = Change la configuration de 914 ou l'utilise\nsanya nukecap = Lève ou baise le petit cache sure la nuke \nsanya sonar = Combien il y a de joueur ennemie par rapport a votre rôle \nsanya blackout = Active un blackout de 10 secondes HCZ et LCZ \nsanya blackout hcz {durée}= Active un blackout de {durée} secondes HCZ\nsanya femur = Active que le son du re-confinement de 106 \nsanya explode[id] = Explose une grenade sur le joueur ciblé\nsanya grenade[id] = Spawn une grenade sous les pied du joueur ciblé\nsanya flash[id] = Spawn une flash sous les pied du joueur ciblé\nsanya ball[id] = Spawn une balle sous les pied du joueur ciblé\nsanya ammo [id]= Full munition pour le joueur ciblé\nsanya next(ic / ntf) = Configure le prochain spawn a MTF ou IC / MdS(MTF ou NTF c'est identique)\nsanya spawn         =Force le prochain spawn \nsanya roompos = la position X Y Z des salle avec leurs noms \nsanya tppos(id)(x)(y)(z) \nsanya pocket = Vous tp dans la pocket \nsanya van = Fait venir la voiture des chaos \nsanya heli = Fait venir un Hélico \nsanya dummy = Fait spawn un PNG \nsanya cleareffect = clear tout les effet \n Commande pour les générateur \nsanya gen unlock = Unlock tout les générateurs de SCP-079 \nsanya gen door = Ouvre tout les porte de SCP-079 \nsanya gen set = Place une tablette dans TOUT les générateur de SCP-079 \nsanya gen once = pose une tablette dans un seul générateur \nsanya gen eject = eject tout les tablette des générateur de SCP-079";
+								ReturnStr = " Sanya Commands\nsanya showconfig    =Config du plugin\nsanya list          =liste de tout les joueur connecté \nsanya startair      =Bombardement Aérien Démarage \nsanya stopair       =Bombardement Aérien Arrét \nsanya 914(knob / use) = Change la configuration de 914 ou l'utilise\nsanya nukecap = Lève ou baisse le petit cache sure la nuke \nsanya sonar = Combien il y a de joueur ennemie par rapport a votre rôle \nsanya blackout = Active un blackout de 10 secondes HCZ et LCZ \nsanya blackout hcz {durée}= Active un blackout de {durée} secondes HCZ\nsanya femur = Active que le son du re-confinement de 106 \nsanya explode[id] = Explose une grenade sur le joueur ciblé\nsanya grenade[id] = Spawn une grenade sous les pied du joueur ciblé\nsanya flash[id] = Spawn une flash sous les pied du joueur ciblé\nsanya ball[id] = Spawn une balle sous les pied du joueur ciblé\nsanya ammo [id]= Full munition pour le joueur ciblé\nsanya next(ic / ntf) = Configure le prochain spawn a MTF ou IC / MdS(MTF ou NTF c'est identique)\nsanya spawn         =Force le prochain spawn \nsanya roompos = la position X Y Z des salle avec leurs noms \nsanya tppos(id)(x)(y)(z) \nsanya pocket = Vous tp dans la pocket \nsanya van = Fait venir la voiture des chaos \nsanya heli = Fait venir un Hélico \nsanya dummy = Fait spawn un PNG \nsanya cleareffect = clear tout les effet \n Commande pour les générateur \nsanya gen unlock = Unlock tout les générateurs de SCP-079 \nsanya gen door = Ouvre tout les porte de SCP-079 \nsanya gen set = Place une tablette dans TOUT les générateur de SCP-079 \nsanya gen once = pose une tablette dans un seul générateur \nsanya gen eject = eject tout les tablette des générateur de SCP-079";
 								break;
 							}
 						default:

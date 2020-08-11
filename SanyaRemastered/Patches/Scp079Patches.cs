@@ -7,6 +7,7 @@ using Respawning;
 using HarmonyLib;
 using Exiled.API.Features;
 using Player = Exiled.API.Features.Player;
+using System.Linq;
 
 [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
 public static class Scp079ManaPatch
@@ -149,19 +150,19 @@ public static class Scp079InteractPatch
 			foreach (GameObject Player in PlayerManager.players)
 		{
 			{
-			if (player.ReferenceHub.scp079PlayerScript.NetworkcurLvl <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
+			if (player.ReferenceHub.scp079PlayerScript.curLvl < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
 				break;
 			}
-			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+			else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
 				break;
 			}
-			else if (player.ReferenceHub.scp079PlayerScript.NetworkcurMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+			else if (player.ReferenceHub.scp079PlayerScript.curMana > SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
 			{
-				player.ReferenceHub.scp079PlayerScript.NetworkcurMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
+				player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
 			}
 			else
 			{
@@ -173,12 +174,11 @@ public static class Scp079InteractPatch
 					Player player2 = Exiled.API.Features.Player.Dictionary[hub.gameObject];
 			Room room = SCP079room(hub);
 			bool locked = false;
-
-				foreach (Door door in room.Transform.GetComponentsInChildren<Door>())
+			List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+					foreach (Door door in doors)
 					{
 						if (!locked &&
-							door._prevDestroyed 
-							|| door.destroyed 
+							( door.destroyed 
 							|| door.lockdown 
 							|| door.locked 
 							|| door._isLockedBy079 
@@ -186,9 +186,9 @@ public static class Scp079InteractPatch
 							|| door.warheadlock
 							|| door._checkpointLockOpen 
 							|| door._checkpointLockOpenDecont 
-							|| door._checkpointLockOpenWarhead) 
+							|| door._checkpointLockOpenWarhead)) 
 							locked = true;
-						if(locked && door._prevDestroyed
+						if(locked
 							&& !door.destroyed
 							&& !door.lockdown
 							&& !door.locked
@@ -203,7 +203,6 @@ public static class Scp079InteractPatch
 
 					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
 			if (room == null || room.Name.StartsWith("EZ") || locked)
-
 			{
 				player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
 				break;
@@ -265,10 +264,8 @@ public static class Scp079InteractPatch
 				}
 			}
 		}*/
-		foreach (var test in Exiled.API.Features.Map.Doors)
-		{ 
-		List<Door> doors = test.transform; 
-			
+		List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+
 		foreach (var item in doors)
 		{
 			item.Networklocked = true;
@@ -329,7 +326,6 @@ public static class Scp079InteractPatch
 			item.Networklocked = false;
 			item.NetworkisOpen = true;
 		}
-	}
 	}
 
 	private static Room SCP079room(ReferenceHub player)
