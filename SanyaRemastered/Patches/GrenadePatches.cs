@@ -3,6 +3,7 @@ using Grenades;
 using HarmonyLib;
 using Mirror;
 using SanyaPlugin;
+using SanyaPlugin.Functions;
 using UnityEngine;
 
 namespace SanyaRemastered.Patches

@@ -75,11 +75,11 @@ namespace SanyaRemastered.Patches
 				{
 					if (!AlphaWarheadOutsitePanel.nukeside.Networkenabled)
 					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#ff0000>DÉSACTIVÉE</color>\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : DÉSACTIVÉE\n");
 					}
 					else 
 					{
-						contentfix += string.Concat($"Statut de l'Alpha Warhead : <color=#228B22>PRÊTE</color>\n");
+						contentfix += string.Concat($"Statut de l'Alpha Warhead : PRÊTE\n");
 					}
 				}
 
@@ -116,7 +116,7 @@ namespace SanyaRemastered.Patches
 				}
 
 				//décontamination
-				if (!DecontaminationController.Singleton._decontaminationBegun)
+				if (DecontaminationController.Singleton._decontaminationBegun)
 				{
 					{
 						contentfix += string.Concat($"La décontamination de la LCZ vas étre effectué\n");
@@ -130,7 +130,7 @@ namespace SanyaRemastered.Patches
 							contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
 						}
 				}
-				else if (DecontaminationController.Singleton._decontaminationBegun)
+				else if (!DecontaminationController.Singleton._decontaminationBegun)
 				{
 					contentfix += string.Concat($"La décontamination de la LCZ a été effectué\n");
 				}

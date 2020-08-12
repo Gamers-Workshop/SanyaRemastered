@@ -22,6 +22,7 @@ using Respawning;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using System.Threading;
+using Object = UnityEngine.Object;
 
 namespace SanyaPlugin.Functions
 {
@@ -593,19 +594,24 @@ namespace SanyaPlugin.Functions
 				scp173.RpcBlinkTime();
 			}
 		}
-		public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
+		/*private void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation, float x = 1, float y = 1, float z = 1)
 		{
-			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs[0]);
-			CharacterClassManager ccm = gameObject.GetComponentInChildren<CharacterClassManager>();
+			GameObject obj =
+				Object.Instantiate(
+					NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+			CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
+			if (ccm == null)
+				Log.Error("CCM is null, doufus. You need to do this the harder way.");
 			ccm.CurClass = role;
 			ccm.RefreshPlyModel();
-			gameObject.GetComponentInChildren<NicknameSync>().Network_myNickSync = "Yamato";
-			gameObject.GetComponentInChildren<QueryProcessor>().NetworkPlayerId = 9999;
-			gameObject.transform.position = pos;
-			gameObject.transform.rotation = rot;
-			NetworkServer.Spawn(gameObject);
-			return gameObject;
-		}
+			obj.GetComponent<NicknameSync>().Network_myNickSync = "Yamato";
+			obj.GetComponent<QueryProcessor>().PlayerId = 9999;
+			obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+			obj.transform.localScale = new Vector3(x, y, z);
+			obj.transform.position = position;
+			obj.transform.rotation = rotation;
+			NetworkServer.Spawn(obj);
+		}*/
 
 		public static int GetMTFTickets()
 		{

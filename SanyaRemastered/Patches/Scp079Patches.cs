@@ -8,6 +8,7 @@ using HarmonyLib;
 using Exiled.API.Features;
 using Player = Exiled.API.Features.Player;
 using System.Linq;
+using CustomPlayerEffects;
 
 [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
 public static class Scp079ManaPatch
@@ -148,35 +149,34 @@ public static class Scp079InteractPatch
 		{
 		__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz, __instance.curMana);
 			foreach (GameObject Player in PlayerManager.players)
-		{
 			{
-			if (player.ReferenceHub.scp079PlayerScript.curLvl < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
-			{
-				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
+				{
+				if (player.ReferenceHub.scp079PlayerScript.curLvl <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
+				{
+					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
+					break;
+				}
+				else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+				{
+					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
+					break;
+				}
+				else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+				{
+					//no break
+				}
+				else
+				{
+				Log.Error("else");
 				break;
-			}
-			else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
-			{
-				player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
-				break;
-			}
-			else if (player.ReferenceHub.scp079PlayerScript.curMana > SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
-			{
-				player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
-			}
-			else
-			{
-			Log.Error("else");
-			break;
-			}
-			
-			ReferenceHub hub = ReferenceHub.GetHub(Player);
+				}
+				ReferenceHub hub = ReferenceHub.GetHub(Player);
 					Player player2 = Exiled.API.Features.Player.Dictionary[hub.gameObject];
-			Room room = SCP079room(hub);
-			bool locked = false;
-			List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
-					foreach (Door door in doors)
-					{
+				Room room = SCP079room(hub);
+				bool locked = false;
+				List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+						foreach (Door door in doors)
+						{
 						if (!locked &&
 							( door.destroyed 
 							|| door.lockdown 
@@ -186,46 +186,36 @@ public static class Scp079InteractPatch
 							|| door.warheadlock
 							|| door._checkpointLockOpen 
 							|| door._checkpointLockOpenDecont 
-							|| door._checkpointLockOpenWarhead)) 
+							|| door._checkpointLockOpenWarhead))
 							locked = true;
-						if(locked
-							&& !door.destroyed
-							&& !door.lockdown
-							&& !door.locked
-							&& !door._isLockedBy079
-							&& !door._wasLocked
-							&& !door.warheadlock
-							&& !door._checkpointLockOpen
-							&& !door._checkpointLockOpenDecont
-							&& !door._checkpointLockOpenWarhead)
-							locked = false;
-                    }
+						}
 
 					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
-			if (room == null || room.Name.StartsWith("EZ") || locked)
-			{
-				player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
-				break;
-			}
-		foreach (var blackroom in SanyaPlugin.SanyaPlugin.Instance.Config.GazBlacklistRooms)
-			{
-				if (room.Name.ToLower().Contains(blackroom.ToLower()))
+				if (room == null || locked)
+				{
+					player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
+					break;
+				}
+			foreach (var blackroom in SanyaPlugin.SanyaPlugin.Instance.Config.GazBlacklistRooms)
+				{
+					if (room.Name.ToLower().Contains(blackroom.ToLower()))
 					{
 						player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
 						break;
 					}
+				}
+					player.ReferenceHub.SendTextHint(Subtitles.Extend079SuccessGaz, 10);
+					player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
+					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
+				}
 			}
-				player.ReferenceHub.SendTextHint(Subtitles.Extend079SuccessGaz, 10);
-				Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
-			}
+			return false;
 		}
-		return false;
-	}
-	if (command.Contains("DOOR:"))
-	{
-			if (__instance.curLvl + 1 <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
+		else if (command.Contains("DOOR:"))
+		{
+			if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
 			{
-				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep > __instance.curMana)
+				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep > __instance.curMana)
 				{
 					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
 					return false;
@@ -242,34 +232,13 @@ public static class Scp079InteractPatch
 		}
 		return true;
 	}
-	
-	private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
-	{/*
-		string str = ".g4 ";
-		for (int i = SanyaPlugin.SanyaPlugin.instance.Config.GasDuration; i > 0f; i--)
-		{
-			str += ". .g4 ";
-		}
-		foreach (var ply in PlayerManager.players)
-		{
-			var player = Exiled.API.Features.Player.Dictionary[ply];
-			if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
-			{
-				foreach (RespawnEffectsController respawnEffectsController in RespawnEffectsController.AllControllers)
-				{
-					if (respawnEffectsController != null)
-					{
-						Methods.RpcCassieAnnouncement(respawnEffectsController, player.ReferenceHub.characterClassManager.Connection, .g4, false, false);
-					}
-				}
-			}
-		}*/
+private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
+	{
 		List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
-
 		foreach (var item in doors)
 		{
-			item.Networklocked = true;
-			item.NetworkisOpen = true;
+			item.locked = true;
+			item.isOpen = true;
 		}
 		
 		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i--)
@@ -294,8 +263,8 @@ public static class Scp079InteractPatch
 		}
 		foreach (var item in doors)
 		{
-			item.Networklocked = true;
-			item.NetworkisOpen = false;
+			item.locked = true;
+			item.isOpen = false;
 		}
 		foreach (var ply in PlayerManager.players)
 		{
@@ -312,7 +281,11 @@ public static class Scp079InteractPatch
 				var player = Exiled.API.Features.Player.Dictionary[ply];
 				if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 				{
-					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(20f, "GAS", DamageTypes.Poison, 0), player.GameObject);
+					player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
+					player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
+					player.ReferenceHub.playerEffectsController.EnableEffect<Corroding>();
+					player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
+					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10f, "GAS", DamageTypes.Poison, 0), player.GameObject);
 					if (player.Role == RoleType.Spectator)
 					{
 						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.Instance.Config.GasExpGain);
@@ -323,8 +296,8 @@ public static class Scp079InteractPatch
 		}
 		foreach (var item in doors)
 		{
-			item.Networklocked = false;
-			item.NetworkisOpen = true;
+			item.locked = false;
+			item.isOpen = true;
 		}
 	}
 

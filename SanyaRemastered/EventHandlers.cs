@@ -1351,70 +1351,230 @@ namespace SanyaPlugin
 									return;
 								}
 							}
-							switch (ev.Player.CurrentRoom.Name.ToLower())
+							switch (ev.Player.CurrentRoom.Name)
 							{
 								case "LCZ_914":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("914"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "LCZ_012":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("012"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_Room3ar":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Heavy containment Zone", true, true);
-										ev.Player.SendConsoleMessage("Armory HCZ room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("HCZ_ARMORY"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Heavy containment Zone", true, true);
+											ev.Player.SendConsoleMessage("Armory HCZ room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "LCZ_Armory":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Light Containment Zone", true, true);
-										ev.Player.SendConsoleMessage("Armory LCZ room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("LCZ_ARMORY"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Light Containment Zone", true, true);
+											ev.Player.SendConsoleMessage("Armory LCZ room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_Nuke":
 									{
 										if (ev.Player.Position.y < -600) break;
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of NATO_A Warhead", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("NUKE_ARMORY"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											if (ev.Player.Position.y < -600) break;
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of NATO_A Warhead", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_Hid":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Storage of Micro H I D", true, true);
-										ev.Player.SendConsoleMessage("HID room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("HID") && doors.PermissionLevels == Door.AccessRequirements.ArmoryLevelThree)
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Storage of Micro H I D", true, true);
+											ev.Player.SendConsoleMessage("HID room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_049":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of SCP 0 4 9", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("049_ARMORY"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of SCP 0 4 9", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_106":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in Containment chamber of SCP 1 0 6", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										if (ev.Player.Position.y < -1000) break;
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("106_BOTTOM"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in Containment chamber of SCP 1 0 6", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								case "HCZ_079":
 									{
-										ev.Player.SetRole(RoleType.Spectator);
-										RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
-										ev.Player.SendConsoleMessage("173 room 049", "default");
+										bool success = false;
+										foreach (var doors in Map.Doors)
+										{
+											if (doors.DoorName.Contains("079"))
+												if (Door.DoorStatus.Closed == doors.status)
+												{
+													doors.locked = true;
+													success = true;
+												}
+												else
+												{
+													success = false;
+													break;
+												}
+										}
+										if (success)
+										{
+											ev.Player.SetRole(RoleType.Spectator);
+											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
+											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+										}
 										break;
 									}
 								default:
@@ -1428,15 +1588,49 @@ namespace SanyaPlugin
 						{
 							if (ev.Player.CurrentRoom.Name.Contains("HCZ_457"))
 							{
-								ev.Player.SetRole(RoleType.Spectator);
-								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
-								ev.Player.SendConsoleMessage("096 room 096","default");
+								bool success = false;
+								foreach (var doors in Map.Doors)
+								{
+									if (doors.DoorName.Contains("096"))
+										if (Door.DoorStatus.Closed == doors.status)
+										{
+											doors.locked = true;
+											success = true;
+										}
+								}
+								if (success)
+								{
+									ev.Player.SetRole(RoleType.Spectator);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
+									ev.Player.SendConsoleMessage("096 room 096", "default");
+								}
+								else
+								{
+									ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+								}
 							}
 							else if (ev.Player.CurrentRoom.Name.Contains("HCZ_Nuke") && ev.Player.Position.y >= -600)
 							{
-								ev.Player.SetRole(RoleType.Spectator);
-								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the  Armory of Heavy containment Zone", true, true);
-								ev.Player.SendConsoleMessage("096 room nuke", "default");
+								bool success = false;
+								foreach (var doors in Map.Doors)
+								{
+									if (doors.DoorName.Contains("NUKE_ARMORY"))
+										if (Door.DoorStatus.Closed == doors.status)
+										{
+											doors.locked = true;
+											success = true;
+										}
+								}
+								if (success)
+								{
+									ev.Player.SetRole(RoleType.Spectator);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the  Armory of Heavy containment Zone", true, true);
+									ev.Player.SendConsoleMessage("096 room nuke", "default");
+								}
+								else
+								{
+									ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
+								}
 							}
 							else
 							{
@@ -1448,9 +1642,35 @@ namespace SanyaPlugin
 						{
 							if (ev.Player.CurrentRoom.Name.Contains("HCZ_049"))
 							{
-								ev.Player.SetRole(RoleType.Spectator);
-								RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
-								ev.Player.SendConsoleMessage("096 room 096", "default");
+								bool success = false;
+								foreach (var doors in Map.Doors)
+								{
+									
+									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
+									if (doors.doorType == Door.DoorTypes.Standard && doors.name == "ContDoor" && dis < 20)
+									{
+										if (Door.DoorStatus.Closed == doors.status)
+										{
+											doors.locked = true;
+											success = true;
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("Vous devez avoir la porte de votre confinement fermer", "red");
+											return;
+										}
+									}
+								}
+								if (success)
+								{
+									ev.Player.SetRole(RoleType.Spectator);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 4 9 as been contained in there containment chamber", true, true);
+									ev.Player.SendConsoleMessage("Le confinement a été effectué", "default");
+								}
+								else
+								{
+									ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+								}
 							}
 							break;
 						}
@@ -1505,13 +1725,22 @@ namespace SanyaPlugin
 								ReturnStr = $"test ok.{ev.Sender.Position.x} {ev.Sender.Position.y} {ev.Sender.Position.z}:{ev.Sender.Role}";
 								break;
 							}
-						case "room":
+						case "roompos":
 							{
-								ReturnStr = $"RoomList";
+								ReturnStr = $"RoomList\n";
 								foreach (var rooms in Map.Rooms)
 								{
-									ev.Sender.RemoteAdminMessage($"");
-									ReturnStr += $"{rooms.Name} {rooms.Position}\n";
+									ReturnStr += $"{rooms.Name} : {rooms.Position}\n";
+								}
+								break;
+							}
+						case "doorpos":
+							{
+								ReturnStr = $"RoomList\n";
+								foreach (var doors in Map.Doors)
+								{
+									if (doors.isOpen)
+									ReturnStr += $"{doors.DoorName} : {doors.doorType} : {doors.name} : {doors.transform.position}\n";
 								}
 								break;
 							}
@@ -1926,8 +2155,8 @@ namespace SanyaPlugin
 									ReturnStr = "Failed to set."; 
 									break;
 								}
-							}/*
-						case "dummy":
+							}
+						/*case "dummy":
 							{
 								if (!ev.Sender.CheckPermission("sanya.dummy"))
 								{
@@ -1990,9 +2219,9 @@ namespace SanyaPlugin
 								ReturnStr = "EV Used.";
 								break;
 							}
-						case "roompos":
+						case "ridpos":
 							{
-								if (!ev.Sender.CheckPermission("sanya.roompos"))
+								if (!ev.Sender.CheckPermission("sanya.ridpos"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2028,13 +2257,32 @@ namespace SanyaPlugin
 										else
 										{
 											isSuccess = false;
-											ReturnStr = "[tppos] Wrong parameters.";
+											ReturnStr = "[tppos] manque les coordonés <x> <y> <z>.";
+										}
+									}
+									else if (args[2] == "all")
+									{
+										if (float.TryParse(args[3], out float x)
+											&& float.TryParse(args[4], out float y)
+											&& float.TryParse(args[5], out float z))
+										{
+											Vector3 pos = new Vector3(x, y, z);
+											foreach (var ply in Player.List)
+											{
+												ply.ReferenceHub.playerMovementSync.OverridePosition(pos, 0f, true);
+											}
+											ReturnStr = $"TP to {pos}.";
+										}
+										else
+										{
+											isSuccess = false;
+											ReturnStr = "[tppos] manque les coordonés <x> <y> <z>.";
 										}
 									}
 									else
 									{
 										isSuccess = false;
-										ReturnStr = "[tppos] missing target.";
+										ReturnStr = "[tppos] manque la cible.";
 									}
 								}
 								else
@@ -2042,7 +2290,6 @@ namespace SanyaPlugin
 									isSuccess = false;
 									ReturnStr = "[tppos] parameters : tppos <player> <x> <y> <z>";
 								}
-
 								break;
 							}
 						case "gen":
@@ -2140,13 +2387,15 @@ namespace SanyaPlugin
 								{
 									if (args[2] == "ci" || args[2] == "ic")
 									{
-										mtfRespawn.Spawn();
+										mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
+										mtfRespawn.ReadyToCommence();
 										ReturnStr = $"force spawn ChaosInsurgency";
 										break;
 									}
 								else if (args[2] == "mtf" || args[2] == "ntf")
 									{
-										mtfRespawn.Spawn();
+										mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
+										mtfRespawn.ReadyToCommence();
 										ReturnStr = $"force spawn NineTailedFox";
 										break;
 									}
@@ -2171,7 +2420,7 @@ namespace SanyaPlugin
 										break;
 									}
 								}
-							}/*
+							}
 						case "next":
 							{
 								if (!ev.Sender.CheckPermission("sanya.next"))
@@ -2184,18 +2433,19 @@ namespace SanyaPlugin
 								{
 									if (args[2] == "time")
 									{
-										//Intercom NextSpawn
+										//NextSpawn
 										ReturnStr = $"Futur Commande";
 										break;
 									}
 									if (args[2] == "ci" || args[2] == "ic")
 									{
+										mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
 										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency}";
 										break;
 									}
 									else if (args[2] == "mtf" || args[2] == "ntf")
 									{
-										RespawnTickets.Singleton.
+										mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
 										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox}";
 										break;
 									}
@@ -2213,35 +2463,21 @@ namespace SanyaPlugin
 										ReturnStr = $"Next Respawn is ChaosInsurgency";
 										break;
 									}
-									else if (mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox)
+									else
 									{ 
 										ReturnStr = $"Next Respawn is NineTailedFox";
 										break;
 									}
-									else
-									{
-										if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
-										{
-											ReturnStr = $"Next spawn is Chaos Insurgency";
-											break;
-										}
-										else
-										{
-											ReturnStr = $"Next spawn is Nine Tailed Fox";
-											break;
-										}
-									}
-								}								
+								}
 							}
-						case "van":
+						/*case "van":
 							{
 								if (!ev.Sender.CheckPermission("sanya.van"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								RespawnManager.Singleton.GetComponent<RespawnWaveGenerator>;
-								PlayerManager.localPlayer.GetComponent<MTFRespawn>()?.RpcVan();
+
 								ReturnStr = "Van Called!";
 								break;
 							}
@@ -2252,6 +2488,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
+
 								ReturnStr = "Heli Called!";
 								break;
 							}*/
