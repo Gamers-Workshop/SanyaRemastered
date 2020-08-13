@@ -22,6 +22,7 @@ using Exiled.Permissions.Extensions;
 using System.Linq;
 using Scp914;
 using Assets._Scripts.RemoteAdmin;
+using PlayableScps;
 
 namespace SanyaPlugin
 {
@@ -1013,8 +1014,8 @@ namespace SanyaPlugin
 				{
 					var dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
 					if (dis <= 4)
-					{ 
-						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(10f,true);
+					{
+						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f,true);
 					}
 				}
 			}
@@ -1303,10 +1304,10 @@ namespace SanyaPlugin
 
 				if (SanyaPlugin.Instance.Config.Grenade_shoot_fuse)
 				{
-					var grenade = raycastHit.transform.GetComponentInParent<FragGrenade>();
-					if (grenade != null)
+					var fraggrenade = raycastHit.transform.GetComponentInParent<FragGrenade>();
+					if (fraggrenade != null)
 					{
-						grenade.NetworkfuseTime = 0.1f;
+						fraggrenade.NetworkfuseTime = 0.1f;
 					}
 					var Flashgrenade = raycastHit.transform.GetComponentInParent<FlashGrenade>();
 					if (Flashgrenade != null)
@@ -1356,12 +1357,58 @@ namespace SanyaPlugin
 								case "LCZ_914":
 									{
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 9.7f;
+											var x2 = -2.1f;
+											var z1 = 9.6f;
+											var z2 = -9.6f;
+											var y1 = 0f;
+											var y2 = -5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("914"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("914"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1379,13 +1426,100 @@ namespace SanyaPlugin
 									}
 								case "LCZ_012":
 									{
+										int TEST = 0;
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 10.2f;
+											var x2 = -9.6f;
+											var z1 = 8.2f;
+											var z2 = 2.7f;
+											var y1 = 8f;
+											var y2 = -3f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												TEST = 1;
+											}
+										}
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 9.8f;
+											var x2 = -8.9f;
+											var z1 = 7.8f;
+											var z2 = -10f;
+											var y1 = 8f;
+											var y2 = 2.5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												TEST = 2;
+											}
+										}
+										if (TEST == 0)
+										{
+											break;
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("012"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("012"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1404,12 +1538,58 @@ namespace SanyaPlugin
 								case "HCZ_Room3ar":
 									{
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 5.9f;
+											var x2 = 0.4f;
+											var z1 = 2.4f;
+											var z2 = -2.9f;
+											var y1 = 0f;
+											var y2 = -5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("HCZ_ARMORY"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("HCZ_ARMORY"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1428,12 +1608,58 @@ namespace SanyaPlugin
 								case "LCZ_Armory":
 									{
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 7.2f;
+											var x2 = -7.2f;
+											var z1 = 11f;
+											var z2 = -0.5f;
+											var y1 = 20f;
+											var y2 = -5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("LCZ_ARMORY"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("LCZ_ARMORY"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1451,14 +1677,60 @@ namespace SanyaPlugin
 									}
 								case "HCZ_Nuke":
 									{
-										if (ev.Player.Position.y < -600) break;
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 7.5f;
+											var x2 = 0f;
+											var z1 = -15.4f;
+											var z2 = -20.4f;
+											var y1 = -400;
+											var y2 = -420f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre confiné", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("NUKE_ARMORY"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("NUKE_ARMORY"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1478,12 +1750,58 @@ namespace SanyaPlugin
 								case "HCZ_Hid":
 									{
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 3.7f;
+											var x2 = -4.0f;
+											var z1 = 9.8f;
+											var z2 = 7.4f;
+											var y1 = 0f;
+											var y2 = -5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("HID") && doors.PermissionLevels == Door.AccessRequirements.ArmoryLevelThree)
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("HID") && doors.PermissionLevels == Door.AccessRequirements.ArmoryLevelThree)
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1502,12 +1820,58 @@ namespace SanyaPlugin
 								case "HCZ_049":
 									{
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 3.7f;
+											var x2 = -4.0f;
+											var z1 = 9.8f;//a faire
+											var z2 = 7.4f;
+											var y1 = 0f;
+											var y2 = -5f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("049_ARMORY"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("049_ARMORY"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1525,14 +1889,58 @@ namespace SanyaPlugin
 									}
 								case "HCZ_106":
 									{
-										if (ev.Player.Position.y < -1000) break;
 										bool success = false;
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 1.9f;
+											var x2 = -30.8f;
+											var z1 = 9.6f;
+											var z2 = -24.5f;
+											var y1 = 20f;
+											var y2 = 13f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												success = true;
+											}
+											else
+											{
+												break;
+											}
+										}
 										foreach (var doors in Map.Doors)
 										{
-											if (doors.DoorName.Contains("106_BOTTOM"))
-												if (Door.DoorStatus.Closed == doors.status)
+											if (doors.DoorName.Equals("106_BOTTOM"))
+												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 												{
-													doors.locked = true;
+													doors.Networklocked = true;
 													success = true;
 												}
 										}
@@ -1551,25 +1959,135 @@ namespace SanyaPlugin
 								case "HCZ_079":
 									{
 										bool success = false;
-										foreach (var doors in Map.Doors)
+										int TEST = 0;
 										{
-											if (doors.DoorName.Contains("079"))
-												if (Door.DoorStatus.Closed == doors.status)
-												{
-													doors.locked = true;
-													success = true;
-												}
-												else
-												{
-													success = false;
-													break;
-												}
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 8.3f;
+											var x2 = -9.9f;
+											var z1 = -5.6f;
+											var z2 = -22f;
+											var y1 = 10f;
+											var y2 = 0f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												TEST = 1;
+											}
+										}
+										if (TEST != 1)
+										{
+											Vector3 end;
+											Vector3 end2;
+											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+											var x1 = 20.6f;
+											var x2 = 12.1f;
+											var z1 = 2.1f;
+											var z2 = -18.6f;
+											var y1 = 7f;
+											var y2 = 0f;
+											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+											{
+												end = new Vector3(z1, y1, -x2);
+												end2 = new Vector3(z2, y2, -x1);
+											}
+											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+											{
+												end = new Vector3(x1, y1, z1);
+												end2 = new Vector3(x2, y2, z2);
+											}
+											else
+											{
+												end = new Vector3(-z2, y1, x1);
+												end2 = new Vector3(-z1, y2, x2);
+											}
+
+											Log.Info(end2.x < posroom.x);
+											Log.Info(posroom.x < end.x);
+											Log.Info(end2.y < posroom.y);
+											Log.Info(posroom.y < end.y);
+											Log.Info(end2.z < posroom.z);
+											Log.Info(posroom.z < end.z);
+											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+											{
+												TEST = 2;
+											}
+										}
+										if (TEST == 1)
+										{
+											foreach (var doors in Map.Doors)
+											{
+												if (doors.DoorName.Equals("079_SECOND"))
+													if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+													{
+														doors.Networklocked = true;
+														success = true;
+													}
+													else
+													{
+														success = false;
+														break;
+													}
+											}
+										}
+										if (TEST == 2)
+										{
+											foreach (var doors in Map.Doors)
+											{
+												if (doors.DoorName.Equals("079_FIRST") && TEST == 2)
+													if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+													{
+														doors.Networklocked = true;
+														success = true;
+													}
+													else
+													{
+														success = false;
+														break;
+													}
+											}
 										}
 										if (success)
 										{
 											ev.Player.SetRole(RoleType.Spectator);
 											RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
 											ev.Player.SendConsoleMessage("173 room 049", "default");
+										}
+										if (TEST == 0)
+										{
+											ev.Player.SendConsoleMessage("Tu doit étre confiné", "red");
 										}
 										else
 										{
@@ -1586,15 +2104,68 @@ namespace SanyaPlugin
 						}
 					case RoleType.Scp096:
 						{
-							if (ev.Player.CurrentRoom.Name.Contains("HCZ_457"))
+							Log.Info($"096 state : {(ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
+							if (Scp096PlayerState.Docile != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState 
+								&& Scp096PlayerState.TryNotToCry != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
+							{
+								ev.Player.SendConsoleMessage("NON MEC VAS TUER LES GENS IL Doivent pas te reconf si t'es trigger", "red");
+								break;
+							}
+							if (ev.Player.CurrentRoom.Name.Equals("HCZ_457"))
 							{
 								bool success = false;
+								{
+									Vector3 end;
+									Vector3 end2;
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position; 
+									var x1 = 4.4f;
+									var x2 = 0.5f;
+									var z1 = 1.9f;
+									var z2 = -1.9f;
+									var y1 = 0f;
+									var y2 = -5f;
+									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+									{
+										end = new Vector3(z1, y1, -x2);
+										end2 = new Vector3(z2, y2, -x1);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else
+									{
+										end = new Vector3(-z2, y1, x1);
+										end2 = new Vector3(-z1, y2, x2);
+									}
+									Log.Info(end2.x < posroom.x);
+									Log.Info(posroom.x < end.x);
+									Log.Info(end2.y < posroom.y);
+									Log.Info(posroom.y < end.y);
+									Log.Info(end2.z < posroom.z);
+									Log.Info(posroom.z < end.z);
+									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+									{
+										success = true;
+									}
+									else
+									{
+										ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+										break;
+									}
+								}
 								foreach (var doors in Map.Doors)
 								{
-									if (doors.DoorName.Contains("096"))
-										if (Door.DoorStatus.Closed == doors.status)
+									if (doors.DoorName.Equals("096"))
+										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 										{
-											doors.locked = true;
+											doors.Networklocked = true;
 											success = true;
 										}
 								}
@@ -1609,22 +2180,70 @@ namespace SanyaPlugin
 									ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
 								}
 							}
-							else if (ev.Player.CurrentRoom.Name.Contains("HCZ_Nuke") && ev.Player.Position.y >= -600)
+							else if (ev.Player.CurrentRoom.Name.Equals("HCZ_Nuke"))
 							{
 								bool success = false;
+										{
+										Vector3 end;
+										Vector3 end2;
+										var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+										var x1 = 7.5f;
+										var x2 = 0f;
+										var z1 = -15.4f;
+										var z2 = -20.4f;
+										var y1 = -390;
+										var y2 = -420f;
+
+										if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+										{
+											end = new Vector3(x1, y1, z1);
+											end2 = new Vector3(x2, y2, z2);
+										}
+										else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+										{
+											end = new Vector3(z1, y1, -x2);
+											end2 = new Vector3(z2, y2, -x1);
+										}
+										else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+										{
+											end = new Vector3(x1, y1, z1);
+											end2 = new Vector3(x2, y2, z2);
+										}
+										else
+										{
+											end = new Vector3(-z2, y1, x1);
+											end2 = new Vector3(-z1, y2, x2);
+										}
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+
+										if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+										{
+											success = true;
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("Tu doit étre confiné", "red");
+											break;
+										}
+								}
 								foreach (var doors in Map.Doors)
 								{
-									if (doors.DoorName.Contains("NUKE_ARMORY"))
-										if (Door.DoorStatus.Closed == doors.status)
+									if (doors.DoorName.Equals("NUKE_ARMORY"))
+										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 										{
-											doors.locked = true;
+											doors.Networklocked = true;
 											success = true;
 										}
 								}
 								if (success)
 								{
 									ev.Player.SetRole(RoleType.Spectator);
-									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the  Armory of Heavy containment Zone", true, true);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the Armory of NATO_A Warhead", true, true);
 									ev.Player.SendConsoleMessage("096 room nuke", "default");
 								}
 								else
@@ -1640,18 +2259,63 @@ namespace SanyaPlugin
 						}
 					case RoleType.Scp049:
 						{
-							if (ev.Player.CurrentRoom.Name.Contains("HCZ_049"))
+							if (ev.Player.CurrentRoom.Name.Equals("HCZ_049"))
 							{
-								bool success = false;
+								bool success;
+								{
+									Vector3 end;
+									Vector3 end2;
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+									var x1 = 9.3f;
+									var x2 = -9.3f;
+									var z1 = -11.6f;
+									var z2 = -16.5f;
+									var y1 = -250f;
+									var y2 = -275f;
+									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+									{
+										end = new Vector3(z1, y1, -x2);
+										end2 = new Vector3(z2, y2, -x1);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else
+									{
+										end = new Vector3(-z2, y1, x1);
+										end2 = new Vector3(-z1, y2, x2);
+									}
+									Log.Info(end2.x < posroom.x);
+									Log.Info(posroom.x < end.x); 
+									Log.Info(end2.y < posroom.y);
+									Log.Info(posroom.y < end.y);
+									Log.Info(end2.z < posroom.z);
+									Log.Info(posroom.z < end.z);
+									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+									{
+										success = true;
+									}
+									else
+									{
+										ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+										break;
+									}
+								}
 								foreach (var doors in Map.Doors)
 								{
-									
 									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
-									if (doors.doorType == Door.DoorTypes.Standard && doors.name == "ContDoor" && dis < 20)
+									if (doors.doorType == Door.DoorTypes.Standard && doors.name == "ContDoor" && dis < 25)
 									{
-										if (Door.DoorStatus.Closed == doors.status)
+										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
 										{
-											doors.locked = true;
+											doors.Networklocked = true;
 											success = true;
 										}
 										else
@@ -1667,30 +2331,158 @@ namespace SanyaPlugin
 									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 4 9 as been contained in there containment chamber", true, true);
 									ev.Player.SendConsoleMessage("Le confinement a été effectué", "default");
 								}
-								else
-								{
-									ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
-								}
 							}
 							break;
 						}
 					case RoleType.Scp93953:
 					case RoleType.Scp93989:
 						{
-							if (ev.Player.CurrentRoom.Name.Contains("HCZ_106") && ev.Player.Position.y < -1000)
+							if (ev.Player.CurrentRoom.Name.Equals("HCZ_106"))
 							{
-								ev.Player.SetRole(RoleType.Spectator);
-								RespawnEffectsController.PlayCassieAnnouncement("SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6", true, true);
-								ev.Player.SendConsoleMessage("939 confiné", "default");
+								bool success = false;
+								{
+									Vector3 end;
+									Vector3 end2;
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+									var x1 = 1.9f;
+									var x2 = -30.8f;
+									var z1 = 9.6f;
+									var z2 = -24.5f;
+									var y1 = 20f;
+									var y2 = 13f;
+									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+									{
+										end = new Vector3(z1, y1, -x2);
+										end2 = new Vector3(z2, y2, -x1);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else
+									{
+										end = new Vector3(-z2, y1, x1);
+										end2 = new Vector3(-z1, y2, x2);
+									}
+									Log.Info(end2.x < posroom.x);
+									Log.Info(posroom.x < end.x);
+									Log.Info(end2.y < posroom.y);
+									Log.Info(posroom.y < end.y);
+									Log.Info(end2.z < posroom.z);
+									Log.Info(posroom.z < end.z);
+									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+									{
+										success = true;
+									}
+									else
+									{
+										break;
+									}
+								}
+								foreach (var doors in Map.Doors)
+								{
+									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
+									if (doors.DoorName.Equals("106_BOTTOM"))
+									{
+										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										{
+											doors.Networklocked = true;
+											success = true;
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La porte est ouverte", "red");
+											return;
+										}
+									}
+								}
+								if (success)
+								{
+									ev.Player.SetRole(RoleType.Spectator);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6", true, true);
+									ev.Player.SendConsoleMessage("939 confiné", "default");
+								}
 							}
 							break;
 						}
 					case RoleType.Scp0492:
 						{
-							if (ev.Player.CurrentRoom.Name.Contains("HCZ_106") && ev.Player.Position.y < -1000)
+							if (ev.Player.CurrentRoom.Name.Equals("HCZ_106"))
 							{
-								ev.Player.SetRole(RoleType.Spectator);
-								ev.Player.SendConsoleMessage("049-2 confiné", "default");
+								bool success = false;
+								{
+									Vector3 end;
+									Vector3 end2;
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+									var x1 = 1.9f;
+									var x2 = -30.8f;
+									var z1 = 9.6f;
+									var z2 = -24.5f;
+									var y1 = 20f;
+									var y2 = 13f;
+									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+									{
+										end = new Vector3(z1, y1, -x2);
+										end2 = new Vector3(z2, y2, -x1);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else
+									{
+										end = new Vector3(-z2, y1, x1);
+										end2 = new Vector3(-z1, y2, x2);
+									}
+									Log.Info(end2.x < posroom.x);
+									Log.Info(posroom.x < end.x);
+									Log.Info(end2.y < posroom.y);
+									Log.Info(posroom.y < end.y);
+									Log.Info(end2.z < posroom.z);
+									Log.Info(posroom.z < end.z);
+									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+									{
+										success = true;
+									}
+									else
+									{
+										break;
+									}
+								}
+								foreach (var doors in Map.Doors)
+								{
+									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
+									if (doors.DoorName.Equals("106_BOTTOM"))
+									{
+										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										{
+											doors.Networklocked = true;
+											success = true;
+										}
+										else
+										{
+											ev.Player.SendConsoleMessage("La porte est ouverte", "red");
+											return;
+										}
+									}
+								}
+								if (success)
+								{
+									ev.Player.SetRole(RoleType.Spectator);
+									ev.Player.SendConsoleMessage("049-2 confiné", "default");
+								}
 							}
 							break;
 						}
@@ -1722,7 +2514,14 @@ namespace SanyaPlugin
 					{
 						case "test":
 							{
-								ReturnStr = $"test ok.{ev.Sender.Position.x} {ev.Sender.Position.y} {ev.Sender.Position.z}:{ev.Sender.Role}";
+								ReturnStr = $"test ok.\n{ev.Sender.Position.x} {ev.Sender.Position.y} {ev.Sender.Position.z}:{ev.Sender.Role}";
+								break;
+							}
+						case "test1":
+							{
+								var roompos = ev.Sender.CurrentRoom.Transform.position - ev.Sender.Position;
+								ReturnStr = $"Verification\n{ev.Sender.CurrentRoom.Transform.rotation.eulerAngles}";
+								ReturnStr += $"position en fonction de la salle : {roompos}";
 								break;
 							}
 						case "roompos":
@@ -1740,7 +2539,7 @@ namespace SanyaPlugin
 								foreach (var doors in Map.Doors)
 								{
 									if (doors.isOpen)
-									ReturnStr += $"{doors.DoorName} : {doors.doorType} : {doors.name} : {doors.transform.position}\n";
+									ReturnStr += $"{doors.doorType} : {doors.name} : {doors.transform.position} : {doors.DoorName} \n";
 								}
 								break;
 							}

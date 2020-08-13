@@ -642,7 +642,6 @@ namespace SanyaPlugin.Functions
 			NetworkWriterPool.Recycle(writer);
 			NetworkWriterPool.Recycle(writer2);
 		}
-
 		public static void MakeCustomSyncVarWriter(NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncVar, NetworkWriter owner, NetworkWriter observer)
 		{
 			ulong dirty = 0ul;

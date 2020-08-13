@@ -151,7 +151,7 @@ public static class Scp079InteractPatch
 			foreach (GameObject Player in PlayerManager.players)
 			{
 				{
-				if (player.ReferenceHub.scp079PlayerScript.curLvl <= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
+				if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
 				{
 					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
 					break;
@@ -205,7 +205,7 @@ public static class Scp079InteractPatch
 					}
 				}
 					player.ReferenceHub.SendTextHint(Subtitles.Extend079SuccessGaz, 10);
-					player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
+					if (!player.IsStaffBypassEnabled || !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
 					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
 				}
 			}
@@ -213,7 +213,7 @@ public static class Scp079InteractPatch
 		}
 		else if (command.Contains("DOOR:"))
 		{
-			if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
+			if (__instance.curLvl + 2 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
 			{
 				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep > __instance.curMana)
 				{
@@ -225,7 +225,7 @@ public static class Scp079InteractPatch
 				{
 					player.ReferenceHub.playerInteract.RpcDenied(target);
 					door.curCooldown = 0.5f;
-					__instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
+					if (!player.IsStaffBypassEnabled || !player.IsBypassModeEnabled) __instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
 				}
 				return false;
 			}
@@ -237,8 +237,8 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
 		foreach (var item in doors)
 		{
-			item.locked = true;
-			item.isOpen = true;
+			item.Networklocked = true;
+			item.NetworkisOpen = true;
 		}
 		
 		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i--)
@@ -263,8 +263,8 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		}
 		foreach (var item in doors)
 		{
-			item.locked = true;
-			item.isOpen = false;
+			item.Networklocked = true;
+			item.NetworkisOpen = false;
 		}
 		foreach (var ply in PlayerManager.players)
 		{
@@ -283,7 +283,6 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 				{
 					player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 					player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
-					player.ReferenceHub.playerEffectsController.EnableEffect<Corroding>();
 					player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
 					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10f, "GAS", DamageTypes.Poison, 0), player.GameObject);
 					if (player.Role == RoleType.Spectator)
@@ -296,8 +295,8 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		}
 		foreach (var item in doors)
 		{
-			item.locked = false;
-			item.isOpen = true;
+			item.Networklocked = false;
+			item.NetworkisOpen = true;
 		}
 	}
 
