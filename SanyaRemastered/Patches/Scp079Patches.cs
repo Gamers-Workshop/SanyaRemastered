@@ -147,27 +147,26 @@ public static class Scp079InteractPatch
 		
 		if (command.Contains("LOCKDOWN:"))
 		{
-		__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz, __instance.curMana);
 			foreach (GameObject Player in PlayerManager.players)
 			{
 				{
-				if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_level_gaz)
+				if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExLevelGaz)
 				{
 					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
 					break;
 				}
-				else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+				else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
 				{
 					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
 					break;
 				}
-				else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz)
+				else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
 				{
 					//no break
 				}
 				else
 				{
-				Log.Error("else");
+				Log.Error("ERROR");
 				break;
 				}
 				ReferenceHub hub = ReferenceHub.GetHub(Player);
@@ -178,14 +177,14 @@ public static class Scp079InteractPatch
 						foreach (Door door in doors)
 						{
 						if (!locked &&
-							( door.destroyed 
-							|| door.lockdown 
-							|| door.locked 
-							|| door._isLockedBy079 
-							|| door._wasLocked 
+							( door.destroyed
+							|| door.lockdown
+							|| door.locked
+							|| door._isLockedBy079
+							|| door._wasLocked
 							|| door.warheadlock
-							|| door._checkpointLockOpen 
-							|| door._checkpointLockOpenDecont 
+							|| door._checkpointLockOpen
+							|| door._checkpointLockOpenDecont
 							|| door._checkpointLockOpenWarhead))
 							locked = true;
 						}
@@ -205,7 +204,7 @@ public static class Scp079InteractPatch
 					}
 				}
 					player.ReferenceHub.SendTextHint(Subtitles.Extend079SuccessGaz, 10);
-					if (!player.IsStaffBypassEnabled || !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079_ex_cost_gaz;
+					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz;
 					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
 				}
 			}
@@ -213,19 +212,36 @@ public static class Scp079InteractPatch
 		}
 		else if (command.Contains("DOOR:"))
 		{
-			if (__instance.curLvl + 2 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
+			__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
+			foreach (GameObject Player in PlayerManager.players)
 			{
-				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep > __instance.curMana)
 				{
-					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
-					return false;
+					if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
+					{
+						player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
+						break;
+					}
+					else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
+					{
+						player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
+						break;
+					}
+					else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
+					{
+						//no break
+					}
+					else
+					{
+						Log.Error("ERROR");
+						break;
+					}
 				}
 				var door = target.GetComponent<Door>();
 				if (door != null && door.curCooldown <= 0f)
 				{
-					player.ReferenceHub.playerInteract.RpcDenied(target);
+					player.ReferenceHub.playerInteract.CallRpcDenied(target);
 					door.curCooldown = 0.5f;
-					if (!player.IsStaffBypassEnabled || !player.IsBypassModeEnabled) __instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
+					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
 				}
 				return false;
 			}
@@ -241,15 +257,18 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 			item.NetworkisOpen = true;
 		}
 		
-		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i--)
+		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i -= 1)
 		{
 			foreach (var ply in PlayerManager.players)
 			{
 				var player = Exiled.API.Features.Player.Dictionary[ply];
-				if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+				if (player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 				{
-					player.ClearBroadcasts();
-					player.Broadcast(1, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
+					if (SanyaPlugin.SanyaPlugin.Instance.Config.CassieSubtitle)
+					{
+						player.ClearBroadcasts();
+						player.Broadcast(1, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
+					}
 					foreach (RespawnEffectsController respawnEffectsController in RespawnEffectsController.AllControllers)
 					{
 						if (respawnEffectsController != null)
@@ -259,7 +278,7 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 					}
 				}
 			}
-			yield return Timing.WaitForSeconds(0.5f);
+			yield return Timing.WaitForSeconds(1);
 		}
 		foreach (var item in doors)
 		{
@@ -284,14 +303,15 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 					player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 					player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
 					player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
-					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(10f, "GAS", DamageTypes.Poison, 0), player.GameObject);
+					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2.5f, "GAS", DamageTypes.Poison, 0), player.GameObject);
 					if (player.Role == RoleType.Spectator)
 					{
 						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.Instance.Config.GasExpGain);
+						player.ReferenceHub.SendTextHint("Vous étes mort par le gazage de SCP-079", 20);
 					}
 				}
 			}
-			yield return Timing.WaitForSeconds(1);
+			yield return Timing.WaitForSeconds(0.5f);
 		}
 		foreach (var item in doors)
 		{

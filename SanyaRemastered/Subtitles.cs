@@ -97,7 +97,7 @@
 		);
 		internal static readonly string Extend106First = string.Concat(
 			"<color=#bbee00><size=25>",
-			"Extend mode available. You can toggle by sprint keys.\nIt can be created at random humans position by using [create sinkhole] in extend mode.",
+			"WIP Extend mode available. You can toggle by sprint keys.\nIt can be created at random humans position by using [create sinkhole] in extend mode.",
 			"WIP Le mode étendue de SCP-106. Vous permet de vous tp dans la salle devant vous en appuyant sur sprint et en utilisant votre tp",
 			"</size></color>"
 		);

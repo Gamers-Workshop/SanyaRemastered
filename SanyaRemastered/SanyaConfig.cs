@@ -80,6 +80,9 @@ namespace SanyaRemastered
 		public bool Scp049_2DontOpenDoorAnd106 { get; set; } = false;
 		public bool Scp939And096DontOpenlockerAndGenerator { get; set; } = false;
 		public bool GrenadeEffect { get; set; } = false;
+		public bool Scp939RemoveRagdoll { get; set; } = false;
+		public bool Scp096RemoveRagdoll { get; set; } = false;
+		public bool TeslaExplodeGrenade { get; set; } = false;
 
 		[Description("Corosion sur les tache de SCP-106 WIP")]
 		public bool Coroding106 { get; set; } = false;
@@ -148,15 +151,15 @@ namespace SanyaRemastered
 		public int Scp939RecoveryAmount { get; set; } = 0;
 
 		[Description("Diviseur de dégats")]
-		public float Scp096DamageDivisor { get; set; } = 1f;
-		public float Scp173DamageDivisor { get; set; } = 1f;
-		public float Scp049DamageDivisor { get; set; } = 1f;
-		public float Scp0492DamageDivisor { get; set; } = 1f;
-		public float Scp939DamageDivisor { get; set; } = 1f;
+		public float Scp096DamageMultiplicator { get; set; } = 1f;
+		public float Scp173DamageMultiplicator { get; set; } = 1f;
+		public float Scp049DamageMultiplicator { get; set; } = 1f;
+		public float Scp0492DamageMultiplicator { get; set; } = 1f;
+		public float Scp939DamageMultiplicator { get; set; } = 1f;
 
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
-		public float Scp106DamageDivisor { get; set; } = 1f;
-		public float Scp106GrenadeDivisor { get; set; } = 1f;
+		public float Scp106DamageMultiplicator { get; set; } = 1f;
+		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
 		
 
 		[Description("SCP-079 Activé le mode Etendue de 079")]
@@ -173,8 +176,8 @@ namespace SanyaRemastered
 		public int GasDuration  { get; set; } = 60;
 		public int TimerWaitGas { get; set; } = 60;
 		public int GasExpGain { get; set; } = 2;
-		public float Scp079_ex_cost_gaz { get; set; } = 150;
-		public int Scp079_ex_level_gaz { get; set; } = 4;
+		public float Scp079ExCostGaz { get; set; } = 150;
+		public int Scp079ExLevelGaz { get; set; } = 4;
 
 		[Description("SCP-079 Config")]
 		public float Scp079CostCamera { get; set; } = 1f;

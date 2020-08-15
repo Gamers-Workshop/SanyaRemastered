@@ -21,7 +21,6 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System.Linq;
 using Scp914;
-using Assets._Scripts.RemoteAdmin;
 using PlayableScps;
 
 namespace SanyaPlugin
@@ -187,6 +186,8 @@ namespace SanyaPlugin
 		/** Flag Params **/
 		private readonly int grenade_pickup_mask = 1049088;
 		private int prevMaxAHP = 0;
+		private bool StopRespawn = false;
+		private bool StopTicket = false;
 
 		public void OnWaintingForPlayers()
 		{
@@ -221,7 +222,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.ClassD_container_locked)
 			{
-				Coroutines.StartContainClassD();
+				Coroutines.StartContainClassD(false ,SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
 			}
 		}
 
@@ -281,6 +282,14 @@ namespace SanyaPlugin
 		{
 			Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}");
 
+			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
+			{
+				ev.IsAllowed = false;
+			}
+			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
+			{
+				ev.IsAllowed = false;
+			}
 			if (SanyaPlugin.Instance.Config.CassieSubtitle)
 			{
 				bool isresumed = AlphaWarheadController._resumeScenario != -1;
@@ -409,7 +418,7 @@ namespace SanyaPlugin
 		{
 			Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}");
 
-			if ((SanyaPlugin.Instance.Config.KickSteamLimited || SanyaPlugin.Instance.Config.KickVpn) && !ev.UserId.Contains("@northwood", StringComparison.InvariantCultureIgnoreCase))
+			if ((SanyaPlugin.Instance.Config.KickSteamLimited || SanyaPlugin.Instance.Config.KickVpn) && !ev.UserId.EndsWith("@northwood", StringComparison.InvariantCultureIgnoreCase))
 			{
 				reader.SetSource(ev.Request.Data.RawData, 20);
 				if (reader.TryGetBytesWithLength(out var sb) && reader.TryGetString(out var s) &&
@@ -443,7 +452,7 @@ namespace SanyaPlugin
 				roundCoroutines.Add(Timing.RunCoroutine(ShitChecker.CheckVPN(ev)));
 			}
 
-			if (SanyaPlugin.Instance.Config.KickSteamLimited && ev.UserId.Contains("@steam", StringComparison.InvariantCultureIgnoreCase))
+			if (SanyaPlugin.Instance.Config.KickSteamLimited && ev.UserId.EndsWith("@steam", StringComparison.InvariantCultureIgnoreCase))
 			{
 				roundCoroutines.Add(Timing.RunCoroutine(ShitChecker.CheckIsLimitedSteam(ev.UserId)));
 			}
@@ -651,26 +660,26 @@ namespace SanyaPlugin
 					switch (ev.Target.Role)
 					{
 						case RoleType.Scp173:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp173DamageDivisor;
+							ev.Amount *= SanyaPlugin.Instance.Config.Scp173DamageMultiplicator;
 							break;
 						case RoleType.Scp106:
-							if (ev.DamageType == DamageTypes.Grenade) ev.Amount /= SanyaPlugin.Instance.Config.Scp106GrenadeDivisor;
+							if (ev.DamageType == DamageTypes.Grenade) ev.Amount *= SanyaPlugin.Instance.Config.Scp106GrenadeMultiplicator;
 							if (ev.DamageType != DamageTypes.MicroHid
 								&& ev.DamageType != DamageTypes.Tesla)
-								ev.Amount /= SanyaPlugin.Instance.Config.Scp106DamageDivisor;
+								ev.Amount *= SanyaPlugin.Instance.Config.Scp106DamageMultiplicator;
 							break;
 						case RoleType.Scp049:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp049DamageDivisor;
+							ev.Amount *= SanyaPlugin.Instance.Config.Scp049DamageMultiplicator;
 							break;
 						case RoleType.Scp096:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp096DamageDivisor;
+							ev.Amount *= SanyaPlugin.Instance.Config.Scp096DamageMultiplicator;
 							break;
 						case RoleType.Scp0492:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp0492DamageDivisor;
+							ev.Amount *= SanyaPlugin.Instance.Config.Scp0492DamageMultiplicator;
 							break;
 						case RoleType.Scp93953:
 						case RoleType.Scp93989:
-							ev.Amount /= SanyaPlugin.Instance.Config.Scp939DamageDivisor;
+							ev.Amount *= SanyaPlugin.Instance.Config.Scp939DamageMultiplicator;
 							break;
 					}
 				}
@@ -683,9 +692,8 @@ namespace SanyaPlugin
 		{
 			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
 			Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.GetDamageName()}-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
-
+			
 			if (ev.Killer == null) return;
-
 			if (SanyaPlugin.Instance.Config.DataEnabled)
 			{
 				if (!string.IsNullOrEmpty(ev.Killer.UserId)
@@ -700,7 +708,6 @@ namespace SanyaPlugin
 					PlayerDataManager.playersData[ev.Target.UserId].AddExp(SanyaPlugin.Instance.Config.LevelExpDeath);
 				}
 			}
-
 			if (ev.HitInformations.GetDamageType() == DamageTypes.Scp173 && ev.Killer.Role == RoleType.Scp173 && SanyaPlugin.Instance.Config.Scp173RecoveryAmount > 0)
 			{
 				ev.Killer.ReferenceHub.playerStats.HealHPAmount(SanyaPlugin.Instance.Config.Scp173RecoveryAmount);
@@ -815,23 +822,26 @@ namespace SanyaPlugin
 			}
 
 			//Ticket Extend a revoir
-			var ticket = RespawnTickets.Singleton._tickets;
-			switch (ev.Killer.Team)
+			if (StopTicket)
 			{
-				case Team.CDP:
-					ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_classd_died_count);
-					if (ev.Killer.Team == Team.MTF || ev.Killer.Team == Team.RSC) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_classd_killed_count);
-					break;
-				case Team.RSC:
-					ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_scientist_died_count);
-					if (ev.Killer.Team == Team.CHI || ev.Killer.Team == Team.CDP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_ci_scientist_killed_count);
-					break;
-				case Team.MTF:
-					if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_killed_by_scp_count);
-					break;
-				case Team.CHI:
-					if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_killed_by_scp_count);
-					break;
+				var ticket = RespawnTickets.Singleton._tickets;
+				switch (ev.Killer.Team)
+				{
+					case Team.CDP:
+						ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_classd_died_count);
+						if (ev.Killer.Team == Team.MTF || ev.Killer.Team == Team.RSC) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_classd_killed_count);
+						break;
+					case Team.RSC:
+						ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_scientist_died_count);
+						if (ev.Killer.Team == Team.CHI || ev.Killer.Team == Team.CDP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_ci_scientist_killed_count);
+						break;
+					case Team.MTF:
+						if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_killed_by_scp_count);
+						break;
+					case Team.CHI:
+						if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_killed_by_scp_count);
+						break;
+				}
 			}
 		}
 
@@ -883,11 +893,14 @@ namespace SanyaPlugin
 			}
 			if (ev.Item == ItemType.SCP500)
 			{
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Asphyxiated>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Poisoned>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Amnesia>();
+				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Deafened>();
 			}
 		}
 
@@ -958,7 +971,7 @@ namespace SanyaPlugin
 		}
 		public void OnPlayerChangeAnim(SyncingDataEventArgs ev)
 		{
-			if (ev.Player.IsHost || ev.Player.ReferenceHub.animationController.curAnim == ev.CurrentAnimation) return;
+			if (ev.Player.IsHost || ev.Player.ReferenceHub.animationController.curAnim == ev.CurrentAnimation || ev.Player == null) return;
 
 			if (SanyaPlugin.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
 			{
@@ -1004,6 +1017,10 @@ namespace SanyaPlugin
 			{
 				ev.Players.Clear();
 			}
+			if (StopRespawn)
+			{
+				ev.Players.Clear();
+			}
 		}
 		public void OnExplodingGrenade (ExplodingGrenadeEventArgs ev)
 		{
@@ -1013,24 +1030,16 @@ namespace SanyaPlugin
 				foreach (var ply in Player.List)
 				{
 					var dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
-					if (dis <= 4)
+					if (dis <= 15)
 					{
-						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f,true);
+						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f / dis,true);
 					}
 				}
 			}
 		}
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
-			Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname} Permissions : {ev.Permissions} Type : {ev.GetType()}  Allowed : {ev.IsAllowed}");
-			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
-			{
-				ev.IsAllowed = false;
-			}
-			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
-			{
-				ev.IsAllowed = false;
-			}
+			Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
@@ -1039,8 +1048,8 @@ namespace SanyaPlugin
 				foreach (var item in ev.Player.Inventory.items)
 				{
 					if (ev.Player.Inventory.GetItemByID(item.id).permissions.Contains("ARMORY_LVL_2"))
-					{ 
-						ev.IsAllowed = true; 
+					{
+						ev.IsAllowed = true;
 					}
 				}
 					
@@ -1270,13 +1279,13 @@ namespace SanyaPlugin
 						foreach (var player in ev.Players)
 						{
 							player.ReferenceHub.fpc.sprintToggle = true;
-							player.ReferenceHub.fpc.effectScp207.Intensity += 4;
+							player.ReferenceHub.fpc.effectScp207.Intensity = 4;
 						}
 						break;
 					case Scp914Knob.VeryFine:
 						foreach (var player in ev.Players)
 						{
-							var Death = new PlayerStats.HitInfo(99999, "Scp-914", DamageTypes.RagdollLess, 0);
+							var Death = new PlayerStats.HitInfo(99999, "Scp-914", DamageTypes.Scp096, 0);
 							player.ReferenceHub.playerStats.HurtPlayer(Death, player.ReferenceHub.gameObject);
 							player.ReferenceHub.SendTextHint("L'analyse chimique de la substance a l'intérieur de SCP-914 reste non concluante.", 30);
 						}
@@ -1354,17 +1363,17 @@ namespace SanyaPlugin
 							}
 							switch (ev.Player.CurrentRoom.Name)
 							{
-								case "LCZ_914":
+								case "LCZ_914 (14)":
 									{
 										bool success = false;
 										{
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 9.7f;
-											var x2 = -2.1f;
-											var z1 = 9.6f;
-											var z2 = -9.6f;
+											var x1 = 2.9f;
+											var x2 = -10.2f;
+											var z1 = 10.1f;
+											var z2 = -10.2f;
 											var y1 = 0f;
 											var y2 = -5f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -1379,8 +1388,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1395,7 +1404,7 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+												
 											}
 											else
 											{
@@ -1406,7 +1415,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("914"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1424,7 +1433,7 @@ namespace SanyaPlugin
 										}
 										break;
 									}
-								case "LCZ_012":
+								case "LCZ_012 (12)":
 									{
 										int TEST = 0;
 										bool success = false;
@@ -1450,8 +1459,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1469,6 +1478,7 @@ namespace SanyaPlugin
 												TEST = 1;
 											}
 										}
+										if (TEST != 1)
 										{
 											Vector3 end;
 											Vector3 end2;
@@ -1491,8 +1501,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1507,7 +1517,8 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												TEST = 2;
+												ev.Player.SendConsoleMessage("Tu n'est pas coincé", "default");
+												TEST = 1;
 											}
 										}
 										if (TEST == 0)
@@ -1517,7 +1528,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("012"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1542,10 +1553,10 @@ namespace SanyaPlugin
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 5.9f;
-											var x2 = 0.4f;
-											var z1 = 2.4f;
-											var z2 = -2.9f;
+											var x1 = 0.1f;
+											var x2 = -5.6f;
+											var z1 = 2.9f;
+											var z2 = -2.8f;
 											var y1 = 0f;
 											var y2 = -5f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -1560,8 +1571,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1576,7 +1587,7 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+												
 											}
 											else
 											{
@@ -1587,7 +1598,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("HCZ_ARMORY"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1610,14 +1621,14 @@ namespace SanyaPlugin
 										bool success = false;
 										{
 											Vector3 end;
-											Vector3 end2;
+                                            Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 7.2f;
-											var x2 = -7.2f;
-											var z1 = 11f;
-											var z2 = -0.5f;
-											var y1 = 20f;
-											var y2 = -5f;
+											var x1 = 1.2f;
+											var x2 = -9.5f;
+											var z1 = 6f;
+											var z2 = -7f;
+											var y1 = -1f;
+											var y2 = -10f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
 											{
 												end = new Vector3(x1, y1, z1);
@@ -1630,8 +1641,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1646,7 +1657,7 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+												
 											}
 											else
 											{
@@ -1657,7 +1668,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("LCZ_ARMORY"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1700,8 +1711,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1717,7 +1728,7 @@ namespace SanyaPlugin
 
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+
 											}
 											else
 											{
@@ -1728,7 +1739,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("NUKE_ARMORY"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1772,8 +1783,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1788,7 +1799,7 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+
 											}
 											else
 											{
@@ -1799,7 +1810,7 @@ namespace SanyaPlugin
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("HID") && doors.PermissionLevels == Door.AccessRequirements.ArmoryLevelThree)
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1824,12 +1835,12 @@ namespace SanyaPlugin
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 3.7f;
-											var x2 = -4.0f;
-											var z1 = 9.8f;//a faire
-											var z2 = 7.4f;
-											var y1 = 0f;
-											var y2 = -5f;
+											var x1 = -3f;
+											var x2 = -8.6f;
+											var z1 = -4.6f;
+											var z2 = -10.1f;
+											var y1 = -260f;
+											var y2 = -270f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
 											{
 												end = new Vector3(x1, y1, z1);
@@ -1842,8 +1853,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1858,7 +1869,7 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
+
 											}
 											else
 											{
@@ -1866,10 +1877,14 @@ namespace SanyaPlugin
 												break;
 											}
 										}
+										/*foreach (var window in )
+										{
+											if (window == )
+										}*/
 										foreach (var doors in Map.Doors)
 										{
 											if (doors.DoorName.Equals("049_ARMORY"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 												{
 													doors.Networklocked = true;
 													success = true;
@@ -1889,15 +1904,16 @@ namespace SanyaPlugin
 									}
 								case "HCZ_106":
 									{
+										int TEST = 0;
 										bool success = false;
 										{
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 1.9f;
-											var x2 = -30.8f;
-											var z1 = 9.6f;
-											var z2 = -24.5f;
+											var x1 = 9.6f;
+											var x2 = -24.4f;
+											var z1 = 30.8f;
+											var z2 = -1.9f;
 											var y1 = 20f;
 											var y2 = 13f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -1912,8 +1928,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -1928,21 +1944,95 @@ namespace SanyaPlugin
 											Log.Info(posroom.z < end.z);
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												success = true;
-											}
-											else
-											{
-												break;
+												TEST = 1;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										if (TEST != 1)
 										{
-											if (doors.DoorName.Equals("106_BOTTOM"))
-												if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+											{
+												foreach (var ply in Player.List)
 												{
-													doors.Networklocked = true;
-													success = true;
+													if (ply.Role == RoleType.Scp106)
+													{
+														ev.Player.SendConsoleMessage("Tu ne peux pas te faire reconfiner ici car SCP-106 est pas confiné", "default");
+														return;
+													}
 												}
+												{
+													Vector3 end;
+													Vector3 end2;
+													var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+													var x1 = -25.6f;
+													var x2 = -33.7f;
+													var z1 = 32f;
+													var z2 = -4.6f;
+													var y1 = 20f;
+													var y2 = -10f;
+													if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+													{
+														end = new Vector3(x1, y1, z1);
+														end2 = new Vector3(x2, y2, z2);
+													}
+													else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+													{
+														end = new Vector3(z1, y1, -x2);
+														end2 = new Vector3(z2, y2, -x1);
+													}
+													else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+													{
+														end = new Vector3(-x2, y1, -z2);
+														end2 = new Vector3(-x1, y2, -z1);
+													}
+													else
+													{
+														end = new Vector3(-z2, y1, x1);
+														end2 = new Vector3(-z1, y2, x2);
+													}
+													Log.Info(end2.x < posroom.x);
+													Log.Info(posroom.x < end.x);
+													Log.Info(end2.y < posroom.y);
+													Log.Info(posroom.y < end.y);
+													Log.Info(end2.z < posroom.z);
+													Log.Info(posroom.z < end.z);
+													if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+													{
+														TEST = 2;
+													}
+												}
+											}
+										}
+										if (TEST == 1)
+										{
+											foreach (var doors in Map.Doors)
+											{
+												if (doors.DoorName.Equals("106_BOTTOM"))
+												{
+													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+													{
+														doors.Networklocked = true;
+														success = true;
+													}
+												}
+											}
+										}
+										if (TEST == 2)
+										{
+											foreach (var doors in Map.Doors)
+											{
+												if (doors.DoorName.Equals("106_PRIMARY") || doors.DoorName.Equals("106_SECONDARY"))
+												{
+													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+													{
+														doors.Networklocked = true;
+														success = true;
+													}
+													else
+													{
+														success = false;
+														break;
+													}
+												}
+											}
 										}
 										if (success)
 										{
@@ -1964,10 +2054,10 @@ namespace SanyaPlugin
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 8.3f;
-											var x2 = -9.9f;
-											var z1 = -5.6f;
-											var z2 = -22f;
+											var x1 = 10.3f;
+											var x2 = -8.2f;
+											var z1 = 22.5f;
+											var z2 = 5.2f;
 											var y1 = 10f;
 											var y2 = 0f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -1982,8 +2072,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -2007,10 +2097,10 @@ namespace SanyaPlugin
 											Vector3 end;
 											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-											var x1 = 20.6f;
-											var x2 = 12.1f;
-											var z1 = 2.1f;
-											var z2 = -18.6f;
+											var x1 = -12.3f;
+											var x2 = -20.8f;
+											var z1 = 18.7f;
+											var z2 = -2.5f;
 											var y1 = 7f;
 											var y2 = 0f;
 											if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -2025,8 +2115,8 @@ namespace SanyaPlugin
 											}
 											else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 											{
-												end = new Vector3(x1, y1, z1);
-												end2 = new Vector3(x2, y2, z2);
+												end = new Vector3(-x2, y1, -z2);
+												end2 = new Vector3(-x1, y2, -z1);
 											}
 											else
 											{
@@ -2050,15 +2140,10 @@ namespace SanyaPlugin
 											foreach (var doors in Map.Doors)
 											{
 												if (doors.DoorName.Equals("079_SECOND"))
-													if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 													{
 														doors.Networklocked = true;
 														success = true;
-													}
-													else
-													{
-														success = false;
-														break;
 													}
 											}
 										}
@@ -2067,15 +2152,10 @@ namespace SanyaPlugin
 											foreach (var doors in Map.Doors)
 											{
 												if (doors.DoorName.Equals("079_FIRST") && TEST == 2)
-													if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 													{
 														doors.Networklocked = true;
 														success = true;
-													}
-													else
-													{
-														success = false;
-														break;
 													}
 											}
 										}
@@ -2136,8 +2216,8 @@ namespace SanyaPlugin
 									}
 									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 									{
-										end = new Vector3(x1, y1, z1);
-										end2 = new Vector3(x2, y2, z2);
+										end = new Vector3(-x2, y1, -z2);
+										end2 = new Vector3(-x1, y2, -z1);
 									}
 									else
 									{
@@ -2152,18 +2232,18 @@ namespace SanyaPlugin
 									Log.Info(posroom.z < end.z);
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
-										success = true;
+
 									}
 									else
 									{
-										ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement", "red");
+										ev.Player.SendConsoleMessage("Tu doit étre dans ton confinement (au centre)", "red");
 										break;
 									}
 								}
 								foreach (var doors in Map.Doors)
 								{
 									if (doors.DoorName.Equals("096"))
-										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 										{
 											doors.Networklocked = true;
 											success = true;
@@ -2180,61 +2260,60 @@ namespace SanyaPlugin
 									ev.Player.SendConsoleMessage("La gate n'est pas fermer", "default");
 								}
 							}
-							else if (ev.Player.CurrentRoom.Name.Equals("HCZ_Nuke"))
+							else if (ev.Player.CurrentRoom.Name.Equals("HCZ_Room3ar"))
 							{
 								bool success = false;
-										{
-										Vector3 end;
-										Vector3 end2;
-										var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-										var x1 = 7.5f;
-										var x2 = 0f;
-										var z1 = -15.4f;
-										var z2 = -20.4f;
-										var y1 = -390;
-										var y2 = -420f;
+								{
+									Vector3 end;
+									Vector3 end2;
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
+									var x1 = 0.1f;
+									var x2 = -5.6f;
+									var z1 = 2.9f;
+									var z2 = -2.8f;
+									var y1 = 0f;
+									var y2 = -5f;
+									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
+									{
+										end = new Vector3(x1, y1, z1);
+										end2 = new Vector3(x2, y2, z2);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
+									{
+										end = new Vector3(z1, y1, -x2);
+										end2 = new Vector3(z2, y2, -x1);
+									}
+									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
+									{
+										end = new Vector3(-x2, y1, -z2);
+										end2 = new Vector3(-x1, y2, -z1);
+									}
+									else
+									{
+										end = new Vector3(-z2, y1, x1);//x x0.1
+										end2 = new Vector3(-z1, y2, x2);//z z
+									}
+									Log.Info(end2.x < posroom.x);
+									Log.Info(posroom.x < end.x);
+									Log.Info(end2.y < posroom.y);
+									Log.Info(posroom.y < end.y);
+									Log.Info(end2.z < posroom.z);
+									Log.Info(posroom.z < end.z);
 
-										if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
-										{
-											end = new Vector3(x1, y1, z1);
-											end2 = new Vector3(x2, y2, z2);
-										}
-										else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 90f)
-										{
-											end = new Vector3(z1, y1, -x2);
-											end2 = new Vector3(z2, y2, -x1);
-										}
-										else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
-										{
-											end = new Vector3(x1, y1, z1);
-											end2 = new Vector3(x2, y2, z2);
-										}
-										else
-										{
-											end = new Vector3(-z2, y1, x1);
-											end2 = new Vector3(-z1, y2, x2);
-										}
-										Log.Info(end2.x < posroom.x);
-										Log.Info(posroom.x < end.x);
-										Log.Info(end2.y < posroom.y);
-										Log.Info(posroom.y < end.y);
-										Log.Info(end2.z < posroom.z);
-										Log.Info(posroom.z < end.z);
+									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+									{
 
-										if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
-										{
-											success = true;
-										}
-										else
-										{
-											ev.Player.SendConsoleMessage("Tu doit étre confiné", "red");
-											break;
-										}
+									}
+									else
+									{
+										ev.Player.SendConsoleMessage("Tu doit étre confiné", "red");
+										break;
+									}
 								}
 								foreach (var doors in Map.Doors)
 								{
-									if (doors.DoorName.Equals("NUKE_ARMORY"))
-										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+									if (doors.DoorName.Equals("HCZ_ARMORY"))
+										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 										{
 											doors.Networklocked = true;
 											success = true;
@@ -2243,7 +2322,7 @@ namespace SanyaPlugin
 								if (success)
 								{
 									ev.Player.SetRole(RoleType.Spectator);
-									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the Armory of NATO_A Warhead", true, true);
+									RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the Armory of Heavy Containment Zone", true, true);
 									ev.Player.SendConsoleMessage("096 room nuke", "default");
 								}
 								else
@@ -2261,12 +2340,12 @@ namespace SanyaPlugin
 						{
 							if (ev.Player.CurrentRoom.Name.Equals("HCZ_049"))
 							{
-								bool success;
+								bool success = false;
 								{
 									Vector3 end;
 									Vector3 end2;
 									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-									var x1 = 9.3f;
+									var x1 = 9.2f;
 									var x2 = -9.3f;
 									var z1 = -11.6f;
 									var z2 = -16.5f;
@@ -2284,8 +2363,8 @@ namespace SanyaPlugin
 									}
 									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 									{
-										end = new Vector3(x1, y1, z1);
-										end2 = new Vector3(x2, y2, z2);
+										end = new Vector3(-x2, y1, -z2);
+										end2 = new Vector3(-x1, y2, -z1);
 									}
 									else
 									{
@@ -2300,7 +2379,7 @@ namespace SanyaPlugin
 									Log.Info(posroom.z < end.z);
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
-										success = true;
+
 									}
 									else
 									{
@@ -2313,7 +2392,7 @@ namespace SanyaPlugin
 									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
 									if (doors.doorType == Door.DoorTypes.Standard && doors.name == "ContDoor" && dis < 25)
 									{
-										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 										{
 											doors.Networklocked = true;
 											success = true;
@@ -2344,10 +2423,10 @@ namespace SanyaPlugin
 									Vector3 end;
 									Vector3 end2;
 									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-									var x1 = 1.9f;
-									var x2 = -30.8f;
-									var z1 = 9.6f;
-									var z2 = -24.5f;
+									var x1 = 9.6f;
+									var x2 = -24.4f;
+									var z1 = 30.8f;
+									var z2 = -1.9f;
 									var y1 = 20f;
 									var y2 = 13f;
 									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -2362,8 +2441,8 @@ namespace SanyaPlugin
 									}
 									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 									{
-										end = new Vector3(x1, y1, z1);
-										end2 = new Vector3(x2, y2, z2);
+										end = new Vector3(-x2, y1, -z2);
+										end2 = new Vector3(-x1, y2, -z1);
 									}
 									else
 									{
@@ -2378,7 +2457,7 @@ namespace SanyaPlugin
 									Log.Info(posroom.z < end.z);
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
-										success = true;
+
 									}
 									else
 									{
@@ -2390,7 +2469,7 @@ namespace SanyaPlugin
 									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
 									if (doors.DoorName.Equals("106_BOTTOM"))
 									{
-										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 										{
 											doors.Networklocked = true;
 											success = true;
@@ -2420,10 +2499,10 @@ namespace SanyaPlugin
 									Vector3 end;
 									Vector3 end2;
 									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
-									var x1 = 1.9f;
-									var x2 = -30.8f;
-									var z1 = 9.6f;
-									var z2 = -24.5f;
+									var x1 = 9.6f;
+									var x2 = -24.4f;
+									var z1 = 30.8f;
+									var z2 = -1.9f;
 									var y1 = 20f;
 									var y2 = 13f;
 									if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 0f)
@@ -2438,8 +2517,8 @@ namespace SanyaPlugin
 									}
 									else if (ev.Player.CurrentRoom.Transform.rotation.eulerAngles.y == 180f)
 									{
-										end = new Vector3(x1, y1, z1);
-										end2 = new Vector3(x2, y2, z2);
+										end = new Vector3(-x2, y1, -z2);
+										end2 = new Vector3(-x1, y2, -z1);
 									}
 									else
 									{
@@ -2454,7 +2533,7 @@ namespace SanyaPlugin
 									Log.Info(posroom.z < end.z);
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
-										success = true;
+
 									}
 									else
 									{
@@ -2466,7 +2545,7 @@ namespace SanyaPlugin
 									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
 									if (doors.DoorName.Equals("106_BOTTOM"))
 									{
-										if (doors.status != (Door.DoorStatus.Open | Door.DoorStatus.Moving))
+										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
 										{
 											doors.Networklocked = true;
 											success = true;
@@ -2514,18 +2593,28 @@ namespace SanyaPlugin
 					{
 						case "test":
 							{
-								ReturnStr = $"test ok.\n{ev.Sender.Position.x} {ev.Sender.Position.y} {ev.Sender.Position.z}:{ev.Sender.Role}";
+								ReturnStr = $"test ok.";
 								break;
 							}
-						case "test1":
+						case "posroom":
 							{
+								if (!perm.CheckPermission("sanya.dev"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
 								var roompos = ev.Sender.CurrentRoom.Transform.position - ev.Sender.Position;
 								ReturnStr = $"Verification\n{ev.Sender.CurrentRoom.Transform.rotation.eulerAngles}";
 								ReturnStr += $"position en fonction de la salle : {roompos}";
 								break;
 							}
-						case "roompos":
+						case "roomlist":
 							{
+								if (!perm.CheckPermission("sanya.dev"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
 								ReturnStr = $"RoomList\n";
 								foreach (var rooms in Map.Rooms)
 								{
@@ -2533,56 +2622,33 @@ namespace SanyaPlugin
 								}
 								break;
 							}
-						case "doorpos":
+						case "listdoor":
 							{
+								if (!perm.CheckPermission("sanya.dev"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
 								ReturnStr = $"RoomList\n";
 								foreach (var doors in Map.Doors)
 								{
-									if (doors.isOpen)
-									ReturnStr += $"{doors.doorType} : {doors.name} : {doors.transform.position} : {doors.DoorName} \n";
+									ReturnStr += $"{doors.doorType} : {doors.name} : {doors.DoorName} \n";
 								}
-								break;
-							}
-						case "resynceffect":
-							{
-								if (!ev.Sender.CheckPermission("sanya.resynceffect"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								foreach (var ply in Player.List)
-								{
-									ply.ReferenceHub.playerEffectsController.Resync();
-								}
-								ReturnStr = "Resync ok.";
-								break;
-							}
-						case "check":
-							{
-								if (!ev.Sender.CheckPermission("sanya.check"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = $"\nPlayers List ({PlayerManager.players.Count})\n";
-								foreach (var i in Player.List)
-								{
-									ReturnStr += $"{i.Nickname} {i.Position}\n";
-									foreach (var effect in i.ReferenceHub.playerEffectsController.syncEffectsIntensity)
-										ReturnStr += $"{effect}";
-									ReturnStr += "\n";
-								}
-								ReturnStr.Trim();
 								break;
 							}
 						case "showconfig":
 							{
+								if (!perm.CheckPermission("sanya.showconfig"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
 								ReturnStr = SanyaPlugin.Instance.Config.GetConfigs();
 								break;
 							}
 						case "reload":
 							{
-								if (!ev.Sender.CheckPermission("sanya.reload"))
+								if (!perm.CheckPermission("sanya.reload"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2594,7 +2660,7 @@ namespace SanyaPlugin
 							}
 						case "list":
 							{
-								if (!ev.Sender.CheckPermission("sanya.list"))
+								if (!perm.CheckPermission("sanya.list"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2607,64 +2673,109 @@ namespace SanyaPlugin
 								ReturnStr.Trim();
 								break;
 							}
-						case "startair":
+						case "air":
 							{
-								if (!ev.Sender.CheckPermission("sanya.airbomb"))
+								if (!perm.CheckPermission("sanya.airbomb"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args[2] == "start")
 								{
-									if (int.TryParse(args[2], out int duration))
+									if (args.Length > 2)
 									{
-										if (int.TryParse(args[3], out int duration2))
+										if (int.TryParse(args[3], out int duration))
 										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration, duration2)));
-											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60} and stop in {duration2 / 60}:{duration2 % 60:00}";
-											break;
+											if (int.TryParse(args[4], out int duration2))
+											{
+												roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
+												ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60} and stop in {duration2 / 60}:{duration2 % 60:00}";
+												break;
+											}
+											else
+											{
+												roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
+												ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
+												break;
+											}
 										}
 										else
 										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration)));
-											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
+											isSuccess = false;
+											ReturnStr = "startair {durée avant que ça démare} {durée du bombardement}";
 											break;
 										}
 									}
 									else
 									{
-										isSuccess = false;
-										ReturnStr = "startair {durée avant que ça démare} {durée du bombardement}";
+										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
+										ReturnStr = "Started!";
 										break;
 									}
 								}
 								else
 								{
-									roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
-									ReturnStr = "Started!";
+									roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
+									Coroutines.isAirBombGoing = false;
+									ReturnStr = $"Stop ok. now:{Coroutines.isAirBombGoing}";
 									break;
 								}
 							}
-						case "stopair":
+						case "stoprespawn":
+						case "stopres":
 							{
-								if (!ev.Sender.CheckPermission("sanya.airbomb"))
+								if (!perm.CheckPermission("sanya.stoprespawn"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
-								Coroutines.isAirBombGoing = false;
-								ReturnStr = $"Stop ok. now:{Coroutines.isAirBombGoing}";
+								if (args.Length > 1 && args[2] == "true")
+								{
+									StopRespawn = true;
+									ReturnStr = $"StopRespawn = {StopRespawn}";
+								}
+								else if (args.Length > 1 && args[2] == "false")
+								{
+									StopRespawn = false;
+									ReturnStr = $"StopRespawn = {StopRespawn}";
+								}
+								else
+								{
+									ReturnStr = $"StopRespawn = {StopRespawn}";
+								}
+								break;
+							}
+						case "stopticket":
+							{
+								if (!perm.CheckPermission("sanya.stopticket"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
+								if (args.Length > 1 && args[2] == "true")
+								{
+									StopTicket = true;
+									ReturnStr = $"StopTicket = {StopTicket}";
+								}
+								else if (args.Length > 1 && args[2] == "false")
+								{
+									StopTicket = false;
+									ReturnStr = $"StopTicket = {StopTicket}";
+								}
+								else
+								{
+									ReturnStr = $"StopTicket = {StopTicket}";
+								}
 								break;
 							}
 						case "914":
 							{
-								if (!ev.Sender.CheckPermission("sanya.914"))
+								if (!perm.CheckPermission("sanya.914"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									if (!Scp914.Scp914Machine.singleton.working)
 									{
@@ -2700,7 +2811,7 @@ namespace SanyaPlugin
 							}
 						case "nukecap":
 							{
-								if (!ev.Sender.CheckPermission("sanya.nukecap"))
+								if (!perm.CheckPermission("sanya.nukecap"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2710,32 +2821,9 @@ namespace SanyaPlugin
 								ReturnStr = $"{outsite?.keycardEntered}";
 								break;
 							}
-						case "blackout":
-							{
-								if (!ev.Sender.CheckPermission("sanya.blackout"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2 && args[2] == "hcz")
-								{
-									if (float.TryParse(args[3], out float duration))
-									{ }
-									ReturnStr = "HCZ blackout!";
-								}
-								if (args.Length > 2 && args[2] == "all")
-								{
-									if (float.TryParse(args[3], out float duration))
-										{ }
-									ReturnStr = "ALL blackout!";
-								}
-								else
-									ReturnStr = "all ou hcz";
-								break;
-							}
 						case "femur":
 							{
-								if (!ev.Sender.CheckPermission("sanya.femur"))
+								if (!perm.CheckPermission("sanya.femur"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2744,14 +2832,48 @@ namespace SanyaPlugin
 								ReturnStr = "FemurScreamer!";
 								break;
 							}
-						case "explode":
+						case "dlock":
 							{
-								if (!ev.Sender.CheckPermission("sanya.explode"))
+								if (!perm.CheckPermission("sanya.dlock"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								{
+									if (int.TryParse(args[2], out int duration))
+									{
+										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(false, duration)));
+										ReturnStr = $"The classD are lock for {duration / 60}:{duration % 60}";
+										break;
+									}
+									if (args[2] == "false" || args[2] == "stop")
+									{
+										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(true)));
+										ReturnStr = "Stop!";
+										break;
+									}
+									if (args[2] == "true" || args[2] == "start")
+									{
+										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(false)));
+										ReturnStr = "Started!";
+										break;
+									}
+									else
+									{
+										isSuccess = false;
+										ReturnStr = "dlock {durée avant que ça lock} {durée du lock}";
+										break;
+									}
+								}
+							}
+						case "explode":
+							{
+								if (!perm.CheckPermission("sanya.explode"))
+								{
+									ev.Sender.RemoteAdminMessage("Permission denied.");
+									return;
+								}
+								if (args.Length > 1)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -2762,6 +2884,11 @@ namespace SanyaPlugin
 									}
 									if (args[2] == "all")
 									{
+										if (!perm.CheckPermission("sanya.allexplode"))
+										{
+											ev.Sender.RemoteAdminMessage("Permission denied.");
+											return;
+										}
 										foreach (var ply in Player.List)
 										{
 											Methods.SpawnGrenade(ply.Position, false, 0.1f, ply.ReferenceHub);
@@ -2794,12 +2921,12 @@ namespace SanyaPlugin
 							}
 						case "ammo":
 							{
-								if (!ev.Sender.CheckPermission("sanya.ammo"))
+								if (!perm.CheckPermission("sanya.ammo"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -2821,7 +2948,12 @@ namespace SanyaPlugin
 										}
 									}
 									if (args[2] == "all")
-									{		
+									{
+										if (!perm.CheckPermission("sanya.allammo"))
+										{
+											ev.Sender.RemoteAdminMessage("Permission denied.");
+											return;
+										}
 										if (uint.TryParse(args[3], out uint Nato556)
 											&& uint.TryParse(args[4], out uint Nato762)
 											&& uint.TryParse(args[5], out uint Nato9))
@@ -2856,22 +2988,27 @@ namespace SanyaPlugin
 							}
 						case "clearinv":
 							{
-								if (!ev.Sender.CheckPermission("sanya.clearinv"))
+								if (!perm.CheckPermission("sanya.clearinv"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									Player target = Player.UserIdsCache[args[2]];
 									if (target != null && target.Role != RoleType.Spectator)
 									{
 										target.ClearInventory();
-										ReturnStr = $"Clear Inventory: {target.Nickname}";
+										ReturnStr = $"Clear Inventory : {target.Nickname}";
 										break;
 									}
 									if (args[2] == "all")
 									{
+										if (!perm.CheckPermission("sanya.allclearinv"))
+										{
+											ev.Sender.RemoteAdminMessage("Permission denied.");
+											return;
+										}
 										foreach (var ply in Player.List)
 										{
 											ply.ClearInventory();
@@ -2900,12 +3037,12 @@ namespace SanyaPlugin
 							}
 						case "cleareffect":
 							{
-								if (!ev.Sender.CheckPermission("sanya.cleareffect"))
+								if (!perm.CheckPermission("sanya.cleareffect"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									
 									Player target = Player.UserIdsCache[args[2]];
@@ -2926,16 +3063,6 @@ namespace SanyaPlugin
 										break;
 									}
 								}
-								if (player != null)
-								{
-									foreach (KeyValuePair<Type, PlayerEffect> keyValuePair in player.playerEffectsController.AllEffects.ToArray())
-									{
-										PlayerEffect effect = keyValuePair.Value;
-										effect.ServerDisable();
-									}
-									ReturnStr = "ALL YOUR EFFECT AS BEEN CLEAR";
-									break;
-								}
 								if (args[2] == "all")
 								{
 									foreach (var ply in Player.List)
@@ -2949,6 +3076,16 @@ namespace SanyaPlugin
 									ReturnStr = "ALL EFFECT OF ALL PLAYER AS BEEN CLEAR";
 									break;
 								}
+								if (player != null)
+								{
+									foreach (KeyValuePair<Type, PlayerEffect> keyValuePair in player.playerEffectsController.AllEffects.ToArray())
+									{
+										PlayerEffect effect = keyValuePair.Value;
+										effect.ServerDisable();
+									}
+									ReturnStr = "ALL YOUR EFFECT AS BEEN CLEAR";
+									break;
+								}
 								else
 								{
 									ReturnStr = "Failed to set."; 
@@ -2957,7 +3094,7 @@ namespace SanyaPlugin
 							}
 						/*case "dummy":
 							{
-								if (!ev.Sender.CheckPermission("sanya.dummy"))
+								if (!perm.CheckPermission("sanya.dummy"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -2974,6 +3111,11 @@ namespace SanyaPlugin
 									}
 									if (args[2] == "all")
 									{
+										if (!perm.CheckPermission("sanya.alldummy"))
+										{
+											ev.Sender.RemoteAdminMessage("Permission denied.");
+											return;
+										}
 										foreach (var ply in Player.List)
 										{
 											Methods.SpawnDummy(ply.Role,ply.Position,ply.ReferenceHub.transform.rotation);
@@ -3004,38 +3146,9 @@ namespace SanyaPlugin
 									}
 								}
 							}*/
-						case "ev":
-							{
-								if (!ev.Sender.CheckPermission("sanya.ev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								foreach (Lift lift in UnityEngine.Object.FindObjectsOfType<Lift>())
-								{
-									lift.UseLift();
-								}
-								ReturnStr = "EV Used.";
-								break;
-							}
-						case "ridpos":
-							{
-								if (!ev.Sender.CheckPermission("sanya.ridpos"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								string output = "\n";
-								foreach (var rid in UnityEngine.Object.FindObjectsOfType<Rid>())
-								{
-									output += $"{rid.id} : {rid.transform.position}\n";
-								}
-								ReturnStr = output;
-								break;
-							}
 						case "tppos":
 							{
-								if (!ev.Sender.CheckPermission("sanya.tppos"))
+								if (!perm.CheckPermission("sanya.tppos"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -3061,6 +3174,11 @@ namespace SanyaPlugin
 									}
 									else if (args[2] == "all")
 									{
+										if (!perm.CheckPermission("sanya.alltppos"))
+										{
+											ev.Sender.RemoteAdminMessage("Permission denied.");
+											return;
+										}
 										if (float.TryParse(args[3], out float x)
 											&& float.TryParse(args[4], out float y)
 											&& float.TryParse(args[5], out float z))
@@ -3093,12 +3211,12 @@ namespace SanyaPlugin
 							}
 						case "gen":
 							{
-								if (!ev.Sender.CheckPermission("sanya.gen"))
+								if (!perm.CheckPermission("sanya.gen"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									if (args[2] == "unlock")
 									{
@@ -3176,25 +3294,25 @@ namespace SanyaPlugin
 							}
 						case "spawn":
 							{
-								if (!ev.Sender.CheckPermission("sanya.spawn"))
+								if (!perm.CheckPermission("sanya.spawn"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
 								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									if (args[2] == "ci" || args[2] == "ic")
 									{
 										mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-										mtfRespawn.ReadyToCommence();
+										mtfRespawn._started = true;
 										ReturnStr = $"force spawn ChaosInsurgency";
 										break;
 									}
 								else if (args[2] == "mtf" || args[2] == "ntf")
 									{
 										mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-										mtfRespawn.ReadyToCommence();
+										mtfRespawn._started = true;
 										ReturnStr = $"force spawn NineTailedFox";
 										break;
 									}
@@ -3208,27 +3326,27 @@ namespace SanyaPlugin
 								{
 									if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
 									{
-										mtfRespawn.Spawn();
-										ReturnStr = $"spawn soon. Chaos Insurgency";
+										mtfRespawn._timeForNextSequence = 0;
+										ReturnStr = $"Spawn. Chaos Insurgency";
 										break;
 									}
 									else
 									{
-										mtfRespawn.Spawn();
-										ReturnStr = $"spawn soon. Nine Tailed Fox";
+										mtfRespawn._timeForNextSequence = 0;
+										ReturnStr = $"Spawn. Nine Tailed Fox";
 										break;
 									}
 								}
 							}
 						case "next":
 							{
-								if (!ev.Sender.CheckPermission("sanya.next"))
+								if (!perm.CheckPermission("sanya.next") && !perm.CheckPermission("sanya.spawn"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
 								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 2)
+								if (args.Length > 1)
 								{
 									if (args[2] == "time")
 									{
@@ -3259,19 +3377,19 @@ namespace SanyaPlugin
 								{
 									if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
 									{ 
-										ReturnStr = $"Next Respawn is ChaosInsurgency";
+										ReturnStr = $"Prochain Respawn = ChaosInsurgency";
 										break;
 									}
 									else
 									{ 
-										ReturnStr = $"Next Respawn is NineTailedFox";
+										ReturnStr = $"Prochain Respawn = NineTailedFox";
 										break;
 									}
 								}
 							}
 						/*case "van":
 							{
-								if (!ev.Sender.CheckPermission("sanya.van"))
+								if (!perm.CheckPermission("sanya.deco"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -3282,7 +3400,7 @@ namespace SanyaPlugin
 							}
 						case "heli":
 							{
-								if (!ev.Sender.CheckPermission("sanya.heli"))
+								if (!perm.CheckPermission("sanya.deco"))
 								{
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
@@ -3291,24 +3409,19 @@ namespace SanyaPlugin
 								ReturnStr = "Heli Called!";
 								break;
 							}*/
-						case "now":
-							{
-								if (!ev.Sender.CheckPermission("sanya.now"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = TimeBehaviour.CurrentTimestamp().ToString();
-								break;
-							}
 						case "help":
 							{
-								ReturnStr = " Sanya Commands\nsanya showconfig    =Config du plugin\nsanya list          =liste de tout les joueur connecté \nsanya startair      =Bombardement Aérien Démarage \nsanya stopair       =Bombardement Aérien Arrét \nsanya 914(knob / use) = Change la configuration de 914 ou l'utilise\nsanya nukecap = Lève ou baisse le petit cache sure la nuke \nsanya sonar = Combien il y a de joueur ennemie par rapport a votre rôle \nsanya blackout = Active un blackout de 10 secondes HCZ et LCZ \nsanya blackout hcz {durée}= Active un blackout de {durée} secondes HCZ\nsanya femur = Active que le son du re-confinement de 106 \nsanya explode[id] = Explose une grenade sur le joueur ciblé\nsanya grenade[id] = Spawn une grenade sous les pied du joueur ciblé\nsanya flash[id] = Spawn une flash sous les pied du joueur ciblé\nsanya ball[id] = Spawn une balle sous les pied du joueur ciblé\nsanya ammo [id]= Full munition pour le joueur ciblé\nsanya next(ic / ntf) = Configure le prochain spawn a MTF ou IC / MdS(MTF ou NTF c'est identique)\nsanya spawn         =Force le prochain spawn \nsanya roompos = la position X Y Z des salle avec leurs noms \nsanya tppos(id)(x)(y)(z) \nsanya pocket = Vous tp dans la pocket \nsanya van = Fait venir la voiture des chaos \nsanya heli = Fait venir un Hélico \nsanya dummy = Fait spawn un PNG \nsanya cleareffect = clear tout les effet \n Commande pour les générateur \nsanya gen unlock = Unlock tout les générateurs de SCP-079 \nsanya gen door = Ouvre tout les porte de SCP-079 \nsanya gen set = Place une tablette dans TOUT les générateur de SCP-079 \nsanya gen once = pose une tablette dans un seul générateur \nsanya gen eject = eject tout les tablette des générateur de SCP-079";
+								ReturnStr = "Toute les commande ou t'as la permission";
+								if (perm.CheckPermission("sanya.deco"))
+								{
+									ReturnStr += "";
+									return;
+								}
 								break;
 							}
 						default:
 							{
-								ReturnStr = "Wrong Parameters.";
+								ReturnStr = "Sanya help for more information.";
 								isSuccess = false;
 								break;
 							}

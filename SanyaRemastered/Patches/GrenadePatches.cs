@@ -2,8 +2,6 @@
 using Grenades;
 using HarmonyLib;
 using Mirror;
-using SanyaPlugin;
-using SanyaPlugin.Functions;
 using UnityEngine;
 
 namespace SanyaRemastered.Patches
@@ -49,9 +47,8 @@ namespace SanyaRemastered.Patches
 			__result = true;
 			return false;
 		}
-	}
-	//override - 10.0.0 checked
-	[HarmonyPatch(typeof(Grenade), nameof(Grenade.ServersideExplosion))]
+		//override - 10.0.0 checked
+		[HarmonyPatch(typeof(Grenade), nameof(Grenade.ServersideExplosion))]
 	public static class GrenadeLogPatch
 	{
 		public static bool Prefix(Grenade __instance, ref bool __result)
@@ -71,5 +68,17 @@ namespace SanyaRemastered.Patches
 				return true;
 			}
 		}
+		}/*
+	[HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.IsInvoking))]
+	public static class TeslaExplodeGrenade
+	{
+		public static bool Prefix()
+		{
+			if (!SanyaPlugin.SanyaPlugin.Instance.Config.TeslaExplodeGrenade) return true;
+			{
+				return true;
+			}
+		}*/
 	}
+	
 }

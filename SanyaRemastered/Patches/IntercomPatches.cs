@@ -2,7 +2,7 @@
 using LightContainmentZoneDecontamination;
 using System;
 using UnityEngine;
-using Respawning;
+using Exiled.API.Features;
 
 namespace SanyaRemastered.Patches
 {
@@ -15,8 +15,18 @@ namespace SanyaRemastered.Patches
 		public static bool Prefix(Intercom __instance)
 		{	
 		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return true;
+		{
+			/*int Light = 0;
+			foreach (FlickerableLight light in GameObject.FindObjectsOfType<FlickerableLight>())
 			{
-				RespawnManager respawn = RespawnManager.Singleton;
+				if (light._enabled)//Toujours en FALSE
+				{
+					Light = 1;
+					Log.Info("Light = 1");
+				}
+			}*/
+			if (true)
+			{
 				int leftdecont = (int)Math.Truncate(15f * 60 - DecontaminationController.GetServerTime);
 			//	int nextRespawn = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
@@ -63,7 +73,7 @@ namespace SanyaRemastered.Patches
 				}
 
 				//warhead
-				if (TimeWarhead < 10)
+				if (TimeWarhead <= 10)
 				{
 					contentfix += string.Concat($"<color=#ff0000>Détonation inévitable : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
 				}
@@ -116,7 +126,7 @@ namespace SanyaRemastered.Patches
 				}
 
 				//décontamination
-				if (DecontaminationController.Singleton._decontaminationBegun)
+				if (!DecontaminationController.Singleton._decontaminationBegun)
 				{
 					{
 						contentfix += string.Concat($"La décontamination de la LCZ vas étre effectué\n");
@@ -130,7 +140,7 @@ namespace SanyaRemastered.Patches
 							contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
 						}
 				}
-				else if (!DecontaminationController.Singleton._decontaminationBegun)
+				else if (DecontaminationController.Singleton._decontaminationBegun)
 				{
 					contentfix += string.Concat($"La décontamination de la LCZ a été effectué\n");
 				}
@@ -186,6 +196,12 @@ namespace SanyaRemastered.Patches
 				}
 				return false;
 			}
+		/*else
+		{
+			string.Concat(__instance._content  + " ");
+					return false;
+		}*/
+		}
 		}
 	}
 }

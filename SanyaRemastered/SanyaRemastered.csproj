@@ -48,7 +48,7 @@
     <Compile Include="Patches\PlayerMovementPatches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\VoicePatches.cs" />
-    <Compile Include="Patches\WarheadPatches.cs" />
+    <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SanyaConfig.cs" />
     <Compile Include="Subtitles.cs" />

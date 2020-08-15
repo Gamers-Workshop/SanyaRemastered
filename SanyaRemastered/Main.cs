@@ -26,7 +26,6 @@ namespace SanyaPlugin
 
 		public override void OnEnabled()
 		{
-			//Config = new SanyaRemastered.Configs();
 			if (Config.KickVpn) ShitChecker.LoadLists();
 
 			EventHandlers = new EventHandlers(this);
@@ -134,7 +133,7 @@ namespace SanyaPlugin
 			Handlers.Player.ClosingGenerator -= EventHandlers.OnGeneratorClose;
 			Handlers.Player.InsertingGeneratorTablet -= EventHandlers.OnGeneratorInsert;
 			Handlers.Player.ActivatingWarheadPanel -= EventHandlers.OnActivatingWarheadPanel;
-			
+
 			Handlers.Scp106.CreatingPortal -= EventHandlers.On106MakePortal;
 			Handlers.Scp106.Teleporting -= EventHandlers.On106Teleport;
 			Handlers.Scp079.GainingLevel -= EventHandlers.On079LevelGain;

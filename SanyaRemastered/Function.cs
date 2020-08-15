@@ -345,22 +345,27 @@ namespace SanyaPlugin.Functions
 			microHID.TargetSendHitmarker(false);
 			yield break;
 		}
-		public static IEnumerator<float> StartContainClassD()
+		public static IEnumerator<float> StartContainClassD(bool stop , float TimeLock = 0)
 		{
 			foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
 			{
-				if (door.name.Contains("PrisonDoor"))
+				while (!stop)
 				{
-					door.lockdown = true;
-					yield return Timing.WaitForSeconds(SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
-					door.lockdown = false;
-					break;
+					if (door.name.Contains("PrisonDoor"))
+					{
+						door.lockdown = true;
+					}
+					yield return Timing.WaitForSeconds(TimeLock);
+					stop = true;
 				}
+				door.lockdown = false;
+				stop = true;
+				yield break;
 			}
 		}
 		public static IEnumerator<float> AirSupportBomb(bool stop = false,float timewait = 0,float TimeEnd = -1)
 		{
-			while (timewait >= 0)
+			while (timewait > 0 && !isAirBombGoing)
 			{
 				if (timewait == 60f || timewait == 120f || timewait == 300f || timewait == 600f || timewait == 1800f || timewait == 3600f)
 				{
@@ -370,7 +375,7 @@ namespace SanyaPlugin.Functions
 						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", ((int)timewait / 60).ToString()), 10);
 					}
 				}
-				if (timewait == 30f)
+				else if (timewait == 30f)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", false, true);
 					if (SanyaPlugin.Instance.Config.CassieSubtitle)
@@ -378,9 +383,9 @@ namespace SanyaPlugin.Functions
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
 				}
-				if (stop)
+				if (stop && timewait > 0)
 				{
-					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been cancel .", false, true);
+					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
 					if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStop, 10);
@@ -388,7 +393,9 @@ namespace SanyaPlugin.Functions
 					Log.Info($"[AirSupportBomb] The AirBomb as stop");
 					break;
 				}
-				yield return Timing.WaitForSeconds(timewait);
+				timewait--;
+				yield return Timing.WaitForSeconds(1);
+			}
 				Log.Info($"[AirSupportBomb] booting...");
 				if (isAirBombGoing)
 				{
@@ -445,7 +452,7 @@ namespace SanyaPlugin.Functions
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 				Log.Info($"[AirSupportBomb] Ended.");
 				yield break;
-			}
+			
 		}
 	}
 	internal static class Methods
