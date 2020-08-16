@@ -8,15 +8,7 @@
 			"Venez sur le serveur discord pour avoir plus de détail"
 			);
 		internal static readonly string LimitedKickMessage = string.Concat(
-			"Venez sur le serveur discord pour avoir plus de détail"
-			);
-		internal static readonly string VPNKickMessage = string.Concat(
-			"Ce serveur n'accepte pas les VPN ou les Proxy\n",
-			"Venez sur le serveur discord pour avoir plus de détail"
-			);
-		internal static readonly string VPNKickMessageShort = string.Concat(
-			"Ce serveur n'accepte pas les VPN ou les Proxy.\n",
-			"Venez sur le serveur discord pour avoir plus de détail"
+			"Vous avez été Kick, Venez sur le serveur Discord pour étre WhiteList : https://discord.gg/ZsyeBED"
 			);
 
 		internal static readonly string ExtendEnabled = string.Concat(

@@ -110,6 +110,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="Unity.Mathematics">
       <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\Unity.Mathematics.dll</HintPath>
     </Reference>
@@ -226,6 +227,26 @@
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
       <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5324120\SCPSL_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5407689\SCPSL_Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5407689\SCPSL_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5407689\SCPSL_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5407689\SCPSL_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\louismonneyronpc\Desktop\depotdownloader-2.3.6\depots\996561\5407689\SCPSL_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>C:\Users\louismonneyronpc\Downloads\Exiled (2)\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>

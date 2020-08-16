@@ -26,8 +26,6 @@ namespace SanyaPlugin
 
 		public override void OnEnabled()
 		{
-			if (Config.KickVpn) ShitChecker.LoadLists();
-
 			EventHandlers = new EventHandlers(this);
 			Handlers.Server.SendingRemoteAdminCommand += EventHandlers.OnRACommand;
 			Handlers.Server.SendingConsoleCommand += EventHandlers.OnCommand;
@@ -59,7 +57,7 @@ namespace SanyaPlugin
 			Handlers.Player.TriggeringTesla += EventHandlers.OnPlayerTriggerTesla;
 			Handlers.Player.InteractingDoor += EventHandlers.OnPlayerDoorInteract;
 			Handlers.Player.InteractingLocker += EventHandlers.OnPlayerLockerInteract;
-			Handlers.Player.SyncingData += EventHandlers.OnPlayerChangeAnim;
+			Handlers.Player.SyncingData += EventHandlers.OnSyncingData;
 			
 			Handlers.Player.Shooting += EventHandlers.OnShoot;
 			Handlers.Player.UnlockingGenerator += EventHandlers.OnGeneratorUnlock;
@@ -127,7 +125,7 @@ namespace SanyaPlugin
 			Handlers.Player.InteractingLocker -= EventHandlers.OnPlayerLockerInteract;
 			
 			Handlers.Player.Shooting -= EventHandlers.OnShoot;
-			Handlers.Player.SyncingData -= EventHandlers.OnPlayerChangeAnim;
+			Handlers.Player.SyncingData -= EventHandlers.OnSyncingData;
 			Handlers.Player.UnlockingGenerator -= EventHandlers.OnGeneratorUnlock;
 			Handlers.Player.OpeningGenerator -= EventHandlers.OnGeneratorOpen;
 			Handlers.Player.ClosingGenerator -= EventHandlers.OnGeneratorClose;

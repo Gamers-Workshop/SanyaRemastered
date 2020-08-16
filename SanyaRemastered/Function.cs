@@ -23,6 +23,7 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using System.Threading;
 using Object = UnityEngine.Object;
+using SanyaRemastered;
 
 namespace SanyaPlugin.Functions
 {
@@ -83,24 +84,24 @@ namespace SanyaPlugin.Functions
 
 	internal static class ShitChecker
 	{
-		private static string whitelist_path = Path.Combine(SanyaPlugin.DataPath, "VPN-Whitelist.txt");
+		private static string whitelist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
 		public static HashSet<IPAddress> whitelist = new HashSet<IPAddress>();
-		private static string blacklist_path = Path.Combine(SanyaPlugin.DataPath, "VPN-Blacklist.txt");
+		private static string blacklist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
 		public static HashSet<IPAddress> blacklist = new HashSet<IPAddress>();
 
-		public static IEnumerator<float> CheckVPN(PreAuthenticatingEventArgs ev)
+		/*public static IEnumerator<float> CheckVPN(PreAuthenticatingEventArgs ev)
 		{
 			IPAddress address = ev.Request.RemoteEndPoint.Address;
 
 			if (IsWhiteListed(address) || IsBlacklisted(address))
 			{
-				Log.Debug($"[VPNChecker] Already Checked:{address}");
+				Log.Debug($"[VPNChecker] Already Checked:{address}", SanyaPlugin.Instance.Config.IsDebugged);
 				yield break;
 			}
 
-			/*using (UnityWebRequest unityWebRequest = UnityWebRequest.Get($"https://v2.api.iphub.info/ip/{address}"))
+			using (UnityWebRequest unityWebRequest = UnityWebRequest.Get($"https://v2.api.iphub.info/ip/{address}"))
 			{
-				unityWebRequest.SetRequestHeader("X-Key", Configs.kick_vpn_apikey);
+				unityWebRequest.SetRequestHeader("X-Key", SanyaPlugin.Instance.Config.KickVpnApikey);
 				yield return Timing.WaitUntilDone(unityWebRequest.SendWebRequest());
 				if (!unityWebRequest.isNetworkError)
 				{
@@ -119,10 +120,10 @@ namespace SanyaPlugin.Functions
 						Log.Info($"[VPNChecker] VPN Detected:{address} UserId:{ev.UserId}");
 						AddBlacklist(address);
 
-						ReferenceHub player = Player.GetPlayer(ev.UserId);
+						var player = Player.Get(ev.UserId);
 						if (player != null)
 						{
-							ServerConsole.Disconnect(player.characterClassManager.connectionToClient, Subtitles.VPNKickMessage);
+							ServerConsole.Disconnect(player.Connection, Subtitles.VPNKickMessage);
 						}
 						if (!EventHandlers.kickedbyChecker.ContainsKey(ev.UserId))
 							EventHandlers.kickedbyChecker.Add(ev.UserId, "vpn");
@@ -138,19 +139,14 @@ namespace SanyaPlugin.Functions
 					Log.Error($"[VPNChecker] Error({unityWebRequest.responseCode}):{unityWebRequest.error}");
 					yield break;
 				}
-			}*/
+			}
 		}
-
+		*/
 		public static IEnumerator<float> CheckIsLimitedSteam(string userid)
 		{
 			PlayerData data = null;
-			if (SanyaPlugin.Instance.Config.DataEnabled && PlayerDataManager.playersData.TryGetValue(userid, out data) && !data.limited)
-			{
-				Log.Debug($"[SteamCheck] Already Checked:{userid}");
-				yield break;
-			}
 
-			/*string xmlurl = string.Concat(
+			string xmlurl = string.Concat(
 				"https://steamcommunity.com/profiles/",
 				userid.Replace("@steam", string.Empty),
 				"?xml=1"
@@ -180,10 +176,10 @@ namespace SanyaPlugin.Functions
 							else
 							{
 								Log.Warn($"[SteamCheck] NG:{userid}");
-								ReferenceHub player = Player.GetPlayer(userid);
+								var player = Player.Get(userid);
 								if (player != null)
 								{
-									ServerConsole.Disconnect(player.characterClassManager.connectionToClient, Subtitles.LimitedKickMessage);
+									ServerConsole.Disconnect(player.Connection, Subtitles.LimitedKickMessage);
 								}
 
 								if (!EventHandlers.kickedbyChecker.ContainsKey(userid))
@@ -195,10 +191,10 @@ namespace SanyaPlugin.Functions
 						else
 						{
 							Log.Warn($"[SteamCheck] Falied(NoProfile):{userid}");
-							ReferenceHub player = Player.GetPlayer(userid);
+							var player = Player.Get(userid);
 							if (player != null)
 							{
-								ServerConsole.Disconnect(player.characterClassManager.connectionToClient, Subtitles.NoProfileKickMessage);
+								ServerConsole.Disconnect(player.Connection, Subtitles.NoProfileKickMessage);
 							}
 							if (!EventHandlers.kickedbyChecker.ContainsKey(userid))
 								EventHandlers.kickedbyChecker.Add(userid, "steam");
@@ -212,7 +208,7 @@ namespace SanyaPlugin.Functions
 					yield break;
 				}
 			}
-			yield break;*/
+			yield break;
 		}
 
 		public static void LoadLists()
@@ -275,70 +271,6 @@ namespace SanyaPlugin.Functions
 	{
 		public static bool isAirBombGoing = false;
 
-		public static IEnumerator<float> GrantedLevel(ReferenceHub player, PlayerData data)
-		{
-			yield return Timing.WaitForSeconds(1f);
-
-			var group = player.serverRoles.Group?.Clone();
-			string level = data.level.ToString();
-			string rolestr = player.serverRoles.GetUncoloredRoleString();
-			string rolecolor = player.serverRoles.MyColor;
-			string badge;
-
-			rolestr = rolestr.Replace("[", string.Empty).Replace("]", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-
-			if (rolecolor == "light_red")
-			{
-				rolecolor = "pink";
-			}
-
-			if (data.level == -1)
-			{
-				level = "???";
-			}
-
-			if (string.IsNullOrEmpty(rolestr))
-			{
-				badge = $"Level{level}";
-			}
-			else
-			{
-				badge = $"Level{level} : {rolestr}";
-			}
-
-			if (SanyaPlugin.Instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(Player.Dictionary[player.gameObject].UserId))
-			{
-				badge += " : Certifié";
-			}
-
-			if (group == null)
-			{
-				group = new UserGroup()
-				{
-					BadgeText = badge,
-					BadgeColor = "default",
-					HiddenByDefault = false,
-					Cover = true,
-					KickPower = 0,
-					Permissions = 0,
-					RequiredKickPower = 0,
-					Shared = false
-				};
-			}
-			else
-			{
-				group.BadgeText = badge;
-				group.BadgeColor = rolecolor;
-				group.HiddenByDefault = false;
-				group.Cover = true;
-			}
-
-			player.serverRoles.SetGroup(group, false, false, true);
-
-			Log.Debug($"[GrantedLevel] {Player.Dictionary[player.gameObject].UserId} : Level{level}");
-
-			yield break;
-		}
 		public static IEnumerator<float> BigHitmark(MicroHID microHID)
 		{
 			yield return Timing.WaitForSeconds(0.1f);
@@ -359,7 +291,6 @@ namespace SanyaPlugin.Functions
 					stop = true;
 				}
 				door.lockdown = false;
-				stop = true;
 				yield break;
 			}
 		}
