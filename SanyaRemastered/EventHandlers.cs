@@ -37,7 +37,7 @@ namespace SanyaPlugin
 		internal Task sendertask;
 		internal async Task SenderAsync()
 		{
-			Log.Debug($"[Infosender_Task] Started.");
+			Log.Info($"[Infosender_Task] Started.");
 
 			while (true)
 			{
@@ -51,7 +51,7 @@ namespace SanyaPlugin
 
 					if (!this.loaded)
 					{
-						Log.Debug($"[Infosender_Task] Plugin not loaded. Skipped...");
+						Log.Info($"[Infosender_Task] Plugin not loaded. Skipped...");
 						await Task.Delay(TimeSpan.FromSeconds(30));
 					}
 
@@ -90,7 +90,7 @@ namespace SanyaPlugin
 
 					byte[] sendBytes = Encoding.UTF8.GetBytes(json);
 					udpClient.Send(sendBytes, sendBytes.Length, SanyaPlugin.Instance.Config.InfosenderIp, SanyaPlugin.Instance.Config.InfosenderPort);
-					Log.Debug($"[Infosender_Task] {SanyaPlugin.Instance.Config.InfosenderIp}:{SanyaPlugin.Instance.Config.InfosenderPort}");
+					if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[Infosender_Task] {SanyaPlugin.Instance.Config.InfosenderIp}:{SanyaPlugin.Instance.Config.InfosenderPort}");
 				}
 				catch (Exception e)
 				{
@@ -123,7 +123,7 @@ namespace SanyaPlugin
 							if (Time.time - i.Value > SanyaPlugin.Instance.Config.ItemCleanup && i.Key != null)
 							{
 								if (nowitems == null) nowitems = new List<GameObject>();
-								Log.Debug($"[ItemCleanupPatch] Cleanup:{i.Key.transform.position} {Time.time - i.Value} > {SanyaPlugin.Instance.Config.ItemCleanup}");
+								if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[ItemCleanupPatch] Cleanup:{i.Key.transform.position} {Time.time - i.Value} > {SanyaPlugin.Instance.Config.ItemCleanup}");
 								nowitems.Add(i.Key);
 							}
 						}
@@ -212,7 +212,7 @@ namespace SanyaPlugin
 					tesla.sizeOfTrigger = SanyaPlugin.Instance.Config.TeslaRange;
 				}
 			}
-			
+
 			Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
 		}
 
@@ -222,7 +222,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.ClassD_container_locked)
 			{
-				Coroutines.StartContainClassD(false ,SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
+				Coroutines.StartContainClassD(false, SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
 			}
 		}
 
@@ -252,7 +252,7 @@ namespace SanyaPlugin
 
 		public void OnWarheadStart(StartingEventArgs ev)
 		{
-			Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}");
 
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
@@ -309,7 +309,7 @@ namespace SanyaPlugin
 
 		public void OnDetonated()
 		{
-			Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}");
 
 			if (SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke != 0)
 			{
@@ -318,7 +318,7 @@ namespace SanyaPlugin
 		}
 		public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
 		{
-			Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}");
 
 			if (SanyaPlugin.Instance.Config.CassieSubtitle)
 			{
@@ -388,7 +388,7 @@ namespace SanyaPlugin
 
 		public void OnPreAuth(PreAuthenticatingEventArgs ev)
 		{
-			Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}");
 
 			if ((SanyaPlugin.Instance.Config.KickSteamLimited) && !ev.UserId.EndsWith("@northwood", StringComparison.InvariantCultureIgnoreCase))
 			{
@@ -454,47 +454,13 @@ namespace SanyaPlugin
 		public void OnPlayerLeave(LeftEventArgs ev)
 		{
 			if (ev.Player.IsHost) return;
-			Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
 		}
-		#region A regler
-		/*public void OnStartItems(StartItemsEvent ev)
-		{
-			if (ev.Player.IsHost()) return;
-			Log.Debug($"[OnStartItems] {ev.Player.GetNickname()} -> {ev.Role}");
 
-			if (Configs.defaultitems.TryGetValue(ev.Role, out List<ItemType> itemconfig) && itemconfig.Count > 0)
-			{
-				ev.StartItems = itemconfig;
-			}
-
-			if (itemconfig != null && itemconfig.Contains(ItemType.None))
-			{
-				ev.StartItems.Clear();
-			}
-
-			switch (eventmode)
-			{
-				case SANYA_GAME_MODE.CLASSD_INSURGENCY:
-					{
-						if (ev.Role == RoleType.ClassD && Configs.classd_insurgency_classd_inventory.Count > 0)
-						{
-							ev.StartItems = Configs.classd_insurgency_classd_inventory;
-						}
-						if (ev.Role == RoleType.Scientist && Configs.classd_insurgency_scientist_inventory.Count > 0)
-						{
-							ev.StartItems = Configs.classd_insurgency_scientist_inventory;
-						}
-						break;
-					}
-			}
-		}
-		*/
-
-		#endregion A regler
 		public void OnPlayerSetClass(ChangingRoleEventArgs ev)
 		{
 			if (ev.Player.IsHost) return;
-			Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}");
 
 			if (SanyaPlugin.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
 			{
@@ -537,13 +503,15 @@ namespace SanyaPlugin
 		public void OnPlayerSpawn(SpawningEventArgs ev)
 		{
 			if (ev.Player.IsHost) return;
-			Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}");
 			ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
+			if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
+				ev.Player.Scale = new Vector3(SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size);
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
 		{
 			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
-			Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
 
 			if (ev.Attacker == null) return;
 
@@ -588,9 +556,11 @@ namespace SanyaPlugin
 				}
 
 				//SCPsDivisor
-				if (ev.DamageType != DamageTypes.Wall
-					&& ev.DamageType != DamageTypes.Nuke
-					&& ev.DamageType != DamageTypes.Decont)
+				if (ev.DamageType != DamageTypes.Contain
+					&& ev.DamageType != DamageTypes.Decont
+					&& ev.DamageType != DamageTypes.Flying
+					&& ev.DamageType != DamageTypes.Poison
+					&& ev.DamageType != DamageTypes.Recontainment)
 				{
 					switch (ev.Target.Role)
 					{
@@ -620,13 +590,13 @@ namespace SanyaPlugin
 				}
 			}
 
-			Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
 		}
 
 		public void OnPlayerDeath(DiedEventArgs ev)
 		{
 			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
-			Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.GetDamageName()}-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.GetDamageName()}-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
 			
 			if (ev.Killer == null) return;
 
@@ -689,7 +659,7 @@ namespace SanyaPlugin
 									killerTeam = Exiledi.Team;
 								}
 							}
-							Log.Debug($"[CheckTeam] ply:{ev.Target.ReferenceHub.queryProcessor.PlayerId} kill:{ev.Killer.ReferenceHub.queryProcessor.PlayerId} plyid:{ev.HitInformations.PlayerId} killteam:{killerTeam}");
+							if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[CheckTeam] ply:{ev.Target.ReferenceHub.queryProcessor.PlayerId} kill:{ev.Killer.ReferenceHub.queryProcessor.PlayerId} plyid:{ev.HitInformations.PlayerId} killteam:{killerTeam}");
 							switch (killerTeam)
 							{
 								case Team.CDP:
@@ -732,7 +702,7 @@ namespace SanyaPlugin
 					if (i.Role == RoleType.Scp079) isFound079 = true;
 				}
 
-				Log.Debug($"[Check079] SCPs:{count} isFound079:{isFound079} totalvol:{Generator079.mainGenerator.totalVoltage} forced:{Generator079.mainGenerator.forcedOvercharge}");
+				if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[Check079] SCPs:{count} isFound079:{isFound079} totalvol:{Generator079.mainGenerator.totalVoltage} forced:{Generator079.mainGenerator.forcedOvercharge}");
 				if (count == 1
 					&& isFound079
 					&& Generator079.mainGenerator.totalVoltage < 4
@@ -781,7 +751,7 @@ namespace SanyaPlugin
 
 		public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
 		{
-			Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
 
 			if (SanyaPlugin.Instance.Config.Scp106RecoveryAmount > 0)
 			{
@@ -798,7 +768,7 @@ namespace SanyaPlugin
 
 		public void OnPlayerUsedMedicalItem(UsedMedicalItemEventArgs ev)
 		{
-			Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item}");
 
 			if (ev.Item == ItemType.Medkit)
 			{
@@ -826,7 +796,7 @@ namespace SanyaPlugin
 
 		public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
 		{
-			Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}");
 			if (SanyaPlugin.Instance.Config.TeslaTriggerableTeams.Count == 0
 				|| SanyaPlugin.Instance.Config.TeslaTriggerableTeams.Contains(ev.Player.Team))
 			{
@@ -847,7 +817,7 @@ namespace SanyaPlugin
 
 		public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
 		{
-			Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door.DoorName}:{ev.Door.doorType}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door.DoorName}:{ev.Door.doorType}");
 
 			if (plugin.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled && !ev.Door.locked)
 				foreach (var item in ev.Player.Inventory.items)
@@ -869,7 +839,7 @@ namespace SanyaPlugin
 
 		public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
 		{
-			Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
 			if (SanyaPlugin.Instance.Config.InventoryKeycardActivation)
 			{
 				foreach (var item in ev.Player.Inventory.items)
@@ -931,7 +901,7 @@ namespace SanyaPlugin
 
 		public void OnTeamRespawn(RespawningTeamEventArgs ev)
 		{
-			Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count} IsCI:{ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency} MaxAmount:{ev.MaximumRespawnAmount}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count} IsCI:{ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency} MaxAmount:{ev.MaximumRespawnAmount}");
 
 			if (SanyaPlugin.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated)
 			{
@@ -952,7 +922,7 @@ namespace SanyaPlugin
 		}
 		public void OnExplodingGrenade (ExplodingGrenadeEventArgs ev)
 		{
-			Log.Debug($"[OnExplodingGrenade] {ev.Grenade.transform.position}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnExplodingGrenade] {ev.Grenade.transform.position}");
 			if (SanyaPlugin.Instance.Config.GrenadeEffect)
 			{
 				foreach (var ply in Player.List)
@@ -967,7 +937,7 @@ namespace SanyaPlugin
 		}
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
-			Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
@@ -993,7 +963,7 @@ namespace SanyaPlugin
 
 		public void OnGeneratorOpen(OpeningGeneratorEventArgs ev)
 		{
-			Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
 			if (ev.Generator.prevFinish && SanyaPlugin.Instance.Config.GeneratorFinishLock)
 			{
 				ev.IsAllowed = false;
@@ -1012,7 +982,7 @@ namespace SanyaPlugin
 
 		public void OnGeneratorClose(ClosingGeneratorEventArgs ev)
 		{
-			Log.Debug($"[OnGeneratorClose] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorClose] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
 			if (ev.IsAllowed && ev.Generator.isTabletConnected && SanyaPlugin.Instance.Config.GeneratorActivatingClose)
 			{
 				ev.Generator._doorAnimationCooldown = 2f;
@@ -1032,7 +1002,7 @@ namespace SanyaPlugin
 		}
 		public void OnEjectingGeneratorTablet(EjectingGeneratorTabletEventArgs ev)
 		{
-			Log.Debug($"[OnEjectingGeneratorTablet] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnEjectingGeneratorTablet] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
@@ -1046,12 +1016,12 @@ namespace SanyaPlugin
 		}
 		public void OnGeneratorInsert(InsertingGeneratorTabletEventArgs ev)
 		{
-			Log.Debug($"[OnGeneratorInsert] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorInsert] {ev.Player.Nickname} -> {ev.Generator.CurRoom}");
 		}
 
 		public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
 		{
-			Log.Debug($"[OnGeneratorFinish] {ev.Generator.CurRoom}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorFinish] {ev.Generator.CurRoom}");
 			if (SanyaPlugin.Instance.Config.GeneratorFinishLock) ev.Generator.NetworkisDoorOpen = false;
 
 			int curgen = Generator079.mainGenerator.NetworktotalVoltage + 1;
@@ -1069,7 +1039,7 @@ namespace SanyaPlugin
 		}
 		public void OnInteractingElevator(InteractingElevatorEventArgs ev)
 		{
-			Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Type : {ev.Elevator.GetType()}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Type : {ev.Elevator.GetType()}");
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492))
 			{
 				ev.IsAllowed = false;
@@ -1077,7 +1047,7 @@ namespace SanyaPlugin
 		}
 		public void OnPlacingDecal(PlacingDecalEventArgs ev)
 		{
-			Log.Debug($"[OnPlacingDecal] position : {ev.Position} Owner: {ev.Owner} Type: {ev.Type}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlacingDecal] position : {ev.Position} Owner: {ev.Owner} Type: {ev.Type}");
 			if (SanyaPlugin.Instance.Config.Coroding106 && ev.Type == 6)
 			{
 				List<Vector3> DecalList = new List<Vector3>{ev.Position};
@@ -1100,7 +1070,7 @@ namespace SanyaPlugin
 		}
 		public void On079LevelGain(GainingLevelEventArgs ev)
 		{
-			Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}");
 
 			if (SanyaPlugin.Instance.Config.Scp079ExtendEnabled)
 			{
@@ -1115,27 +1085,30 @@ namespace SanyaPlugin
 					case 3:
 						ev.Player.ReferenceHub.SendTextHint(Subtitles.Extend079Lv4, 10);
 						break;
+					case 4:
+						ev.Player.ReferenceHub.SendTextHint(Subtitles.Extend079Lv4, 10);
+						break;
 				}
 			}
 		}
 		public void On106MakePortal(CreatingPortalEventArgs ev)
 		{
-			Log.Debug($"[On106MakePortal] {ev.Player.Nickname}:{ev.Position}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On106MakePortal] {ev.Player.Nickname}:{ev.Position}");
 		}
 
 		public void On106Teleport(TeleportingEventArgs ev)
 		{
-			Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}");
 		//	if (SanyaPlugin.instance.Config.Scp106PortalExtensionEnabled) ;
 		}
 		public void OnEnraging(EnragingEventArgs ev)
 		{
-			Log.Debug($"[On106MakePortal] {ev.Player.Nickname}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On106MakePortal] {ev.Player.Nickname}");
 
 		}
 	public void On914Upgrade(UpgradingItemsEventArgs ev)
 		{
-			Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
 
 			if (SanyaPlugin.Instance.Config.Scp914Effect)
 			{
@@ -1226,7 +1199,7 @@ namespace SanyaPlugin
 		}
 		public void OnShoot(ShootingEventArgs ev)
 		{
-			Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.Position}-> {ev.Target?.name}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.Position}-> {ev.Target?.name}");
 
 			if ((SanyaPlugin.Instance.Config.Grenade_shoot_fuse || SanyaPlugin.Instance.Config.Item_shoot_move)
 				&& ev.Position != Vector3.zero
@@ -1270,7 +1243,7 @@ namespace SanyaPlugin
 		public void OnCommand(SendingConsoleCommandEventArgs ev)
 		{
 			string[] args = ev.Arguments.ToArray();
-			Log.Debug($"[OnCommand] Player : {ev.Player} command:{ev.Name} args:{args.Length}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnCommand] Player : {ev.Player} command:{ev.Name} args:{args.Length}");
 			string effort = $"{ev.Name} ";
 			foreach (string s in ev.Arguments)
 				effort += $"{s} ";
@@ -1326,12 +1299,18 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												if (SanyaPlugin.Instance.Config.IsDebugged)
+												{
+													Log.Info(end2.x < posroom.x);
+													Log.Info(posroom.x < end.x);
+													Log.Info(end2.y < posroom.y);
+													Log.Info(posroom.y < end.y);
+													Log.Info(end2.z < posroom.z);
+													Log.Info(posroom.z < end.z);
+												}
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												
@@ -1397,12 +1376,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												TEST = 1;
@@ -1509,12 +1491,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												
@@ -1579,12 +1564,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												
@@ -1649,12 +1637,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
@@ -1721,12 +1712,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 
@@ -1791,12 +1785,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 
@@ -1866,12 +1863,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												TEST = 1;
@@ -1918,12 +1918,15 @@ namespace SanyaPlugin
 														end = new Vector3(-z2, y1, x1);
 														end2 = new Vector3(-z1, y2, x2);
 													}
-													Log.Info(end2.x < posroom.x);
-													Log.Info(posroom.x < end.x);
-													Log.Info(end2.y < posroom.y);
-													Log.Info(posroom.y < end.y);
-													Log.Info(end2.z < posroom.z);
-													Log.Info(posroom.z < end.z);
+													if (SanyaPlugin.Instance.Config.IsDebugged)
+													{
+														Log.Info(end2.x < posroom.x);
+														Log.Info(posroom.x < end.x);
+														Log.Info(end2.y < posroom.y);
+														Log.Info(posroom.y < end.y);
+														Log.Info(end2.z < posroom.z);
+														Log.Info(posroom.z < end.z);
+													}
 													if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 													{
 														TEST = 2;
@@ -2010,13 +2013,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												TEST = 1;
@@ -2053,13 +2058,15 @@ namespace SanyaPlugin
 												end = new Vector3(-z2, y1, x1);
 												end2 = new Vector3(-z1, y2, x2);
 											}
-
-											Log.Info(end2.x < posroom.x);
-											Log.Info(posroom.x < end.x);
-											Log.Info(end2.y < posroom.y);
-											Log.Info(posroom.y < end.y);
-											Log.Info(end2.z < posroom.z);
-											Log.Info(posroom.z < end.z);
+											if (SanyaPlugin.Instance.Config.IsDebugged)
+											{
+												Log.Info(end2.x < posroom.x);
+												Log.Info(posroom.x < end.x);
+												Log.Info(end2.y < posroom.y);
+												Log.Info(posroom.y < end.y);
+												Log.Info(end2.z < posroom.z);
+												Log.Info(posroom.z < end.z);
+											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
 												TEST = 2;
@@ -2114,7 +2121,7 @@ namespace SanyaPlugin
 						}
 					case RoleType.Scp096:
 						{
-							Log.Info($"096 state : {(ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
+							if (SanyaPlugin.Instance.Config.IsDebugged)	Log.Info($"096 state : {(ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
 							if (Scp096PlayerState.Docile != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState 
 								&& Scp096PlayerState.TryNotToCry != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
 							{
@@ -2154,12 +2161,15 @@ namespace SanyaPlugin
 										end = new Vector3(-z2, y1, x1);
 										end2 = new Vector3(-z1, y2, x2);
 									}
-									Log.Info(end2.x < posroom.x);
-									Log.Info(posroom.x < end.x);
-									Log.Info(end2.y < posroom.y);
-									Log.Info(posroom.y < end.y);
-									Log.Info(end2.z < posroom.z);
-									Log.Info(posroom.z < end.z);
+									if (SanyaPlugin.Instance.Config.IsDebugged)
+									{
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+									}
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
 
@@ -2220,15 +2230,18 @@ namespace SanyaPlugin
 									}
 									else
 									{
-										end = new Vector3(-z2, y1, x1);//x x0.1
-										end2 = new Vector3(-z1, y2, x2);//z z
+										end = new Vector3(-z2, y1, x1);
+										end2 = new Vector3(-z1, y2, x2);
 									}
-									Log.Info(end2.x < posroom.x);
-									Log.Info(posroom.x < end.x);
-									Log.Info(end2.y < posroom.y);
-									Log.Info(posroom.y < end.y);
-									Log.Info(end2.z < posroom.z);
-									Log.Info(posroom.z < end.z);
+									if (SanyaPlugin.Instance.Config.IsDebugged)
+									{
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+									}
 
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
@@ -2301,12 +2314,15 @@ namespace SanyaPlugin
 										end = new Vector3(-z2, y1, x1);
 										end2 = new Vector3(-z1, y2, x2);
 									}
-									Log.Info(end2.x < posroom.x);
-									Log.Info(posroom.x < end.x); 
-									Log.Info(end2.y < posroom.y);
-									Log.Info(posroom.y < end.y);
-									Log.Info(end2.z < posroom.z);
-									Log.Info(posroom.z < end.z);
+									if (SanyaPlugin.Instance.Config.IsDebugged)
+									{
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+									}
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
 
@@ -2379,12 +2395,15 @@ namespace SanyaPlugin
 										end = new Vector3(-z2, y1, x1);
 										end2 = new Vector3(-z1, y2, x2);
 									}
-									Log.Info(end2.x < posroom.x);
-									Log.Info(posroom.x < end.x);
-									Log.Info(end2.y < posroom.y);
-									Log.Info(posroom.y < end.y);
-									Log.Info(end2.z < posroom.z);
-									Log.Info(posroom.z < end.z);
+									if (SanyaPlugin.Instance.Config.IsDebugged)
+									{
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+									}
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
 
@@ -2455,12 +2474,15 @@ namespace SanyaPlugin
 										end = new Vector3(-z2, y1, x1);
 										end2 = new Vector3(-z1, y2, x2);
 									}
-									Log.Info(end2.x < posroom.x);
-									Log.Info(posroom.x < end.x);
-									Log.Info(end2.y < posroom.y);
-									Log.Info(posroom.y < end.y);
-									Log.Info(end2.z < posroom.z);
-									Log.Info(posroom.z < end.z);
+									if (SanyaPlugin.Instance.Config.IsDebugged)
+									{
+										Log.Info(end2.x < posroom.x);
+										Log.Info(posroom.x < end.x);
+										Log.Info(end2.y < posroom.y);
+										Log.Info(posroom.y < end.y);
+										Log.Info(end2.z < posroom.z);
+										Log.Info(posroom.z < end.z);
+									}
 									if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 									{
 
@@ -2505,7 +2527,7 @@ namespace SanyaPlugin
 		public void OnRACommand(SendingRemoteAdminCommandEventArgs ev)
 		{
 			string[] args = ev.Arguments.ToArray();
-			Log.Debug($"[OnCommand] sender:{ev.CommandSender.SenderId} command:{ev.Name} args:{args.Length}");
+			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnCommand] sender:{ev.CommandSender.SenderId} command:{ev.Name} args:{args.Length}");
 			string effort = $"{ev.Name} ";
 			foreach (string s in ev.Arguments)
 				effort += $"{s} ";
@@ -2515,7 +2537,7 @@ namespace SanyaPlugin
 			{
 				ReferenceHub player = ev.CommandSender.SenderId == "SERVER CONSOLE" || ev.CommandSender.SenderId == "GAME CONSOLE" ? Player.Dictionary[PlayerManager.localPlayer].ReferenceHub : ev.Sender.ReferenceHub;
 				Player perm = Player.Dictionary[player.gameObject];
-				if (args.Length > 1)
+				if (args.Length > 2)
 				{
 					string ReturnStr;
 					bool isSuccess = true;
@@ -2654,12 +2676,12 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1 && args[2] == "true")
+								if (args.Length > 2 && args[2] == "true")
 								{
 									StopRespawn = true;
 									ReturnStr = $"StopRespawn = {StopRespawn}";
 								}
-								else if (args.Length > 1 && args[2] == "false")
+								else if (args.Length > 2 && args[2] == "false")
 								{
 									StopRespawn = false;
 									ReturnStr = $"StopRespawn = {StopRespawn}";
@@ -2677,12 +2699,12 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1 && args[2] == "true")
+								if (args.Length > 2 && args[2] == "true")
 								{
 									StopTicket = true;
 									ReturnStr = $"StopTicket = {StopTicket}";
 								}
-								else if (args.Length > 1 && args[2] == "false")
+								else if (args.Length > 2 && args[2] == "false")
 								{
 									StopTicket = false;
 									ReturnStr = $"StopTicket = {StopTicket}";
@@ -2700,7 +2722,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									if (!Scp914.Scp914Machine.singleton.working)
 									{
@@ -2798,7 +2820,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -2851,7 +2873,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -2904,7 +2926,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -2957,7 +2979,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									Player target = Player.Get(args[2]);
 									if (target != null && target.Role != RoleType.Spectator)
@@ -3064,7 +3086,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									
 									Player target = Player.UserIdsCache[args[2]];
@@ -3114,7 +3136,7 @@ namespace SanyaPlugin
 									break;
 								}
 							}
-						/*case "dummy":
+						case "dummy":
 							{
 								if (!perm.CheckPermission("sanya.dummy"))
 								{
@@ -3167,7 +3189,7 @@ namespace SanyaPlugin
 										break;
 									}
 								}
-							}*/
+							}
 						case "tppos":
 							{
 								if (!perm.CheckPermission("sanya.tppos"))
@@ -3230,7 +3252,7 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									if (args[2] == "unlock")
 									{
@@ -3314,7 +3336,7 @@ namespace SanyaPlugin
 									return;
 								}
 								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									if (args[2] == "ci" || args[2] == "ic")
 									{
@@ -3360,7 +3382,7 @@ namespace SanyaPlugin
 									return;
 								}
 								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 1)
+								if (args.Length > 2)
 								{
 									if (args[2] == "time")
 									{
@@ -3425,7 +3447,7 @@ namespace SanyaPlugin
 							}*/
 						case "help":
 							{
-								ReturnStr = "Toute les commande ou t'as la permission";
+								ReturnStr = "\nToute les commande ou t'as la permission";
 								if (perm.CheckPermission("sanya."))
 								{
 									ReturnStr += "";

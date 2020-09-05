@@ -237,18 +237,16 @@
 			"《Le bombardement de l'ensemble du site à été effectué et c'est terminé avec succès !》\n",
 			"</size></color>"
 		);
-
 		internal static readonly string DecontEvent = string.Concat(
 			"<color=#bbee00><size=25>",
 			"《Le protocole de décontamination de la Light Containement Zone a commencé. Les objets SCP dans la zone seront décontaminés.》\n",
 			"</size></color>"
 		);
-
-    /*    internal static readonly string SCPEscapeEvent = string.Concat(
-            "<color=#bbee00><size=25>",
-            "《Le {0} s'est échappé de la fondation.》\n",
-            "</size></color>"
-		);
-	*/	
-    }											
+		/*    internal static readonly string SCPEscapeEvent = string.Concat(
+				"<color=#bbee00><size=25>",
+				"《Le {0} s'est échappé de la fondation.》\n",
+				"</size></color>"
+			);
+		*/
+	}											
 }

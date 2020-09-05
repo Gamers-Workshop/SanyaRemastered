@@ -14,8 +14,7 @@ namespace SanyaRemastered.Patches
 			if (!SanyaPlugin.SanyaPlugin.Instance.Config.GrenadeChainSametiming) return true;
 
 			GrenadeSettings grenadeSettings = null;
-			int i = 0;
-			while (i < __instance.thrower.availableGrenades.Length)
+			for (int i = 0; i < __instance.thrower.availableGrenades.Length;)
 			{
 				GrenadeSettings grenadeSettings2 = __instance.thrower.availableGrenades[i];
 				if (grenadeSettings2.inventoryID == item.ItemId)

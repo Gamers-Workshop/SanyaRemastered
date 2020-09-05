@@ -1,6 +1,5 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -121,7 +120,8 @@ namespace SanyaRemastered
 		public bool Scp939AttackBleeding { get; set; } = false;
 		public float Scp939AttackBleedingTime { get; set; } = 60f;
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
-	
+
+		public float Scp939Size { get; set; } = 0.74f;
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
