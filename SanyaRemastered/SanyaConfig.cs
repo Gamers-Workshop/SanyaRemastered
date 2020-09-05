@@ -15,7 +15,7 @@ namespace SanyaRemastered
 			DataDirectory = Path.Combine(Paths.Plugins, "SanyaPlugin");
 		}
 		[Description("Activation du SanyaPlugin")]
-		public bool IsEnabled { get; set; } = false;
+		public bool IsEnabled { get; set; }
 
 		[Description("WIP")]
 		public bool IsDebugged { get; set; } = false;

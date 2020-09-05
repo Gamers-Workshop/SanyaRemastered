@@ -662,54 +662,66 @@ namespace SanyaPlugin
 			{
 				string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
 				string str;
-				if (ev.HitInformations.GetDamageType() == DamageTypes.Tesla)
+				switch (ev.HitInformations.GetDamageType().name)
 				{
-					str = Subtitles.SCPDeathTesla.Replace("{0}", fullname);
-				}
-				else if (ev.HitInformations.GetDamageType() == DamageTypes.Nuke)
-				{
-					str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
-				}
-				else if (ev.HitInformations.GetDamageType() == DamageTypes.Decont)
-				{
-					str = Subtitles.SCPDeathDecont.Replace("{0}", fullname);
-				}
-				else
-				{
-					Team killerTeam = ev.Killer.Team;
-					foreach (Player Exiledi in Player.List)
-					{
-						if (Exiledi.ReferenceHub.queryProcessor.PlayerId == ev.HitInformations.PlayerId)
+					case "Tesla":
 						{
-							killerTeam = Exiledi.Team;
+							str = Subtitles.SCPDeathTesla.Replace("{0}", fullname);
+							break;
 						}
-					}
-					Log.Debug($"[CheckTeam] ply:{ev.Target.ReferenceHub.queryProcessor.PlayerId} kil:{ev.Killer.ReferenceHub.queryProcessor.PlayerId} plyid:{ev.HitInformations.PlayerId} killteam:{killerTeam}");
-
-					if (killerTeam == Team.CDP)
-					{
-						str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un classe-D");
-					}
-					else if (killerTeam == Team.CHI)
-					{
-						str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "l'insurection du chaos");
-					}
-					else if (killerTeam == Team.RSC)
-					{
-						str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un scientifique");
-					}
-					else if (killerTeam == Team.MTF)
-					{
-
-						string unit = ev.Killer.ReferenceHub.characterClassManager.CurUnitName;
-						str = Subtitles.SCPDeathContainedMTF.Replace("{0}", fullname).Replace("{1}", unit);
-					}
-					else
-					{
-						str = Subtitles.SCPDeathUnknown.Replace("{0}", fullname);
-					}
+					case "Nuke":
+						{
+							str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
+							break;
+						}
+					case "Decont":
+						{
+							str = Subtitles.SCPDeathDecont.Replace("{0}", fullname);
+							break;
+						}
+					default:
+						{
+							Team killerTeam = ev.Killer.Team;
+							foreach (Player Exiledi in Player.List)
+							{
+								if (Exiledi.ReferenceHub.queryProcessor.PlayerId == ev.HitInformations.PlayerId)
+								{
+									killerTeam = Exiledi.Team;
+								}
+							}
+							Log.Debug($"[CheckTeam] ply:{ev.Target.ReferenceHub.queryProcessor.PlayerId} kill:{ev.Killer.ReferenceHub.queryProcessor.PlayerId} plyid:{ev.HitInformations.PlayerId} killteam:{killerTeam}");
+							switch (killerTeam)
+							{
+								case Team.CDP:
+									{
+										str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un classe-D");
+										break;
+									}
+								case Team.CHI:
+									{
+										str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "l'insurection du chaos");
+										break;
+									}
+								case Team.RSC:
+									{
+										str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un scientifique");
+										break;
+									}
+								case Team.MTF:
+									{
+										string unit = ev.Killer.ReferenceHub.characterClassManager.CurUnitName;
+										str = Subtitles.SCPDeathContainedMTF.Replace("{0}", fullname).Replace("{1}", unit);
+										break;
+									}
+								default:
+									{
+										str = Subtitles.SCPDeathUnknown.Replace("{0}", fullname);
+										break;
+									}
+							}
+							break;
+						}
 				}
-
 				int count = 0;
 				bool isFound079 = false;
 				bool isForced = false;
@@ -2597,29 +2609,20 @@ namespace SanyaPlugin
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								if (args[2] == "start")
+								if (args[1] == "start")
 								{
-									if (args.Length > 2)
+									if (int.TryParse(args[2], out int duration))
 									{
-										if (int.TryParse(args[3], out int duration))
+										if (int.TryParse(args[3], out int duration2))
 										{
-											if (int.TryParse(args[4], out int duration2))
-											{
-												roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
-												ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60} and stop in {duration2 / 60}:{duration2 % 60:00}";
-												break;
-											}
-											else
-											{
-												roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
-												ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
-												break;
-											}
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
+											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
+											break;
 										}
 										else
 										{
-											isSuccess = false;
-											ReturnStr = "startair {durée avant que ça démare} {durée du bombardement}";
+											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
+											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 											break;
 										}
 									}
@@ -2630,11 +2633,16 @@ namespace SanyaPlugin
 										break;
 									}
 								}
-								else
+								else if (args[1] == "stop")
 								{
 									roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
 									Coroutines.isAirBombGoing = false;
-									ReturnStr = $"Stop ok. now:{Coroutines.isAirBombGoing}";
+									ReturnStr = $"Stop ok.";
+									break;
+								}
+								else
+								{
+									ReturnStr = $"sanya air start/stop";
 									break;
 								}
 							}
