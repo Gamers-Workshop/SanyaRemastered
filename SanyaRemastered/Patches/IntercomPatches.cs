@@ -3,6 +3,7 @@ using LightContainmentZoneDecontamination;
 using System;
 using UnityEngine;
 using Respawning;
+using Exiled.API.Features;
 
 namespace SanyaRemastered.Patches
 {
@@ -18,12 +19,11 @@ namespace SanyaRemastered.Patches
 		{
 			if (true)
 			{
-				int leftdecont = (int)Math.Truncate(15f * 60 - DecontaminationController.GetServerTime);
+				int leftdecont = (int)Math.Truncate((DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger) - Math.Truncate(DecontaminationController.GetServerTime));
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
 				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
-			//	bool SpawnCI = respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency;
 				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
@@ -64,6 +64,7 @@ namespace SanyaRemastered.Patches
 				}
 
 				//warhead
+
 				if (TimeWarhead <= 10)
 				{
 					contentfix += string.Concat($"<color=#ff0000>Détonation inévitable : {TimeWarhead / 60}:{TimeWarhead % 60:00}</color>\n");
@@ -84,7 +85,7 @@ namespace SanyaRemastered.Patches
 					}
 				}
 
-				//Générateur 
+				//Générateur 079
 
 				if (TimeContained == 0 && IntercomUpdateTextPatches.draw == false)
 				{ 
@@ -146,8 +147,34 @@ namespace SanyaRemastered.Patches
 
 				else
 					contentfix += string.Concat($"Les renforts se préparent\n");
-
-				__instance.CustomContent = contentfix;
+				
+					//Speak Intercom
+					if (__instance.Muted)
+					{
+						contentfix += "<color=#ff0000>Accréditation insuffisante.</color>";
+					}
+					else if (Intercom.AdminSpeaking)
+					{
+						contentfix += "<color=#ff0000>L'administrateur a la priorité sur les équipements de diffusion.</color>";
+					}
+					else if (__instance.remainingCooldown > 0f)
+					{
+						contentfix += "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + " secondes ";
+					}
+					else if (__instance.remainingCooldown > 0f)
+					{
+						contentfix +=  $"{ReferenceHub.GetHub(__instance.Networkspeaker).nicknameSync._myNickSync} à une diffusion prioritaire";
+					}
+					
+					else if (__instance.speaker != null)
+					{
+						contentfix += $"{ReferenceHub.GetHub(__instance.Networkspeaker).nicknameSync._myNickSync} Diffuse : " + Mathf.CeilToInt(__instance.speechRemainingTime) + " secondes ";
+					}
+					else
+					{
+						contentfix += "Intercom prêt à l'emploi.";
+					}
+					__instance.CustomContent = contentfix;
 
 				return;
 				}

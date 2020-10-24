@@ -45,7 +45,6 @@
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\MTFRespawnPatches.cs" />
-    <Compile Include="Patches\PlayerMovementPatches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\SinkHolesPatches.cs" />
     <Compile Include="Patches\VoicePatches.cs" />
