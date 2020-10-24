@@ -2,7 +2,7 @@
 using LightContainmentZoneDecontamination;
 using System;
 using UnityEngine;
-using Exiled.API.Features;
+using Respawning;
 
 namespace SanyaRemastered.Patches
 {
@@ -12,23 +12,14 @@ namespace SanyaRemastered.Patches
 	{
 		public static float time = 67.50499f;
 		public static bool draw = true;
-		public static bool Prefix(Intercom __instance)
+		public static void Prefix(Intercom __instance)
 		{	
-		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return true;
+		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return;
 		{
-			/*int Light = 0;
-			foreach (FlickerableLight light in GameObject.FindObjectsOfType<FlickerableLight>())
-			{
-				if (light._enabled)//Toujours en FALSE
-				{
-					Light = 1;
-					Log.Info("Light = 1");
-				}
-			}*/
 			if (true)
 			{
 				int leftdecont = (int)Math.Truncate(15f * 60 - DecontaminationController.GetServerTime);
-			//	int nextRespawn = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence : 0);
+				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
 				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
@@ -147,61 +138,21 @@ namespace SanyaRemastered.Patches
 
 				//Prochain spawn + durée MTF
 
-				/*if (!SpawnCI)
-					contentfix += string.Concat($"Prochains renforts MTF : {nextRespawn / 60:00}:{nextRespawn % 60:00}\n");
+				if (RespawnManager.Singleton.NextKnownTeam == SpawnableTeamType.NineTailedFox)
+					contentfix += string.Concat($"Prochains renforts MTF : {respawntime / 60:00}:{respawntime % 60:00}\n");
 
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
 					contentfix += string.Concat($"Aucun renforts prévus pour le site\n");
 
 				else
-					contentfix += string.Concat($"Les renforts se préparent\n");*/
-			
-				//Voice intercom
-				if (__instance.Muted)
-				{
-					__instance._content = contentfix + "<color=#ff0000>Accréditation insuffisante.</color>";
+					contentfix += string.Concat($"Les renforts se préparent\n");
+
+				__instance.CustomContent = contentfix;
+
+				return;
 				}
-				else if (Intercom.AdminSpeaking)
-				{
-					__instance._content = contentfix + "<color=#ff0000>L'administrateur a la priorité sur les équipements de diffusion.</color>";
-				}
-				else if (__instance.remainingCooldown > 0f)
-				{
-					__instance._content = contentfix + "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + " secondes ";
-				}
-				else if (__instance.Networkspeaker != null)
-				{
-					if (__instance.speechRemainingTime == -77f)
-					{
-						__instance._content = contentfix + $"{ReferenceHub.GetHub(__instance.Networkspeaker).nicknameSync._myNickSync} a une diffusion prioritaire";
-					}
-					else
-					{
-						__instance._content = contentfix + $"{ReferenceHub.GetHub(__instance.Networkspeaker).nicknameSync._myNickSync} Diffuse : " + Mathf.CeilToInt(__instance.speechRemainingTime) + " secondes ";
-					}
-				}
-				else
-				{
-					__instance._content = contentfix + "Intercom prêt à l'emploi.";
-				}
-				if (__instance._contentDirty)
-				{
-					__instance.NetworkintercomText = __instance._content;
-					__instance._contentDirty = false;
-				}
-				if (Intercom.AdminSpeaking != Intercom.LastState)
-				{
-					Intercom.LastState = Intercom.AdminSpeaking;
-					__instance.RpcUpdateAdminStatus(Intercom.AdminSpeaking);
-				}
-				return false;
 			}
-		/*else
-		{
-			string.Concat(__instance._content  + " ");
-					return false;
-		}*/
-		}
 		}
 	}
 }
+

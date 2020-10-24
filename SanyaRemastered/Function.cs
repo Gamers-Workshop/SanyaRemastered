@@ -294,7 +294,7 @@ namespace SanyaPlugin.Functions
 				yield break;
 			}
 		}
-		public static IEnumerator<float> AirSupportBomb(bool stop = false,float timewait = 0,float TimeEnd = -1)
+		public static IEnumerator<float> AirSupportBomb(bool stop ,float timewait = 0,float TimeEnd = -1)
 		{
 			while (timewait > 0 && !isAirBombGoing)
 			{
@@ -314,7 +314,7 @@ namespace SanyaPlugin.Functions
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
 				}
-				if (stop && timewait > 0)
+				if (stop || timewait > 0)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
 					if (SanyaPlugin.Instance.Config.CassieSubtitle)
@@ -322,6 +322,11 @@ namespace SanyaPlugin.Functions
 						Methods.SendSubtitle(Subtitles.AirbombStop, 10);
 					}
 					Log.Info($"[AirSupportBomb] The AirBomb as stop");
+					break;
+				}
+				if (timewait == 0)
+				{
+					isAirBombGoing = true;
 					break;
 				}
 				timewait--;

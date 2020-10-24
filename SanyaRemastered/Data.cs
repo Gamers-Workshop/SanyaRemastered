@@ -194,6 +194,9 @@ namespace SanyaPlugin.Data
 		public string Value { get; set; }
 		public bool Inline { get; set; } = false;
 	}
+	/*public class        private bool StopRespawn = false;
+	private bool StopTicket = false;
+	{}*/
 	/*
 	public class SCPPlayerData
 	{

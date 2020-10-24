@@ -23,7 +23,8 @@ namespace SanyaRemastered
 		public bool TeslaExplodeGrenade { get; set; } = false;
 		public bool Coroding106 { get; set; } = false;
 
-	
+		[Description("RandomRespawnPosPercent")]
+		public int RandomRespawnPosPercent { get; set; } = -1;
 		[Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
 		public string DataDirectory { get; private set; } = string.Empty;
 
@@ -38,6 +39,8 @@ namespace SanyaRemastered
 
 		[Description("Message de Bienvenue")]
 		public string MotdMessage { get; set; } = string.Empty;
+		[Description("Disable Player lists")]
+		public bool DisablePlayerLists { get; set; } = false;
 
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
@@ -100,6 +103,8 @@ namespace SanyaRemastered
 		[Description("Le cadavre n'apparait pas quand on se fait tuer par")]
 		public bool Scp939RemoveRagdoll { get; set; } = false;
 		public bool Scp096RemoveRagdoll { get; set; } = false;
+		[Description("Effect sur SCP-049-2")]
+		public bool Scp0492effect { get; set; } = false;
 
 		[Description("SCP-914 = Effect")]
 		public bool Scp914Effect { get; set; } = false;

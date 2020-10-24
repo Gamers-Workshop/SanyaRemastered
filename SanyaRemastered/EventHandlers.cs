@@ -22,6 +22,9 @@ using Exiled.Permissions.Extensions;
 using System.Linq;
 using Scp914;
 using PlayableScps;
+using Mirror.LiteNetLib4Mirror;
+using Exiled.API.Extensions;
+using Exiled.API.Enums;
 
 namespace SanyaPlugin
 {
@@ -185,7 +188,9 @@ namespace SanyaPlugin
 
 		/** Flag Params **/
 		private readonly int grenade_pickup_mask = 1049088;
+		private Vector3 nextRespawnPos = Vector3.zero;
 		private int prevMaxAHP = 0;
+		private uint playerlistnetid = 0;
 		private bool StopRespawn = false;
 		private bool StopTicket = false;
 
@@ -205,6 +210,7 @@ namespace SanyaPlugin
 			Coroutines.isAirBombGoing = false;
 
 
+
 			if (SanyaPlugin.Instance.Config.TeslaRange != 5.5f)
 			{
 				foreach (var tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
@@ -213,6 +219,16 @@ namespace SanyaPlugin
 				}
 			}
 
+			if (plugin.Config.DisablePlayerLists)
+			{
+				foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
+				{
+					if (identity.name == "PlayerList")
+					{
+						playerlistnetid = identity.netId;
+					}
+				}
+			}
 			Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
 		}
 
@@ -438,7 +454,12 @@ namespace SanyaPlugin
 					ev.Player.ReferenceHub.characterClassManager.NetworkMuted = true;
 				}
 			}
-
+			if (plugin.Config.DisablePlayerLists && playerlistnetid > 0)
+			{
+				ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage();
+				objectDestroyMessage.netId = playerlistnetid;
+				ev.Player.Connection.Send(objectDestroyMessage, 0);
+			}
 			//MuteFixer
 			foreach (Player ExiledPlayer in Player.List)
 			{
@@ -507,6 +528,21 @@ namespace SanyaPlugin
 			ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
 			if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
 				ev.Player.Scale = new Vector3(SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size);
+			if (SanyaPlugin.Instance.Config.Scp0492effect && ev.Player.Role == RoleType.Scp0492)
+			{
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Ensnared>(5f);
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(5f);
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Blinded>(3f);
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Amnesia>(5f);
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.5f);
+			}
+			if (plugin.Config.RandomRespawnPosPercent > 0
+				&& ev.Player.ReferenceHub.characterClassManager._prevId == RoleType.Spectator
+				&& (ev.RoleType.GetTeam() == Team.MTF || ev.RoleType.GetTeam() == Team.CHI)
+				&& nextRespawnPos != Vector3.zero)
+			{
+				ev.Position = nextRespawnPos;
+			}
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
 		{
@@ -919,6 +955,57 @@ namespace SanyaPlugin
 			{
 				ev.Players.Clear();
 			}
+			if (plugin.Config.RandomRespawnPosPercent > 0)
+			{
+				int randomnum = UnityEngine.Random.Range(0, 100);
+				Log.Debug($"[RandomRespawnPos] Check:{randomnum}>{plugin.Config.RandomRespawnPosPercent}", SanyaPlugin.Instance.Config.IsDebugged);
+				if (randomnum > plugin.Config.RandomRespawnPosPercent && !Warhead.IsDetonated)
+				{
+					List<Vector3> poslist = new List<Vector3>();
+					poslist.Add(RoleType.Scp049.GetRandomSpawnPoint());
+					poslist.Add(RoleType.Scp93953.GetRandomSpawnPoint());
+
+					if (!Map.IsLCZDecontaminated && DecontaminationController.Singleton._nextPhase < 4)
+					{
+						poslist.Add(Map.Rooms.First(x => x.Type == Exiled.API.Enums.RoomType.LczArmory).Position);
+
+						foreach (var itempos in RandomItemSpawner.singleton.posIds)
+						{
+							if (itempos.posID == "RandomPistol" && itempos.position.position.y > 0.5f && itempos.position.position.y < 0.7f)
+							{
+								poslist.Add(new Vector3(itempos.position.position.x, itempos.position.position.y, itempos.position.position.z));
+							}
+							else if (itempos.posID == "toilet_keycard" && itempos.position.position.y > 1.25f && itempos.position.position.y < 1.35f)
+							{
+								poslist.Add(new Vector3(itempos.position.position.x, itempos.position.position.y - 0.5f, itempos.position.position.z));
+							}
+						}
+					}
+
+					foreach (GameObject roomid in GameObject.FindGameObjectsWithTag("RoomID"))
+					{
+						Rid rid = roomid.GetComponent<Rid>();
+						if (rid != null && (rid.id == "LC_ARMORY" || rid.id == "Shelter"))
+						{
+							poslist.Add(roomid.transform.position);
+						}
+					}
+
+					foreach (var i in poslist)
+					{
+						Log.Debug($"[RandomRespawnPos] TargetLists:{i}", SanyaPlugin.Instance.Config.IsDebugged);
+					}
+
+					int randomnumlast = UnityEngine.Random.Range(0, poslist.Count);
+					nextRespawnPos = new Vector3(poslist[randomnumlast].x, poslist[randomnumlast].y + 2, poslist[randomnumlast].z);
+
+					Log.Info($"[RandomRespawnPos] Determined:{nextRespawnPos}");
+				}
+				else
+				{
+					nextRespawnPos = Vector3.zero;
+				}
+			}
 		}
 		public void OnExplodingGrenade (ExplodingGrenadeEventArgs ev)
 		{
@@ -971,12 +1058,10 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
 
@@ -992,12 +1077,10 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
 		public void OnEjectingGeneratorTablet(EjectingGeneratorTabletEventArgs ev)
@@ -1006,12 +1089,10 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 			if (SanyaPlugin.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
 			{
 				ev.IsAllowed = false;
-				ev.Player.ReferenceHub.SendTextHint("Tu fait pas ça", 3);
 			}
 		}
 		public void OnGeneratorInsert(InsertingGeneratorTabletEventArgs ev)
@@ -1164,13 +1245,7 @@ namespace SanyaPlugin
 							if (player.Team != Team.SCP)
 							{
 								{
-									//Reverse ammo
-									var Nato556 = player.GetAmmo(Exiled.API.Enums.AmmoType.Nato556);
-									var Nato762 = player.GetAmmo(Exiled.API.Enums.AmmoType.Nato762);
-									var Nato9 = player.GetAmmo(Exiled.API.Enums.AmmoType.Nato9);
-									player.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, Nato762);
-									player.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, Nato9);
-									player.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, Nato556);
+
 								}
 								{
 
@@ -2588,6 +2663,27 @@ namespace SanyaPlugin
 								}
 								break;
 							}
+						case "ping":
+							{
+								ReturnStr = "Pings:\n";
+
+								foreach (var ply in Player.List)
+								{
+									ReturnStr += $"{ply.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId].Ping}ms\n";
+								}
+								break;
+							}
+						case "addscps":
+							{
+								ReturnStr = $"ok.{RoundSummary.singleton.classlistStart.scps_except_zombies++}";
+								break;
+							}
+						case "forceend":
+							{
+								RoundSummary.singleton.ForceEnd();
+								ReturnStr = "Force Ended!";
+								break;
+							}
 						case "showconfig":
 							{
 								if (!perm.CheckPermission("sanya.showconfig"))
@@ -2650,7 +2746,7 @@ namespace SanyaPlugin
 									}
 									else
 									{
-										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb()));
+										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
 										ReturnStr = "Started!";
 										break;
 									}
@@ -2988,9 +3084,9 @@ namespace SanyaPlugin
 											uint.TryParse(args[4], out uint Nato762) &&
 											uint.TryParse(args[5], out uint Nato9))
 										{
-											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato556, Nato556);
-											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, Nato762);
-											target.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, Nato9);
+											target.Ammo[(int)AmmoType.Nato556] = Nato556;
+											target.Ammo[(int)AmmoType.Nato762] = Nato762;
+											target.Ammo[(int)AmmoType.Nato9] = Nato9;
 											ReturnStr = $"{target.Nickname}  {Nato556}:{Nato762}:{Nato9}";
 											break;
 										}
@@ -3013,9 +3109,9 @@ namespace SanyaPlugin
 										{
 											foreach (var ply in Player.List)
 											{
-												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato556 , Nato556);
-												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato762, Nato762);
-												ply.SetAmmo(Exiled.API.Enums.AmmoType.Nato9, Nato9);
+												ply.Ammo[(int)AmmoType.Nato556] = Nato556;
+												ply.Ammo[(int)AmmoType.Nato762] = Nato762;
+												ply.Ammo[(int)AmmoType.Nato9] = Nato9;
 											}
 											ReturnStr = $"ammo set {Nato556}:{Nato762}:{Nato9}";
 											break;
@@ -3423,36 +3519,10 @@ namespace SanyaPlugin
 									}
 								}
 							}
-						/*case "van":
-							{
-								if (!perm.CheckPermission("sanya.deco"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-
-								ReturnStr = "Van Called!";
-								break;
-							}
-						case "heli":
-							{
-								if (!perm.CheckPermission("sanya.deco"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-
-								ReturnStr = "Heli Called!";
-								break;
-							}*/
 						case "help":
 							{
 								ReturnStr = "\nToute les commande ou t'as la permission";
-								if (perm.CheckPermission("sanya."))
-								{
-									ReturnStr += "";
-									return;
-								}
+								ReturnStr += "";
 								break;
 							}
 						default:
