@@ -1,5 +1,8 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Interfaces;
+using SanyaPlugin.Functions;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -25,6 +28,7 @@ namespace SanyaRemastered
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
+		public bool FacilityGuardChangeSpawnPos { get; set; } = false;
 		[Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
 		public string DataDirectory { get; private set; } = string.Empty;
 
@@ -37,6 +41,9 @@ namespace SanyaRemastered
 		[Description("Kick Player")]
 		public bool KickSteamLimited { get; set; } = false;
 
+		[Description("Hud Activé")]
+		public bool ExHudEnabled { get; set; } = false;
+
 		[Description("Message de Bienvenue")]
 		public string MotdMessage { get; set; } = string.Empty;
 		[Description("Disable Player lists")]
@@ -44,12 +51,14 @@ namespace SanyaRemastered
 
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
-		public List<Team> TeslaTriggerableTeams { get; set; } = new List<Team>();
+		public List<string> TeslaTriggerableTeams { get; set; } = new List<string>();
+		public List<Team> TeslaTriggerableTeamsParsed = new List<Team>();
 		public bool TeslaNoTriggerableDisarmed { get; set; } = false;
 
 		[Description("ItemCleanup Config")]
 		public int ItemCleanup { get; set; } = -1;
-		public List<ItemType> ItemCleanupIgnore { get; set; } = new List<ItemType>();
+		public List<string> ItemCleanupIgnore { get; set; } = new List<string>();
+		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
 		public bool CassieSubtitle { get; set; } = false;
 		public bool IntercomInformation { get; set; } = false;
 		public bool CloseDoorsOnNukecancel { get; set; } = false;
@@ -91,7 +100,7 @@ namespace SanyaRemastered
 		public int TraitorChancePercent { get; set; } = 50;
 
 		[Description("\n  # SCP Balanced")]
-		public float Scp939CanSeeVoiceChatting { get; set; } = 0;
+		public float Scp939CanSeeVoiceChatting { get; set; } = 0f;
 
 		[Description("Interdiction d'ouvrir ou de fermer")]
 		public bool Scp049_2DontOpenDoorAnd106 { get; set; } = false;
@@ -103,6 +112,7 @@ namespace SanyaRemastered
 		[Description("Le cadavre n'apparait pas quand on se fait tuer par")]
 		public bool Scp939RemoveRagdoll { get; set; } = false;
 		public bool Scp096RemoveRagdoll { get; set; } = false;
+
 		[Description("Effect sur SCP-049-2")]
 		public bool Scp0492effect { get; set; } = false;
 
@@ -126,7 +136,7 @@ namespace SanyaRemastered
 		public float Scp939AttackBleedingTime { get; set; } = 60f;
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
 
-		public float Scp939Size { get; set; } = 0.74f;
+		public float Scp939Size { get; set; } = 1f;
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
@@ -149,7 +159,11 @@ namespace SanyaRemastered
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
 		public float Scp106DamageMultiplicator { get; set; } = 1f;
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
-		
+		[Description("SCP-106の壁抜け移動が使用可能になるまでの秒数")]
+		public int Scp106WalkthroughCooldown { get; set; } = -1;
+		[Description("Vキーチャットが可能なSCP（SCP-939以外）")]
+		public List<string> AltvoicechatScps { get; set; } = new List<string>();
+		public List<RoleType> AltvoicechatScpsParsed = new List<RoleType>();
 
 		[Description("SCP-079 Activé le mode Etendue de 079")]
 		public bool Scp079ExtendEnabled { get; set; } = false;
@@ -159,6 +173,12 @@ namespace SanyaRemastered
 		public float Scp079ExtendCostFindscp { get; set; } = 10f;
 		public int Scp079ExtendLevelDoorbeep { get; set; } = 1;
 		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
+
+		[Description("SCP-079 Radar Humain")]
+		public bool Scp079spot;
+
+		[Description("SCP-079 Niveau requis pour le spot")]
+		public int Scp079ExtendLevelSpot { get; set; } = 1;
 
 		[Description("SCP-079 GAS Config")]
 		public List<string> GazBlacklistRooms { get; set; } = new List<string>();
@@ -206,11 +226,115 @@ namespace SanyaRemastered
 
 			foreach (PropertyInfo info in infoArray)
 			{
-				returned += $"{info.Name}: {info.GetValue(this)}\n";
+				if (info.PropertyType.IsList())
+				{
+					var list = info.GetValue(this) as IEnumerable;
+					returned += $"{info.Name}:\n";
+					if (list != null)
+						foreach (var i in list) returned += $"{i}\n";
+				}
+				else if (info.PropertyType.IsDictionary())
+				{
+					returned += $"{info.Name}: ";
+
+					var obj = info.GetValue(this);
+
+					IDictionary dict = (IDictionary)obj;
+
+					var key = obj.GetType().GetProperty("Keys");
+					var value = obj.GetType().GetProperty("Values");
+					var keyObj = key.GetValue(obj, null);
+					var valueObj = value.GetValue(obj, null);
+					var keyEnum = keyObj as IEnumerable;
+
+					foreach (var i in dict.Keys)
+					{
+						returned += $"[{i}:{dict[i]}]";
+					}
+
+					returned += "\n";
+				}
+				else
+				{
+					returned += $"{info.Name}: {info.GetValue(this)}\n";
+				}
+			}
+
+			FieldInfo[] fieldInfos = typeof(Configs).GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+			foreach (var info in fieldInfos)
+			{
+				if (info.FieldType.IsList())
+				{
+					var list = info.GetValue(this) as IEnumerable;
+					returned += $"{info.Name}:\n";
+					if (list != null)
+						foreach (var i in list) returned += $"{i}\n";
+				}
+				else if (info.FieldType.IsDictionary())
+				{
+					returned += $"{info.Name}: ";
+
+					var obj = info.GetValue(this);
+
+					IDictionary dict = (IDictionary)obj;
+
+					var key = obj.GetType().GetProperty("Keys");
+					var value = obj.GetType().GetProperty("Values");
+					var keyObj = key.GetValue(obj, null);
+					var valueObj = value.GetValue(obj, null);
+					var keyEnum = keyObj as IEnumerable;
+
+					foreach (var i in dict.Keys)
+					{
+						if (dict[i].GetType().IsList())
+						{
+							var list = dict[i] as IEnumerable;
+							returned += $"[{i}:";
+							if (list != null)
+								foreach (var x in list) returned += $"{x},";
+							returned += "]";
+						}
+						else
+						{
+							returned += $"[{i}:{dict[i]}]";
+						}
+					}
+
+					returned += "\n";
+				}
+				else
+				{
+					returned += $"{info.Name}: {info.GetValue(this)}\n";
+				}
 			}
 
 			return returned;
 		}
+		public void ParseConfig()
+		{
+			try
+			{
+				ItemCleanupIgnore.Clear();
+				TeslaTriggerableTeams.Clear();
+				AltvoicechatScpsParsed.Clear();
+
+				foreach (var item in ItemCleanupIgnore)
+					if (Enum.TryParse(item, out ItemType type))
+						ItemCleanupIgnoreParsed.Add(type);
+
+				foreach (var item in TeslaTriggerableTeams)
+					if (Enum.TryParse(item, out Team team))
+						TeslaTriggerableTeamsParsed.Add(team);
+
+				foreach (var item in AltvoicechatScps)
+					if (Enum.TryParse(item, out RoleType role))
+						AltvoicechatScpsParsed.Add(role);
+			}
+			catch (Exception ex)
+			{
+				Log.Error($"[ParseConfig] Error : {ex}");
+			}
+		}
 	}
 }
-

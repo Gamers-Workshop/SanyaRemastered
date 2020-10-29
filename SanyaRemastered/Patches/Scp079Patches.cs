@@ -133,7 +133,7 @@ public static class Scp079CameraPatch
 }
 
 //SCP-079Extend Sprint 
-[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 public static class Scp079InteractPatch
 {
 	public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -269,13 +269,7 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 						player.ClearBroadcasts();
 						player.Broadcast(1, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
 					}
-					foreach (RespawnEffectsController respawnEffectsController in RespawnEffectsController.AllControllers)
-					{
-						if (respawnEffectsController != null)
-						{
-							Methods.RpcCassieAnnouncement(respawnEffectsController, player.ReferenceHub.characterClassManager.Connection," .g4 ", false, false);
-						}
-					}
+					Methods.PlayAmbientSound(7);
 				}
 			}
 			yield return Timing.WaitForSeconds(1);
@@ -340,4 +334,4 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 
 		return new Room(transform.name, transform, transform.position);
 	}
-}
+}*/

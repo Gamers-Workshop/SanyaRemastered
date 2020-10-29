@@ -13,9 +13,9 @@ namespace SanyaRemastered.Patches
 
 		public static bool Prefix(Inventory __instance, ref Pickup __result, ItemType droppedItemId, float dur, Vector3 pos, Quaternion rot, int s, int b, int o)
 		{
-			if (SanyaPlugin.SanyaPlugin.Instance.Config.ItemCleanup< 0 || __instance.name == "Host") return true;
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.ItemCleanup < 0 || __instance.name == "Host") return true;
 
-			if (SanyaPlugin.SanyaPlugin.Instance.Config.ItemCleanupIgnore.Contains(droppedItemId))
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.ItemCleanupIgnoreParsed.Contains(droppedItemId))
 			{
 				Log.Debug($"[ItemCleanupPatch] Ignored:{droppedItemId}");
 				return true;

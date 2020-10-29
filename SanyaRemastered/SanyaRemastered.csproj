@@ -32,15 +32,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
+    <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\InfiniteAmmoPatches.cs" />
     <Compile Include="Patches\DecontaminationPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\ItemCleanupPatch.cs" />
+    <Compile Include="Patches\PlayerInteractPatch.cs" />
     <Compile Include="Patches\Scp018Patches.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
@@ -51,10 +54,12 @@
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SanyaConfig.cs" />
+    <Compile Include="SanyaPluginComponent.cs" />
     <Compile Include="Subtitles.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
+    <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="AmplifyBloom">
@@ -89,20 +94,24 @@
     <Reference Include="DissonanceVoip">
       <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5728538\SCPSL_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API">
+    <Reference Include="Exiled.API, Version=2.1.11.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events">
+    <Reference Include="Exiled.Events, Version=2.1.11.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Loader, Version=2.1.6.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Exiled.Loader, Version=2.1.11.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Exiled.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Permissions">
+    <Reference Include="Exiled.Permissions, Version=2.1.11.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Permissions.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Updater">
+    <Reference Include="Exiled.Updater, Version=3.0.3.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Steamworks.Win64">
@@ -145,10 +154,6 @@
       <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5728538\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\System.Buffers.dll</HintPath>
-    </Reference>
     <Reference Include="System.Collections" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -343,7 +348,8 @@
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
       <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5728538\SCPSL_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
-    <Reference Include="YamlDotNet">
+    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>
     </Reference>
     <Reference Include="zxing.unity">

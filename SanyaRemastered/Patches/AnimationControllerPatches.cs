@@ -1,7 +1,9 @@
 ﻿
+using HarmonyLib;
+
 namespace SanyaRemastered.Patches
 {
-    //[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.PlaySound))]
+   // [HarmonyPatch(typeof(AnimationController), nameof(AnimationController.PlaySound))]
     class AnimationControllerPatches
     {
         public static bool Prefix(AnimationController __instance, int id, bool isGun)

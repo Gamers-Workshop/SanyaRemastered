@@ -24,6 +24,7 @@ using Exiled.Events.EventArgs;
 using System.Threading;
 using Object = UnityEngine.Object;
 using SanyaRemastered;
+using CustomPlayerEffects;
 
 namespace SanyaPlugin.Functions
 {
@@ -33,17 +34,17 @@ namespace SanyaPlugin.Functions
 
 		public static PlayerData LoadPlayerData(string userid)
 		{
-			string targetuseridpath = Path.Combine(SanyaPlugin.DataPath, $"{userid}.txt");
-			if (!Directory.Exists(SanyaPlugin.DataPath)) Directory.CreateDirectory(SanyaPlugin.DataPath);
+			string targetuseridpath = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, $"{userid}.txt");
+			if (!Directory.Exists(SanyaPlugin.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaPlugin.Instance.Config.DataDirectory);
 			if (!File.Exists(targetuseridpath)) return new PlayerData(DateTime.Now, userid, true, 0, 0, 0);
 			else return ParsePlayerData(targetuseridpath);
 		}
 
 		public static void SavePlayerData(PlayerData data)
 		{
-			string targetuseridpath = Path.Combine(SanyaPlugin.DataPath, $"{data.userid}.txt");
+			string targetuseridpath = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, $"{data.userid}.txt");
 
-			if (!Directory.Exists(SanyaPlugin.DataPath)) Directory.CreateDirectory(SanyaPlugin.DataPath);
+			if (!Directory.Exists(SanyaPlugin.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaPlugin.Instance.Config.DataDirectory);
 
 			string[] textdata = new string[] {
 				data.lastUpdate.ToString("yyyy-MM-ddTHH:mm:sszzzz"),
@@ -69,24 +70,13 @@ namespace SanyaPlugin.Functions
 				int.Parse(text[5])
 				);
 		}
-
-		public static void ResetLimitedFlag()
-		{
-			foreach (var file in Directory.GetFiles(SanyaPlugin.DataPath))
-			{
-				var data = LoadPlayerData(file.Replace(".txt", string.Empty));
-				Log.Warn($"{data.userid}:{data.limited}");
-				data.limited = true;
-				SavePlayerData(data);
-			}
-		}
 	}
 
 	internal static class ShitChecker
 	{
-		private static string whitelist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
+		private static readonly string whitelist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
 		public static HashSet<IPAddress> whitelist = new HashSet<IPAddress>();
-		private static string blacklist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
+		private static readonly string blacklist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
 		public static HashSet<IPAddress> blacklist = new HashSet<IPAddress>();
 
 		/*public static IEnumerator<float> CheckVPN(PreAuthenticatingEventArgs ev)
@@ -270,6 +260,7 @@ namespace SanyaPlugin.Functions
 	internal static class Coroutines
 	{
 		public static bool isAirBombGoing = false;
+		public static bool ContainClassD = false;
 
 		public static IEnumerator<float> BigHitmark(MicroHID microHID)
 		{
@@ -277,34 +268,68 @@ namespace SanyaPlugin.Functions
 			microHID.TargetSendHitmarker(false);
 			yield break;
 		}
-		public static IEnumerator<float> StartContainClassD(bool stop , float TimeLock = 0)
+		public static IEnumerator<float> StartContainClassD(bool stop, float TimeLock = 0)
 		{
-			foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
+			if (stop)
 			{
-				while (!stop)
+				ContainClassD = false;
+				foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
 				{
 					if (door.name.Contains("PrisonDoor"))
 					{
-						door.lockdown = true;
+						door.SetLock(false);
+						yield break;
 					}
-					yield return Timing.WaitForSeconds(TimeLock);
-					stop = true;
 				}
-				door.lockdown = false;
-				yield break;
+			}
+			else 
+			{
+				ContainClassD = true;
+				while (ContainClassD)
+				{
+					foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
+					{
+						if (door.name.Contains("PrisonDoor"))
+						{
+							door.SetLock(true);
+							yield return Timing.WaitForSeconds(TimeLock);
+							door.SetLock(false);
+							yield break;
+						}
+					}
+				}
 			}
 		}
-		public static IEnumerator<float> AirSupportBomb(bool stop ,float timewait = 0,float TimeEnd = -1)
+		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1)
 		{
-			while (timewait > 0 && !isAirBombGoing)
+			if (isAirBombGoing && stop)
 			{
+				isAirBombGoing = false;
+				RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
+				if (SanyaPlugin.Instance.Config.CassieSubtitle)
+				{
+					Methods.SendSubtitle(Subtitles.AirbombStop, 10);
+				}
+				Log.Info("[AirSupportBomb] The AirBomb as stop");
+				yield break;
+			}
+			else if (isAirBombGoing && !stop)
+			{
+				Log.Info("[AirSupportBomb] The AirBomb as stop");
+				yield break;
+			}
+			isAirBombGoing = true;
+			while (timewait >= 0)
+			{
+				Log.Debug("Démarage AirSupport timewait");
 				if (timewait == 60f || timewait == 120f || timewait == 300f || timewait == 600f || timewait == 1800f || timewait == 3600f)
 				{
-					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {(int)timewait / 60} minutes .", false, true);
+					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {timewait / 60} minutes .", false, true);
 					if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
-						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", ((int)timewait / 60).ToString()), 10);
+						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", (timewait / 60).ToString()), 10);
 					}
+					Log.Debug($"Time wait {timewait / 60} seconds");
 				}
 				else if (timewait == 30f)
 				{
@@ -313,8 +338,14 @@ namespace SanyaPlugin.Functions
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
+					Log.Debug("reste 30 seconde");
 				}
-				if (stop || timewait > 0)
+				else if (timewait == 0)
+				{
+					Log.Debug("reste 0 seconde");
+					break;
+				}
+				if (!isAirBombGoing)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
 					if (SanyaPlugin.Instance.Config.CassieSubtitle)
@@ -322,27 +353,15 @@ namespace SanyaPlugin.Functions
 						Methods.SendSubtitle(Subtitles.AirbombStop, 10);
 					}
 					Log.Info($"[AirSupportBomb] The AirBomb as stop");
-					break;
+					yield break;
 				}
-				if (timewait == 0)
-				{
-					isAirBombGoing = true;
-					break;
-				}
+				Log.Debug("-1 seconde");
 				timewait--;
 				yield return Timing.WaitForSeconds(1);
 			}
+			if (isAirBombGoing)
+			{
 				Log.Info($"[AirSupportBomb] booting...");
-				if (isAirBombGoing)
-				{
-					Log.Info($"[Airbomb] already booted, cancel.");
-					yield break;
-				}
-				else
-				{
-					stop = true;
-					isAirBombGoing = true;
-				}
 				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
 				if (SanyaPlugin.Instance.Config.CassieSubtitle)
 				{
@@ -356,6 +375,10 @@ namespace SanyaPlugin.Functions
 					{
 						Methods.PlayAmbientSound(7);
 						waitforready--;
+						if (!isAirBombGoing)
+						{
+							yield break;
+						}
 						yield return Timing.WaitForSeconds(1f);
 					}
 				}
@@ -366,16 +389,14 @@ namespace SanyaPlugin.Functions
 					foreach (var pos in randampos)
 					{
 						Methods.SpawnGrenade(pos, false, 0.1f);
-						yield return Timing.WaitForSeconds(0.075f);
+						yield return Timing.WaitForSeconds(0.2f);
 					}
 					if (TimeEnd != -1)
 					{
-						float TimeBombing = 0;
-						TimeBombing += Time.deltaTime;
-						if (TimeBombing <= TimeEnd)
+						if (TimeEnd <= Time.time)
 						{
-							Log.Info($"[AirSupportBomb] TimeBombing:{TimeBombing}");
 							isAirBombGoing = false;
+							Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
 							break;
 						}
 					}
@@ -388,7 +409,52 @@ namespace SanyaPlugin.Functions
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 				Log.Info($"[AirSupportBomb] Ended.");
 				yield break;
-			
+			}
+		}
+		public static IEnumerator<float> Scp106WalkingThrough(Player player)
+		{
+			yield return Timing.WaitForOneFrame;
+
+			if (!Physics.Raycast(player.Position, -Vector3.up, 50f, player.ReferenceHub.scp106PlayerScript.teleportPlacementMask))
+			{
+				player.Position = Map.GetRandomSpawnPoint(RoleType.Scp106);
+				yield break;
+			}
+
+			Vector3 forward = player.CameraTransform.forward;
+			forward.Set(forward.x * 0.1f, 0f, forward.z * 0.1f);
+
+			var hits = Physics.RaycastAll(player.Position, forward, 50f, 1);
+			if (hits.Length < 2) yield break;
+			if (hits[0].distance > 1f) yield break;
+
+			if (!Physics.Raycast(hits.Last().point + forward, forward * -1f, out var BackHits, 50f, 1)) yield break;
+
+			if (!PlayerMovementSync.FindSafePosition(BackHits.point, out var pos, true)) yield break;
+			player.ReferenceHub.playerMovementSync.WhitelistPlayer = true;
+			yield return Timing.WaitForOneFrame;
+			player.ReferenceHub.fpc.NetworkforceStopInputs = true;
+			player.AddItem(ItemType.SCP268);
+			player.ReferenceHub.playerEffectsController.EnableEffect<Scp268>();
+			player.ReferenceHub.playerEffectsController.EnableEffect<Deafened>();
+			player.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Visuals939>(1);
+			SanyaPlugin.Instance.Handlers.last106walkthrough.Restart();
+
+			while (true)
+			{
+				if (player.Position == pos || player.Role != RoleType.Scp106)
+				{
+					player.ReferenceHub.fpc.NetworkforceStopInputs = false;
+					player.ClearInventory();
+					player.ReferenceHub.playerEffectsController.DisableEffect<Deafened>();
+					player.ReferenceHub.playerEffectsController.DisableEffect<Visuals939>();
+					yield return Timing.WaitForOneFrame;
+					player.ReferenceHub.playerMovementSync.WhitelistPlayer = false;
+					yield break;
+				}
+				player.Position = Vector3.MoveTowards(player.Position, pos, 0.25f);
+				yield return Timing.WaitForOneFrame;
+			}
 		}
 	}
 	internal static class Methods
@@ -467,18 +533,20 @@ namespace SanyaPlugin.Functions
 				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
 			}
 		}
+		public static void PlayGenerator079sound(byte curr)
+		{
+			UnityEngine.GameObject.FindObjectOfType<Generator079>().CallRpcNotify(curr);
+		}
 
 		public static void PlayAmbientSound(int id)
 		{
-			PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 31));
+			PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
 		}
 
 		public static void PlayRandomAmbient()
 		{
-			PlayAmbientSound(UnityEngine.Random.Range(0, 32));
+			PlayAmbientSound(UnityEngine.Random.Range(0, 31));
 		}
-
-
 
 		public static void TargetShake(this ReferenceHub target, bool achieve)
 		{
@@ -499,7 +567,73 @@ namespace SanyaPlugin.Functions
 			};
 			sendto?.characterClassManager.connectionToClient.Send(msg, 0);
 		}
+		public static void SendCustomSync(this Player player, NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncObject, Action<NetworkWriter> customSyncVar)
+		{
+			/* 
+			
+			Example(SyncVar) [TargetOnlyBadge]:
+			player.SendCustomSync(player.networkIdentity, typeof(ServerRoles), null, (targetwriter) =>
+			{
+				targetwriter.WritePackedUInt64(2UL);
+				targetwriter.WriteString("test");
+			});
 
+			Example(SyncList) [EffectOnlySCP207]:
+			player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
+				writer.WritePackedUInt64(1ul);								// DirtyObjectsBit
+				writer.WritePackedUInt32((uint)1);							// DirtyIndexCount
+				writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);	// Operations
+				writer.WritePackedUInt32((uint)0);							// EditIndex
+				writer.WriteByte((byte)1);									// Item
+			}, null);
+
+			*/
+			NetworkWriter writer = NetworkWriterPool.GetWriter();
+			NetworkWriter writer2 = NetworkWriterPool.GetWriter();
+			MakeCustomSyncWriter(behaviorOwner, targetType, customSyncObject, customSyncVar, writer, writer2);
+			NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new UpdateVarsMessage() { netId = behaviorOwner.netId, payload = writer.ToArraySegment() });
+			NetworkWriterPool.Recycle(writer);
+			NetworkWriterPool.Recycle(writer2);
+		}
+		public static void MakeCustomSyncWriter(NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncObject, Action<NetworkWriter> customSyncVar, NetworkWriter owner, NetworkWriter observer)
+		{
+			ulong dirty = 0ul;
+			ulong dirty_o = 0ul;
+			NetworkBehaviour behaviour = null;
+			for (int i = 0; i < behaviorOwner.NetworkBehaviours.Length; i++)
+			{
+				behaviour = behaviorOwner.NetworkBehaviours[i];
+				if (behaviour.GetType() == targetType)
+				{
+					dirty |= 1UL << i;
+					if (behaviour.syncMode == SyncMode.Observers) dirty_o |= 1UL << i;
+				}
+			}
+			owner.WritePackedUInt64(dirty);
+			observer.WritePackedUInt64(dirty & dirty_o);
+
+			int position = owner.Position;
+			owner.WriteInt32(0);
+			int position2 = owner.Position;
+
+			if (customSyncObject != null)
+				customSyncObject.Invoke(owner);
+			else
+				behaviour.SerializeObjectsDelta(owner);
+
+			customSyncVar?.Invoke(owner);
+
+			int position3 = owner.Position;
+			owner.Position = position;
+			owner.WriteInt32(position3 - position2);
+			owner.Position = position3;
+
+			if (dirty_o != 0ul)
+			{
+				ArraySegment<byte> arraySegment = owner.ToArraySegment();
+				observer.WriteBytes(arraySegment.Array, position, owner.Position - position);
+			}
+		}
 		public static void AddDeathTimeForScp049(ReferenceHub target)
 		{
 			PlayerManager.localPlayer.GetComponent<RagdollManager>().SpawnRagdoll(
@@ -524,9 +658,8 @@ namespace SanyaPlugin.Functions
 			Vector3 vector = player.transform.position - camera.transform.position;
 			float num = Vector3.Dot(camera.head.transform.forward, vector);
 
-			RaycastHit raycastHit;
 			return (num >= 0f && num * num / vector.sqrMagnitude > 0.4225f)
-				&& Physics.Raycast(camera.transform.position, vector, out raycastHit, 100f, -117407543)
+				&& Physics.Raycast(camera.transform.position, vector, out RaycastHit raycastHit, 100f, -117407543)
 				&& raycastHit.transform.name == player.name;
 		}
 
@@ -630,23 +763,23 @@ namespace SanyaPlugin.Functions
 			return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
 		}
 
-		internal static void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation,string name = "Yamato")
+		internal static void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation, string name = "Yamato")
 		{
-				GameObject obj =
-					Object.Instantiate(
-						NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-				CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-				if (ccm == null)
-					Log.Error("CCM is null, doufus. You need to do this the harder way.");
-				ccm.CurClass = role;
-				obj.GetComponent<NicknameSync>().Network_myNickSync = name;
-				obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-				obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-				obj.transform.localScale = new Vector3(1, 1, 1);
-				obj.transform.position = position;
-				obj.transform.rotation = rotation;
-				NetworkServer.Spawn(obj);
-			}
+			GameObject obj =
+				Object.Instantiate(
+					NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+			CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
+			if (ccm == null)
+				Log.Error("CCM is null, doufus. You need to do this the harder way.");
+			ccm.CurClass = role;
+			obj.GetComponent<NicknameSync>().Network_myNickSync = name;
+			obj.GetComponent<QueryProcessor>().PlayerId = 9999;
+			obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+			obj.transform.localScale = new Vector3(1, 1, 1);
+			obj.transform.position = position;
+			obj.transform.rotation = rotation;
+			NetworkServer.Spawn(obj);
+		}
 	}
 	internal static class Extensions
 	{
@@ -654,18 +787,26 @@ namespace SanyaPlugin.Functions
 		{
 			return task.ContinueWith((x) => { Log.Error($"[Sender] {x}"); }, TaskContinuationOptions.OnlyOnFaulted);
 		}
-
-		public static bool IsEnemy(this ReferenceHub player, Team target)
+		public static bool IsHuman(this Player player)
 		{
-			Player EPlayer = Player.Dictionary[player.gameObject];
-			if (EPlayer.Role == RoleType.Spectator || EPlayer.Role == RoleType.None || EPlayer.Team == target)
+			return player.Team != Team.SCP && player.Team != Team.RIP;
+		}
+
+		public static bool IsEnemy(this Player player, Team target)
+		{
+			if (player.Role == RoleType.Spectator || player.Role == RoleType.None || player.Team == target)
 				return false;
 
 			return target == Team.SCP ||
-				((EPlayer.Team != Team.MTF && EPlayer.Team != Team.RSC) || (target != Team.MTF && target != Team.RSC))
+				((player.Team != Team.MTF && player.Team != Team.RSC) || (target != Team.MTF && target != Team.RSC))
 				&&
-				((EPlayer.Team != Team.CDP && EPlayer.Team != Team.CHI) || (target != Team.CDP && target != Team.CHI))
+				((player.Team != Team.CDP && player.Team != Team.CHI) || (target != Team.CDP && target != Team.CHI))
 			;
+		}
+
+		public static int GetHealthAmountPercent(this Player player)
+		{
+			return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));
 		}
 
 		public static void ShowHitmarker(this ReferenceHub player)
@@ -673,9 +814,9 @@ namespace SanyaPlugin.Functions
 			player.GetComponent<Scp173PlayerScript>().TargetHitMarker(player.characterClassManager.connectionToClient);
 		}
 
-		public static void SendTextHint(this ReferenceHub player, string text, ushort time)
+		public static void SendTextHintNotEffect(this Player player, string text, float time)
 		{
-			player.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter("") }, new HintEffect[] { HintEffectPresets.TrailingPulseAlpha(0.5f, 1f, 0.5f, 2f, 0f, 2) }, time));
+			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(text) }, null, time));
 		}
 
 		public static IEnumerable<Camera079> GetNearCams(this ReferenceHub player)
@@ -690,22 +831,37 @@ namespace SanyaPlugin.Functions
 				}
 			}
 		}
-
-		public static bool IsExmode(this ReferenceHub player) => player.animationController.curAnim == 1;
+		public static bool IsExmode(this Player player) => player.ReferenceHub.animationController.curAnim == 1;
 
 		public static bool HasPermission(this Door.AccessRequirements value, Door.AccessRequirements flag)
 		{
 			return (value & flag) == flag;
 		}
 
+		public static bool IsList(this Type type)
+		{
+			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+		}
+
+		public static bool IsDictionary(this Type type)
+		{
+			return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+		}
+
+		public static Type GetListArgs(this Type type)
+		{
+			return type.GetGenericArguments()[0];
+		}
+
 		public static T GetRandomOne<T>(this List<T> list)
 		{
 			return list[UnityEngine.Random.Range(0, list.Count)];
 		}
+
 		public static T Random<T>(this IEnumerable<T> ie)
 		{
 			if (!ie.Any()) return default;
-			return ie.ElementAt(SanyaPlugin.random.Next(ie.Count()));
+			return ie.ElementAt(SanyaPlugin.Instance.Random.Next(ie.Count()));
 		}
 	}
 }

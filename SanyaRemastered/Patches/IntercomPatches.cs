@@ -139,15 +139,13 @@ namespace SanyaRemastered.Patches
 
 				//Prochain spawn + durée MTF
 
-				if (RespawnManager.Singleton.NextKnownTeam == SpawnableTeamType.NineTailedFox)
-					contentfix += string.Concat($"Prochains renforts MTF : {respawntime / 60:00}:{respawntime % 60:00}\n");
-
+				if (RespawnManager.Singleton.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
+					contentfix += string.Concat($"Les renforts se préparent\n");
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
 					contentfix += string.Concat($"Aucun renforts prévus pour le site\n");
-
 				else
-					contentfix += string.Concat($"Les renforts se préparent\n");
-				
+					contentfix += string.Concat($"Prochains renforts MTF : {respawntime / 60:00}:{respawntime % 60:00}\n");
+
 					//Speak Intercom
 					if (__instance.Muted)
 					{
@@ -161,7 +159,7 @@ namespace SanyaRemastered.Patches
 					{
 						contentfix += "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + " secondes ";
 					}
-					else if (__instance.remainingCooldown > 0f)
+					else if (__instance.speechRemainingTime == -77f)
 					{
 						contentfix +=  $"{ReferenceHub.GetHub(__instance.Networkspeaker).nicknameSync._myNickSync} à une diffusion prioritaire";
 					}
