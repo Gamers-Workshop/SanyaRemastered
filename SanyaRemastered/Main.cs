@@ -68,7 +68,6 @@ namespace SanyaPlugin
 		private void RegistEvents()
 		{
 			Handlers = new EventHandlers(this);
-			ServerEvents.SendingRemoteAdminCommand += Handlers.OnRACommand;
 			ServerEvents.SendingConsoleCommand += Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers += Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted += Handlers.OnRoundStart;
@@ -117,7 +116,6 @@ namespace SanyaPlugin
 
 		private void UnRegistEvents()
 		{
-			ServerEvents.SendingRemoteAdminCommand -= Handlers.OnRACommand;
 			ServerEvents.SendingConsoleCommand -= Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers -= Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted -= Handlers.OnRoundStart;

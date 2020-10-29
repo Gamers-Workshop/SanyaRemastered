@@ -221,7 +221,6 @@ namespace SanyaPlugin
 		private readonly int grenade_pickup_mask = 1049088;
 		private int prevMaxAHP = 0;
 		private bool StopRespawn = false;
-		private bool StopTicket = false;
 		/** RoundVar **/
 		private FlickerableLightController flickerableLightController = null;
 		internal bool IsEnableBlackout = false;
@@ -244,7 +243,7 @@ namespace SanyaPlugin
 			PlayerDataManager.playersData.Clear();
 			ItemCleanupPatch.items.Clear();
 			Coroutines.isAirBombGoing = false;
-			
+
 			flickerableLightController = UnityEngine.Object.FindObjectOfType<FlickerableLightController>();
 
 			last079cam = null;
@@ -369,7 +368,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke >= 0)
 			{
-				roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke)));
+				roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke)));
 			}
 		}
 		public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
@@ -811,29 +810,6 @@ namespace SanyaPlugin
 			{
 				ev.Target.Inventory.Clear();
 			}
-
-			//Ticket Extend a revoir
-			if (StopTicket)
-			{
-				var ticket = RespawnTickets.Singleton._tickets;
-				switch (ev.Killer.Team)
-				{
-					case Team.CDP:
-						ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_classd_died_count);
-						if (ev.Killer.Team == Team.MTF || ev.Killer.Team == Team.RSC) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_classd_killed_count);
-						break;
-					case Team.RSC:
-						ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_scientist_died_count);
-						if (ev.Killer.Team == Team.CHI || ev.Killer.Team == Team.CDP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_ci_scientist_killed_count);
-						break;
-					case Team.MTF:
-						if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.NineTailedFox, SanyaPlugin.Instance.Config.Tickets_mtf_killed_by_scp_count);
-						break;
-					case Team.CHI:
-						if (ev.Killer.Team == Team.SCP) ticket.Add(SpawnableTeamType.ChaosInsurgency, SanyaPlugin.Instance.Config.Tickets_ci_killed_by_scp_count);
-						break;
-				}
-			}
 		}
 
 		public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
@@ -914,7 +890,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
-				ev.IsAllowed = false;			
+				ev.IsAllowed = false;
 			}
 
 			//Mini fix
@@ -1068,7 +1044,7 @@ namespace SanyaPlugin
 				}
 			}
 		}
-		public void OnExplodingGrenade (ExplodingGrenadeEventArgs ev)
+		public void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnExplodingGrenade] {ev.Grenade.transform.position}");
 			if (SanyaPlugin.Instance.Config.GrenadeEffect)
@@ -1078,7 +1054,7 @@ namespace SanyaPlugin
 					var dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
 					if (dis <= 15)
 					{
-						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f / dis,true);
+						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f / dis, true);
 					}
 				}
 			}
@@ -1098,7 +1074,7 @@ namespace SanyaPlugin
 						ev.IsAllowed = true;
 					}
 				}
-					
+
 			}
 
 			if (ev.IsAllowed && SanyaPlugin.Instance.Config.GeneratorUnlockOpen)
@@ -1192,7 +1168,7 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlacingDecal] position : {ev.Position} Owner: {ev.Owner} Type: {ev.Type}");
 			if (SanyaPlugin.Instance.Config.Coroding106 && ev.Type == 6)
 			{
-				List<Vector3> DecalList = new List<Vector3>{ev.Position};
+				List<Vector3> DecalList = new List<Vector3> { ev.Position };
 				while (SanyaPlugin.Instance.Config.Coroding106)
 				{
 					foreach (var ply in Player.List)
@@ -1241,14 +1217,14 @@ namespace SanyaPlugin
 		public void On106Teleport(TeleportingEventArgs ev)
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}");
-		//	if (SanyaPlugin.instance.Config.Scp106PortalExtensionEnabled) ;
+			//	if (SanyaPlugin.instance.Config.Scp106PortalExtensionEnabled) ;
 		}
 		public void OnEnraging(EnragingEventArgs ev)
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On106MakePortal] {ev.Player.Nickname}");
 
 		}
-	public void On914Upgrade(UpgradingItemsEventArgs ev)
+		public void On914Upgrade(UpgradingItemsEventArgs ev)
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
 
@@ -1262,7 +1238,7 @@ namespace SanyaPlugin
 							var Death = new PlayerStats.HitInfo(99999, "Scp-914", DamageTypes.RagdollLess, 0);
 							player.ReferenceHub.playerStats.HurtPlayer(Death, player.ReferenceHub.gameObject);
 							if (player.Team != Team.SCP)
-							player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
+								player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
 						}
 						break;
 					case Scp914Knob.Coarse:
@@ -1299,7 +1275,7 @@ namespace SanyaPlugin
 							{
 								var Health = player.Health;
 								player.SetRole(RoleType.Scp93953);
-								var Hit = new PlayerStats.HitInfo(player.MaxHealth - Health, "Scp-914", DamageTypes.RagdollLess ,0);
+								var Hit = new PlayerStats.HitInfo(player.MaxHealth - Health, "Scp-914", DamageTypes.RagdollLess, 0);
 								player.ReferenceHub.playerStats.HurtPlayer(Hit, player.ReferenceHub.gameObject);
 								break;
 							}
@@ -1387,7 +1363,7 @@ namespace SanyaPlugin
 			args = effort.Split(' ');
 			if (SanyaPlugin.Instance.Config.ContainCommand && ev.Player.Team == Team.SCP && args[0] == "contain")
 			{
-				switch(ev.Player.Role)
+				switch (ev.Player.Role)
 				{
 					case RoleType.Scp173:
 						{
@@ -1449,7 +1425,7 @@ namespace SanyaPlugin
 											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												
+
 											}
 											else
 											{
@@ -1638,7 +1614,7 @@ namespace SanyaPlugin
 											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												
+
 											}
 											else
 											{
@@ -1672,7 +1648,7 @@ namespace SanyaPlugin
 										bool success = false;
 										{
 											Vector3 end;
-                                            Vector3 end2;
+											Vector3 end2;
 											var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
 											var x1 = 1.2f;
 											var x2 = -9.5f;
@@ -1711,7 +1687,7 @@ namespace SanyaPlugin
 											}
 											if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
 											{
-												
+
 											}
 											else
 											{
@@ -2257,8 +2233,8 @@ namespace SanyaPlugin
 						}
 					case RoleType.Scp096:
 						{
-							if (SanyaPlugin.Instance.Config.IsDebugged)	Log.Info($"096 state : {(ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
-							if (Scp096PlayerState.Docile != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState 
+							if (SanyaPlugin.Instance.Config.IsDebugged) Log.Info($"096 state : {(ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
+							if (Scp096PlayerState.Docile != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState
 								&& Scp096PlayerState.TryNotToCry != (ev.Player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
 							{
 								ev.Player.SendConsoleMessage("NON MEC VAS TUER LES GENS IL Doivent pas te reconf si t'es trigger", "red");
@@ -2270,7 +2246,7 @@ namespace SanyaPlugin
 								{
 									Vector3 end;
 									Vector3 end2;
-									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position; 
+									var posroom = ev.Player.CurrentRoom.Transform.position - ev.Player.Position;
 									var x1 = 4.4f;
 									var x2 = 0.5f;
 									var z1 = 1.9f;
@@ -2660,986 +2636,5 @@ namespace SanyaPlugin
 				}
 			}
 		}
-		public void OnRACommand(SendingRemoteAdminCommandEventArgs ev)
-		{
-			string[] args = ev.Arguments.ToArray();
-			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnCommand] sender:{ev.CommandSender.SenderId} command:{ev.Name} args:{args.Length}");
-			string effort = $"{ev.Name} ";
-			foreach (string s in ev.Arguments)
-				effort += $"{s} ";
-
-			args = effort.Split(' ');
-			if (args[0].ToLower() == "sanya" || args[0].ToLower() == "sn")
-			{
-				ReferenceHub player = ev.CommandSender.SenderId == "SERVER CONSOLE" || ev.CommandSender.SenderId == "GAME CONSOLE" ? Player.Dictionary[PlayerManager.localPlayer].ReferenceHub : ev.Sender.ReferenceHub;
-				Player perm = Player.Dictionary[player.gameObject];
-				if (args.Length > 2)
-				{
-					string ReturnStr;
-					bool isSuccess = true;
-					switch (args[1].ToLower())
-					{
-						case "test":
-							{
-								ReturnStr = $"test ok.";
-								break;
-							}
-						case "posroom":
-							{
-								if (!perm.CheckPermission("sanya.dev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								var roompos = ev.Sender.CurrentRoom.Transform.position - ev.Sender.Position;
-								ReturnStr = $"Verification\n{ev.Sender.CurrentRoom.Transform.rotation.eulerAngles}";
-								ReturnStr += $"position en fonction de la salle : {roompos}";
-								break;
-							}
-						case "roomlist":
-							{
-								if (!perm.CheckPermission("sanya.dev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = $"RoomList\n";
-								foreach (var rooms in Map.Rooms)
-								{
-									ReturnStr += $"{rooms.Name} : {rooms.Position}\n";
-								}
-								break;
-							}
-						case "playambiant":
-							{
-								if (!perm.CheckPermission("sanya.dev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (int.TryParse(args[2], out int sound))
-								{ 
-									Methods.PlayAmbientSound(sound);
-								}
-								ReturnStr = $"Ambien sound \n";
-								break;
-							}
-						case "playgen":
-							{
-								if (!perm.CheckPermission("sanya.dev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (byte.TryParse(args[2], out byte sound))
-								{
-									Methods.PlayGenerator079sound(sound);
-
-								}
-								ReturnStr = $"Ambien sound \n";
-								break;
-							}
-						case "listdoor":
-							{
-								if (!perm.CheckPermission("sanya.dev"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = $"RoomList\n";
-								foreach (var doors in Map.Doors)
-								{
-									ReturnStr += $"{doors.doorType} : {doors.name} : {doors.DoorName} \n";
-								}
-								break;
-							}
-						case "ping":
-							{
-								ReturnStr = "Pings:\n";
-
-								foreach (var ply in Player.List)
-								{
-									ReturnStr += $"{ply.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId].Ping}ms\n";
-								}
-								break;
-							}
-						case "addscps":
-							{
-								ReturnStr = $"ok.{RoundSummary.singleton.classlistStart.scps_except_zombies++}";
-								break;
-							}
-						case "forceend":
-							{
-								RoundSummary.singleton.ForceEnd();
-								ReturnStr = "Force Ended!";
-								break;
-							}
-						case "showconfig":
-							{
-								if (!perm.CheckPermission("sanya.showconfig"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = SanyaPlugin.Instance.Config.GetConfigs();
-								break;
-							}
-						case "reload":
-							{
-								if (!perm.CheckPermission("sanya.reload"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								SanyaPlugin.Instance.Config.GetConfigs();
-								ReturnStr = "reload ok";
-								break;
-							}
-						case "list":
-							{
-								if (!perm.CheckPermission("sanya.list"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReturnStr = $"Players List ({PlayerManager.players.Count})\n";
-								foreach (var i in Player.List)
-								{
-									ReturnStr += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i.Position}\n";
-								}
-								ReturnStr.Trim();
-								break;
-							}
-						case "air":
-							{
-								if (!perm.CheckPermission("sanya.airbomb"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args[2] == "start")
-								{
-									if (int.TryParse(args[3], out int duration))
-									{
-										if (int.TryParse(args[4], out int duration2))
-										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration, duration2)));
-											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
-											break;
-										}
-										else
-										{
-											roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false,duration)));
-											ReturnStr = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
-											break;
-										}
-									}
-									else
-									{
-										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
-										ReturnStr = "Started!";
-										break;
-									}
-								}
-								else if (args[2] == "stop")
-								{
-									roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(true)));
-									Coroutines.isAirBombGoing = false;
-									ReturnStr = $"Stop ok.";
-									break;
-								}
-								else
-								{
-									ReturnStr = $"sanya air start/stop";
-									break;
-								}
-							}
-						case "stoprespawn":
-						case "stopres":
-							{
-								if (!perm.CheckPermission("sanya.stoprespawn"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2 && args[2] == "true")
-								{
-									StopRespawn = true;
-									ReturnStr = $"StopRespawn = {StopRespawn}";
-								}
-								else if (args.Length > 2 && args[2] == "false")
-								{
-									StopRespawn = false;
-									ReturnStr = $"StopRespawn = {StopRespawn}";
-								}
-								else
-								{
-									ReturnStr = $"StopRespawn = {StopRespawn}";
-								}
-								break;
-							}
-						case "stopticket":
-							{
-								if (!perm.CheckPermission("sanya.stopticket"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2 && args[2] == "true")
-								{
-									StopTicket = true;
-									ReturnStr = $"StopTicket = {StopTicket}";
-								}
-								else if (args.Length > 2 && args[2] == "false")
-								{
-									StopTicket = false;
-									ReturnStr = $"StopTicket = {StopTicket}";
-								}
-								else
-								{
-									ReturnStr = $"StopTicket = {StopTicket}";
-								}
-								break;
-							}
-						case "914":
-							{
-								if (!perm.CheckPermission("sanya.914"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2)
-								{
-									if (!Scp914.Scp914Machine.singleton.working)
-									{
-
-										if (args[2] == "use")
-										{
-											Scp914.Scp914Machine.singleton.RpcActivate(NetworkTime.time);
-											ReturnStr = $"Used : {Scp914.Scp914Machine.singleton.knobState}";
-										}
-										else if (args[2] == "knob")
-										{
-											Scp914.Scp914Machine.singleton.ChangeKnobStatus();
-											ReturnStr = $"Knob Changed to:{Scp914.Scp914Machine.singleton.knobState}";
-										}
-										else
-										{
-											isSuccess = false;
-											ReturnStr = "[914] Wrong Parameters.";
-										}
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[914] SCP-914 is working now.";
-									}
-								}
-								else
-								{
-									isSuccess = false;
-									ReturnStr = "[914] Parameters : 914 <use/knob>";
-								}
-								break;
-							}
-						case "nukecap":
-							{
-								if (!perm.CheckPermission("sanya.nukecap"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								var outsite = GameObject.Find("OutsitePanelScript")?.GetComponent<AlphaWarheadOutsitePanel>();
-								outsite.NetworkkeycardEntered = !outsite.keycardEntered;
-								ReturnStr = $"{outsite?.keycardEntered}";
-								break;
-							}
-						case "femur":
-							{
-								if (!perm.CheckPermission("sanya.femur"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								PlayerManager.localPlayer.GetComponent<PlayerInteract>()?.RpcContain106(PlayerManager.localPlayer);
-								ReturnStr = "FemurScreamer!";
-								break;
-							}
-						case "dlock":
-							{
-								if (!perm.CheckPermission("sanya.dlock"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								{
-									if (int.TryParse(args[2], out int duration))
-									{
-										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(false, duration)));
-										ReturnStr = $"The classD are lock for {duration / 60}:{duration % 60}";
-										break;
-									}
-									else if (args[2] == "false" || args[2] == "stop")
-									{
-										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(true)));
-										ReturnStr = "Stop!";
-										break;
-									}
-									else if(args[2] == "true" || args[2] == "start")
-									{
-										roundCoroutines.Add(Timing.RunCoroutine(Coroutines.StartContainClassD(false)));
-										ReturnStr = "Started!";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "dlock {durée du lock} ou start/stop";
-										break;
-									}
-								}
-							}
-						case "expl":
-						case "explode":
-							{
-								if (!perm.CheckPermission("sanya.explode"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.SpawnGrenade(target.Position, false, 0.1f, target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-										break;
-									}
-									if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.allexplode"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										foreach (var ply in Player.List)
-										{
-											Methods.SpawnGrenade(ply.Position, false, 0.1f, ply.ReferenceHub);
-										}
-										ReturnStr = "success spawn grenade on all player";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[explode] missing target.";
-										break;
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.SpawnGrenade(player.transform.position, false, 0.1f, player);
-										ReturnStr = $"success. target:{Player.Get(player.gameObject).Nickname}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[explode] missing target.";
-										break;
-									}
-								}
-							}
-						case "ball":
-							{
-								if (!perm.CheckPermission("sanya.ball"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.Spawn018(target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-										break;
-									}
-									if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.allball"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										foreach (var ply in Player.List)
-										{
-											Methods.Spawn018(ply.ReferenceHub);
-										}
-										ReturnStr = "success spawn ball on all player";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[ball] missing target.";
-										break;
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.Spawn018(player);
-										ReturnStr = $"success. target:{Player.Get(player.gameObject).Nickname}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[ball] missing target.";
-										break;
-									}
-								}
-							}
-						case "grenade":
-							{
-								if (!perm.CheckPermission("sanya.grenade"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										Methods.SpawnGrenade(target.Position, false, -1f, target.ReferenceHub);
-										ReturnStr = $"success. target:{target.Nickname}";
-										break;
-									}
-									if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.allgrenade"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										foreach (var ply in Player.List)
-										{
-											Methods.SpawnGrenade(ply.Position, false, -1f, ply.ReferenceHub);
-										}
-										ReturnStr = "success spawn grenade on all player";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[grenade] missing target.";
-										break;
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.SpawnGrenade(player.transform.position, false, -1f, player);
-										ReturnStr = $"success. target:{Player.Get(player.gameObject).Nickname}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[ball] missing target.";
-										break;
-									}
-								}
-							}
-						case "ammo":
-							{
-								if (!perm.CheckPermission("sanya.ammo"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									Player target = Player.Get(args[2]);
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										if (uint.TryParse(args[3], out uint Nato556) && 
-											uint.TryParse(args[4], out uint Nato762) &&
-											uint.TryParse(args[5], out uint Nato9))
-										{
-											target.Ammo[(int)AmmoType.Nato556] = Nato556;
-											target.Ammo[(int)AmmoType.Nato762] = Nato762;
-											target.Ammo[(int)AmmoType.Nato9] = Nato9;
-											ReturnStr = $"{target.Nickname}  {Nato556}:{Nato762}:{Nato9}";
-											break;
-										}
-										else
-										{ 
-											ReturnStr = "sanya ammo {player} (5.56) (7.62) (9mm).";
-											break;
-										}
-									}
-									if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.allammo"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										if (uint.TryParse(args[3], out uint Nato556)
-											&& uint.TryParse(args[4], out uint Nato762)
-											&& uint.TryParse(args[5], out uint Nato9))
-										{
-											foreach (var ply in Player.List)
-											{
-												ply.Ammo[(int)AmmoType.Nato556] = Nato556;
-												ply.Ammo[(int)AmmoType.Nato762] = Nato762;
-												ply.Ammo[(int)AmmoType.Nato9] = Nato9;
-											}
-											ReturnStr = $"ammo set {Nato556}:{Nato762}:{Nato9}";
-											break;
-										}
-										else
-										{ 
-											ReturnStr = "sanya ammo all (5.56) (7.62) (9mm)";
-											break;
-										}
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "sanya (player id ou all) ";
-										break;
-									}
-								}
-								else
-								{
-									ReturnStr = "Failed to set. (cant use from SERVER)";
-									break;
-								}
-							}
-						case "clearinv":
-							{
-								if (!perm.CheckPermission("sanya.clearinv"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								Player target = Player.UserIdsCache[args[2]];
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										target.ClearInventory();
-										ReturnStr = $"Clear Inventory : {target.Nickname}";
-										break;
-									}
-									else if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.allclearinv"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										foreach (var ply in Player.List)
-										{
-											ply.ClearInventory();
-										}
-										ReturnStr = "INVENTORY OF ALL PLAYER AS BEEN CLEAR";
-										break;
-									}
-								else if(ev.Sender != null)
-								{
-									ev.Sender.ClearInventory();
-									ReturnStr = "Your Inventory as been clear";
-									break;
-								}
-								else
-								{
-									ReturnStr = $"sanya clearinv <target/all>";
-									break;
-								}
-							}
-						case "cleareffect":
-							{
-								if (!perm.CheckPermission("sanya.cleareffect"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									
-									Player target = Player.UserIdsCache[args[2]];
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-										foreach(KeyValuePair<Type, PlayerEffect> keyValuePair in target.ReferenceHub.playerEffectsController.AllEffects.ToArray())
-                                        {
-											PlayerEffect effect = keyValuePair.Value;
-											effect.ServerDisable();
-										}
-										ReturnStr = $"ALL EFFECT AS BEEN CLEAR FOR {target.Nickname}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "Fail";
-										break;
-									}
-								}
-								if (args[2] == "all")
-								{
-									foreach (var ply in Player.List)
-									{
-										foreach (KeyValuePair<Type, PlayerEffect> keyValuePair in ply.ReferenceHub.playerEffectsController.AllEffects.ToArray())
-										{
-											PlayerEffect effect = keyValuePair.Value;
-											effect.ServerDisable();
-										}
-									}
-									ReturnStr = "ALL EFFECT OF ALL PLAYER AS BEEN CLEAR";
-									break;
-								}
-								if (player != null)
-								{
-									foreach (KeyValuePair<Type, PlayerEffect> keyValuePair in player.playerEffectsController.AllEffects.ToArray())
-									{
-										PlayerEffect effect = keyValuePair.Value;
-										effect.ServerDisable();
-									}
-									ReturnStr = "ALL YOUR EFFECT AS BEEN CLEAR";
-									break;
-								}
-								else
-								{
-									ReturnStr = "Failed to set."; 
-									break;
-								}
-							}
-						/*case "dummy":
-							{
-								if (!perm.CheckPermission("sanya.dummy"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 1)
-								{
-									Player target = Player.Get(args[2]);
-									var roletype = target.Role;
-									if (target != null && target.Role != RoleType.Spectator)
-									{
-									Methods.SpawnDummy(target.Role , target.Position, target.ReferenceHub.transform.rotation);
-									ReturnStr = $"{target.Role}'s Dummy Created. pos:{target.Position} rot:{target.ReferenceHub.transform.rotation}";
-									break;
-									}
-									if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.alldummy"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										foreach (var ply in Player.List)
-										{
-											Methods.SpawnDummy(ply.Role,ply.Position,ply.ReferenceHub.transform.rotation);
-										}
-										ReturnStr = "success spawn grenade on all player";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[explode] missing target.";
-										break;
-									}
-								}
-								else
-								{
-									if (player != null)
-									{
-										Methods.SpawnDummy(RoleType.ClassD , perm.Position, player.transform.rotation);
-										ReturnStr = $"{perm.Role}'s Dummy Created. pos:{perm.Position} rot:{player.transform.rotation}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[explode] missing target.";
-										break;
-									}
-								}
-							}*/
-						case "tppos":
-							{
-								if (!perm.CheckPermission("sanya.tppos"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								ReferenceHub target = Player.UserIdsCache[args[2]].ReferenceHub;
-									if (target != null)
-									{
-										if (float.TryParse(args[3], out float x)
-											&& float.TryParse(args[4], out float y)
-											&& float.TryParse(args[5], out float z))
-										{
-											Vector3 pos = new Vector3(x, y, z);
-											target.playerMovementSync.OverridePosition(pos, 0f, true);
-											ReturnStr = $"TP to {pos}.";
-										}
-										else
-										{
-											isSuccess = false;
-											ReturnStr = "[tppos] manque les coordonés <x> <y> <z>.";
-										}
-									}
-									else if (args[2] == "all")
-									{
-										if (!perm.CheckPermission("sanya.alltppos"))
-										{
-											ev.Sender.RemoteAdminMessage("Permission denied.");
-											return;
-										}
-										if (float.TryParse(args[3], out float x)
-											&& float.TryParse(args[4], out float y)
-											&& float.TryParse(args[5], out float z))
-										{
-											Vector3 pos = new Vector3(x, y, z);
-											foreach (var ply in Player.List)
-											{
-												ply.ReferenceHub.playerMovementSync.OverridePosition(pos, 0f, true);
-											}
-											ReturnStr = $"TP to {pos}.";
-										}
-										else
-										{
-											isSuccess = false;
-											ReturnStr = "[tppos] manque les coordonés <x> <y> <z>.";
-										}
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[tppos] manque la cible.";
-									}
-								break;
-							}
-						case "gen":
-							{
-								if (!perm.CheckPermission("sanya.gen"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								if (args.Length > 2)
-								{
-									if (args[2] == "unlock")
-									{
-										foreach (var generator in Generator079.Generators)
-										{
-											generator.NetworkisDoorUnlocked = true;
-											generator.NetworkisDoorOpen = true;
-											generator._doorAnimationCooldown = 0.5f;
-										}
-										ReturnStr = "gen unlocked.";
-									}
-									else if (args[2] == "door")
-									{
-										foreach (var generator in Generator079.Generators)
-										{
-											if (!generator.prevFinish)
-											{
-												bool now = !generator.isDoorOpen;
-												generator.NetworkisDoorOpen = now;
-												generator.CallRpcDoSound(now);
-											}
-										}
-										ReturnStr = $"gen doors interacted.";
-									}
-									else if (args[2] == "set")
-									{
-										float cur = 10f;
-										foreach (var generator in Generator079.Generators)
-										{
-											if (!generator.prevFinish)
-											{
-												generator.NetworkisDoorOpen = true;
-												generator.NetworkisTabletConnected = true;
-												generator.NetworkremainingPowerup = cur;
-												cur += 10f;
-											}
-										}
-										ReturnStr = "gen set.";
-									}
-									else if (args[2] == "once")
-									{
-										Generator079 gen = Generator079.Generators.FindAll(x => !x.prevFinish).GetRandomOne();
-
-										if (gen != null)
-										{
-											gen.NetworkisDoorUnlocked = true;
-											gen.NetworkisTabletConnected = true;
-											gen.NetworkisDoorOpen = true;
-										}
-										ReturnStr = "set once.";
-									}
-									else if (args[2] == "eject")
-									{
-										foreach (var generator in Generator079.Generators)
-										{
-											if (generator.isTabletConnected)
-											{
-												generator.EjectTablet();
-											}
-										}
-										ReturnStr = "gen ejected.";
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "[gen] Wrong Parameters.";
-									}
-								}
-								else
-								{
-									isSuccess = false;
-									ReturnStr = "[gen] Parameters : gen <unlock/door/set/once/eject>";
-								}
-								break;
-							}
-						case "spawn":
-							{
-								if (!perm.CheckPermission("sanya.spawn"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 3)
-								{
-									if (args[2] == "ci" || args[2] == "ic")
-									{
-										mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-										mtfRespawn.Start();
-										ReturnStr = $"force spawn ChaosInsurgency";
-										break;
-									}
-								else if (args[2] == "mtf" || args[2] == "ntf")
-									{
-										mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-										mtfRespawn.Start();
-										ReturnStr = $"force spawn NineTailedFox";
-										break;
-									}
-									else
-									{ 
-									ReturnStr = $"ntf/mtf ou ci/ic ou rien";
-									break;
-									}
-								}
-								else
-								{
-									if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
-									{
-										mtfRespawn.Start();
-										ReturnStr = $"Spawn. Chaos Insurgency";
-										break;
-									}
-									else
-									{
-										mtfRespawn.Start();
-										ReturnStr = $"Spawn. Nine Tailed Fox";
-										break;
-									}
-								}
-							}
-						case "next":
-							{
-								if (!perm.CheckPermission("sanya.next") || !perm.CheckPermission("sanya.spawn"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
-								var mtfRespawn = RespawnManager.Singleton;
-								if (args.Length > 3)
-								{
-									if (args[2] == "ci" || args[2] == "ic")
-									{
-										mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency}\n ";
-										ReturnStr += $"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-										break;
-									}
-									else if (args[2] == "mtf" || args[2] == "ntf")
-									{
-										mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-										ReturnStr = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox}";
-										ReturnStr += $"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-										break;
-									}
-									else
-									{
-										isSuccess = false;
-										ReturnStr = "ntf/mtf ou ci/ic";
-										break;
-									}
-								}
-								else
-								{
-									if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
-									{ 
-										ReturnStr = $"\nProchain Respawn = ChaosInsurgency";
-										ReturnStr += $"\nProchains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-										break;
-									}
-									else
-									{ 
-										ReturnStr = $"\nProchain Respawn = NineTailedFox";
-										ReturnStr += $"\nProchains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-										break;
-									}
-								}
-							}
-						case "van":
-							{
-								Respawn.SummonChaosInsurgencyVan(false);
-								ReturnStr = "Van as comming";
-								break;
-							}
-						case "heli":
-							{
-								Respawn.SummonNtfChopper();
-								ReturnStr = "Heli as comming";
-								break;
-							}
-						default:
-							{
-								ReturnStr = "Sanya help for more information.";
-								isSuccess = false;
-								break;
-							}
-					}
-					ev.IsAllowed = false;
-					ev.Sender.RemoteAdminMessage(ReturnStr, isSuccess);
-				}
-				else
-				{
-					ev.IsAllowed = false;
-					ev.Sender.RemoteAdminMessage(string.Concat(
-						"Usage : sanya help <reload / startair / stopair / list / blackout ",
-						"/ roompos / tppos / pocket / gen / spawn / next / van / heli / 106 / 096 / 914 / now / ammo / test >"
-						), false);
-				}
-			}
-		}
-	}
+	}	
 }
