@@ -44,6 +44,10 @@ namespace SanyaRemastered
 		[Description("Hud Activé")]
 		public bool ExHudEnabled { get; set; } = false;
 
+		[Description("Hud Scp-079 auras plus d'info")]
+		public bool ExHudScp079Moreinfo { get; set; } = false;
+		[Description("Hud Scp-079 auras plus d'info")]
+		public bool ExHudScpList { get; set; } = false;
 		[Description("Message de Bienvenue")]
 		public string MotdMessage { get; set; } = string.Empty;
 		[Description("Disable Player lists")]
@@ -112,7 +116,10 @@ namespace SanyaRemastered
 		[Description("Le cadavre n'apparait pas quand on se fait tuer par")]
 		public bool Scp939RemoveRagdoll { get; set; } = false;
 		public bool Scp096RemoveRagdoll { get; set; } = false;
-
+		[Description("Scp106 est ralentie")]
+		public bool Scp106slow { get; set; } = false;
+		[Description("Scp939 est ralentie")]
+		public bool Scp939slow { get; set; } = false;
 		[Description("Effect sur SCP-049-2")]
 		public bool Scp0492effect { get; set; } = false;
 
@@ -159,7 +166,7 @@ namespace SanyaRemastered
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
 		public float Scp106DamageMultiplicator { get; set; } = 1f;
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
-		[Description("SCP-106の壁抜け移動が使用可能になるまでの秒数")]
+		[Description("SCP-106Capacité de traverser les murs cooldown")]
 		public int Scp106WalkthroughCooldown { get; set; } = -1;
 		[Description("Vキーチャットが可能なSCP（SCP-939以外）")]
 		public List<string> AltvoicechatScps { get; set; } = new List<string>();

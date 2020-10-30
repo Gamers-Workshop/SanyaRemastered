@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CommandSystem;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -467,7 +468,7 @@ namespace SanyaPlugin.Commands
 							}
 							else
 							{
-								Coroutines.AirSupportBomb(true);
+								Coroutines.AirSupportBomb(false);
 								response = "Started!";
 								return true;
 							}
@@ -957,7 +958,7 @@ namespace SanyaPlugin.Commands
 					}
 				case "next":
 					{
-						if (player != null && !player.CheckPermission("sanya.next") || !player.CheckPermission("sanya.spawn"))
+						if (player != null && !player.CheckPermission("sanya.next"))
 						{
 							response = "Permission denied.";
 							return false;

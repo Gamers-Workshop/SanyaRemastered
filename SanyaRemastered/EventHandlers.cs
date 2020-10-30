@@ -568,7 +568,7 @@ namespace SanyaPlugin
 			if (ev.Player.IsHost) return;
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}");
 			ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
-			if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
+			if (ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
 				ev.Player.Scale = new Vector3(SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size, SanyaPlugin.Instance.Config.Scp939Size);
 			if (SanyaPlugin.Instance.Config.Scp0492effect && ev.Player.Role == RoleType.Scp0492)
 			{
@@ -590,6 +590,11 @@ namespace SanyaPlugin
 				ev.Position = UnityEngine.GameObject.FindGameObjectsWithTag("RoomID").First(x => x.GetComponent<Rid>().id == "nukesite").transform.position;
 				PlayerMovementSync.FindSafePosition(Map.Doors.First(x => x.DoorName.ToUpper() == "CHECKPOINT_ENT").transform.position, out var pos, true);
 				ev.Position = pos;
+			}
+			if (SanyaPlugin.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106 
+				|| SanyaPlugin.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
+			{
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 			}
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
@@ -796,7 +801,7 @@ namespace SanyaPlugin
 					&& ev.HitInformations.GetDamageType() != DamageTypes.Nuke)
 				{
 					isForced = true;
-					str = str.Replace("{-1}", "\n《Tout les SCP ont été sécurisé.\nLa séquence de reconfinement de SCP-079 a commencé\nLa Heavy Containement Zone vas surcharger dans t-moins 1 minutes.》");
+					str = str.Replace("{-1}", "\nTout les SCP ont été sécurisé.\nLa séquence de reconfinement de SCP-079 a commencé\nLa Heavy Containement Zone vas surcharger dans t-moins 1 minutes.");
 				}
 				else
 				{

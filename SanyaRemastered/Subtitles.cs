@@ -138,7 +138,7 @@
 
 		internal static readonly string SCPDeathTerminated = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《{0} {-1} a été éliminé par {1} 》\n",
+			"《{0} a été éliminé par {1} {-1}》\n",
 			"</size></color>"
 		);
 

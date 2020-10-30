@@ -11,7 +11,7 @@ using SanyaPlugin.Data;
 using SanyaPlugin.Functions;
 using System.Collections.Generic;
 using System.Threading;
-
+using GameCore;
 
 namespace SanyaPlugin
 {
@@ -108,7 +108,7 @@ namespace SanyaPlugin
 			if (_player.IsHuman()
 				&& _player.GameObject.TryGetComponent(out Radio radio)
 				&& (radio.isVoiceChatting || radio.isTransmitting))
-				_player.ReferenceHub.footstepSync._visionController.MakeNoise(radio.noiseMultiplier * _plugin.Config.Scp939CanSeeVoiceChatting);
+				_player.ReferenceHub.footstepSync._visionController.MakeNoise(25f);
 		}
 
 		private void UpdateRespawnCounter()
@@ -139,23 +139,32 @@ namespace SanyaPlugin
 
 			string curText = _hudTemplate;
 			//[LEFT_UP]
-			curText = curText.Replace("[LEFT_UP]", FormatStringForHud(string.Empty, 6));
+
+			curText = curText.Replace("[LEFT_UP]", string.Empty);
 			//[SCPLIST]
 			if (_player.Team == Team.SCP)
 			{
 				string scpList = string.Empty;
-				foreach (var scp in _scplists)
-					if (scp.Role == RoleType.Scp079)
-						scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}\n";
-					else
-						scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
-				scpList.TrimEnd('\n');
-
+				if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.ExHudScp079Moreinfo)
+				{
+					foreach (var scp in _scplists)
+						if (scp.Role == RoleType.Scp079)
+							scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}\n";
+						else
+							scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
+					scpList.TrimEnd('\n');
+				}
+				else if (SanyaPlugin.Instance.Config.ExHudScpList)
+				{
+					foreach (var scp in _scplists)
+						scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}\n";
+					scpList.TrimEnd('\n');
+				}
 				curText = curText.Replace("[SCPLIST]", FormatStringForHud(scpList, 6));
 			}
 			else
 				curText = curText.Replace("[SCPLIST]", FormatStringForHud(string.Empty, 6));
-
+			
 			//[CENTER_UP]
 			if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.Scp079ExtendEnabled)
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
@@ -184,7 +193,7 @@ namespace SanyaPlugin
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 
-			if (_hudText != curText || _timer > 1f)
+			if (_hudText != curText || _timer > 1f && _player.Team == Team.SCP)
 			{
 				_hudText = curText;
 				_player.SendTextHintNotEffect(_hudText, 3);
