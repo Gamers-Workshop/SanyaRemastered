@@ -387,7 +387,7 @@ namespace SanyaPlugin
 							foreach (Player player in Player.List)
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationInit, 20);
+									Methods.SendSubtitle(player, Subtitles.DecontaminationInit, 20, player.ReferenceHub);
 							}
 							break;
 						}
@@ -396,7 +396,7 @@ namespace SanyaPlugin
 							foreach (Player player in Player.List)
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15);
+									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15, player.ReferenceHub);
 							}
 							break;
 						}
@@ -405,7 +405,7 @@ namespace SanyaPlugin
 							foreach (Player player in Player.List)
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15);
+									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15, player.ReferenceHub);
 							}
 							break;
 						}
@@ -414,7 +414,7 @@ namespace SanyaPlugin
 							foreach (Player player in Player.List)
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15);
+									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15, player.ReferenceHub);
 							}
 							break;
 						}
@@ -423,7 +423,7 @@ namespace SanyaPlugin
 							foreach (Player player in Player.List)
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(Subtitles.Decontamination30s, 45);
+									Methods.SendSubtitle(Subtitles.Decontamination30s, 45 , player.ReferenceHub);
 							}
 							break;
 						}
