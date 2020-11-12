@@ -24,7 +24,7 @@ namespace SanyaPlugin
 		private SanyaPlugin _plugin;
 		private Player _player;
 		private Vector3 _espaceArea;
-		private string _hudTemplate = "<align=left><voffset=38em><size=50%>[LEFT_UP]\n</size></align><align=right>[SCPLIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
+		private string _hudTemplate = "<align=left><voffset=38em><size=50%>([STATS])\n</size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
 		private string _hudText = string.Empty;
@@ -139,31 +139,25 @@ namespace SanyaPlugin
 
 			string curText = _hudTemplate;
 			//[LEFT_UP]
-
-			curText = curText.Replace("[LEFT_UP]", string.Empty);
-			//[SCPLIST]
+			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting)) curText += _hudTemplate.Replace("[STATS]",$"Vous avez été mute");
+			curText = curText.Replace("([STATS])", string.Empty);
+			//[LIST]
 			if (_player.Team == Team.SCP)
 			{
-				string scpList = string.Empty;
+				string List = string.Empty;
 				if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.ExHudScp079Moreinfo)
 				{
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
-							scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}\n";
+							List += $"<u>{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}</u>\n";
 						else
-							scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
-					scpList.TrimEnd('\n');
+							List += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
+					List.TrimEnd('\n');
 				}
-				else if (SanyaPlugin.Instance.Config.ExHudScpList)
-				{
-					foreach (var scp in _scplists)
-						scpList += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}\n";
-					scpList.TrimEnd('\n');
-				}
-				curText = curText.Replace("[SCPLIST]", FormatStringForHud(scpList, 6));
+				curText = curText.Replace("[LIST]", FormatStringForHud(List, 6));
 			}
 			else
-				curText = curText.Replace("[SCPLIST]", FormatStringForHud(string.Empty, 6));
+				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 6));
 			
 			//[CENTER_UP]
 			if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.Scp079ExtendEnabled)

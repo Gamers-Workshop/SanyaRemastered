@@ -543,11 +543,6 @@ namespace SanyaPlugin.Functions
 			PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
 		}
 
-		public static void PlayRandomAmbient()
-		{
-			PlayAmbientSound(UnityEngine.Random.Range(0, 31));
-		}
-
 		public static void TargetShake(this ReferenceHub target, bool achieve)
 		{
 			NetworkWriter writer = NetworkWriterPool.GetWriter();
@@ -765,20 +760,7 @@ namespace SanyaPlugin.Functions
 
 		internal static void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation, string name = "Yamato")
 		{
-			GameObject obj =
-				Object.Instantiate(
-					NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-			CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-			if (ccm == null)
-				Log.Error("CCM is null, doufus. You need to do this the harder way.");
-			ccm.CurClass = role;
-			obj.GetComponent<NicknameSync>().Network_myNickSync = name;
-			obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-			obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-			obj.transform.localScale = new Vector3(1, 1, 1);
-			obj.transform.position = position;
-			obj.transform.rotation = rotation;
-			NetworkServer.Spawn(obj);
+
 		}
 	}
 	internal static class Extensions

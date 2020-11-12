@@ -303,6 +303,8 @@ namespace SanyaPlugin
 			foreach (var cor in roundCoroutines)
 				Timing.KillCoroutines(cor);
 			roundCoroutines.Clear();
+			Log.Info($"Removed {Timing.KillCoroutines()} Coroutines.");
+			RoundSummary.singleton._roundEnded = true;
 		}
 
 		public void OnWarheadStart(StartingEventArgs ev)
@@ -723,7 +725,7 @@ namespace SanyaPlugin
 			{
 				string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
 				string str;
-				switch (ev.HitInformations.GetDamageType().name)
+				switch (ev.HitInformations.GetDamageType().name)// a revoir
 				{
 					case "Tesla":
 						{
@@ -1067,6 +1069,12 @@ namespace SanyaPlugin
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
+			
+			if (ev.IsAllowed && SanyaPlugin.Instance.Config.nukecapclose)
+			{
+				var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
+				outsite.NetworkkeycardEntered = !outsite.keycardEntered;
+			}
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{

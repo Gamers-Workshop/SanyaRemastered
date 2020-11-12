@@ -60,32 +60,6 @@ namespace SanyaPlugin.Commands
 						response += $"{comp.DisableHud}";
 						return true;
 					}
-				case "hand":
-					{
-						if (player != null && !player.CheckPermission("sanya.hand"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						if (arguments.Count > 1)
-						{
-							var hub = ReferenceHub.GetHub(int.Parse(arguments.At(1)));
-							UnityEngine.Object.FindObjectOfType<SCPSL.Halloween.Scp330>()?.SpawnHands(hub);
-							response = "ok.";
-							return true;
-						}
-						else if(player != null)
-						{
-							UnityEngine.Object.FindObjectOfType<SCPSL.Halloween.Scp330>()?.SpawnHands(player.ReferenceHub);
-							response = "ok.";
-							return true;
-						}
-						else
-						{
-							response = "this command cant use on server console.";
-							return false;
-						}
-					}
 				case "ping":
 					{
 						if (player != null && !player.CheckPermission("sanya.ping"))
@@ -238,10 +212,24 @@ namespace SanyaPlugin.Commands
 						{
 							response = "Permission denied.";
 							return false;
+						}		
+						if (arguments.Count > 1 && arguments.At(1) == "hcz")
+						{
+							if (float.TryParse(arguments.At(2), out float duration))
+								Generator079.mainGenerator.ServerOvercharge(duration, true);
+							response = "HCZ blackout!";
+							return true;
 						}
-						Generator079.mainGenerator.ServerOvercharge(8f, false);
-						response = "ok.";
-						return true;
+						if (arguments.Count > 1 && arguments.At(1) == "all")
+						{
+							if (float.TryParse(arguments.At(2), out float duration))
+								Generator079.mainGenerator.ServerOvercharge(duration, false);
+							response = "ALL blackout!";
+							return true;
+						}
+						else
+							response = "all ou hcz";
+						return false;
 					}
 				case "addscps":
 					{
@@ -449,7 +437,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						if (arguments.At(1) == "start")
+						if (arguments.At(1).ToLower() == "start")
 						{
 							if (int.TryParse(arguments.At(2), out int duration))
 							{
@@ -473,7 +461,7 @@ namespace SanyaPlugin.Commands
 								return true;
 							}
 						}
-						else if (arguments.At(1) == "stop")
+						else if (arguments.At(1).ToLower() == "stop")
 						{
 							Coroutines.AirSupportBomb(true);
 							Coroutines.isAirBombGoing = false;
@@ -500,13 +488,13 @@ namespace SanyaPlugin.Commands
 								response = $"The classD are lock for {duration / 60}:{duration % 60}";
 								return true;
 							}
-							else if (arguments.At(1) == "false" || arguments.At(1) == "stop")
+							else if (arguments.At(1).ToLower() == "false" || arguments.At(1).ToLower() == "stop")
 							{
 								Coroutines.StartContainClassD(true);
 								response = "Stop!";
 								return true;
 							}
-							else if (arguments.At(1) == "true" || arguments.At(1) == "start")
+							else if (arguments.At(1).ToLower() == "true" || arguments.At(1).ToLower() == "start")
 							{
 								Coroutines.StartContainClassD(false);
 								response = "Started!";
@@ -536,7 +524,7 @@ namespace SanyaPlugin.Commands
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
-							if (arguments.At(1) == "all")
+							if (arguments.At(1).ToLower() == "all")
 							{
 								if (player != null && !player.CheckPermission("sanya.allexplode"))
 								{
@@ -587,7 +575,7 @@ namespace SanyaPlugin.Commands
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
-							if (arguments.At(1) == "all")
+							if (arguments.At(1).ToLower() == "all")
 							{
 								if (player != null && !player.CheckPermission("sanya.allball"))
 								{
@@ -638,7 +626,7 @@ namespace SanyaPlugin.Commands
 								response = $"success. target:{target.Nickname}";
 								return false;
 							}
-							if (arguments.At(1) == "all")
+							if (arguments.At(1).ToLower() == "all")
 							{
 								if (player != null && !player.CheckPermission("sanya.allgrenade"))
 								{
@@ -687,7 +675,7 @@ namespace SanyaPlugin.Commands
 							response = $"Clear Inventory : {target.Nickname}";
 							return true;
 						}
-						else if (arguments.At(1) == "all")
+						else if (arguments.At(1).ToLower() == "all")
 						{
 							if (player != null && !player.CheckPermission("sanya.allclearinv"))
 							{
@@ -792,7 +780,7 @@ namespace SanyaPlugin.Commands
 								return false;
 							}
 						}
-						else if (arguments.At(1) == "all")
+						else if (arguments.At(1).ToLower() == "all")
 						{
 							if (player != null && !player.CheckPermission("sanya.alltppos"))
 							{
@@ -832,7 +820,7 @@ namespace SanyaPlugin.Commands
 						}
 						if (arguments.Count > 2)
 						{
-							if (arguments.At(1) == "unlock")
+							if (arguments.At(1).ToLower() == "unlock")
 							{
 								foreach (var generator in Generator079.Generators)
 								{
@@ -843,7 +831,7 @@ namespace SanyaPlugin.Commands
 								response = "gen unlocked.";
 								return true;
 							}
-							else if (arguments.At(1) == "door")
+							else if (arguments.At(1).ToLower() == "door")
 							{
 								foreach (var generator in Generator079.Generators)
 								{
@@ -857,7 +845,7 @@ namespace SanyaPlugin.Commands
 								response = $"gen doors interacted.";
 								return true;
 							}
-							else if (arguments.At(1) == "set")
+							else if (arguments.At(1).ToLower() == "set")
 							{
 								float cur = 10f;
 								foreach (var generator in Generator079.Generators)
@@ -873,7 +861,7 @@ namespace SanyaPlugin.Commands
 								response = "gen set.";
 								return true;
 							}
-							else if (arguments.At(1) == "once")
+							else if (arguments.At(1).ToLower() == "once")
 							{
 								Generator079 gen = Generator079.Generators.FindAll(x => !x.prevFinish).GetRandomOne();
 
@@ -886,7 +874,7 @@ namespace SanyaPlugin.Commands
 								response = "set once.";
 								return true;
 							}
-							else if (arguments.At(1) == "eject")
+							else if (arguments.At(1).ToLower() == "eject")
 							{
 								foreach (var generator in Generator079.Generators)
 								{
@@ -920,14 +908,14 @@ namespace SanyaPlugin.Commands
 						var mtfRespawn = RespawnManager.Singleton;
 						if (arguments.Count > 3)
 						{
-							if (arguments.At(1) == "ci" || arguments.At(1) == "ic")
+							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
 								mtfRespawn.Start();
 								response = $"force spawn ChaosInsurgency";
 								return true;
 							}
-							else if (arguments.At(1) == "mtf" || arguments.At(1) == "ntf")
+							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
 								mtfRespawn.Start();
@@ -967,14 +955,14 @@ namespace SanyaPlugin.Commands
 						var mtfRespawn = RespawnManager.Singleton;
 						if (arguments.Count > 3)
 						{
-							if (arguments.At(1) == "ci" || arguments.At(1) == "ic")
+							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
 								response = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency}\n ";
 								response += $"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
 								return true;
 							}
-							else if (arguments.At(1) == "mtf" || arguments.At(1) == "ntf")
+							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
 								response = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox}";

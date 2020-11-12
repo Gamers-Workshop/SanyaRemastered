@@ -13,7 +13,7 @@ namespace SanyaRemastered.Patches
 			if (!SanyaPlugin.SanyaPlugin.Instance.Config.DisableSpectatorChat || (SanyaPlugin.SanyaPlugin.Instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(__instance.ccm.UserId))) return true;
 			var team = __instance.ccm.Classes.SafeGet(__instance.ccm.CurClass).team;
 			Log.Debug($"[VCPreventsPatch] team:{team} value:{b} current:{__instance.isVoiceChatting} RoundEnded:{RoundSummary.singleton._roundEnded}");
-			if (SanyaPlugin.SanyaPlugin.Instance.Config.DisableSpectatorChat&& team == Team.RIP && !RoundSummary.singleton._roundEnded) b = false;
+			if (SanyaPlugin.SanyaPlugin.Instance.Config.DisableSpectatorChat && team == Team.RIP && !RoundSummary.singleton._roundEnded) b = false;
 			return true;
 		}
 	}

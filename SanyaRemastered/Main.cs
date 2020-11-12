@@ -2,26 +2,21 @@
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using HarmonyLib;
-using MEC;
-using SanyaPlugin.Functions;
 
 using ServerEvents = Exiled.Events.Handlers.Server;
 using MapEvents = Exiled.Events.Handlers.Map;
 using WarheadEvents = Exiled.Events.Handlers.Warhead;
 using PlayerEvents = Exiled.Events.Handlers.Player;
-using Scp049Events = Exiled.Events.Handlers.Scp049;
 using Scp079Events = Exiled.Events.Handlers.Scp079;
 using Scp914Events = Exiled.Events.Handlers.Scp914;
 using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
 using SanyaRemastered;
-using System.Collections.Generic;
 
 namespace SanyaPlugin
 {
 	public class SanyaPlugin : Plugin<Configs>
 	{
-		//プラグイン設定
 		public override string Name => "SanyaPlugin";
 		public override string Prefix => "sanya";
 		public override string Author => "sanyae2439";
@@ -56,7 +51,7 @@ namespace SanyaPlugin
 			base.OnDisabled();
 
 			foreach (var cor in Handlers.roundCoroutines)
-				Timing.KillCoroutines(cor);
+				MEC.Timing.KillCoroutines(cor);
 			Handlers.roundCoroutines.Clear();
 
 			UnRegistEvents();

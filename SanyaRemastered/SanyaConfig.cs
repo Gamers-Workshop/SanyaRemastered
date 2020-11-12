@@ -52,7 +52,8 @@ namespace SanyaRemastered
 		public string MotdMessage { get; set; } = string.Empty;
 		[Description("Disable Player lists")]
 		public bool DisablePlayerLists { get; set; } = false;
-
+		[Description("NukeCap peut étre refermer")]
+		public bool nukecapclose { get; set; } = false;
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
 		public List<string> TeslaTriggerableTeams { get; set; } = new List<string>();

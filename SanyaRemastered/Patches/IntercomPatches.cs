@@ -23,7 +23,7 @@ namespace SanyaRemastered.Patches
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
-				bool isAlreadyUsed = UnityEngine.Object.FindObjectOfType<OneOhSixContainer>().Networkused;
+				bool isAlreadyUsed = OneOhSixContainer.used;
 				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
@@ -97,8 +97,8 @@ namespace SanyaRemastered.Patches
 					}
 					else
 					{ 
-					IntercomUpdateTextPatches.time -= Time.deltaTime;
-					contentfix += string.Concat($"<color=#ff0000>Surcharge du site : "+minutes+":"+seconds+"</color>\n");
+						IntercomUpdateTextPatches.time -= Time.deltaTime;
+						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : "+minutes+":"+seconds+"</color>\n");
 					}
 				}
 				else
