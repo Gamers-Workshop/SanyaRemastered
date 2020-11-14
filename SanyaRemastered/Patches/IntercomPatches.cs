@@ -23,7 +23,6 @@ namespace SanyaRemastered.Patches
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
-				bool isAlreadyUsed = OneOhSixContainer.used;
 				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
@@ -49,7 +48,7 @@ namespace SanyaRemastered.Patches
 				//SCP-106 Femur
 				if (isContain)
 				{
-					if (isAlreadyUsed)
+					if (OneOhSixContainer.used)
 					{
 						contentfix += string.Concat($"Statut du briseur de fémur : <color=#228B22>Utilisé</color>\n");
 					}
@@ -89,16 +88,14 @@ namespace SanyaRemastered.Patches
 
 				if (TimeContained == 0 && IntercomUpdateTextPatches.draw == false)
 				{ 
-					string minutes = Mathf.Floor(time / 60).ToString("00");
-					string seconds = (time % 60).ToString("00");
-					if (minutes.StartsWith("00") && seconds.StartsWith("00"))
+					if (time == 0f)
 					{
 						draw = true;
 					}
 					else
 					{ 
 						IntercomUpdateTextPatches.time -= Time.deltaTime;
-						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : "+minutes+":"+seconds+"</color>\n");
+						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : {time / 60}:{time % 60}</color>\n");
 					}
 				}
 				else
@@ -144,7 +141,7 @@ namespace SanyaRemastered.Patches
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
 					contentfix += string.Concat($"Aucun renforts prévus pour le site\n");
 				else
-					contentfix += string.Concat($"Prochains renforts MTF : {respawntime / 60:00}:{respawntime % 60:00}\n");
+					contentfix += string.Concat($"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}\n");
 
 					//Speak Intercom
 					if (__instance.Muted)

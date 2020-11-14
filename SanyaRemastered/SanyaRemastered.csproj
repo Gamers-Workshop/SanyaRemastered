@@ -47,7 +47,7 @@
     <Compile Include="Patches\Scp018Patches.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
-    <Compile Include="Patches\MTFRespawnPatches.cs" />
+    <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\Scp096Patches.cs" />
     <Compile Include="Patches\Scp106.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />

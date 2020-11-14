@@ -158,3 +158,33 @@ D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered0\SanyaRemastered\obj\Debug\S
 D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered0\SanyaRemastered\obj\Debug\SanyaRemastered.dll
 D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered0\SanyaRemastered\obj\Debug\SanyaRemastered.pdb
 D:\ACCESS PL\Plugin Gamers Workshop\SanyaRemastered0\SanyaRemastered\bin\Debug\System.Buffers.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.pdb
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\0Harmony.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.API.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Events.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Loader.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Permissions.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Updater.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\YamlDotNet.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UI.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UIModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.TextRenderingModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Buffers.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UNETModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.TextCoreModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UnityConnectModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UnityAnalyticsModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.TilemapModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.VFXModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.VideoModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.VRModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UIElementsModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.VehiclesModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.WindModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.XRModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.csprojAssemblyReference.cache
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.csproj.CoreCompileInputs.cache
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.csproj.CopyComplete
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.pdb

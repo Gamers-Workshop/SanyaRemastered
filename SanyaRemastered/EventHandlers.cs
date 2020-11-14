@@ -186,27 +186,7 @@ namespace SanyaPlugin
 			{
 				try
 				{
-					/*//SCP-939VoiceChatVision
-					if (plugin.Config.Scp939CanSeeVoiceChatting != 0)
-					{
-						List<ReferenceHub> scp939 = null;
-						List<ReferenceHub> humans = new List<ReferenceHub>();
-						foreach (var player in ReferenceHub.GetAllHubs().Values)
-						{
-							if (player.characterClassManager.CurRole.team != Team.RIP && player.TryGetComponent(out Radio radio) && (radio.g_voice))
-							{
-								player.footstepSync._visionController.MakeNoise(radio.noiseSource.volume * plugin.Config.Scp939CanSeeVoiceChatting);
-							}
-							if (player.characterClassManager.CurRole.roleId.Is939())
-							{
-								if (scp939 == null)
-									scp939 = new List<ReferenceHub>();
-								scp939.Add(player);
-							}
-							if (player.characterClassManager.IsHuman())
-								humans.Add(player);
-						}
-					}*/
+
 				}
 				catch (Exception e)
 				{
@@ -229,6 +209,8 @@ namespace SanyaPlugin
 		private Camera079 last079cam = null;
 		internal Stopwatch last106walkthrough = new Stopwatch();
 
+		internal List<CoroutineHandle> RoundCoroutines { get => roundCoroutines; set => roundCoroutines = value; }
+
 		public void OnWaintingForPlayers()
 		{
 			loaded = true;
@@ -237,8 +219,8 @@ namespace SanyaPlugin
 				&& plugin.Config.InfosenderIp != "none" && plugin.Config.InfosenderPort != -1)
 				sendertask = SenderAsync().StartSender();
 
-			roundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
-			roundCoroutines.Add(Timing.RunCoroutine(FixedUpdate(), Segment.FixedUpdate));
+			RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
+			RoundCoroutines.Add(Timing.RunCoroutine(FixedUpdate(), Segment.FixedUpdate));
 
 			PlayerDataManager.playersData.Clear();
 			ItemCleanupPatch.items.Clear();
@@ -300,9 +282,9 @@ namespace SanyaPlugin
 		{
 			Log.Info($"[OnRoundRestart] Restarting...");
 
-			foreach (var cor in roundCoroutines)
+			foreach (var cor in RoundCoroutines)
 				Timing.KillCoroutines(cor);
-			roundCoroutines.Clear();
+			RoundCoroutines.Clear();
 			Log.Info($"Removed {Timing.KillCoroutines()} Coroutines.");
 			RoundSummary.singleton._roundEnded = true;
 		}
@@ -370,7 +352,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke >= 0)
 			{
-				roundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke)));
+				RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaPlugin.Instance.Config.OutsidezoneTerminationTimeAfterNuke)));
 			}
 		}
 		public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
@@ -463,7 +445,7 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.KickSteamLimited && ev.UserId.EndsWith("@steam", StringComparison.InvariantCultureIgnoreCase))
 			{
-				roundCoroutines.Add(Timing.RunCoroutine(ShitChecker.CheckIsLimitedSteam(ev.UserId)));
+				RoundCoroutines.Add(Timing.RunCoroutine(ShitChecker.CheckIsLimitedSteam(ev.UserId)));
 			}
 		}
 
@@ -534,11 +516,11 @@ namespace SanyaPlugin
 
 			if (SanyaPlugin.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
 			{
-				roundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079First, 10)));
+				RoundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079First, 10)));
 			}
 			if (plugin.Config.Scp106WalkthroughCooldown > 0 && ev.NewRole == RoleType.Scp106)
 			{
-				roundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend106First, 10)));
+				RoundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend106First, 10)));
 			}
 			if (SanyaPlugin.Instance.Config.Scp049_add_time_res_success && ev.NewRole == RoleType.Scp0492)
 			{
@@ -578,7 +560,7 @@ namespace SanyaPlugin
 				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(5f);
 				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Blinded>(3f);
 				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Amnesia>(5f);
-				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.5f);
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.2f);
 			}
 			if (plugin.Config.RandomRespawnPosPercent > 0
 				&& ev.Player.ReferenceHub.characterClassManager._prevId == RoleType.Spectator
@@ -587,12 +569,7 @@ namespace SanyaPlugin
 			{
 				ev.Position = nextRespawnPos;
 			}
-			if (plugin.Config.FacilityGuardChangeSpawnPos && ev.RoleType == RoleType.FacilityGuard)
-			{
-				ev.Position = UnityEngine.GameObject.FindGameObjectsWithTag("RoomID").First(x => x.GetComponent<Rid>().id == "nukesite").transform.position;
-				PlayerMovementSync.FindSafePosition(Map.Doors.First(x => x.DoorName.ToUpper() == "CHECKPOINT_ENT").transform.position, out var pos, true);
-				ev.Position = pos;
-			}
+			
 			if (SanyaPlugin.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106 
 				|| SanyaPlugin.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
 			{
@@ -939,7 +916,7 @@ namespace SanyaPlugin
 					&& !ev.Player.ReferenceHub.fpc.NetworkforceStopInputs)
 			{
 				if (last106walkthrough.Elapsed.TotalSeconds > plugin.Config.Scp106WalkthroughCooldown || ev.Player.IsBypassModeEnabled)
-					roundCoroutines.Add(Timing.RunCoroutine(Coroutines.Scp106WalkingThrough(ev.Player)));
+					RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.Scp106WalkingThrough(ev.Player)));
 				if (ev.CurrentAnimation == 1)
 					ev.Player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.ExtendEnabled, 3);
 				else
@@ -1029,7 +1006,7 @@ namespace SanyaPlugin
 					foreach (GameObject roomid in GameObject.FindGameObjectsWithTag("RoomID"))
 					{
 						Rid rid = roomid.GetComponent<Rid>();
-						if (rid != null && (rid.id == "LC_ARMORY" || rid.id == "Shelter"))
+						if (rid != null && (rid.id == "LCZ_ARMORY" || rid.id == "Shelter"))
 						{
 							poslist.Add(roomid.transform.position);
 						}
@@ -1061,7 +1038,7 @@ namespace SanyaPlugin
 					var dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
 					if (dis <= 15)
 					{
-						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(30f / dis, true);
+						ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
 					}
 				}
 			}
@@ -1070,7 +1047,7 @@ namespace SanyaPlugin
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
 			
-			if (ev.IsAllowed && SanyaPlugin.Instance.Config.nukecapclose)
+			if (ev.IsAllowed && SanyaPlugin.Instance.Config.Nukecapclose)
 			{
 				var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
 				outsite.NetworkkeycardEntered = !outsite.keycardEntered;

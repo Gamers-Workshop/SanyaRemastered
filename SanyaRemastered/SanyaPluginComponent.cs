@@ -139,7 +139,8 @@ namespace SanyaPlugin
 
 			string curText = _hudTemplate;
 			//[LEFT_UP]
-			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting)) curText += _hudTemplate.Replace("[STATS]",$"Vous avez été mute");
+			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting)) 
+				curText = _hudTemplate.Replace("[STATS]",$"Vous avez été mute");
 			curText = curText.Replace("([STATS])", string.Empty);
 			//[LIST]
 			if (_player.Team == Team.SCP)
@@ -187,10 +188,10 @@ namespace SanyaPlugin
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 
-			if (_hudText != curText || _timer > 1f && _player.Team == Team.SCP)
+			if (_hudText != curText || _timer > 2f && _player.Team == Team.SCP)
 			{
 				_hudText = curText;
-				_player.SendTextHintNotEffect(_hudText, 3);
+				_player.SendTextHintNotEffect(_hudText, 6);
 			}
 		}
 

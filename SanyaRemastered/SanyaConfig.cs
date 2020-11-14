@@ -28,7 +28,6 @@ namespace SanyaRemastered
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
-		public bool FacilityGuardChangeSpawnPos { get; set; } = false;
 		[Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
 		public string DataDirectory { get; private set; } = string.Empty;
 
@@ -53,7 +52,7 @@ namespace SanyaRemastered
 		[Description("Disable Player lists")]
 		public bool DisablePlayerLists { get; set; } = false;
 		[Description("NukeCap peut étre refermer")]
-		public bool nukecapclose { get; set; } = false;
+		public bool Nukecapclose { get; set; } = false;
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
 		public List<string> TeslaTriggerableTeams { get; set; } = new List<string>();

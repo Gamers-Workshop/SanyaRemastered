@@ -50,9 +50,9 @@ namespace SanyaPlugin
 		{
 			base.OnDisabled();
 
-			foreach (var cor in Handlers.roundCoroutines)
+			foreach (var cor in Handlers.RoundCoroutines)
 				MEC.Timing.KillCoroutines(cor);
-			Handlers.roundCoroutines.Clear();
+			Handlers.RoundCoroutines.Clear();
 
 			UnRegistEvents();
 			UnRegistPatch();
