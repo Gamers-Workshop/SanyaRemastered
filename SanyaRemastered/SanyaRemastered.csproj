@@ -39,7 +39,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
-    <Compile Include="Patches\InfiniteAmmoPatches.cs" />
     <Compile Include="Patches\DecontaminationPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\ItemCleanupPatch.cs" />

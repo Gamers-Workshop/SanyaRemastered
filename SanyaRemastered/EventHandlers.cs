@@ -208,13 +208,13 @@ namespace SanyaPlugin
 		private Vector3 nextRespawnPos = Vector3.zero;
 		private Camera079 last079cam = null;
 		internal Stopwatch last106walkthrough = new Stopwatch();
+		
 
 		internal List<CoroutineHandle> RoundCoroutines { get => roundCoroutines; set => roundCoroutines = value; }
 
 		public void OnWaintingForPlayers()
 		{
 			loaded = true;
-
 			if (sendertask?.Status != TaskStatus.Running && sendertask?.Status != TaskStatus.WaitingForActivation
 				&& plugin.Config.InfosenderIp != "none" && plugin.Config.InfosenderPort != -1)
 				sendertask = SenderAsync().StartSender();
@@ -256,7 +256,6 @@ namespace SanyaPlugin
 		public void OnRoundStart()
 		{
 			Log.Info($"[OnRoundStart] Round Start!");
-
 			if (SanyaPlugin.Instance.Config.ClassD_container_locked)
 			{
 				Coroutines.StartContainClassD(false, SanyaPlugin.Instance.Config.ClassD_container_Unlocked);
@@ -573,7 +572,7 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106 
 				|| SanyaPlugin.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
 			{
-				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
+				ev.Player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
 			}
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
@@ -949,7 +948,7 @@ namespace SanyaPlugin
 					&& !ev.Player.ReferenceHub.fpc.staminaController._scp207.Enabled
 					)
 				{
-					ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(3f);
+					ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
 				}
 			}
 		}
@@ -1243,9 +1242,9 @@ namespace SanyaPlugin
 							{
 								var Hit = new PlayerStats.HitInfo(70, "Scp-914", DamageTypes.RagdollLess, 0);
 								player.ReferenceHub.playerStats.HurtPlayer(Hit, player.ReferenceHub.gameObject);
-								player.ReferenceHub.playerEffectsController.EnableEffect<Hemorrhage>();
-								player.ReferenceHub.playerEffectsController.EnableEffect<Bleeding>();
-								player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
+								player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>();
+								player.ReferenceHub.playerEffectsController.GetEffect<Bleeding>();
+								player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
 								player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText("Vous remarquez d'innombrables petites incisions dans votre corps.", 10);
 							}
 						}
@@ -1274,9 +1273,6 @@ namespace SanyaPlugin
 								{
 
 								}
-								{
-
-								}
 							}
 						}
 						break;
@@ -1284,7 +1280,7 @@ namespace SanyaPlugin
 						foreach (var player in ev.Players)
 						{
 							player.ReferenceHub.fpc.sprintToggle = true;
-							player.ReferenceHub.fpc.effectScp207.Intensity = 4;
+							player.ReferenceHub.fpc.effectScp207.Intensity = 20;
 						}
 						break;
 					case Scp914Knob.VeryFine:
@@ -1303,7 +1299,7 @@ namespace SanyaPlugin
 		{
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.Position}-> {ev.Target?.name}");
 
-			if ((SanyaPlugin.Instance.Config.Grenade_shoot_fuse || SanyaPlugin.Instance.Config.Item_shoot_move)
+			if ((SanyaPlugin.Instance.Config.Grenade_shoot_fuse || SanyaPlugin.Instance.Config.Item_shoot_move || SanyaPlugin.Instance.Config.OpenDoorOnShoot)
 				&& ev.Position != Vector3.zero
 				&& Physics.Linecast(ev.Shooter.Position, ev.Position, out RaycastHit raycastHit, grenade_pickup_mask))
 			{
@@ -1329,6 +1325,24 @@ namespace SanyaPlugin
 						Flashgrenade.NetworkfuseTime = 0.1f;
 					}
 				}
+				if (SanyaPlugin.Instance.Config.OpenDoorOnShoot)
+				{
+
+					var door = raycastHit.transform.GetComponentInParent<Door>();
+					Log.Info($"door.status != Door.DoorStatus.Moving {door.status != Door.DoorStatus.Moving} !door.destroyed {!door.destroyed} !door.lockdown {!door.lockdown} !door.locked {!door.locked} !door._isLockedBy079 {!door._isLockedBy079} !door._wasLocked {!door._wasLocked} !door.warheadlock  {!door.warheadlock} door.doorType == Door.DoorTypes.Standard {door.doorType == Door.DoorTypes.Standard}");
+					if (door != null
+						&& door.status != Door.DoorStatus.Moving
+						&& !door.destroyed
+						&& !door.lockdown
+						&& !door.locked
+						&& !door._isLockedBy079
+						&& !door._wasLocked
+						&& !door.warheadlock
+						&& door.doorType == Door.DoorTypes.Standard)
+					{
+						door.NetworkisOpen = !door.isOpen;
+					}
+				}
 			}
 			if (SanyaPlugin.Instance.Config.StaminaLostLogicer > 0f
 				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman()
@@ -1338,7 +1352,7 @@ namespace SanyaPlugin
 				&& !ev.Shooter.ReferenceHub.fpc.staminaController._scp207.Enabled
 				)
 			{
-				ev.Shooter.ReferenceHub.fpc.staminaController.RemainingStamina = SanyaPlugin.Instance.Config.StaminaLostLogicer;
+				ev.Shooter.ReferenceHub.fpc.staminaController.RemainingStamina -= SanyaPlugin.Instance.Config.StaminaLostLogicer;
 				ev.Shooter.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
 			}
 		}

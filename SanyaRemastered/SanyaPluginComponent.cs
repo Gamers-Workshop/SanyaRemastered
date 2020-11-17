@@ -176,11 +176,15 @@ namespace SanyaPlugin
 
 			//[CENTER_DOWN]
 			if (_player.Team == Team.RIP)
+			{ 
 				if (_respawnCounter == 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
 				else
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} secondes", 6));
-			else if (!string.IsNullOrEmpty(_hudCenterDownString))
+				if (!string.IsNullOrEmpty(_hudCenterDownString))
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
+			}
+			else if(!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
 			else
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
@@ -188,10 +192,10 @@ namespace SanyaPlugin
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 
-			if (_hudText != curText || _timer > 2f && _player.Team == Team.SCP)
+			if (_hudText != curText || RoundSummary.roundTime > 0)
 			{
 				_hudText = curText;
-				_player.SendTextHintNotEffect(_hudText, 6);
+				_player.SendTextHintNotEffect(_hudText, 2);
 			}
 		}
 

@@ -818,7 +818,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						if (arguments.Count > 2)
+						if (arguments.Count > 1)
 						{
 							if (arguments.At(1).ToLower() == "unlock")
 							{
@@ -911,14 +911,14 @@ namespace SanyaPlugin.Commands
 							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"force spawn ChaosInsurgency";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"force spawn NineTailedFox";
 								return true;
 							}
@@ -932,13 +932,13 @@ namespace SanyaPlugin.Commands
 						{
 							if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
 							{
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"Spawn. Chaos Insurgency";
 								return true;
 							}
 							else
 							{
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"Spawn. Nine Tailed Fox";
 								return true;
 							}

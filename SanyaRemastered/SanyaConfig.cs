@@ -83,6 +83,7 @@ namespace SanyaRemastered
 		public bool StopRespawnAfterDetonated { get; set; } = false;
 		public bool Item_shoot_move { get; set; } = false;
 		public bool Grenade_shoot_fuse { get; set; } = false;
+		public bool OpenDoorOnShoot { get; set; } = false;
 		public bool GrenadeChainSametiming { get; set; } = false;
 		public bool GodmodeAfterEndround { get; set; } = false;
 		public bool InventoryKeycardActivation { get; set; } = false;
