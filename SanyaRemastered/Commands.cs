@@ -127,6 +127,17 @@ namespace SanyaPlugin.Commands
 						response = "ok.";
 						return true;
 					}
+				case "pocket":
+					{
+						if (player != null && !player.CheckPermission("sanya.pocket"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						player.Position = new Vector3(0f, -1998f, 0f);
+						response = "ok.";
+						return true;
+					}
 				case "914":
 					{
 						if (player != null && !player.CheckPermission("sanya.914"))
