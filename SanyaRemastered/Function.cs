@@ -467,7 +467,7 @@ namespace SanyaPlugin.Functions
 			var gm = player.GetComponent<Grenades.GrenadeManager>();
 			Grenades.Grenade component = UnityEngine.Object.Instantiate(gm.availableGrenades[isFlash ? (int)GRENADE_ID.FLASH_NADE : (int)GRENADE_ID.FRAG_NADE].grenadeInstance).GetComponent<Grenades.Grenade>();
 			if (fusedur != -1) component.fuseDuration = fusedur;
-			component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity);
+			component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity, player == null ? Team.TUT : player.characterClassManager.CurRole.team);
 			NetworkServer.Spawn(component.gameObject);
 		}
 
@@ -550,7 +550,20 @@ namespace SanyaPlugin.Functions
 			target.TargetSendRpc(AlphaWarheadController.Host, nameof(AlphaWarheadController.RpcShake), writer);
 			NetworkWriterPool.Recycle(writer);
 		}
-
+		public static bool IsStuck(Vector3 pos)
+		{
+			bool result = false;
+			foreach (Collider collider in Physics.OverlapBox(pos, new Vector3(0.4f, 1f, 0.4f), new Quaternion(0f, 0f, 0f, 0f)))
+			{
+				bool flag = collider.name.Contains("Hitbox") || collider.name.Contains("mixamorig") || collider.name.Equals("Player") || collider.name.Equals("PlyCenter") || collider.name.Equals("Antijumper");
+				if (!flag)
+				{
+					Log.Warn($"Detect:{collider.name}");
+					result = true;
+				}
+			}
+			return result;
+		}
 		public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
 		{
 			var msg = new RpcMessage
