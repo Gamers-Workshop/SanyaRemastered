@@ -171,6 +171,16 @@ namespace SanyaPlugin
 							}
 						}
 					}
+					if (plugin.Config.PainEffectStart > 0)
+					{
+						foreach(Player player in Player.List)
+						{
+							if (player.IsHuman() && (100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f) <= SanyaPlugin.Instance.Config.PainEffectStart))
+							{
+								player.EnableEffect<Disabled>(1.2f);
+							}
+						}
+					}
 				}
 				catch (Exception e)
 				{
@@ -1338,7 +1348,8 @@ namespace SanyaPlugin
 						&& !door._isLockedBy079
 						&& !door._wasLocked
 						&& !door.warheadlock
-						&& door.doorType == Door.DoorTypes.Standard)
+						&& door.doorType == Door.DoorTypes.Standard
+						&& string.IsNullOrEmpty(door.DoorName))
 					{
 						door.NetworkisOpen = !door.isOpen;
 					}
