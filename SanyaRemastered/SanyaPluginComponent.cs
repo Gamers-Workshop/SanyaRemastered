@@ -30,7 +30,9 @@ namespace SanyaPlugin
 		private string _hudText = string.Empty;
 		private string _hudCenterDownString = string.Empty;
 		private float _hudCenterDownTime = -1f;
-		private float _hudCenterDownTimer = 0f;
+		private float _hudCenterDownTimer = 0f; 
+		private Player _targetedPlayer = null;
+
 
 		private void Start()
 		{
@@ -49,6 +51,7 @@ namespace SanyaPlugin
 
 			CheckTraitor();
 			CheckVoiceChatting();
+			CheckTargetPlayer();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateExHud();
@@ -110,7 +113,21 @@ namespace SanyaPlugin
 				&& (radio.isVoiceChatting || radio.isTransmitting))
 				_player.ReferenceHub.footstepSync._visionController.MakeNoise(25f);
 		}
-
+		private void CheckTargetPlayer()
+		{
+			if (!(_timer > 1f)) return;
+			if (_targetedPlayer != null && !_player.IsHuman()) _targetedPlayer = null;
+			if (!_player.IsHuman()) return;
+			Vector3 forward = _player.CameraTransform.forward;
+			forward.Scale(new Vector3(0.1f, 0.1f, 0.1f));
+			if (Physics.Raycast(this._player.CameraTransform.position + forward, forward, out var hit, 2.5f, _player.ReferenceHub.characterClassManager.Scp939.attackMask))
+			{
+				_targetedPlayer = Player.Get(hit.transform.gameObject);
+				if (_targetedPlayer != null && _targetedPlayer == _player) _targetedPlayer = null;
+			}
+			else
+				_targetedPlayer = null;
+		}
 		private void UpdateRespawnCounter()
 		{
 			if (!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator || _timer < 1f) return;
@@ -192,7 +209,7 @@ namespace SanyaPlugin
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 
-			if (_hudText != curText || RoundSummary.roundTime > 0)
+			if (_hudText != curText || RoundSummary.RoundInProgress())
 			{
 				_hudText = curText;
 				_player.SendTextHintNotEffect(_hudText, 2);

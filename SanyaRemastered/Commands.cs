@@ -34,13 +34,13 @@ namespace SanyaPlugin.Commands
 			Player player = null;
 			if(sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 
-			if(arguments.Count == 0)
+			if (arguments.Count == 0)
 			{
-				response = "sanya plugins command.";
+				response = "sanya plugins command. params: <hud/ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forrcend/now/config>";
 				return true;
 			}
 
-			switch(arguments.FirstElement().ToLower())
+			switch (arguments.FirstElement().ToLower())
 			{
 				case "test":
 					{
@@ -452,22 +452,22 @@ namespace SanyaPlugin.Commands
 						{
 							if (int.TryParse(arguments.At(2), out int duration))
 							{
-								if (int.TryParse(arguments.At(3), out int duration2))
+								if (float.TryParse(arguments.At(3), out float duration2))
 								{
-									Coroutines.AirSupportBomb(false, duration, duration2);
+									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
 									return true;
 								}
 								else
 								{
-									Coroutines.AirSupportBomb(false, duration);
+									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 									return true;
 								}
 							}
 							else
 							{
-								Coroutines.AirSupportBomb(false);
+								SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
 								response = "Started!";
 								return true;
 							}

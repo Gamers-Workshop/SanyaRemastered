@@ -19,13 +19,16 @@ namespace SanyaRemastered.Patches
 		{
 			if (true)
 			{
+
 				int leftdecont = (int)Math.Truncate((DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger) - Math.Truncate(DecontaminationController.GetServerTime));
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
-				float totalvoltagefloat = 0f;
 				float TimeContained = 0f;
 
+				leftdecont = Mathf.Clamp(leftdecont, 0, leftdecont);
+
+				float totalvoltagefloat = 0f;
 				foreach (var i in Generator079.Generators)
 				{
 					totalvoltagefloat += i.localVoltage;
@@ -40,7 +43,7 @@ namespace SanyaRemastered.Patches
 				string contentfix = string.Concat(
 								$"<color=#fffffff>──── Centre d'information FIM Epsilon-11 ────</color>\n",
 								$"Durée de la brèche : {RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}\n",
-								$"SCP restants : {RoundSummary.singleton.CountTeam(Team.SCP):00}/{RoundSummary.singleton.classlistStart.scps_except_zombies:00}\n",
+								$"SCP restants : {RoundSummary.singleton.CountTeam(Team.SCP) - RoundSummary.singleton.CountRole(RoleType.Scp0492):00}/{RoundSummary.singleton.classlistStart.scps_except_zombies:00}\n",
 								$"Classe-D restants : {RoundSummary.singleton.CountTeam(Team.CDP):00}/{RoundSummary.singleton.classlistStart.class_ds:00}\n",
 								$"Scientifique restants : {RoundSummary.singleton.CountTeam(Team.RSC):00}/{RoundSummary.singleton.classlistStart.scientists:00}\n",
 								$"Nine-Tailed Fox restants : {RoundSummary.singleton.CountTeam(Team.MTF):00}\n"

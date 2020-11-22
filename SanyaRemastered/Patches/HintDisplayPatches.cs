@@ -14,20 +14,17 @@ namespace SanyaRemastered.Patches
 		[HarmonyPatch(typeof(HintDisplay), nameof(HintDisplay.Show))]
 		public static class HintPreventPatch
 		{
-			public static void Prefix(HintDisplay __instance, Hint hint)
+			public static bool Prefix(HintDisplay __instance, Hint hint)
 			{
+				if (!SanyaPlugin.SanyaPlugin.Instance.Config.ExHudEnabled) return true;
+
 				if (hint.GetType() == typeof(TranslationHint))
-				{
-					Log.Debug($"[HintPreventPatch] TranslationHint Detect:{Player.Get(__instance.gameObject).Nickname}", SanyaPlugin.SanyaPlugin.Instance.Config.IsDebugged);
-					return;
-				}
+					return false;
+
 				if (hint._effects != null && hint._effects.Length > 0)
-				{
-					Log.Debug($"[HintPreventPatch] HintEffects Detect:{Player.Get(__instance.gameObject).Nickname}", SanyaPlugin.SanyaPlugin.Instance.Config.IsDebugged);
-					return;
-				}
-				Log.Debug($"[HintPreventPatch] Allow:{Player.Get(__instance.gameObject).Nickname}", SanyaPlugin.SanyaPlugin.Instance.Config.IsDebugged);
-				return;
+					return false;
+
+				return true;
 			}
 		}
 	}

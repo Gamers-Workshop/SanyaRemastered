@@ -300,7 +300,7 @@ namespace SanyaPlugin.Functions
 				}
 			}
 		}
-		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1)
+		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = -1, float TimeEnd = -1f)
 		{
 			if (isAirBombGoing && stop)
 			{
@@ -389,11 +389,11 @@ namespace SanyaPlugin.Functions
 					foreach (var pos in randampos)
 					{
 						Methods.SpawnGrenade(pos, false, 0.1f);
-						yield return Timing.WaitForSeconds(0.2f);
+						yield return Timing.WaitForSeconds(0.1f);
 					}
 					if (TimeEnd != -1)
 					{
-						if (TimeEnd <= Time.time)
+						if (TimeEnd <= Time.deltaTime)
 						{
 							isAirBombGoing = false;
 							Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
@@ -403,9 +403,7 @@ namespace SanyaPlugin.Functions
 					yield return Timing.WaitForSeconds(0.25f);
 				}
 				if (SanyaPlugin.Instance.Config.CassieSubtitle)
-				{
 					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
-				}
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 				Log.Info($"[AirSupportBomb] Ended.");
 				yield break;
@@ -771,9 +769,18 @@ namespace SanyaPlugin.Functions
 			return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
 		}
 
-		internal static void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation, string name = "Yamato")
+		public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
 		{
-
+			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+			CharacterClassManager ccm = gameObject.GetComponent<CharacterClassManager>();
+			ccm.CurClass = role;
+			ccm.RefreshPlyModel();
+			gameObject.GetComponent<NicknameSync>().Network_myNickSync = "Yamato";
+			gameObject.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+			gameObject.transform.position = pos;
+			gameObject.transform.rotation = rot;
+			NetworkServer.Spawn(gameObject);
+			return gameObject;
 		}
 	}
 	internal static class Extensions
