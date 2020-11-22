@@ -22,7 +22,6 @@ namespace SanyaRemastered
 		[Description("WIP")]
 		public bool IsDebugged { get; set; } = false;
 		public bool Scp106PortalExtensionEnabled { get; set; } = false;
-		public float PainEffectStart { get; set; } = 20;
 		public bool TeslaExplodeGrenade { get; set; } = false;
 		public bool Coroding106 { get; set; } = false;
 
@@ -83,10 +82,12 @@ namespace SanyaRemastered
 		public bool StopRespawnAfterDetonated { get; set; } = false;
 		public bool Item_shoot_move { get; set; } = false;
 		public bool Grenade_shoot_fuse { get; set; } = false;
+		public bool OpenDoorOnShoot { get; set; } = false;
 		public bool GrenadeChainSametiming { get; set; } = false;
 		public bool GodmodeAfterEndround { get; set; } = false;
 		public bool InventoryKeycardActivation { get; set; } = false;
-		
+		public float PainEffectStart { get; set; } = -1;
+
 		[Description("Donne un effect d'assourdissement quand on est proche de l'explosion d'une grenade")]
 		public bool GrenadeEffect { get; set; } = false;
 		

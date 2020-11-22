@@ -34,13 +34,13 @@ namespace SanyaPlugin.Commands
 			Player player = null;
 			if(sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 
-			if(arguments.Count == 0)
+			if (arguments.Count == 0)
 			{
-				response = "sanya plugins command.";
+				response = "sanya plugins command. params: <hud/ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forrcend/now/config>";
 				return true;
 			}
 
-			switch(arguments.FirstElement().ToLower())
+			switch (arguments.FirstElement().ToLower())
 			{
 				case "test":
 					{
@@ -124,6 +124,17 @@ namespace SanyaPlugin.Commands
 						{
 							pocketteleport.SetType(PocketDimensionTeleport.PDTeleportType.Exit);
 						}
+						response = "ok.";
+						return true;
+					}
+				case "pocket":
+					{
+						if (player != null && !player.CheckPermission("sanya.pocket"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						player.Position = new Vector3(0f, -1998f, 0f);
 						response = "ok.";
 						return true;
 					}
@@ -441,22 +452,22 @@ namespace SanyaPlugin.Commands
 						{
 							if (int.TryParse(arguments.At(2), out int duration))
 							{
-								if (int.TryParse(arguments.At(3), out int duration2))
+								if (float.TryParse(arguments.At(3), out float duration2))
 								{
-									Coroutines.AirSupportBomb(false, duration, duration2);
+									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
 									return true;
 								}
 								else
 								{
-									Coroutines.AirSupportBomb(false, duration);
+									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 									return true;
 								}
 							}
 							else
 							{
-								Coroutines.AirSupportBomb(false);
+								SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
 								response = "Started!";
 								return true;
 							}
@@ -818,7 +829,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						if (arguments.Count > 2)
+						if (arguments.Count > 1)
 						{
 							if (arguments.At(1).ToLower() == "unlock")
 							{
@@ -911,14 +922,14 @@ namespace SanyaPlugin.Commands
 							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"force spawn ChaosInsurgency";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
 							{
 								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"force spawn NineTailedFox";
 								return true;
 							}
@@ -932,13 +943,13 @@ namespace SanyaPlugin.Commands
 						{
 							if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
 							{
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"Spawn. Chaos Insurgency";
 								return true;
 							}
 							else
 							{
-								mtfRespawn.Start();
+								mtfRespawn._timeForNextSequence = 0f;
 								response = $"Spawn. Nine Tailed Fox";
 								return true;
 							}

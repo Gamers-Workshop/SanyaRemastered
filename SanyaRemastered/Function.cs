@@ -300,7 +300,7 @@ namespace SanyaPlugin.Functions
 				}
 			}
 		}
-		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1)
+		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = -1, float TimeEnd = -1f)
 		{
 			if (isAirBombGoing && stop)
 			{
@@ -389,11 +389,11 @@ namespace SanyaPlugin.Functions
 					foreach (var pos in randampos)
 					{
 						Methods.SpawnGrenade(pos, false, 0.1f);
-						yield return Timing.WaitForSeconds(0.2f);
+						yield return Timing.WaitForSeconds(0.1f);
 					}
 					if (TimeEnd != -1)
 					{
-						if (TimeEnd <= Time.time)
+						if (TimeEnd <= Time.deltaTime)
 						{
 							isAirBombGoing = false;
 							Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
@@ -403,9 +403,7 @@ namespace SanyaPlugin.Functions
 					yield return Timing.WaitForSeconds(0.25f);
 				}
 				if (SanyaPlugin.Instance.Config.CassieSubtitle)
-				{
 					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
-				}
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
 				Log.Info($"[AirSupportBomb] Ended.");
 				yield break;
@@ -467,7 +465,7 @@ namespace SanyaPlugin.Functions
 			var gm = player.GetComponent<Grenades.GrenadeManager>();
 			Grenades.Grenade component = UnityEngine.Object.Instantiate(gm.availableGrenades[isFlash ? (int)GRENADE_ID.FLASH_NADE : (int)GRENADE_ID.FRAG_NADE].grenadeInstance).GetComponent<Grenades.Grenade>();
 			if (fusedur != -1) component.fuseDuration = fusedur;
-			component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity);
+			component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity, player == null ? Team.TUT : player.characterClassManager.CurRole.team);
 			NetworkServer.Spawn(component.gameObject);
 		}
 
@@ -550,7 +548,20 @@ namespace SanyaPlugin.Functions
 			target.TargetSendRpc(AlphaWarheadController.Host, nameof(AlphaWarheadController.RpcShake), writer);
 			NetworkWriterPool.Recycle(writer);
 		}
-
+		public static bool IsStuck(Vector3 pos)
+		{
+			bool result = false;
+			foreach (Collider collider in Physics.OverlapBox(pos, new Vector3(0.4f, 1f, 0.4f), new Quaternion(0f, 0f, 0f, 0f)))
+			{
+				bool flag = collider.name.Contains("Hitbox") || collider.name.Contains("mixamorig") || collider.name.Equals("Player") || collider.name.Equals("PlyCenter") || collider.name.Equals("Antijumper");
+				if (!flag)
+				{
+					Log.Warn($"Detect:{collider.name}");
+					result = true;
+				}
+			}
+			return result;
+		}
 		public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
 		{
 			var msg = new RpcMessage
@@ -758,9 +769,18 @@ namespace SanyaPlugin.Functions
 			return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
 		}
 
-		internal static void SpawnDummy(RoleType role, Vector3 position, Quaternion rotation, string name = "Yamato")
+		public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
 		{
-
+			GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+			CharacterClassManager ccm = gameObject.GetComponent<CharacterClassManager>();
+			ccm.CurClass = role;
+			ccm.RefreshPlyModel();
+			gameObject.GetComponent<NicknameSync>().Network_myNickSync = "Yamato";
+			gameObject.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+			gameObject.transform.position = pos;
+			gameObject.transform.rotation = rot;
+			NetworkServer.Spawn(gameObject);
+			return gameObject;
 		}
 	}
 	internal static class Extensions

@@ -9,6 +9,7 @@ using Exiled.API.Features;
 using Player = Exiled.API.Features.Player;
 using System.Linq;
 using CustomPlayerEffects;
+using SanyaPlugin;
 
 [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
 public static class Scp079ManaPatch
@@ -133,7 +134,7 @@ public static class Scp079CameraPatch
 }
 
 //SCP-079Extend Sprint 
-/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 public static class Scp079InteractPatch
 {
 	public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -152,12 +153,12 @@ public static class Scp079InteractPatch
 				{
 				if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExLevelGaz)
 				{
-					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
 					break;
 				}
 				else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
 				{
-					player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
 					break;
 				}
 				else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
@@ -192,18 +193,18 @@ public static class Scp079InteractPatch
 					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
 				if (room == null || locked)
 				{
-					player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
+					player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
 					break;
 				}
 			foreach (var blackroom in SanyaPlugin.SanyaPlugin.Instance.Config.GazBlacklistRooms)
 				{
 					if (room.Name.ToLower().Contains(blackroom.ToLower()))
 					{
-						player.ReferenceHub.SendTextHint(Subtitles.Extend079GazFail, 10);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
 						break;
 					}
 				}
-					player.ReferenceHub.SendTextHint(Subtitles.Extend079SuccessGaz, 10);
+					player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
 					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz;
 					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
 				}
@@ -218,12 +219,12 @@ public static class Scp079InteractPatch
 				{
 					if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
 					{
-						player.ReferenceHub.SendTextHint(Subtitles.Extend079NoLevel, 10);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
 						break;
 					}
 					else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
 					{
-						player.ReferenceHub.SendTextHint(Subtitles.Extend079NoEnergy, 10);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
 						break;
 					}
 					else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
@@ -267,7 +268,7 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 					if (SanyaPlugin.SanyaPlugin.Instance.Config.CassieSubtitle)
 					{
 						player.ClearBroadcasts();
-						player.Broadcast(1, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
+						player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
 					}
 					Methods.PlayAmbientSound(7);
 				}
@@ -301,7 +302,7 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 					if (player.Role == RoleType.Spectator)
 					{
 						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.Instance.Config.GasExpGain);
-						player.ReferenceHub.SendTextHint("Vous étes mort par le gazage de SCP-079", 20);
+						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText("Vous étes mort par le gazage de SCP-079", 20);
 					}
 				}
 			}
@@ -332,6 +333,6 @@ private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 			if (room.Position == transform.position)
 				return room;
 
-		return new Room(transform.name, transform, transform.position);
+		return new Room();
 	}
-}*/
+}
