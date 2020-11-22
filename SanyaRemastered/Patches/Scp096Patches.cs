@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace SanyaRemastered.Patches
 {
 	//Enrange Scp096 au contact
-	/*[HarmonyPatch(typeof(Scp096), nameof(Scp096.GetVisionInformation))]
+	//[HarmonyPatch(typeof(Scp096), nameof(Scp096.GetVisionInformation))]
 	public static class Scp096GetVisionPatch
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
@@ -31,5 +31,51 @@ namespace SanyaRemastered.Patches
 			for (int i = 0; i < newInst.Count; i++)
 				yield return newInst[i];
 		}
-	}*/
+	}
+
+	[HarmonyPatch(typeof(Scp096), nameof(Scp096.ParseVisionInformation))]
+	public static class Scp096PareseVIsionInformation
+    {
+		public static void Postfix(Scp096 __instance, VisionInformation info)
+        {
+			if (info.Looking)
+			{
+				ReferenceHub hub = ReferenceHub.GetHub(info.Source);
+				//__instance
+				if(Scp096Helper.singleton.targets.ContainsKey(__instance.Hub))
+                {
+					List<ReferenceHub> list = Scp096Helper.singleton.targets[__instance.Hub];
+					if(!list.Contains(hub))
+						list.Add(hub);
+                }
+            }
+        }
+
+	}
+
+	[HarmonyPatch(typeof(Scp096), nameof(Scp096.EndEnrage))]
+	public static class Scp096EndEnrage
+	{
+		public static bool Prefix(Scp096 __instance)
+		{
+			if (Scp096Helper.singleton.targets.ContainsKey(__instance.Hub))
+			{
+				List<ReferenceHub> ReferenceHubs = Scp096Helper.singleton.targets[__instance.Hub];
+				foreach(ReferenceHub hub in ReferenceHubs)
+                {
+					if(hub.characterClassManager.CurClass == RoleType.Spectator)
+                    {
+						ReferenceHubs.Remove(hub);
+                    }
+                }
+				Scp096Helper.singleton.targets[__instance.Hub] = ReferenceHubs;
+				if (ReferenceHubs.Count <= 0)
+                {
+					return true;
+                }
+			}
+			return false;
+		}
+
+	}
 }
