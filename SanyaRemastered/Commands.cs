@@ -12,6 +12,8 @@ using RemoteAdmin;
 using Respawning;
 using SanyaPlugin.Functions;
 using UnityEngine;
+using SanyaPlugin.DissonanceControl;
+using System.IO;
 
 namespace SanyaPlugin.Commands
 {
@@ -47,6 +49,76 @@ namespace SanyaPlugin.Commands
 						response = "test ok.";
 						return true;
 					}
+				case "audio":
+					{
+						if (!SanyaPlugin.Instance.Config.DissonanceEnabled)
+						{
+							response = "DissonanceAudio is Disabled.";
+							return false;
+						}
+
+						if (arguments.Count < 2)
+						{
+							response = "need args. <play filename/volume float/stop>";
+							return false;
+						}
+
+						switch (arguments.At(1).ToLower())
+						{
+							case "play":
+								{
+									response = $"Play file:{Path.Combine(SanyaPlugin.Instance.Config.DissonanceDataDirectory, arguments.At(2))}";
+
+									if (!DissonanceCommsControl.isReady)
+										DissonanceCommsControl.Init();
+
+									if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == arguments.At(2))
+										DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
+									else
+										DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = arguments.At(2);
+
+									return true;
+								}
+							case "volume":
+								{
+									response = "ok.";
+									DissonanceCommsControl.ChangeVolume(float.Parse(arguments.At(2)));
+									return true;
+								}
+							case "stop":
+								{
+									response = "ok.";
+									DissonanceCommsControl.streamCapture.StopCapture();
+									return true;
+								}
+						}
+
+						response = "invalid args.";
+						return false;
+					}
+				case "scale":
+					{
+						var target = Player.Get(int.Parse(arguments.At(1)));
+
+						target.Scale = new UnityEngine.Vector3(
+							float.Parse(arguments.At(2)),
+							float.Parse(arguments.At(3)),
+							float.Parse(arguments.At(4))
+						);
+
+						response = $"{target.Nickname} ok.";
+						return true;
+					}
+				case "args":
+					{
+						response = "ok.\n";
+						for (int i = 0; i < arguments.Count; i++)
+						{
+							response += $"[{i}]{arguments.At(i)}\n";
+						}
+						response.TrimEnd('\n');
+						return true;
+					}
 				case "hud":
 					{
 						if (player != null && !player.CheckPermission("sanya.hud"))
@@ -77,36 +149,34 @@ namespace SanyaPlugin.Commands
 					}
 				case "actwatch":
 					{
-						if (player != null && !player.CheckPermission("sanya.actwatch"))
+						if (player == null)
 						{
-							response = "Permission denied.";
+							response = "Only can use with RemoteAdmin.";
 							return false;
 						}
-						if (player == null) {
-							response = "Only can use with RemoteAdmin.";
-							return false; 
-						}
 
-						if(!isActwatchEnabled)
+						if (!isActwatchEnabled)
 						{
-							player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
+							player.SendCustomSyncObject(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
+							{
 								writer.WritePackedUInt64(1ul);
 								writer.WritePackedUInt32((uint)1);
 								writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
 								writer.WritePackedUInt32((uint)3);
 								writer.WriteByte((byte)1);
-							}, null);
+							});
 							isActwatchEnabled = true;
 						}
 						else
 						{
-							player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
+							player.SendCustomSyncObject(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
+							{
 								writer.WritePackedUInt64(1ul);
 								writer.WritePackedUInt32((uint)1);
 								writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
 								writer.WritePackedUInt32((uint)3);
 								writer.WriteByte((byte)0);
-							}, null);
+							});
 							isActwatchEnabled = false;
 						}
 

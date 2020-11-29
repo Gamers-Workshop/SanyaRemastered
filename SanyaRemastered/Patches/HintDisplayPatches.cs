@@ -14,17 +14,17 @@ namespace SanyaRemastered.Patches
 		[HarmonyPatch(typeof(HintDisplay), nameof(HintDisplay.Show))]
 		public static class HintPreventPatch
 		{
-			public static bool Prefix(HintDisplay __instance, Hint hint)
+			public static void Prefix(HintDisplay __instance, Hint hint)
 			{
-				if (!SanyaPlugin.SanyaPlugin.Instance.Config.ExHudEnabled) return true;
+				if (!SanyaPlugin.SanyaPlugin.Instance.Config.ExHudEnabled) return ;
 
 				if (hint.GetType() == typeof(TranslationHint))
-					return false;
+					return ;
 
 				if (hint._effects != null && hint._effects.Length > 0)
-					return false;
+					return ;
 
-				return true;
+				return ;
 			}
 		}
 	}

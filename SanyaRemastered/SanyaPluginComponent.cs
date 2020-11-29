@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using Respawning;
 using Exiled.API.Features;
-using Exiled.API.Extensions;
 
 using SanyaPlugin.Data;
 using SanyaPlugin.Functions;
 using System.Collections.Generic;
-using System.Threading;
-using GameCore;
 
 namespace SanyaPlugin
 {
 	public class SanyaPluginComponent : MonoBehaviour
 	{
+
 		public static readonly HashSet<Player> _scplists = new HashSet<Player>();
 
 		public bool DisableHud = false;
@@ -24,15 +21,14 @@ namespace SanyaPlugin
 		private SanyaPlugin _plugin;
 		private Player _player;
 		private Vector3 _espaceArea;
-		private string _hudTemplate = "<align=left><voffset=38em><size=50%>([STATS])\n</size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
+		private string _hudTemplate = "<align=left><voffset=38em><size=50%><alpha=#44>([STATS])\n<alpha=#ff></size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
 		private string _hudText = string.Empty;
 		private string _hudCenterDownString = string.Empty;
 		private float _hudCenterDownTime = -1f;
-		private float _hudCenterDownTimer = 0f; 
-		private Player _targetedPlayer = null;
-
+		private float _hudCenterDownTimer = 0f;
+		private int _prevHealth = -1;
 
 		private void Start()
 		{
@@ -50,8 +46,7 @@ namespace SanyaPlugin
 			UpdateTimers();
 
 			CheckTraitor();
-			CheckVoiceChatting();
-			CheckTargetPlayer();
+			UpdateMyCustomText();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateExHud();
@@ -104,30 +99,16 @@ namespace SanyaPlugin
 				_player.SetRole(RoleType.Spectator);
 		}
 
-		private void CheckVoiceChatting()
+		private void UpdateMyCustomText()
 		{
-			if (_plugin.Config.Scp939CanSeeVoiceChatting == 0) return;
-
-			if (_player.IsHuman()
-				&& _player.GameObject.TryGetComponent(out Radio radio)
-				&& (radio.isVoiceChatting || radio.isTransmitting))
-				_player.ReferenceHub.footstepSync._visionController.MakeNoise(25f);
-		}
-		private void CheckTargetPlayer()
-		{
-			if (!(_timer > 1f)) return;
-			if (_targetedPlayer != null && !_player.IsHuman()) _targetedPlayer = null;
-			if (!_player.IsHuman()) return;
-			Vector3 forward = _player.CameraTransform.forward;
-			forward.Scale(new Vector3(0.1f, 0.1f, 0.1f));
-			if (Physics.Raycast(this._player.CameraTransform.position + forward, forward, out var hit, 2.5f, _player.ReferenceHub.characterClassManager.Scp939.attackMask))
+			if (!(_timer > 1f) || !_player.IsAlive || !SanyaPlugin.Instance.Config.PlayersInfoShowHp) return;
+			if (_prevHealth != _player.Health)
 			{
-				_targetedPlayer = Player.Get(hit.transform.gameObject);
-				if (_targetedPlayer != null && _targetedPlayer == _player) _targetedPlayer = null;
+				_prevHealth = (int)_player.Health;
+				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"{_prevHealth}/{_player.MaxHealth} HP";
 			}
-			else
-				_targetedPlayer = null;
 		}
+
 		private void UpdateRespawnCounter()
 		{
 			if (!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator || _timer < 1f) return;
@@ -148,6 +129,7 @@ namespace SanyaPlugin
 				_scplists.Add(_player);
 				return;
 			}
+
 		}
 
 		private void UpdateExHud()
@@ -156,8 +138,8 @@ namespace SanyaPlugin
 
 			string curText = _hudTemplate;
 			//[LEFT_UP]
-			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting)) 
-				curText = _hudTemplate.Replace("[STATS]",$"Vous avez été mute");
+			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
+				curText = _hudTemplate.Replace("[STATS]", $"Vous avez été mute");
 			curText = curText.Replace("([STATS])", string.Empty);
 			//[LIST]
 			if (_player.Team == Team.SCP)
@@ -176,7 +158,7 @@ namespace SanyaPlugin
 			}
 			else
 				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 6));
-			
+
 			//[CENTER_UP]
 			if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.Scp079ExtendEnabled)
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
@@ -192,8 +174,8 @@ namespace SanyaPlugin
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER_DOWN]
-			if (_player.Team == Team.RIP)
-			{ 
+			if (_player.Team == Team.RIP && _respawnCounter != -1)
+			{
 				if (_respawnCounter == 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
 				else
@@ -201,16 +183,15 @@ namespace SanyaPlugin
 				if (!string.IsNullOrEmpty(_hudCenterDownString))
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
 			}
-			else if(!string.IsNullOrEmpty(_hudCenterDownString))
+			else if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
 			else
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
 
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
-
-			if (_hudText != curText || RoundSummary.RoundInProgress())
-			{
+			if (RoundSummary.roundTime > 0)
+			{ 
 				_hudText = curText;
 				_player.SendTextHintNotEffect(_hudText, 2);
 			}

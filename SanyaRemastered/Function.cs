@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Hints;
@@ -17,14 +15,10 @@ using SanyaRemastered.Data;
 using UnityEngine;
 using Dissonance.Integrations.MirrorIgnorance;
 using UnityEngine.Networking;
-using Utf8Json;
 using Respawning;
 using Exiled.API.Features;
-using Exiled.Events.EventArgs;
-using System.Threading;
-using Object = UnityEngine.Object;
-using SanyaRemastered;
 using CustomPlayerEffects;
+using SanyaPlugin.DissonanceControl;
 
 namespace SanyaPlugin.Functions
 {
@@ -329,7 +323,6 @@ namespace SanyaPlugin.Functions
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", (timewait / 60).ToString()), 10);
 					}
-					Log.Debug($"Time wait {timewait / 60} seconds");
 				}
 				else if (timewait == 30f)
 				{
@@ -338,11 +331,9 @@ namespace SanyaPlugin.Functions
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
-					Log.Debug("reste 30 seconde");
 				}
 				else if (timewait == 0)
 				{
-					Log.Debug("reste 0 seconde");
 					break;
 				}
 				if (!isAirBombGoing)
@@ -355,13 +346,27 @@ namespace SanyaPlugin.Functions
 					Log.Info($"[AirSupportBomb] The AirBomb as stop");
 					yield break;
 				}
-				Log.Debug("-1 seconde");
 				timewait--;
 				yield return Timing.WaitForSeconds(1);
 			}
 			if (isAirBombGoing)
 			{
 				Log.Info($"[AirSupportBomb] booting...");
+				try
+				{
+					if (!DissonanceCommsControl.isReady)
+						DissonanceCommsControl.Init();
+
+					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "Siren.raw")
+						DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
+					else
+						DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "Siren.raw";
+				}
+				catch (Exception)
+				{
+
+				}
+	
 				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
 				if (SanyaPlugin.Instance.Config.CassieSubtitle)
 				{
@@ -377,6 +382,20 @@ namespace SanyaPlugin.Functions
 						waitforready--;
 						if (!isAirBombGoing)
 						{
+							try
+							{
+								if (!DissonanceCommsControl.isReady)
+									DissonanceCommsControl.Init();
+
+								if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
+									DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
+								else
+									DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "";
+							}
+							catch (Exception)
+							{
+
+							}
 							yield break;
 						}
 						yield return Timing.WaitForSeconds(1f);
@@ -402,6 +421,22 @@ namespace SanyaPlugin.Functions
 					}
 					yield return Timing.WaitForSeconds(0.25f);
 				}
+
+				try
+				{
+					if (!DissonanceCommsControl.isReady)
+						DissonanceCommsControl.Init();
+
+					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
+						DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
+					else
+						DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "";
+				}
+				catch (Exception)
+				{
+
+				}
+
 				if (SanyaPlugin.Instance.Config.CassieSubtitle)
 					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
@@ -688,22 +723,87 @@ namespace SanyaPlugin.Functions
 			return RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
 		}
 
-		public static void SendCustomSyncVar(this ReferenceHub player, NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncVar)
+		public static void SendCustomSyncObject(this Player target, NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customAction)
 		{
 			/* 
-			Example:
-			player.SendCustomSyncVar(player.networkIdentity, typeof(ServerRoles), (targetwriter) =>
-			{
-				targetwriter.WritePackedUInt64(2UL);
-				targetwriter.WriteString("test");
+			Cant be use if you dont understand(ill make more use easily soonTM)
+			Example(SyncList) [EffectOnlySCP207]:
+			player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
+				writer.WritePackedUInt64(1ul);								// DirtyObjectsBit
+				writer.WritePackedUInt32((uint)1);							// DirtyIndexCount
+				writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);	// Operations
+				writer.WritePackedUInt32((uint)0);							// EditIndex
+				writer.WriteByte((byte)1);									// Item
 			});
-			 */
+			*/
 			NetworkWriter writer = NetworkWriterPool.GetWriter();
 			NetworkWriter writer2 = NetworkWriterPool.GetWriter();
-			MakeCustomSyncVarWriter(behaviorOwner, targetType, customSyncVar, writer, writer2);
-			NetworkServer.SendToClientOfPlayer(player.networkIdentity, new UpdateVarsMessage() { netId = behaviorOwner.netId, payload = writer.ToArraySegment() });
+			MakeCustomSyncWriter(behaviorOwner, targetType, customAction, null, writer, writer2);
+			NetworkServer.SendToClientOfPlayer(target.ReferenceHub.networkIdentity, new UpdateVarsMessage() { netId = behaviorOwner.netId, payload = writer.ToArraySegment() });
 			NetworkWriterPool.Recycle(writer);
 			NetworkWriterPool.Recycle(writer2);
+		}
+
+		// API, dont change
+		public static int GetComponentIndex(NetworkIdentity identity, Type type)
+		{
+			return Array.FindIndex(identity.NetworkBehaviours, (x) => x.GetType() == type);
+		}
+
+		// API, dont change
+		public static ulong GetDirtyBit(Type targetType, string PropertyName)
+		{
+			var bytecodes = targetType.GetProperty(PropertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)?.GetSetMethod().GetMethodBody().GetILAsByteArray();
+			return bytecodes[Array.FindLastIndex(bytecodes, x => x == System.Reflection.Emit.OpCodes.Ldc_I8.Value) + 1];
+		}
+
+		// API, dont change
+		public static System.Reflection.MethodInfo GetWriteExtension(object value)
+		{
+			Type type = value.GetType();
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.String:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteString));
+				case TypeCode.Boolean:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteBoolean));
+				case TypeCode.Int16:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteInt16));
+				case TypeCode.Int32:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WritePackedInt32));
+				case TypeCode.UInt16:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteUInt16));
+				case TypeCode.Byte:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteByte));
+				case TypeCode.SByte:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteSByte));
+				case TypeCode.Single:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteSingle));
+				case TypeCode.Double:
+					return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteDouble));
+				default:
+					if (type == typeof(Vector3))
+						return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteVector3));
+					if (type == typeof(Vector2))
+						return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteVector2));
+					if (type == typeof(GameObject))
+						return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteGameObject));
+					if (type == typeof(Quaternion))
+						return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteQuaternion));
+					if (type == typeof(BreakableWindow.BreakableWindowStatus))
+						return typeof(BreakableWindowStatusSerializer).GetMethod(nameof(BreakableWindowStatusSerializer.WriteBreakableWindowStatus));
+					if (type == typeof(Grenades.RigidbodyVelocityPair))
+						return typeof(Grenades.RigidbodyVelocityPairSerializer).GetMethod(nameof(Grenades.RigidbodyVelocityPairSerializer.WriteRigidbodyVelocityPair));
+					if (type == typeof(ItemType))
+						return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WritePackedInt32));
+					if (type == typeof(PlayerMovementSync.RotationVector))
+						return typeof(RotationVectorSerializer).GetMethod(nameof(RotationVectorSerializer.WriteRotationVector));
+					if (type == typeof(Pickup.WeaponModifiers))
+						return typeof(WeaponModifiersSerializer).GetMethod(nameof(WeaponModifiersSerializer.WriteWeaponModifiers));
+					if (type == typeof(Offset))
+						return typeof(OffsetSerializer).GetMethod(nameof(OffsetSerializer.WriteOffset));
+					return null;
+			}
 		}
 		public static void MakeCustomSyncVarWriter(NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncVar, NetworkWriter owner, NetworkWriter observer)
 		{

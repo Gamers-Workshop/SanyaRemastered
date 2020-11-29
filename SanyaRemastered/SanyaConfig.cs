@@ -15,6 +15,7 @@ namespace SanyaRemastered
 		public Configs()
 		{
 			DataDirectory = Path.Combine(Paths.Plugins, "SanyaPlugin");
+			DissonanceDataDirectory = Path.Combine(Paths.Configs, "Dissonance");
 		}
 		[Description("Activation du SanyaPlugin")]
 		public bool IsEnabled { get; set; }
@@ -29,6 +30,13 @@ namespace SanyaRemastered
 		public int RandomRespawnPosPercent { get; set; } = -1;
 		[Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
 		public string DataDirectory { get; private set; } = string.Empty;
+		[Description("Activation du fichier Audio")]
+		public bool DissonanceEnabled { get; set; } = false;
+		[Description("localisation du fichier Audio")]
+		public string DissonanceDataDirectory { get; private set; } = string.Empty;
+
+		[Description("Volume du fichier Audio")]
+		public float DissonanceVolume { get; set; } = 0.1f;
 
 		[Description("Informations sur le serveur Adresse IP de destination")]
 		public string InfosenderIp { get; set; } = "none";
@@ -45,7 +53,8 @@ namespace SanyaRemastered
 		[Description("Hud Scp-079 auras plus d'info")]
 		public bool ExHudScp079Moreinfo { get; set; } = false;
 		[Description("Hud Scp-079 auras plus d'info")]
-		public bool ExHudScpList { get; set; } = false;
+		public bool ExHudScp096SeeTargetZone { get; set; } = false;
+
 		[Description("Message de Bienvenue")]
 		public string MotdMessage { get; set; } = string.Empty;
 		[Description("Disable Player lists")]
@@ -62,6 +71,12 @@ namespace SanyaRemastered
 		public int ItemCleanup { get; set; } = -1;
 		public List<string> ItemCleanupIgnore { get; set; } = new List<string>();
 		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
+		[Description("a test")]
+		public bool PlayersInfoDisableFollow { get; set; } = false;
+		[Description("a test")]
+		public bool PlayersInfoShowHp { get; set; } = false;
+		[Description("Game config")]
+
 		public bool CassieSubtitle { get; set; } = false;
 		public bool IntercomInformation { get; set; } = false;
 		public bool CloseDoorsOnNukecancel { get; set; } = false;
@@ -169,7 +184,7 @@ namespace SanyaRemastered
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
 		[Description("SCP-106Capacité de traverser les murs cooldown")]
 		public int Scp106WalkthroughCooldown { get; set; } = -1;
-		[Description("Vキーチャットが可能なSCP（SCP-939以外）")]
+		[Description("Capacité de parler avec la touche V au SCP (sauf 939 qui l'as déjà)")]
 		public List<string> AltvoicechatScps { get; set; } = new List<string>();
 		public List<RoleType> AltvoicechatScpsParsed = new List<RoleType>();
 

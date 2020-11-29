@@ -9,6 +9,7 @@ using LightContainmentZoneDecontamination;
 using LiteNetLib.Utils;
 using MEC;
 using Mirror;
+using Dissonance.Networking.Client;
 using SanyaRemastered.Data;
 using SanyaRemastered.Patches;
 using UnityEngine;
@@ -18,16 +19,15 @@ using SanyaPlugin.Functions;
 using Respawning;
 using Exiled.Events.EventArgs;
 using Exiled.API.Features;
-using Exiled.Permissions.Extensions;
 using System.Linq;
 using Scp914;
 using PlayableScps;
-using Mirror.LiteNetLib4Mirror;
 using Exiled.API.Extensions;
-using Exiled.API.Enums;
 using System.Diagnostics;
-using Respawning.NamingRules;
-using Exiled.Events;
+
+using SanyaPlugin.DissonanceControl;
+using Utf8Json.Resolvers;
+using System.Media;
 
 namespace SanyaPlugin
 {
@@ -196,7 +196,14 @@ namespace SanyaPlugin
 			{
 				try
 				{
+					if (DissonanceCommsControl.mirrorClient != null && !DissonanceCommsControl.mirrorClient._disconnected)
+					{
+						for (int i = 0; i < Dissonance.Config.DebugSettings.Instance._levels.Count; i++)
+							Dissonance.Config.DebugSettings.Instance._levels[i] = Dissonance.LogLevel.Trace;
 
+						if (DissonanceCommsControl.mirrorClient.Update() == ClientStatus.Error)
+							Log.Error($"[FixedUpdate] mirrorClient error detect.");
+					}
 				}
 				catch (Exception e)
 				{
@@ -249,7 +256,6 @@ namespace SanyaPlugin
 					tesla.sizeOfTrigger = SanyaPlugin.Instance.Config.TeslaRange;
 				}
 			}
-
 			if (plugin.Config.DisablePlayerLists)
 			{
 				foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
@@ -291,10 +297,13 @@ namespace SanyaPlugin
 		{
 			Log.Info($"[OnRoundRestart] Restarting...");
 
+			if (plugin.Config.DissonanceEnabled && DissonanceCommsControl.isReady)
+				DissonanceCommsControl.Dispose();
+
 			foreach (var cor in RoundCoroutines)
 				Timing.KillCoroutines(cor);
 			RoundCoroutines.Clear();
-			Log.Info($"Removed {Timing.KillCoroutines()} Coroutines.");
+
 			RoundSummary.singleton._roundEnded = true;
 		}
 
@@ -495,6 +504,9 @@ namespace SanyaPlugin
 				ev.Player.Connection.Send(objectDestroyMessage, 0);
 			}
 
+			if (plugin.Config.PlayersInfoDisableFollow)
+				ev.Player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role;
+
 			//MuteFixer
 			foreach (Player ExiledPlayer in Player.List)
 			{
@@ -516,6 +528,13 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
 			if (SanyaPluginComponent._scplists.Contains(ev.Player))
 				SanyaPluginComponent._scplists.Remove(ev.Player);
+			
+			if (SanyaPlugin.Instance.Config.CassieSubtitle
+				&& ev.Player.Team == Team.SCP
+				&& ev.Player.Role != RoleType.Scp0492)
+			{
+				Subtitles.SCPDeathUnknown.Replace("{0}", CharacterClassManager._staticClasses.Get(ev.Player.Role).fullName);
+			}
 		}
 
 		public void OnPlayerSetClass(ChangingRoleEventArgs ev)
@@ -582,7 +601,7 @@ namespace SanyaPlugin
 			if (SanyaPlugin.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106 
 				|| SanyaPlugin.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
 			{
-				ev.Player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
+				ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 			}
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
@@ -713,17 +732,17 @@ namespace SanyaPlugin
 				string str;
 				switch (ev.HitInformations.GetDamageType().name)// a revoir
 				{
-					case "Tesla":
+					case "TESLA":
 						{
 							str = Subtitles.SCPDeathTesla.Replace("{0}", fullname);
 							break;
 						}
-					case "Nuke":
+					case "NUKE":
 						{
 							str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
 							break;
 						}
-					case "Decont":
+					case "DECONT":
 						{
 							str = Subtitles.SCPDeathDecont.Replace("{0}", fullname);
 							break;
