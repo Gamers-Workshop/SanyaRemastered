@@ -63,6 +63,7 @@ namespace SanyaPlugin
 		private void RegistEvents()
 		{
 			Handlers = new EventHandlers(this);
+			new Scp096Helper();
 			ServerEvents.SendingConsoleCommand += Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers += Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted += Handlers.OnRoundStart;
@@ -89,7 +90,7 @@ namespace SanyaPlugin
 			PlayerEvents.Died += Handlers.OnPlayerDeath;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed += Handlers.OnPlayerUsedMedicalItem;
-			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
+			//PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
