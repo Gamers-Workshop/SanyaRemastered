@@ -13,24 +13,24 @@ using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
 using SanyaRemastered;
 
-namespace SanyaPlugin
+namespace SanyaRemastered
 {
-	public class SanyaPlugin : Plugin<Configs>
+	public class SanyaRemastered : Plugin<Configs>
 	{
-		public override string Name => "SanyaPlugin";
+		public override string Name => "SanyaRemastered";
 		public override string Prefix => "sanya";
 		public override string Author => "sanyae2439";
 		public override PluginPriority Priority => PluginPriority.Default;
 		public override Version Version => new Version(2, 9, 1);
 		public override Version RequiredExiledVersion => new Version(2, 1, 9);
 
-		public static SanyaPlugin Instance { get; private set; }
+		public static SanyaRemastered Instance { get; private set; }
 		public EventHandlers Handlers { get; private set; }
 		public Harmony Harmony { get; private set; }
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
-		public SanyaPlugin() => Instance = this;
+		public SanyaRemastered() => Instance = this;
 
 		public override void OnEnabled()
 		{
@@ -43,7 +43,7 @@ namespace SanyaPlugin
 
 			RegistPatch();
 
-			Log.Info($"[OnEnabled] SanyaPlugin({Version}) Enabled Complete.");
+			Log.Info($"[OnEnabled] SanyaRemastered({Version}) Enabled Complete.");
 		}
 
 		public override void OnDisabled()
@@ -57,7 +57,7 @@ namespace SanyaPlugin
 			UnRegistEvents();
 			UnRegistPatch();
 
-			Log.Info($"[OnDisable] SanyaPlugin({Version}) Disabled Complete.");
+			Log.Info($"[OnDisable] SanyaRemastered({Version}) Disabled Complete.");
 		}
 
 		private void RegistEvents()
@@ -90,7 +90,7 @@ namespace SanyaPlugin
 			PlayerEvents.Died += Handlers.OnPlayerDeath;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed += Handlers.OnPlayerUsedMedicalItem;
-			//PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
+			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;

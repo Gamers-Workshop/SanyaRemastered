@@ -17,7 +17,5 @@ namespace SanyaRemastered
         }
 
         public Dictionary<ReferenceHub, List<ReferenceHub>> targets = new Dictionary<ReferenceHub, List<ReferenceHub>>();
-
-
     }
 }

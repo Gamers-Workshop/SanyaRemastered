@@ -16,7 +16,7 @@ namespace SanyaRemastered.Patches
 		{
 			public static void Prefix(HintDisplay __instance, Hint hint)
 			{
-				if (!SanyaPlugin.SanyaPlugin.Instance.Config.ExHudEnabled) return ;
+				if (!SanyaRemastered.Instance.Config.ExHudEnabled) return ;
 
 				if (hint.GetType() == typeof(TranslationHint))
 					return ;

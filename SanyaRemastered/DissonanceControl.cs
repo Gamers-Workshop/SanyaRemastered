@@ -12,11 +12,11 @@ using NAudio.Wave;
 using Mirror;
 
 
-namespace SanyaPlugin.DissonanceControl
+namespace SanyaRemastered.DissonanceControl
 {
 	internal static class DissonanceCommsControl
 	{
-		public static bool isReady { get; private set; } = false;
+		public static bool IsReady { get; private set; } = false;
 		public static DissonanceComms dissonanceComms = null;
 		public static MirrorIgnoranceCommsNetwork mirrorComms = null;
 		public static MirrorIgnoranceClient mirrorClient = null;
@@ -33,7 +33,7 @@ namespace SanyaPlugin.DissonanceControl
 				mirrorComms.StartClient(Unit.None);
 				mirrorComms.Mode = NetworkMode.Host;
 				mirrorClient = mirrorComms.Client;
-				mirrorClientInfo = mirrorComms.Server._clients.GetOrCreateClientInfo(3781, "SanyaPlugin_Host",
+				mirrorClientInfo = mirrorComms.Server._clients.GetOrCreateClientInfo(3781, "SanyaRemastered_Host",
 					new CodecSettings(Codec.Opus, 960, 48000),
 					new MirrorConn(NetworkServer.localConnection)
 				);
@@ -47,9 +47,9 @@ namespace SanyaPlugin.DissonanceControl
 					dissonanceComms.RoomChannels.Close(i.Value);
 				mirrorComms.Server._clients.LeaveRoom(TriggerType.Intercom.ToString(), mirrorClientInfo);
 				mirrorComms.Server._clients.JoinRoom(TriggerType.Intercom.ToString(), mirrorClientInfo);
-				dissonanceComms.RoomChannels.Open(TriggerType.Intercom.ToString(), false, ChannelPriority.None, SanyaPlugin.Instance.Config.DissonanceVolume);
+				dissonanceComms.RoomChannels.Open(TriggerType.Intercom.ToString(), false, ChannelPriority.None, SanyaRemastered.Instance.Config.DissonanceVolume);
 
-				isReady = true;
+				IsReady = true;
 			}
 			catch (Exception e)
 			{
@@ -77,7 +77,7 @@ namespace SanyaPlugin.DissonanceControl
 			mirrorClient = null;
 			mirrorComms = null;
 			dissonanceComms = null;
-			isReady = false;
+			IsReady = false;
 		}
 	}
 
@@ -104,12 +104,12 @@ namespace SanyaPlugin.DissonanceControl
 			{
 				if (name == "StreamingMic")
 				{
-					Exiled.API.Features.Log.Debug($"[StreamCapture] Init", SanyaPlugin.Instance.Config.IsDebugged);
+					Exiled.API.Features.Log.Debug($"[StreamCapture] Init", SanyaRemastered.Instance.Config.IsDebugged);
 				}
 				else
 				{
 					Exiled.API.Features.Log.Info($"[StreamCapture] Loading:{name}");
-					_fullpath = Path.Combine(SanyaPlugin.Instance.Config.DissonanceDataDirectory, name);
+					_fullpath = Path.Combine(SanyaRemastered.Instance.Config.DissonanceDataDirectory, name);
 					_stream = File.OpenRead(_fullpath);
 
 					if (_stream == null || !_stream.CanRead)

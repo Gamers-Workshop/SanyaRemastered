@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
-
-[HarmonyPatch(typeof(RagdollManager), nameof(RagdollManager.SpawnRagdoll))]
-public static class PreventRagdollPatch
+namespace SanyaRemastered.Patches
 {
-	public static bool Prefix(RagdollManager __instance, PlayerStats.HitInfo ragdollInfo)
+	[HarmonyPatch(typeof(RagdollManager), nameof(RagdollManager.SpawnRagdoll))]
+	public static class PreventRagdollPatch
 	{
-		if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp939RemoveRagdoll && ragdollInfo.GetDamageType() == DamageTypes.Scp939) return false;
-		else if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp096RemoveRagdoll && ragdollInfo.GetDamageType() == DamageTypes.Scp096) return false;
-		else return true;
+		public static bool Prefix(RagdollManager __instance, PlayerStats.HitInfo ragdollInfo)
+		{
+			if (SanyaRemastered.Instance.Config.Scp939RemoveRagdoll && ragdollInfo.GetDamageType() == DamageTypes.Scp939) return false;
+			else if (SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && ragdollInfo.GetDamageType() == DamageTypes.Scp096) return false;
+			else return true;
+		}
 	}
 }

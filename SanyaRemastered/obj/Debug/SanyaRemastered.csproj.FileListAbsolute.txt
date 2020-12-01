@@ -166,7 +166,6 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Events.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Loader.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.Permissions.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\YamlDotNet.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UI.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UIModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.TextRenderingModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Buffers.dll
@@ -203,11 +202,7 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.AnimationModul
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.InputLegacyModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.IMGUIModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.TerrainModule.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Unity.TextMeshPro.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\BouncyCastle.Crypto.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\zxing.unity.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UnityWebRequestAudioModule.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\CloudflareSolverRe.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.ScreenCaptureModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Memory.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.DSPGraphModule.dll

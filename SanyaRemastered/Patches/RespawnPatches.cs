@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using SanyaRemastered.Data;
 using Respawning.NamingRules;
-using SanyaPlugin.Functions;
+using SanyaRemastered.Functions;
 using Respawning;
 using Exiled.API.Features;
 
@@ -15,7 +15,7 @@ namespace SanyaRemastered.Patches
 			if (PlayerManager.localPlayer == null || PlayerManager.localPlayer?.GetComponent<RandomSeedSync>().seed == 0) return;
 			Log.Debug($"[NTFUnitPatch] unit:{regular}");
 
-			if (SanyaPlugin.SanyaPlugin.Instance.Config.CassieSubtitle)
+			if (SanyaRemastered.Instance.Config.CassieSubtitle)
 			{
 				int SCPCount = 0;
 				foreach (Player i in Player.List)
@@ -43,7 +43,7 @@ namespace SanyaRemastered.Patches
 		public static bool Prefix(RespawnEffectsController.EffectType type, SpawnableTeamType team)
 		{
 			Log.Debug($"[RespawnEffectPatch] {type}:{team}");
-			if (SanyaPlugin.SanyaPlugin.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated && type == RespawnEffectsController.EffectType.Selection) return false;
+			if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated && type == RespawnEffectsController.EffectType.Selection) return false;
 			else return true;
 		}
 	}

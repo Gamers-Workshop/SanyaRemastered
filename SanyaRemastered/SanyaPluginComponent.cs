@@ -5,22 +5,27 @@ using Mirror.LiteNetLib4Mirror;
 using Respawning;
 using Exiled.API.Features;
 
-using SanyaPlugin.Data;
-using SanyaPlugin.Functions;
+using SanyaRemastered.Data;
+using SanyaRemastered.Functions;
 using System.Collections.Generic;
+using SanyaRemastered;
+using Targeting;
+using CustomPlayerEffects;
+using Exiled.API.Extensions;
 
-namespace SanyaPlugin
+namespace SanyaRemastered
 {
-	public class SanyaPluginComponent : MonoBehaviour
+	public class SanyaRemasteredComponent : MonoBehaviour
 	{
 
 		public static readonly HashSet<Player> _scplists = new HashSet<Player>();
+		private static Vector3 _espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
+		private static GameObject _portalPrefab;
 
 		public bool DisableHud = false;
 
-		private SanyaPlugin _plugin;
+		private SanyaRemastered _plugin;
 		private Player _player;
-		private Vector3 _espaceArea;
 		private string _hudTemplate = "<align=left><voffset=38em><size=50%><alpha=#44>([STATS])\n<alpha=#ff></size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
@@ -32,7 +37,8 @@ namespace SanyaPlugin
 
 		private void Start()
 		{
-			_plugin = SanyaPlugin.Instance;
+			if (_portalPrefab == null) _portalPrefab = GameObject.Find("SCP106_PORTAL");
+			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
 			_espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 		}
@@ -46,6 +52,8 @@ namespace SanyaPlugin
 			UpdateTimers();
 
 			CheckTraitor();
+			CheckOnPortal();
+
 			UpdateMyCustomText();
 			UpdateRespawnCounter();
 			UpdateScpLists();
@@ -62,7 +70,7 @@ namespace SanyaPlugin
 			_hudCenterDownTimer = 0f;
 		}
 
-		public void ClearHudCenterDownText(string text, ulong timer)
+		public void ClearHudCenterDownText()
 		{
 			_hudCenterDownTime = -1f;
 		}
@@ -98,10 +106,21 @@ namespace SanyaPlugin
 			else
 				_player.SetRole(RoleType.Spectator);
 		}
+		private void CheckOnPortal()
+		{
+			if (_portalPrefab == null || !SanyaRemastered.Instance.Config.Scp106PortalEffect || _player.Role == RoleType.Scp106 || !(_timer > 1f) && !(_timer == 0.5f)) return;
 
+			if (Vector3.Distance(_portalPrefab.transform.position + Vector3.up * 1.5f, _player.Position) < 1.5f)
+			{
+				if (_player.IsHuman())
+					_player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(4f, "Corroding", DamageTypes.Scp106, 0), _player.GameObject);
+				_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
+				Log.Debug($"[PortalTrap]");
+			}
+		}
 		private void UpdateMyCustomText()
 		{
-			if (!(_timer > 1f) || !_player.IsAlive || !SanyaPlugin.Instance.Config.PlayersInfoShowHp) return;
+			if (!(_timer > 1f) || !_player.IsAlive || !SanyaRemastered.Instance.Config.PlayersInfoShowHp) return;
 			if (_prevHealth != _player.Health)
 			{
 				_prevHealth = (int)_player.Health;
@@ -111,7 +130,7 @@ namespace SanyaPlugin
 
 		private void UpdateRespawnCounter()
 		{
-			if (!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator || _timer < 1f) return;
+			if (!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator || !(_timer > 1f)) return;
 
 			_respawnCounter = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 		}
@@ -134,8 +153,7 @@ namespace SanyaPlugin
 
 		private void UpdateExHud()
 		{
-			if (DisableHud || !_plugin.Config.ExHudEnabled) return;
-
+			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
@@ -145,14 +163,18 @@ namespace SanyaPlugin
 			if (_player.Team == Team.SCP)
 			{
 				string List = string.Empty;
-				if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.ExHudScp079Moreinfo)
+				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
-							List += $"<u>{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}</u>\n";
+							List += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}\n";
 						else
 							List += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
 					List.TrimEnd('\n');
+				}
+				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096SeeTargetZone)
+				{
+
 				}
 				curText = curText.Replace("[LIST]", FormatStringForHud(List, 6));
 			}
@@ -160,13 +182,8 @@ namespace SanyaPlugin
 				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER_UP]
-			if (_player.Role == RoleType.Scp079 && SanyaPlugin.Instance.Config.Scp079ExtendEnabled)
+			if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
-			else if (_player.Role == RoleType.Scp106 && SanyaPlugin.Instance.Config.Scp106WalkthroughCooldown != -1)
-				if (SanyaPlugin.Instance.Handlers.last106walkthrough.Elapsed.TotalSeconds > _plugin.Config.Scp106WalkthroughCooldown || _player.IsBypassModeEnabled)
-					curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Extend:Ready", 6));
-				else
-					curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Extend:Charging({_plugin.Config.Scp106WalkthroughCooldown - (int)SanyaPlugin.Instance.Handlers.last106walkthrough.Elapsed.TotalSeconds}s left)", 6));
 			else
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
@@ -174,23 +191,33 @@ namespace SanyaPlugin
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER_DOWN]
-			if (_player.Team == Team.RIP && _respawnCounter != -1)
+			if (!string.IsNullOrEmpty(_hudCenterDownString))
+				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
+			else if (_player.Team == Team.RIP)
 			{
-				if (_respawnCounter == 0)
+				if (Coroutines.isActuallyBombGoing)
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn tant que le bombardement est activé", 6));
+				else if (Coroutines.AirBombWait != 0 && Coroutines.AirBombWait < 60)
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Un bombardement est prévue sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !!", 6));
+				else if (Warhead.IsDetonated && SanyaRemastered.Instance.Config.StopRespawnAfterDetonated)
+					if (Coroutines.AirBombWait != 0)
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn apres une warhead un bombardement vas étre effectué", 6));
+					else
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn apres l'explosion du site", 6));
+				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn Il n'y a plus de ticket", 6));
+				else if (_respawnCounter == 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
 				else
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} secondes", 6));
-				if (!string.IsNullOrEmpty(_hudCenterDownString))
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}", 6));
 			}
-			else if (!string.IsNullOrEmpty(_hudCenterDownString))
-				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
 			else
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
 
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
-			if (RoundSummary.roundTime > 0)
+			
+			if (RoundSummary.RoundInProgress())
 			{ 
 				_hudText = curText;
 				_player.SendTextHintNotEffect(_hudText, 2);

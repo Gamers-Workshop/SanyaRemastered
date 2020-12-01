@@ -11,7 +11,7 @@ namespace SanyaRemastered.Patches
 	{
 		public static bool Prefix(FragGrenade __instance, Pickup item, ref bool __result)
 		{
-			if (!SanyaPlugin.SanyaPlugin.Instance.Config.GrenadeChainSametiming) return true;
+			if (!SanyaRemastered.Instance.Config.GrenadeChainSametiming) return true;
 
 			GrenadeSettings grenadeSettings = null;
 			for (int i = 0; i < __instance.thrower.availableGrenades.Length;)
@@ -73,7 +73,7 @@ namespace SanyaRemastered.Patches
 	{
 		public static bool Prefix()
 		{
-			if (!SanyaPlugin.SanyaPlugin.Instance.Config.TeslaExplodeGrenade) return true;
+			if (!SanyaRemastered.Instance.Config.TeslaExplodeGrenade) return true;
 			{
 				return true;
 			}

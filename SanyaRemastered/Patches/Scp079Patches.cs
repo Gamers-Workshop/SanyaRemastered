@@ -1,338 +1,340 @@
-﻿using SanyaPlugin.Functions;
+﻿using SanyaRemastered.Functions;
 using System.Collections.Generic;
 using UnityEngine;
 using MEC;
 using SanyaRemastered.Data;
-using Respawning;
 using HarmonyLib;
 using Exiled.API.Features;
 using Player = Exiled.API.Features.Player;
 using System.Linq;
 using CustomPlayerEffects;
-using SanyaPlugin;
+using SanyaRemastered;
 
-[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
-public static class Scp079ManaPatch
+namespace SanyaRemastered.Patches
 {
-	public static void Postfix(Scp079PlayerScript __instance)
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
+	public static class Scp079ManaPatch
 	{
-		foreach (Scp079PlayerScript.Ability079 ability in __instance.abilities)
+		public static void Postfix(Scp079PlayerScript __instance)
 		{
-			switch (ability.label)
+			foreach (Scp079PlayerScript.Ability079 ability in __instance.abilities)
 			{
-				case "Camera Switch":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostCamera;
-					break;
-				case "Door Lock":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLock;
-					break;
-				case "Door Lock Start":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLockStart;
-					break;
-				case "Door Lock Minimum":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079RequiredLockStart;
-					break;
-				case "Door Interaction DEFAULT":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorDefault;
-					break;
-				case "Door Interaction CONT_LVL_1":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv1;
-					break;
-				case "Door Interaction CONT_LVL_2":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv2;
-					break;
-				case "Door Interaction CONT_LVL_3":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorContlv3;
-					break;
-				case "Door Interaction ARMORY_LVL_1":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv1;
-					break;
-				case "Door Interaction ARMORY_LVL_2":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv2;
-					break;
-				case "Door Interaction ARMORY_LVL_3":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorArmlv3;
-					break;
-				case "Door Interaction EXIT_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorGate;
-					break;
-				case "Door Interaction INCOM_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorIntercom;
-					break;
-				case "Door Interaction CHCKPOINT_ACC":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostDoorCheckpoint;
-					break;
-				case "Room Lockdown":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostLockDown;
-					break;
-				case "Tesla Gate Burst":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostTesla;
-					break;
-				case "Elevator Teleport":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostElevatorTeleport;
-					break;
-				case "Elevator Use":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostElevatorUse;
-					break;
-				case "Speaker Start":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostSpeakerStart;
-					break;
-				case "Speaker Update":
-					ability.mana = SanyaPlugin.SanyaPlugin.Instance.Config.Scp079CostSpeakerUpdate;
-					break;
+				switch (ability.label)
+				{
+					case "Camera Switch":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostCamera;
+						break;
+					case "Door Lock":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLock;
+						break;
+					case "Door Lock Start":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLockStart;
+						break;
+					case "Door Lock Minimum":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079RequiredLockStart;
+						break;
+					case "Door Interaction DEFAULT":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorDefault;
+						break;
+					case "Door Interaction CONT_LVL_1":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv1;
+						break;
+					case "Door Interaction CONT_LVL_2":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv2;
+						break;
+					case "Door Interaction CONT_LVL_3":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv3;
+						break;
+					case "Door Interaction ARMORY_LVL_1":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv1;
+						break;
+					case "Door Interaction ARMORY_LVL_2":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv2;
+						break;
+					case "Door Interaction ARMORY_LVL_3":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv3;
+						break;
+					case "Door Interaction EXIT_ACC":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorGate;
+						break;
+					case "Door Interaction INCOM_ACC":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorIntercom;
+						break;
+					case "Door Interaction CHCKPOINT_ACC":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorCheckpoint;
+						break;
+					case "Room Lockdown":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLockDown;
+						break;
+					case "Tesla Gate Burst":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostTesla;
+						break;
+					case "Elevator Teleport":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostElevatorTeleport;
+						break;
+					case "Elevator Use":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostElevatorUse;
+						break;
+					case "Speaker Start":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostSpeakerStart;
+						break;
+					case "Speaker Update":
+						ability.mana = SanyaRemastered.Instance.Config.Scp079CostSpeakerUpdate;
+						break;
+				}
 			}
 		}
 	}
-}
 
-//SCP-079 
-[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdSwitchCamera))]
-public static class Scp079CameraPatch
-{
-	public static bool Prefix(Scp079PlayerScript __instance, ref ushort cameraId, bool lookatRotation)
+	//SCP-079 
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdSwitchCamera))]
+	public static class Scp079CameraPatch
 	{
-		if (!SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendEnabled) return true;
-
-		Log.Debug($"[Scp079CameraPatch] {cameraId}:{lookatRotation}");
-
-		if (__instance.GetComponent<AnimationController>().curAnim != 1) return true;
-
-		if (__instance.curLvl + 1 >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelFindscp)
+		public static bool Prefix(Scp079PlayerScript __instance, ref ushort cameraId, bool lookatRotation)
 		{
-			List<Camera079> cams = new List<Camera079>();
-			foreach (var ply in Player.List)
+			if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
+
+			Log.Debug($"[Scp079CameraPatch] {cameraId}:{lookatRotation}");
+
+			if (__instance.GetComponent<AnimationController>().curAnim != 1) return true;
+
+			if (__instance.curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
 			{
-				if (ply.Team == Team.SCP && ply.Role != RoleType.Scp079)
+				List<Camera079> cams = new List<Camera079>();
+				foreach (var ply in Player.List)
 				{
-					cams.AddRange(ply.ReferenceHub.GetNearCams());
+					if (ply.Team == Team.SCP && ply.Role != RoleType.Scp079)
+					{
+						cams.AddRange(ply.ReferenceHub.GetNearCams());
+					}
 				}
-			}
 
-			Camera079 target;
-			if (cams.Count > 0)
-			{
-				target = cams.GetRandomOne();
-			}
-			else return true;
-
-			if (target != null)
-			{
-				if (SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp > __instance.curMana)
+				Camera079 target;
+				if (cams.Count > 0)
 				{
-					__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp, __instance.curMana);
+					target = cams.GetRandomOne();
+				}
+				else return true;
+
+				if (target != null)
+				{
+					if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > __instance.curMana)
+					{
+						__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, __instance.curMana);
+						return false;
+					}
+
+					__instance.RpcSwitchCamera(target.cameraId, lookatRotation);
+					__instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
+					__instance.currentCamera = target;
 					return false;
 				}
-
-				__instance.RpcSwitchCamera(target.cameraId, lookatRotation);
-				__instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostFindscp;
-				__instance.currentCamera = target;
-				return false;
 			}
+			return true;
 		}
-		return true;
 	}
-}
 
-//SCP-079Extend Sprint 
-//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
-public static class Scp079InteractPatch
-{
-	public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
+	//SCP-079Extend Sprint 
+	//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+	public static class Scp079InteractPatch
 	{
-		if (!SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendEnabled) return true;
-
-		var player = Player.Dictionary[__instance.gameObject];
-		Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command}");
-
-		if (player.ReferenceHub.animationController.curAnim != 1) return true;
-		
-		if (command.Contains("LOCKDOWN:"))
+		public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
 		{
-			foreach (GameObject Player in PlayerManager.players)
+			if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
+
+			var player = Player.Dictionary[__instance.gameObject];
+			Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command}");
+
+			if (player.ReferenceHub.animationController.curAnim != 1) return true;
+
+			if (command.Contains("LOCKDOWN:"))
 			{
+				foreach (GameObject Player in PlayerManager.players)
 				{
-				if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExLevelGaz)
-				{
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
-					break;
-				}
-				else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
-				{
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
-					break;
-				}
-				else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz)
-				{
-					//no break
-				}
-				else
-				{
-				Log.Error("ERROR");
-				break;
-				}
-				ReferenceHub hub = ReferenceHub.GetHub(Player);
-					Player player2 = Exiled.API.Features.Player.Dictionary[hub.gameObject];
-				Room room = SCP079room(hub);
-				bool locked = false;
-				List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+					{
+						if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaRemastered.Instance.Config.Scp079ExLevelGaz)
+						{
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+							break;
+						}
+						else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaRemastered.Instance.Config.Scp079ExCostGaz)
+						{
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+							break;
+						}
+						else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaRemastered.Instance.Config.Scp079ExCostGaz)
+						{
+							//no break
+						}
+						else
+						{
+							Log.Error("ERROR");
+							break;
+						}
+						ReferenceHub hub = ReferenceHub.GetHub(Player);
+						Player player2 = Exiled.API.Features.Player.Dictionary[hub.gameObject];
+						Room room = SCP079room(hub);
+						bool locked = false;
+						List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
 						foreach (Door door in doors)
 						{
-						if (!locked &&
-							( door.destroyed
-							|| door.lockdown
-							|| door.locked
-							|| door._isLockedBy079
-							|| door._wasLocked
-							|| door.warheadlock
-							|| door._checkpointLockOpen
-							|| door._checkpointLockOpenDecont
-							|| door._checkpointLockOpenWarhead))
-							locked = true;
+							if (!locked &&
+								(door.destroyed
+								|| door.lockdown
+								|| door.locked
+								|| door._isLockedBy079
+								|| door._wasLocked
+								|| door.warheadlock
+								|| door._checkpointLockOpen
+								|| door._checkpointLockOpenDecont
+								|| door._checkpointLockOpenWarhead))
+								locked = true;
 						}
 
-					if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
-				if (room == null || locked)
-				{
-					player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
-					break;
-				}
-			foreach (var blackroom in SanyaPlugin.SanyaPlugin.Instance.Config.GazBlacklistRooms)
-				{
-					if (room.Name.ToLower().Contains(blackroom.ToLower()))
-					{
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
-						break;
+						if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
+							if (room == null || locked)
+							{
+								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+								break;
+							}
+						foreach (var blackroom in SanyaRemastered.Instance.Config.GazBlacklistRooms)
+						{
+							if (room.Name.ToLower().Contains(blackroom.ToLower()))
+							{
+								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+								break;
+							}
+						}
+						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
+						if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
+						Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
 					}
-				}
-					player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
-					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExCostGaz;
-					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
-				}
-			}
-			return false;
-		}
-		else if (command.Contains("DOOR:"))
-		{
-			__instance.RpcNotEnoughMana(SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
-			foreach (GameObject Player in PlayerManager.players)
-			{
-				{
-					if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendLevelDoorbeep)
-					{
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
-						break;
-					}
-					else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
-					{
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
-						break;
-					}
-					else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep)
-					{
-						//no break
-					}
-					else
-					{
-						Log.Error("ERROR");
-						break;
-					}
-				}
-				var door = target.GetComponent<Door>();
-				if (door != null && door.curCooldown <= 0f)
-				{
-					player.ReferenceHub.playerInteract.CallRpcDenied(target);
-					door.curCooldown = 0.5f;
-					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaPlugin.SanyaPlugin.Instance.Config.Scp079ExtendCostDoorbeep;
 				}
 				return false;
 			}
+			else if (command.Contains("DOOR:"))
+			{
+				__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
+				foreach (GameObject Player in PlayerManager.players)
+				{
+					{
+						if (player.ReferenceHub.scp079PlayerScript.curLvl + 2 < SanyaRemastered.Instance.Config.Scp079ExtendLevelDoorbeep)
+						{
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+							break;
+						}
+						else if (player.ReferenceHub.scp079PlayerScript.curMana < SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
+						{
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+							break;
+						}
+						else if (player.ReferenceHub.scp079PlayerScript.curMana >= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
+						{
+							//no break
+						}
+						else
+						{
+							Log.Error("ERROR");
+							break;
+						}
+					}
+					var door = target.GetComponent<Door>();
+					if (door != null && door.curCooldown <= 0f)
+					{
+						player.ReferenceHub.playerInteract.CallRpcDenied(target);
+						door.curCooldown = 0.5f;
+						if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep;
+					}
+					return false;
+				}
+			}
+			return true;
 		}
-		return true;
-	}
-private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
-	{
-		List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
-		foreach (var item in doors)
+		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
-			item.Networklocked = true;
-			item.NetworkisOpen = true;
-		}
-		
-		for (int i = SanyaPlugin.SanyaPlugin.Instance.Config.GasDuration; i > 0f; i -= 1)
-		{
+			List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+			foreach (var item in doors)
+			{
+				item.Networklocked = true;
+				item.NetworkisOpen = true;
+			}
+
+			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i -= 1)
+			{
+				foreach (var ply in PlayerManager.players)
+				{
+					var player = Exiled.API.Features.Player.Dictionary[ply];
+					if (player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+					{
+						if (SanyaRemastered.Instance.Config.CassieSubtitle)
+						{
+							player.ClearBroadcasts();
+							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
+						}
+						Methods.PlayAmbientSound(7);
+					}
+				}
+				yield return Timing.WaitForSeconds(1);
+			}
+			foreach (var item in doors)
+			{
+				item.Networklocked = true;
+				item.NetworkisOpen = false;
+			}
 			foreach (var ply in PlayerManager.players)
 			{
 				var player = Exiled.API.Features.Player.Dictionary[ply];
-				if (player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+				if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 				{
-					if (SanyaPlugin.SanyaPlugin.Instance.Config.CassieSubtitle)
-					{
-						player.ClearBroadcasts();
-						player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
-					}
-					Methods.PlayAmbientSound(7);
+					player.Broadcast(5, Subtitles.ExtendGazActive, Broadcast.BroadcastFlags.Normal);
 				}
 			}
-			yield return Timing.WaitForSeconds(1);
-		}
-		foreach (var item in doors)
-		{
-			item.Networklocked = true;
-			item.NetworkisOpen = false;
-		}
-		foreach (var ply in PlayerManager.players)
-		{
-			var player = Exiled.API.Features.Player.Dictionary[ply];
-			if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+			for (int i = 0; i < SanyaRemastered.Instance.Config.TimerWaitGas * 2; i++)
 			{
-				player.Broadcast(5, Subtitles.ExtendGazActive, Broadcast.BroadcastFlags.Normal);
-			}
-		}
-		for (int i = 0; i < SanyaPlugin.SanyaPlugin.Instance.Config.TimerWaitGas * 2; i++)
-		{
-			foreach (var ply in PlayerManager.players)
-			{
-				var player = Exiled.API.Features.Player.Dictionary[ply];
-				if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+				foreach (var ply in PlayerManager.players)
 				{
-					player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
-					player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
-					player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
-					player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2.5f, "GAS", DamageTypes.Poison, 0), player.GameObject);
-					if (player.Role == RoleType.Spectator)
+					var player = Exiled.API.Features.Player.Dictionary[ply];
+					if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 					{
-						scp.scp079PlayerScript.AddExperience(SanyaPlugin.SanyaPlugin.Instance.Config.GasExpGain);
-						player.ReferenceHub.GetComponent<SanyaPluginComponent>().AddHudCenterDownText("Vous étes mort par le gazage de SCP-079", 20);
+						player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
+						player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
+						player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
+						player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2.5f, "GAS", DamageTypes.Poison, 0), player.GameObject);
+						if (player.Role == RoleType.Spectator)
+						{
+							scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous étes mort par le gazage de SCP-079", 20);
+						}
 					}
 				}
+				yield return Timing.WaitForSeconds(0.5f);
 			}
-			yield return Timing.WaitForSeconds(0.5f);
+			foreach (var item in doors)
+			{
+				item.Networklocked = false;
+				item.NetworkisOpen = true;
+			}
 		}
-		foreach (var item in doors)
+
+		private static Room SCP079room(ReferenceHub player)
 		{
-			item.Networklocked = false;
-			item.NetworkisOpen = true;
+			Vector3 playerPos = player.scp079PlayerScript.currentCamera.transform.position;
+			Vector3 end = playerPos - new Vector3(0f, 10f, 0f);
+			bool flag = Physics.Linecast(playerPos, end, out RaycastHit raycastHit, -84058629);
+
+			if (!flag || raycastHit.transform == null)
+				return null;
+
+			Transform transform = raycastHit.transform;
+
+			while (transform.parent != null && transform.parent.parent != null)
+				transform = transform.parent;
+
+			foreach (Room room in Exiled.API.Features.Map.Rooms)
+				if (room.Position == transform.position)
+					return room;
+
+			return new Room();
 		}
-	}
-
-	private static Room SCP079room(ReferenceHub player)
-	{
-		Vector3 playerPos = player.scp079PlayerScript.currentCamera.transform.position;
-		Vector3 end = playerPos - new Vector3(0f, 10f, 0f);
-		bool flag = Physics.Linecast(playerPos, end, out RaycastHit raycastHit, -84058629);
-
-		if (!flag || raycastHit.transform == null)
-			return null;
-
-		Transform transform = raycastHit.transform;
-
-		while (transform.parent != null && transform.parent.parent != null)
-			transform = transform.parent;
-
-		foreach (Room room in Exiled.API.Features.Map.Rooms)
-			if (room.Position == transform.position)
-				return room;
-
-		return new Room();
 	}
 }

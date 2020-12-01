@@ -1,6 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Interfaces;
-using SanyaPlugin.Functions;
+using SanyaRemastered.Functions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,10 +14,10 @@ namespace SanyaRemastered
 	{
 		public Configs()
 		{
-			DataDirectory = Path.Combine(Paths.Plugins, "SanyaPlugin");
+			DataDirectory = Path.Combine(Paths.Plugins, "SanyaRemastered");
 			DissonanceDataDirectory = Path.Combine(Paths.Configs, "Dissonance");
 		}
-		[Description("Activation du SanyaPlugin")]
+		[Description("Activation du SanyaRemastered")]
 		public bool IsEnabled { get; set; }
 
 		[Description("WIP")]
@@ -160,6 +160,8 @@ namespace SanyaRemastered
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
 
 		public float Scp939Size { get; set; } = 1f;
+		[Description("SCP-096 Patches")]
+		public bool Scp096Patches { get; set; } = false;
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
@@ -182,15 +184,18 @@ namespace SanyaRemastered
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
 		public float Scp106DamageMultiplicator { get; set; } = 1f;
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
-		[Description("SCP-106Capacité de traverser les murs cooldown")]
-		public int Scp106WalkthroughCooldown { get; set; } = -1;
+
 		[Description("Capacité de parler avec la touche V au SCP (sauf 939 qui l'as déjà)")]
 		public List<string> AltvoicechatScps { get; set; } = new List<string>();
 		public List<RoleType> AltvoicechatScpsParsed = new List<RoleType>();
 
-		[Description("SCP-079 Activé le mode Etendue de 079")]
+		[Description("SCP Activé les mode étendue")]
+		public bool Scp106Exmode { get; set; } = false;
+
 		public bool Scp079ExtendEnabled { get; set; } = false;
-		
+		[Description("SCP-106 Config \n  # Quand vous marcher sur le portail de 106 vous tomber dans la dimmenssion de poche")]
+		public bool Scp106PortalEffect { get; set; } = false;
+
 		[Description("SCP-079 Config Plugin \n  # Pour désactivé une capacité Scp079ExtendLevel = 6")]
 		public int Scp079ExtendLevelFindscp { get; set; } = 1;
 		public float Scp079ExtendCostFindscp { get; set; } = 10f;
@@ -198,7 +203,7 @@ namespace SanyaRemastered
 		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
 
 		[Description("SCP-079 Radar Humain")]
-		public bool Scp079spot;
+		public bool Scp079spot { get; set; } = false;
 
 		[Description("SCP-079 Niveau requis pour le spot")]
 		public int Scp079ExtendLevelSpot { get; set; } = 1;
@@ -232,14 +237,6 @@ namespace SanyaRemastered
 		public float Scp079CostElevatorUse { get; set; } = 10f;
 		public float Scp079CostSpeakerStart { get; set; } = 10f;
 		public float Scp079CostSpeakerUpdate { get; set; } = 0.8f;
-
-		[Description("Ticket Gain Config add")]
-		public int Tickets_ci_classd_died_count { get; set; } = 0;
-		public int Tickets_mtf_scientist_died_count { get; set; } = 0;
-		public int Tickets_mtf_killed_by_scp_count { get; set; } = 0;
-		public int Tickets_mtf_classd_killed_count { get; set; } = 0;
-		public int Tickets_ci_killed_by_scp_count { get; set; } = 0;
-		public int Tickets_ci_scientist_killed_count { get; set; } = 0;
 
 		public string GetConfigs()
 		{

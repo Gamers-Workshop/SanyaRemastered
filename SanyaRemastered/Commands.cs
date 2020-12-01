@@ -10,12 +10,12 @@ using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using Respawning;
-using SanyaPlugin.Functions;
+using SanyaRemastered.Functions;
 using UnityEngine;
-using SanyaPlugin.DissonanceControl;
+using SanyaRemastered.DissonanceControl;
 using System.IO;
 
-namespace SanyaPlugin.Commands
+namespace SanyaRemastered.Commands
 {
 	[CommandHandler(typeof(GameConsoleCommandHandler))]
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -25,20 +25,20 @@ namespace SanyaPlugin.Commands
 
 		public string[] Aliases { get; } = new string[] { "sn" };
 
-		public string Description { get; } = "SanyaPlugin Commands";
+		public string Description { get; } = "SanyaRemastered Commands";
 
 		private bool isActwatchEnabled = false;
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
-			Log.Debug($"[Commands] Sender:{sender.LogName} args:{arguments.Count}", SanyaPlugin.Instance.Config.IsDebugged);
+			Log.Debug($"[Commands] Sender:{sender.LogName} args:{arguments.Count}", SanyaRemastered.Instance.Config.IsDebugged);
 
 			Player player = null;
 			if(sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 
 			if (arguments.Count == 0)
 			{
-				response = "sanya plugins command. params: <hud/ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forrcend/now/config>";
+				response = "sanya plugins command params: <hud/ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forcend/now/config>";
 				return true;
 			}
 
@@ -51,7 +51,7 @@ namespace SanyaPlugin.Commands
 					}
 				case "audio":
 					{
-						if (!SanyaPlugin.Instance.Config.DissonanceEnabled)
+						if (!SanyaRemastered.Instance.Config.DissonanceEnabled)
 						{
 							response = "DissonanceAudio is Disabled.";
 							return false;
@@ -67,9 +67,9 @@ namespace SanyaPlugin.Commands
 						{
 							case "play":
 								{
-									response = $"Play file:{Path.Combine(SanyaPlugin.Instance.Config.DissonanceDataDirectory, arguments.At(2))}";
+									response = $"Play file:{Path.Combine(SanyaRemastered.Instance.Config.DissonanceDataDirectory, arguments.At(2))}";
 
-									if (!DissonanceCommsControl.isReady)
+									if (!DissonanceCommsControl.IsReady)
 										DissonanceCommsControl.Init();
 
 									if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == arguments.At(2))
@@ -126,7 +126,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						var comp = player.GameObject.GetComponent<SanyaPluginComponent>();
+						var comp = player.GameObject.GetComponent<SanyaRemasteredComponent>();
 						response = $"ok.{comp.DisableHud} -> ";
 						comp.DisableHud = !comp.DisableHud;
 						response += $"{comp.DisableHud}";
@@ -418,7 +418,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						response = SanyaPlugin.Instance.Config.GetConfigs();
+						response = SanyaRemastered.Instance.Config.GetConfigs();
 						return true;
 					}
 				case "posroom":
@@ -461,21 +461,6 @@ namespace SanyaPlugin.Commands
 						response = $"Ambien sound \n";
 						return true;
 					}
-				case "playgen":
-					{
-						if (player != null && !player.CheckPermission("sanya.dev"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						if (byte.TryParse(arguments.At(1), out byte sound))
-						{
-							Methods.PlayGenerator079sound(sound);
-
-						}
-						response = $"Ambien sound \n";
-						return true;
-					}
 				case "listdoor":
 					{
 						response = $"RoomList\n";
@@ -492,7 +477,7 @@ namespace SanyaPlugin.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						SanyaPlugin.Instance.Config.GetConfigs();
+						SanyaRemastered.Instance.Config.GetConfigs();
 						response = "reload ok";
 						return true;
 					}
@@ -524,20 +509,20 @@ namespace SanyaPlugin.Commands
 							{
 								if (float.TryParse(arguments.At(3), out float duration2))
 								{
-									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
+									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
 									return true;
 								}
 								else
 								{
-									SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
+									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 									return true;
 								}
 							}
 							else
 							{
-								SanyaPlugin.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
+								SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
 								response = "Started!";
 								return true;
 							}
@@ -991,16 +976,23 @@ namespace SanyaPlugin.Commands
 						{
 							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
 							{
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
 								mtfRespawn._timeForNextSequence = 0f;
+								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
 								response = $"force spawn ChaosInsurgency";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
 							{
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
 								mtfRespawn._timeForNextSequence = 0f;
+								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
 								response = $"force spawn NineTailedFox";
+								return true;
+							}
+							else if (arguments.At(1).ToLower() == "stop")
+							{
+								response = $"ok.[{SanyaRemastered.Instance.Handlers.StopRespawn}] -> ";
+								SanyaRemastered.Instance.Handlers.StopRespawn = !SanyaRemastered.Instance.Handlers.StopRespawn;
+								response += $"[{SanyaRemastered.Instance.Handlers.StopRespawn}]";
 								return true;
 							}
 							else
@@ -1025,7 +1017,7 @@ namespace SanyaPlugin.Commands
 							}
 						}
 					}
-				case "next":
+				/*case "next":
 					{
 						if (player != null && !player.CheckPermission("sanya.next"))
 						{
@@ -1071,7 +1063,7 @@ namespace SanyaPlugin.Commands
 								return true;
 							}
 						}
-					}
+					}*/
 				case "van":
 					{
 						if (player != null && !player.CheckPermission("sanya.van"))

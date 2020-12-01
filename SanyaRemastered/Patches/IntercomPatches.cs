@@ -15,7 +15,7 @@ namespace SanyaRemastered.Patches
 		public static bool draw = true;
 		public static void Prefix(Intercom __instance)
 		{	
-		if (!SanyaPlugin.SanyaPlugin.Instance.Config.IntercomInformation) return;
+		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
 		{
 			if (true)
 			{
@@ -157,7 +157,7 @@ namespace SanyaRemastered.Patches
 					}
 					else if (__instance.remainingCooldown > 0f)
 					{
-						contentfix += "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + " secondes ";
+						contentfix += "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + $" seconde{(__instance.remainingCooldown <= 1 ? "" : "s")} ";
 					}
 					else if (__instance.speechRemainingTime == -77f)
 					{

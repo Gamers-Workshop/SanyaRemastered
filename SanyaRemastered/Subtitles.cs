@@ -87,25 +87,6 @@
 			"《Gazage En Cours》\n",
 			"</size></color>"
 		);
-		internal static readonly string Extend106First = string.Concat(
-			"<color=#bbee00><size=25>",
-			"WIP Extend mode available. You can toggle by sprint keys.\nIt can be created at random humans position by using [create sinkhole] in extend mode.",
-			"WIP Le mode étendue de SCP-106. Vous permet de vous tp dans la salle devant vous en appuyant sur sprint et en utilisant votre tp",
-			"</size></color>"
-		);
-
-		internal static readonly string Extend106RoomtNotFound = string.Concat(
-			"<color=#bbee00><size=25>",
-			"Aucun salle trouvé devant vous",
-			"</size></color>"
-		);
-
-		internal static readonly string Extend106Success = string.Concat(
-			"<color=#bbee00><size=25>",
-			"Création d'un portail dans la {0} position.",
-			"</size></color>"
-		);
-
 		internal static readonly string MTFRespawnSCPs = string.Concat(
 			"<color=#6c80ff><size=25>",
 			"《L'unité mobile d'intervention,Epsilon-11, désignée,「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuations standards jusqu'à qu'une équipe MTF atteigne sa destination dans le site : Il reste sur site {1} SCP.》\n",
@@ -242,11 +223,5 @@
 			"《Le protocole de décontamination de la Light Containement Zone a commencé. Les objets SCP dans la zone seront décontaminés.》\n",
 			"</size></color>"
 		);
-		/*    internal static readonly string SCPEscapeEvent = string.Concat(
-				"<color=#bbee00><size=25>",
-				"《Le {0} s'est échappé de la fondation.》\n",
-				"</size></color>"
-			);
-		*/
 	}											
 }

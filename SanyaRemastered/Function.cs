@@ -10,7 +10,7 @@ using Hints;
 using MEC;
 using Mirror;
 using RemoteAdmin;
-using SanyaPlugin.Data;
+using SanyaRemastered.Data;
 using SanyaRemastered.Data;
 using UnityEngine;
 using Dissonance.Integrations.MirrorIgnorance;
@@ -18,9 +18,9 @@ using UnityEngine.Networking;
 using Respawning;
 using Exiled.API.Features;
 using CustomPlayerEffects;
-using SanyaPlugin.DissonanceControl;
+using SanyaRemastered.DissonanceControl;
 
-namespace SanyaPlugin.Functions
+namespace SanyaRemastered.Functions
 {
 	internal static class PlayerDataManager
 	{
@@ -28,17 +28,17 @@ namespace SanyaPlugin.Functions
 
 		public static PlayerData LoadPlayerData(string userid)
 		{
-			string targetuseridpath = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, $"{userid}.txt");
-			if (!Directory.Exists(SanyaPlugin.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaPlugin.Instance.Config.DataDirectory);
+			string targetuseridpath = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, $"{userid}.txt");
+			if (!Directory.Exists(SanyaRemastered.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaRemastered.Instance.Config.DataDirectory);
 			if (!File.Exists(targetuseridpath)) return new PlayerData(DateTime.Now, userid, true, 0, 0, 0);
 			else return ParsePlayerData(targetuseridpath);
 		}
 
 		public static void SavePlayerData(PlayerData data)
 		{
-			string targetuseridpath = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, $"{data.userid}.txt");
+			string targetuseridpath = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, $"{data.userid}.txt");
 
-			if (!Directory.Exists(SanyaPlugin.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaPlugin.Instance.Config.DataDirectory);
+			if (!Directory.Exists(SanyaRemastered.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaRemastered.Instance.Config.DataDirectory);
 
 			string[] textdata = new string[] {
 				data.lastUpdate.ToString("yyyy-MM-ddTHH:mm:sszzzz"),
@@ -68,9 +68,9 @@ namespace SanyaPlugin.Functions
 
 	internal static class ShitChecker
 	{
-		private static readonly string whitelist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
+		private static readonly string whitelist_path = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
 		public static HashSet<IPAddress> whitelist = new HashSet<IPAddress>();
-		private static readonly string blacklist_path = Path.Combine(SanyaPlugin.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
+		private static readonly string blacklist_path = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
 		public static HashSet<IPAddress> blacklist = new HashSet<IPAddress>();
 
 		/*public static IEnumerator<float> CheckVPN(PreAuthenticatingEventArgs ev)
@@ -79,13 +79,13 @@ namespace SanyaPlugin.Functions
 
 			if (IsWhiteListed(address) || IsBlacklisted(address))
 			{
-				Log.Debug($"[VPNChecker] Already Checked:{address}", SanyaPlugin.Instance.Config.IsDebugged);
+				Log.Debug($"[VPNChecker] Already Checked:{address}", SanyaRemastered.Instance.Config.IsDebugged);
 				yield break;
 			}
 
 			using (UnityWebRequest unityWebRequest = UnityWebRequest.Get($"https://v2.api.iphub.info/ip/{address}"))
 			{
-				unityWebRequest.SetRequestHeader("X-Key", SanyaPlugin.Instance.Config.KickVpnApikey);
+				unityWebRequest.SetRequestHeader("X-Key", SanyaRemastered.Instance.Config.KickVpnApikey);
 				yield return Timing.WaitUntilDone(unityWebRequest.SendWebRequest());
 				if (!unityWebRequest.isNetworkError)
 				{
@@ -254,12 +254,23 @@ namespace SanyaPlugin.Functions
 	internal static class Coroutines
 	{
 		public static bool isAirBombGoing = false;
+		public static bool isActuallyBombGoing = false;
+		public static int AirBombWait = 0;
+
 		public static bool ContainClassD = false;
 
 		public static IEnumerator<float> BigHitmark(MicroHID microHID)
 		{
 			yield return Timing.WaitForSeconds(0.1f);
 			microHID.TargetSendHitmarker(false);
+			yield break;
+		}
+		public static IEnumerator<float> CloseNukeCap()
+		{
+			var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
+			if (!outsite.keycardEntered) yield break;
+			yield return Timing.WaitForSeconds(0.1f);
+				outsite.NetworkkeycardEntered = false;
 			yield break;
 		}
 		public static IEnumerator<float> StartContainClassD(bool stop, float TimeLock = 0)
@@ -294,13 +305,14 @@ namespace SanyaPlugin.Functions
 				}
 			}
 		}
-		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = -1, float TimeEnd = -1f)
+		public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
 		{
+			AirBombWait = timewait;
 			if (isAirBombGoing && stop)
 			{
 				isAirBombGoing = false;
 				RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
-				if (SanyaPlugin.Instance.Config.CassieSubtitle)
+				if (SanyaRemastered.Instance.Config.CassieSubtitle)
 				{
 					Methods.SendSubtitle(Subtitles.AirbombStop, 10);
 				}
@@ -313,40 +325,40 @@ namespace SanyaPlugin.Functions
 				yield break;
 			}
 			isAirBombGoing = true;
-			while (timewait >= 0)
+			while (AirBombWait > 0)
 			{
 				Log.Debug("Démarage AirSupport timewait");
-				if (timewait == 60f || timewait == 120f || timewait == 300f || timewait == 600f || timewait == 1800f || timewait == 3600f)
+				if (AirBombWait == 60f || AirBombWait == 120f || AirBombWait == 300f || AirBombWait == 600f || AirBombWait == 1800f || AirBombWait == 3600f)
 				{
-					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {timewait / 60} minutes .", false, true);
-					if (SanyaPlugin.Instance.Config.CassieSubtitle)
+					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {AirBombWait / 60} minutes .", false, true);
+					if (SanyaRemastered.Instance.Config.CassieSubtitle)
 					{
-						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", (timewait / 60).ToString()), 10);
+						Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()), 10);
 					}
 				}
-				else if (timewait == 30f)
+				else if (AirBombWait == 30f)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", false, true);
-					if (SanyaPlugin.Instance.Config.CassieSubtitle)
+					if (SanyaRemastered.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
 					}
 				}
-				else if (timewait == 0)
+				else if (AirBombWait == 0)
 				{
 					break;
 				}
 				if (!isAirBombGoing)
 				{
 					RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
-					if (SanyaPlugin.Instance.Config.CassieSubtitle)
+					if (SanyaRemastered.Instance.Config.CassieSubtitle)
 					{
 						Methods.SendSubtitle(Subtitles.AirbombStop, 10);
 					}
 					Log.Info($"[AirSupportBomb] The AirBomb as stop");
 					yield break;
 				}
-				timewait--;
+				AirBombWait--;
 				yield return Timing.WaitForSeconds(1);
 			}
 			if (isAirBombGoing)
@@ -354,7 +366,7 @@ namespace SanyaPlugin.Functions
 				Log.Info($"[AirSupportBomb] booting...");
 				try
 				{
-					if (!DissonanceCommsControl.isReady)
+					if (!DissonanceCommsControl.IsReady)
 						DissonanceCommsControl.Init();
 
 					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "Siren.raw")
@@ -368,7 +380,7 @@ namespace SanyaPlugin.Functions
 				}
 	
 				RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
-				if (SanyaPlugin.Instance.Config.CassieSubtitle)
+				if (SanyaRemastered.Instance.Config.CassieSubtitle)
 				{
 					Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
 				}
@@ -384,7 +396,7 @@ namespace SanyaPlugin.Functions
 						{
 							try
 							{
-								if (!DissonanceCommsControl.isReady)
+								if (!DissonanceCommsControl.IsReady)
 									DissonanceCommsControl.Init();
 
 								if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
@@ -401,6 +413,7 @@ namespace SanyaPlugin.Functions
 						yield return Timing.WaitForSeconds(1f);
 					}
 				}
+				isActuallyBombGoing = true;
 				Log.Info($"[AirSupportBomb] throwing...");
 				while (isAirBombGoing)
 				{
@@ -424,7 +437,7 @@ namespace SanyaPlugin.Functions
 
 				try
 				{
-					if (!DissonanceCommsControl.isReady)
+					if (!DissonanceCommsControl.IsReady)
 						DissonanceCommsControl.Init();
 
 					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
@@ -437,56 +450,26 @@ namespace SanyaPlugin.Functions
 
 				}
 
-				if (SanyaPlugin.Instance.Config.CassieSubtitle)
+				if (SanyaRemastered.Instance.Config.CassieSubtitle)
 					Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
 				RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
+				isActuallyBombGoing = false;
 				Log.Info($"[AirSupportBomb] Ended.");
 				yield break;
 			}
 		}
-		public static IEnumerator<float> Scp106WalkingThrough(Player player)
+		public static IEnumerator<float> Scp106CustomTeleport(Scp106PlayerScript scp106PlayerScript, Vector3 position)
 		{
-			yield return Timing.WaitForOneFrame;
-
-			if (!Physics.Raycast(player.Position, -Vector3.up, 50f, player.ReferenceHub.scp106PlayerScript.teleportPlacementMask))
+			if (!scp106PlayerScript.goingViaThePortal)
 			{
-				player.Position = Map.GetRandomSpawnPoint(RoleType.Scp106);
-				yield break;
-			}
-
-			Vector3 forward = player.CameraTransform.forward;
-			forward.Set(forward.x * 0.1f, 0f, forward.z * 0.1f);
-
-			var hits = Physics.RaycastAll(player.Position, forward, 50f, 1);
-			if (hits.Length < 2) yield break;
-			if (hits[0].distance > 1f) yield break;
-
-			if (!Physics.Raycast(hits.Last().point + forward, forward * -1f, out var BackHits, 50f, 1)) yield break;
-
-			if (!PlayerMovementSync.FindSafePosition(BackHits.point, out var pos, true)) yield break;
-			player.ReferenceHub.playerMovementSync.WhitelistPlayer = true;
-			yield return Timing.WaitForOneFrame;
-			player.ReferenceHub.fpc.NetworkforceStopInputs = true;
-			player.AddItem(ItemType.SCP268);
-			player.ReferenceHub.playerEffectsController.EnableEffect<Scp268>();
-			player.ReferenceHub.playerEffectsController.EnableEffect<Deafened>();
-			player.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Visuals939>(1);
-			SanyaPlugin.Instance.Handlers.last106walkthrough.Restart();
-
-			while (true)
-			{
-				if (player.Position == pos || player.Role != RoleType.Scp106)
-				{
-					player.ReferenceHub.fpc.NetworkforceStopInputs = false;
-					player.ClearInventory();
-					player.ReferenceHub.playerEffectsController.DisableEffect<Deafened>();
-					player.ReferenceHub.playerEffectsController.DisableEffect<Visuals939>();
-					yield return Timing.WaitForOneFrame;
-					player.ReferenceHub.playerMovementSync.WhitelistPlayer = false;
-					yield break;
-				}
-				player.Position = Vector3.MoveTowards(player.Position, pos, 0.25f);
-				yield return Timing.WaitForOneFrame;
+				scp106PlayerScript.RpcTeleportAnimation();
+				scp106PlayerScript.goingViaThePortal = true;
+				yield return Timing.WaitForSeconds(3.5f);
+				scp106PlayerScript._hub.playerMovementSync.OverridePosition(position, 0f, false);
+				yield return Timing.WaitForSeconds(3.5f);
+				if (AlphaWarheadController.Host.detonated && scp106PlayerScript.transform.position.y < 800f)
+					scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0), scp106PlayerScript.gameObject, true);
+				scp106PlayerScript.goingViaThePortal = false;
 			}
 		}
 	}
@@ -565,10 +548,6 @@ namespace SanyaPlugin.Functions
 				brd.RpcClearElements();
 				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
 			}
-		}
-		public static void PlayGenerator079sound(byte curr)
-		{
-			UnityEngine.GameObject.FindObjectOfType<Generator079>().CallRpcNotify(curr);
 		}
 
 		public static void PlayAmbientSound(int id)
@@ -910,12 +889,10 @@ namespace SanyaPlugin.Functions
 		{
 			return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));
 		}
-
-		public static void ShowHitmarker(this ReferenceHub player)
+		public static void SendToTargetSound(this Player player)
 		{
-			player.GetComponent<Scp173PlayerScript>().TargetHitMarker(player.characterClassManager.connectionToClient);
+			NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new PlayableScps.Messages.Scp096ToTargetMessage(player.ReferenceHub));
 		}
-
 		public static void SendTextHintNotEffect(this Player player, string text, float time)
 		{
 			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(text) }, null, time));
@@ -963,7 +940,7 @@ namespace SanyaPlugin.Functions
 		public static T Random<T>(this IEnumerable<T> ie)
 		{
 			if (!ie.Any()) return default;
-			return ie.ElementAt(SanyaPlugin.Instance.Random.Next(ie.Count()));
+			return ie.ElementAt(SanyaRemastered.Instance.Random.Next(ie.Count()));
 		}
 	}
 }

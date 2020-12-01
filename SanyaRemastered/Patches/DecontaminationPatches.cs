@@ -7,7 +7,7 @@ public static class AntiCheatNotifyPatch
 	public static bool Prefix(PlayerMovementSync __instance, string message, string code)
 	{
 		var player = Player.Get(__instance._hub);
-		Log.Warn($"[SanyaPlugin] AntiCheatKill Detect:{player.Nickname} [{message}({code})]");
+		Log.Warn($"[SanyaRemastered] AntiCheatKill Detect:{player.Nickname} [{message}({code})]");
 		return false;
 	}
 }

@@ -4,7 +4,7 @@ using Exiled;
 using Exiled.API.Features;
 using UnityEngine;
 
-namespace SanyaPlugin.Data
+namespace SanyaRemastered.Data
 {
 	public enum GRENADE_ID
 	{
