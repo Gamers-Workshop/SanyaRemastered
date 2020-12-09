@@ -108,7 +108,7 @@ namespace SanyaRemastered
 		}
 		private void CheckOnPortal()
 		{
-			if (_portalPrefab == null || !SanyaRemastered.Instance.Config.Scp106PortalEffect || _player.Role == RoleType.Scp106 || !(_timer > 1f) && !(_timer == 0.5f)) return;
+			if (_portalPrefab == null || !SanyaRemastered.Instance.Config.Scp106PortalEffect || _player.Role == RoleType.Scp106 || !(_timer > 1f)) return;
 
 			if (Vector3.Distance(_portalPrefab.transform.position + Vector3.up * 1.5f, _player.Position) < 1.5f)
 			{
@@ -153,11 +153,11 @@ namespace SanyaRemastered
 
 		private void UpdateExHud()
 		{
-			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
+			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f) || !RoundSummary.RoundInProgress()) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
-				curText = _hudTemplate.Replace("[STATS]", $"Vous avez été mute");
+				curText = curText.Replace("[STATS]", $"<b>Vous avez été mute</b>");
 			curText = curText.Replace("([STATS])", string.Empty);
 			//[LIST]
 			if (_player.Team == Team.SCP)
@@ -217,8 +217,7 @@ namespace SanyaRemastered
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 			
-			if (RoundSummary.RoundInProgress())
-			{ 
+			{
 				_hudText = curText;
 				_player.SendTextHintNotEffect(_hudText, 2);
 			}

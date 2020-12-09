@@ -5,6 +5,6 @@ public static class SinkHoleSCPEnablePatch
 {
 	public static void Prefix(SinkholeEnvironmentalHazard __instance)
 	{
-		__instance.SCPImmune = false;
+
 	}
 }*/

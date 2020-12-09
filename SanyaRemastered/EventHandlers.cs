@@ -14,7 +14,6 @@ using SanyaRemastered.Data;
 using SanyaRemastered.Patches;
 using UnityEngine;
 using Utf8Json;
-using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
 using Respawning;
 using Exiled.Events.EventArgs;
@@ -971,7 +970,7 @@ namespace SanyaRemastered
 				ev.Players.Clear();
 			else if (SanyaRemastered.Instance.Config.GodmodeAfterEndround && !RoundSummary.RoundInProgress())
 				ev.Players.Clear();
-			else if (Coroutines.isActuallyBombGoing || Coroutines.AirBombWait < 60)
+			else if (Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60)
 				ev.Players.Clear();
 			else if (StopRespawn)
 				ev.Players.Clear();

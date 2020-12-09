@@ -79,7 +79,7 @@
 			);
 		internal static readonly string ExtendGazWarn = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Gazage de la salle dans {1} seconds》\n",
+			"《Gazage de la salle dans {1} second{2}》\n",
 			"</size></color>"
 		);
 		internal static readonly string ExtendGazActive = string.Concat(

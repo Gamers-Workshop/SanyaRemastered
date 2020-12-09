@@ -11,14 +11,14 @@ using MEC;
 using Mirror;
 using RemoteAdmin;
 using SanyaRemastered.Data;
-using SanyaRemastered.Data;
 using UnityEngine;
 using Dissonance.Integrations.MirrorIgnorance;
 using UnityEngine.Networking;
 using Respawning;
 using Exiled.API.Features;
-using CustomPlayerEffects;
 using SanyaRemastered.DissonanceControl;
+using NorthwoodLib.Pools;
+using System.Text;
 
 namespace SanyaRemastered.Functions
 {
@@ -363,6 +363,7 @@ namespace SanyaRemastered.Functions
 			}
 			if (isAirBombGoing)
 			{
+				isActuallyBombGoing = true;
 				Log.Info($"[AirSupportBomb] booting...");
 				try
 				{
@@ -413,7 +414,6 @@ namespace SanyaRemastered.Functions
 						yield return Timing.WaitForSeconds(1f);
 					}
 				}
-				isActuallyBombGoing = true;
 				Log.Info($"[AirSupportBomb] throwing...");
 				while (isAirBombGoing)
 				{
@@ -941,6 +941,18 @@ namespace SanyaRemastered.Functions
 		{
 			if (!ie.Any()) return default;
 			return ie.ElementAt(SanyaRemastered.Instance.Random.Next(ie.Count()));
+		}
+		public static string FormatArguments(ArraySegment<string> sentence, int index)
+		{
+			StringBuilder SB = StringBuilderPool.Shared.Rent();
+			foreach (string word in sentence.Segment(index))
+			{
+				SB.Append(word);
+				SB.Append(" ");
+			}
+			string msg = SB.ToString();
+			StringBuilderPool.Shared.Return(SB);
+			return msg;
 		}
 	}
 }

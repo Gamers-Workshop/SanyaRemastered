@@ -4,7 +4,6 @@ using CommandSystem;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using HarmonyLib;
 using MEC;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
@@ -118,6 +117,67 @@ namespace SanyaRemastered.Commands
 						}
 						response.TrimEnd('\n');
 						return true;
+					}
+				case "hint":
+					{
+						if (player != null && !player.CheckPermission("sanya.hint"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						if (ulong.TryParse(arguments.At(1), out ulong duration))
+						{
+							string[] Users = arguments.At(2).Split('.');
+							List<Player> PlyList = new List<Player>();
+							foreach (string s in Users)
+							{
+								if (int.TryParse(s, out int id) && Player.Get(id) != null)
+									PlyList.Add(Player.Get(id));
+								else if (Player.Get(s) != null)
+									PlyList.Add(Player.Get(s));
+							}
+							if (PlyList.Count != 0)
+							{
+								foreach (Player ply in PlyList)
+								{	
+									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+								}
+								response = $"Votre message a bien été envoyé à {PlyList}";
+								return true;
+							}
+							else
+							{
+								response = $"Sanya hint <durée> <player> <message> \\\\ Sanya hint <durée> <Player.Otherplayer.AnotherPlayerAgain> <message>";
+								return false;
+							}
+						}
+						else
+						{
+							response = "Sanya hint <durée> <player> <message>";
+							return false;
+						}
+					}
+				case "hintall":
+					{
+						if (player != null && !player.CheckPermission("sanya.hintall"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						if (ulong.TryParse(arguments.At(1), out ulong duration))
+						{
+							foreach (Player ply in Player.List)
+							{
+								ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
+							}
+							response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
+							return true;
+						}
+						else
+						{
+							response = "Sanya hintall <durée> <message>";
+							return false;
+						}
 					}
 				case "hud":
 					{

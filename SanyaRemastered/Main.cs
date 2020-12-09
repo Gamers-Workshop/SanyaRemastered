@@ -11,7 +11,6 @@ using Scp079Events = Exiled.Events.Handlers.Scp079;
 using Scp914Events = Exiled.Events.Handlers.Scp914;
 using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
-using SanyaRemastered;
 
 namespace SanyaRemastered
 {

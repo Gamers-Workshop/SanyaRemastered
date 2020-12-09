@@ -135,7 +135,7 @@ namespace SanyaRemastered.Patches
 	}
 
 	//SCP-079Extend Sprint 
-	//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 	public static class Scp079InteractPatch
 	{
 		public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -173,7 +173,8 @@ namespace SanyaRemastered.Patches
 						}
 						ReferenceHub hub = ReferenceHub.GetHub(Player);
 						Player player2 = Exiled.API.Features.Player.Dictionary[hub.gameObject];
-						Room room = SCP079room(hub);
+						Room room = player2.CurrentRoom;
+
 						bool locked = false;
 						List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
 						foreach (Door door in doors)
@@ -190,13 +191,11 @@ namespace SanyaRemastered.Patches
 								|| door._checkpointLockOpenWarhead))
 								locked = true;
 						}
-
-						if (player2.CurrentRoom == SCP079room(ReferenceHub.GetHub(__instance.gameObject)))
-							if (room == null || locked)
-							{
-								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
-								break;
-							}
+						if (room == null || locked)
+						{
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+							break;
+						}
 						foreach (var blackroom in SanyaRemastered.Instance.Config.GazBlacklistRooms)
 						{
 							if (room.Name.ToLower().Contains(blackroom.ToLower()))
@@ -269,7 +268,7 @@ namespace SanyaRemastered.Patches
 						if (SanyaRemastered.Instance.Config.CassieSubtitle)
 						{
 							player.ClearBroadcasts();
-							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()));
+							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{2}", $"{(i <= 1 ? "" : "s")}"));
 						}
 						Methods.PlayAmbientSound(7);
 					}
@@ -299,7 +298,7 @@ namespace SanyaRemastered.Patches
 						player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 						player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
 						player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>();
-						player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(2.5f, "GAS", DamageTypes.Poison, 0), player.GameObject);
+						player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(5, "GAS", DamageTypes.Poison, 0), player.GameObject);
 						if (player.Role == RoleType.Spectator)
 						{
 							scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);
@@ -314,27 +313,6 @@ namespace SanyaRemastered.Patches
 				item.Networklocked = false;
 				item.NetworkisOpen = true;
 			}
-		}
-
-		private static Room SCP079room(ReferenceHub player)
-		{
-			Vector3 playerPos = player.scp079PlayerScript.currentCamera.transform.position;
-			Vector3 end = playerPos - new Vector3(0f, 10f, 0f);
-			bool flag = Physics.Linecast(playerPos, end, out RaycastHit raycastHit, -84058629);
-
-			if (!flag || raycastHit.transform == null)
-				return null;
-
-			Transform transform = raycastHit.transform;
-
-			while (transform.parent != null && transform.parent.parent != null)
-				transform = transform.parent;
-
-			foreach (Room room in Exiled.API.Features.Map.Rooms)
-				if (room.Position == transform.position)
-					return room;
-
-			return new Room();
 		}
 	}
 }
