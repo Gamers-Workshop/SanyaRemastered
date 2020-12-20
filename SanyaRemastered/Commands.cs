@@ -1077,7 +1077,7 @@ namespace SanyaRemastered.Commands
 							}
 						}
 					}
-				/*case "next":
+				case "next":
 					{
 						if (player != null && !player.CheckPermission("sanya.next"))
 						{
@@ -1123,7 +1123,7 @@ namespace SanyaRemastered.Commands
 								return true;
 							}
 						}
-					}*/
+					}
 				case "van":
 					{
 						if (player != null && !player.CheckPermission("sanya.van"))

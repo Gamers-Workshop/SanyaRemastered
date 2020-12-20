@@ -484,14 +484,6 @@ namespace SanyaRemastered
 			{
 				Methods.SendSubtitle(SanyaRemastered.Instance.Config.MotdMessage.Replace("[name]", ev.Player.Nickname), 10, ev.Player.ReferenceHub);
 			}
-
-			if (SanyaRemastered.Instance.Config.DisableAllChat)
-			{
-				if (!(SanyaRemastered.Instance.Config.DisableChatBypassWhitelist && WhiteList.IsOnWhitelist(ev.Player.UserId)))
-				{
-					ev.Player.ReferenceHub.characterClassManager.NetworkMuted = true;
-				}
-			}
 			if (plugin.Config.DisablePlayerLists && playerlistnetid > 0)
 			{
 				ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage
@@ -599,7 +591,7 @@ namespace SanyaRemastered
 		}
 		public void OnPlayerHurt(HurtingEventArgs ev)
 		{
-			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
+			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
 
 			if (ev.Attacker == null) return;
@@ -682,7 +674,7 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
 		}
 
-		public void OnPlayerDeath(DiedEventArgs ev)
+		public void OnDied(DiedEventArgs ev)
 		{
 			if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.GetDamageName()}-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
@@ -811,12 +803,11 @@ namespace SanyaRemastered
 				Methods.SendSubtitle(str, (ushort)(isForced ? 30 : 10));
 			}
 
-			if (ev.HitInformations.GetDamageType() == DamageTypes.Tesla || ev.HitInformations.GetDamageType() == DamageTypes.Nuke)
+			if (ev.HitInformations.GetDamageType() == DamageTypes.Decont || ev.HitInformations.GetDamageType() == DamageTypes.Nuke)
 			{
 				ev.Target.Inventory.Clear();
 			}
 		}
-
 		public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
@@ -1216,11 +1207,6 @@ namespace SanyaRemastered
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}");
 		}
-		public void OnEnraging(EnragingEventArgs ev)
-		{
-			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On106MakePortal] {ev.Player.Nickname}");
-
-		}
 		public void On914Upgrade(UpgradingItemsEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
@@ -1335,7 +1321,6 @@ namespace SanyaRemastered
 				}
 				if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
 				{
-
 					var door = raycastHit.transform.GetComponentInParent<Door>();
 					Log.Info($"door.status != Door.DoorStatus.Moving {door.status != Door.DoorStatus.Moving} !door.destroyed {!door.destroyed} !door.lockdown {!door.lockdown} !door.locked {!door.locked} !door._isLockedBy079 {!door._isLockedBy079} !door._wasLocked {!door._wasLocked} !door.warheadlock  {!door.warheadlock} door.doorType == Door.DoorTypes.Standard {door.doorType == Door.DoorTypes.Standard}");
 					if (door != null

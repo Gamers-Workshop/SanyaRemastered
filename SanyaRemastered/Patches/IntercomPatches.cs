@@ -120,14 +120,11 @@ namespace SanyaRemastered.Patches
 				//décontamination
 				if (!DecontaminationController.Singleton._decontaminationBegun)
 				{
-					{
-						contentfix += string.Concat($"La décontamination de la LCZ vas étre effectué\n");
-					}
-					if (leftdecont >= 30)
+					if (leftdecont > 30)
 						{
 							contentfix += string.Concat($"Temps restant avant la décontamination de la LCZ :  {leftdecont / 60:00}:{leftdecont % 60:00}\n");
 						}
-					else if (leftdecont >= 15)
+					else if (leftdecont <= 30)
 						{
 							contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
 						}

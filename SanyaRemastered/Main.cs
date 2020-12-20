@@ -19,7 +19,7 @@ namespace SanyaRemastered
 		public override string Name => "SanyaRemastered";
 		public override string Prefix => "sanya";
 		public override string Author => "sanyae2439";
-		public override PluginPriority Priority => PluginPriority.Default;
+		public override PluginPriority Priority => (PluginPriority) 1;
 		public override Version Version => new Version(2, 9, 1);
 		public override Version RequiredExiledVersion => new Version(2, 1, 9);
 
@@ -86,7 +86,7 @@ namespace SanyaRemastered
 			PlayerEvents.ChangingRole += Handlers.OnPlayerSetClass;
 			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
-			PlayerEvents.Died += Handlers.OnPlayerDeath;
+			PlayerEvents.Died += Handlers.OnDied;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed += Handlers.OnPlayerUsedMedicalItem;
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
@@ -106,7 +106,6 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems += Handlers.On914Upgrade;
-			Scp096Events.Enraging += Handlers.OnEnraging;
 		}
 
 		private void UnRegistEvents()
@@ -134,7 +133,7 @@ namespace SanyaRemastered
 			PlayerEvents.ChangingRole -= Handlers.OnPlayerSetClass;
 			PlayerEvents.Spawning -= Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting -= Handlers.OnPlayerHurt;
-			PlayerEvents.Died -= Handlers.OnPlayerDeath;
+			PlayerEvents.Died -= Handlers.OnDied;
 			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed -= Handlers.OnPlayerUsedMedicalItem;
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
@@ -153,7 +152,7 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems -= Handlers.On914Upgrade;
-			Scp096Events.Enraging -= Handlers.OnEnraging;
+
 			Handlers = null;
 		}
 

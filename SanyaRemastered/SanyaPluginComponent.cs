@@ -12,6 +12,7 @@ using SanyaRemastered;
 using Targeting;
 using CustomPlayerEffects;
 using Exiled.API.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace SanyaRemastered
 {
@@ -26,6 +27,7 @@ namespace SanyaRemastered
 
 		private SanyaRemastered _plugin;
 		private Player _player;
+		private string CustomText = string.Empty;
 		private string _hudTemplate = "<align=left><voffset=38em><size=50%><alpha=#44>([STATS])\n<alpha=#ff></size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
@@ -115,17 +117,21 @@ namespace SanyaRemastered
 				if (_player.IsHuman())
 					_player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(4f, "Corroding", DamageTypes.Scp106, 0), _player.GameObject);
 				_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
-				Log.Debug($"[PortalTrap]");
+				Log.Debug($"[CorrodingOnPortal]", SanyaRemastered.Instance.Config.IsDebugged);
 			}
 		}
 		private void UpdateMyCustomText()
 		{
-			if (!(_timer > 1f) || !_player.IsAlive || !SanyaRemastered.Instance.Config.PlayersInfoShowHp) return;
-			if (_prevHealth != _player.Health)
+			if (!(_timer > 1f) || !_player.IsAlive) return;
+			CustomText = string.Empty;
+			if (_prevHealth != _player.Health && SanyaRemastered.Instance.Config.PlayersInfoShowHp)
 			{
 				_prevHealth = (int)_player.Health;
-				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = $"{_prevHealth}/{_player.MaxHealth} HP";
+				CustomText += $"{_prevHealth}/{_player.MaxHealth} HP";
 			}
+			if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
+				CustomText += "Main Du Serpent";
+			_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = CustomText;
 		}
 
 		private void UpdateRespawnCounter()
@@ -207,7 +213,7 @@ namespace SanyaRemastered
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn Il n'y a plus de ticket", 6));
 				else if (_respawnCounter == 0)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours {(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}", 6));
 				else
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}", 6));
 			}

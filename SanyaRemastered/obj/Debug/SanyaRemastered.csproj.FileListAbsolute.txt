@@ -235,3 +235,5 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.ARModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.InputModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Numerics.Vectors.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHandExiled.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHandExiled.pdb

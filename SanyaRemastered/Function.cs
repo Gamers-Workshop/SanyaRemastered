@@ -273,6 +273,14 @@ namespace SanyaRemastered.Functions
 				outsite.NetworkkeycardEntered = false;
 			yield break;
 		}
+		public static IEnumerator<float> Calm096(PlayableScps.Scp096 scp)
+		{
+			if (scp.Enraged && !scp._targets.Any())
+			{
+				scp.PlayerState = PlayableScps.Scp096PlayerState.Calming;
+			}
+			yield break;
+		}
 		public static IEnumerator<float> StartContainClassD(bool stop, float TimeLock = 0)
 		{
 			if (stop)

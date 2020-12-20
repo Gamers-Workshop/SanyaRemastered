@@ -83,11 +83,6 @@ namespace SanyaRemastered
 		public bool Scp049_add_time_res_success { get; set; } = false;
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
 		
-		[Description("Disable Chat")]
-		public bool DisableAllChat { get; set; } = false;
-		public bool DisableSpectatorChat { get; set; } = false;
-		public bool DisableChatBypassWhitelist { get; set; } = false;
-
 		[Description("Generator Config")]
 		public bool GeneratorUnlockOpen { get; set; } = false;
 		public bool GeneratorFinishLock { get; set; } = false;
@@ -161,7 +156,7 @@ namespace SanyaRemastered
 
 		public float Scp939Size { get; set; } = 1f;
 		[Description("SCP-096 Patches")]
-		public bool Scp096Patches { get; set; } = false;
+		public bool Scp096Real { get; set; } = false;
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;

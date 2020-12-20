@@ -52,20 +52,9 @@ namespace SanyaRemastered.Data
 				new Vector3(UnityEngine.Random.Range( 11, -11), 1001, UnityEngine.Random.Range(-18, -21)),
 				new Vector3(UnityEngine.Random.Range(  3,  -3), 1001, UnityEngine.Random.Range( -4, -17)),
 				new Vector3(UnityEngine.Random.Range(  2,  14), 1001, UnityEngine.Random.Range(  3,  -3)),
-				new Vector3(UnityEngine.Random.Range( -1, -13), 1001, UnityEngine.Random.Range(  4,  -3)),
+				new Vector3(UnityEngine.Random.Range( -1, -13), 1001, UnityEngine.Random.Range(  4,  -3))
 			};
 		}
-	}
-
-	public class VPNData
-	{
-		public string Ip { get; set; }
-		public string CountryCode { get; set; }
-		public string CountryName { get; set; }
-		public int Asn { get; set; }
-		public string Isp { get; set; }
-		public int Block { get; set; }
-		public string Hostname { get; set; }
 	}
 
 	public class Serverinfo
