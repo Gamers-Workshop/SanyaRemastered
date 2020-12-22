@@ -73,7 +73,7 @@ namespace SanyaRemastered
 		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
 		[Description("a test")]
 		public bool PlayersInfoDisableFollow { get; set; } = false;
-		[Description("a test")]
+		[Description("Affiche les HP quand tu regarde un joueur")]
 		public bool PlayersInfoShowHp { get; set; } = false;
 		[Description("Game config")]
 

@@ -885,9 +885,10 @@ namespace SanyaRemastered.Functions
 		{
 			if (player.Role == RoleType.Spectator || player.Role == RoleType.None || player.Team == target)
 				return false;
-
-			return target == Team.SCP ||
-				((player.Team != Team.MTF && player.Team != Team.RSC) || (target != Team.MTF && target != Team.RSC))
+			if (player.Team == Team.SCP && target == Team.TUT || player.Team == Team.TUT && target == Team.SCP) return false;
+			return target == Team.SCP
+				|| target == Team.TUT
+				|| ((player.Team != Team.MTF && player.Team != Team.RSC) || (target != Team.MTF && target != Team.RSC))
 				&&
 				((player.Team != Team.CDP && player.Team != Team.CHI) || (target != Team.CDP && target != Team.CHI))
 			;

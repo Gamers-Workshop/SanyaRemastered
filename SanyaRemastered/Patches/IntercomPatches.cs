@@ -89,28 +89,28 @@ namespace SanyaRemastered.Patches
 
 				//Générateur 079
 
-				if (TimeContained == 0 && IntercomUpdateTextPatches.draw == false)
+				if (TimeContained == 0 && draw == false)
 				{ 
-					if (time == 0f)
+					if (time < 0.1f)
 					{
 						draw = true;
 					}
 					else
 					{ 
-						IntercomUpdateTextPatches.time -= Time.deltaTime;
-						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : {time / 60}:{time % 60}</color>\n");
+						time -= Time.deltaTime;
+						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : {(int)time / 60}:{(int)time % 60:00}</color>\n");
 					}
 				}
 				else
 				{
-					IntercomUpdateTextPatches.time = 69.50499f;
+					time = 69.50499f;
 				}
 
-				if (totalvoltagefloat == 5000 && IntercomUpdateTextPatches.draw == true)
+				if (totalvoltagefloat == 5000 && draw == true)
 				{
 
 					contentfix += string.Concat("Tous les générateurs du site sont activés\n");
-					IntercomUpdateTextPatches.draw = false;
+					draw = false;
 				}
 				else if (totalvoltagefloat != 5000)
 				{

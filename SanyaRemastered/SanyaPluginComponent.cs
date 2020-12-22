@@ -124,13 +124,20 @@ namespace SanyaRemastered
 		{
 			if (!(_timer > 1f) || !_player.IsAlive) return;
 			CustomText = string.Empty;
-			if (_prevHealth != _player.Health && SanyaRemastered.Instance.Config.PlayersInfoShowHp)
+			if (SanyaRemastered.Instance.Config.PlayersInfoShowHp)
 			{
 				_prevHealth = (int)_player.Health;
 				CustomText += $"{_prevHealth}/{_player.MaxHealth} HP";
 			}
 			if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
+			{
 				CustomText += "Main Du Serpent";
+				//_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo;
+			}
+			/*else
+			{
+				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role;
+			}*/
 			_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = CustomText;
 		}
 
@@ -212,8 +219,8 @@ namespace SanyaRemastered
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn apres l'explosion du site", 6));
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn Il n'y a plus de ticket", 6));
-				else if (_respawnCounter == 0)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours {(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}", 6));
+				else if (_respawnCounter == 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
 				else
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}", 6));
 			}
