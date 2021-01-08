@@ -9,6 +9,7 @@ using Player = Exiled.API.Features.Player;
 using System.Linq;
 using CustomPlayerEffects;
 using SanyaRemastered;
+using Interactables.Interobjects.DoorUtils;
 
 namespace SanyaRemastered.Patches
 {
@@ -135,7 +136,7 @@ namespace SanyaRemastered.Patches
 	}
 
 	//SCP-079Extend Sprint 
-	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+	/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 	public static class Scp079InteractPatch
 	{
 		public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -176,19 +177,15 @@ namespace SanyaRemastered.Patches
 						Room room = player2.CurrentRoom;
 
 						bool locked = false;
-						List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
-						foreach (Door door in doors)
+						List<DoorVariant> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+						foreach (DoorVariant door in doors)
 						{
+							DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.ActiveLocks);
 							if (!locked &&
-								(door.destroyed
-								|| door.lockdown
-								|| door.locked
-								|| door._isLockedBy079
-								|| door._wasLocked
-								|| door.warheadlock
-								|| door._checkpointLockOpen
-								|| door._checkpointLockOpenDecont
-								|| door._checkpointLockOpenWarhead))
+								(((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
+								|| (door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
+								|| (!door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
+								|| lockMode == DoorLockMode.FullLock))
 								locked = true;
 						}
 						if (room == null || locked)
@@ -237,7 +234,7 @@ namespace SanyaRemastered.Patches
 							break;
 						}
 					}
-					var door = target.GetComponent<Door>();
+					var door = target.GetComponent<DoorVariant>();
 					if (door != null && door.curCooldown <= 0f)
 					{
 						player.ReferenceHub.playerInteract.CallRpcDenied(target);
@@ -251,7 +248,7 @@ namespace SanyaRemastered.Patches
 		}
 		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
-			List<Door> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
+			List<DoorVariant> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
 			foreach (var item in doors)
 			{
 				item.Networklocked = true;
@@ -314,5 +311,5 @@ namespace SanyaRemastered.Patches
 				item.NetworkisOpen = true;
 			}
 		}
-	}
+	}*/
 }

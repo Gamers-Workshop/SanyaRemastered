@@ -187,16 +187,6 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.csproj.Cop
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.pdb
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\DissonanceVoip_publicized.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Assembly-CSharp-firstpass.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Assembly-CSharp_publicized.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\CommandSystem.Core.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Mirror.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\NorthwoodLib.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.AudioModule.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.CoreModule.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.PhysicsModule.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.UnityWebRequestModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.ParticleSystemModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.AnimationModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.InputLegacyModule.dll

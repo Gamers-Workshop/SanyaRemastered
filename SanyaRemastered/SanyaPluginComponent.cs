@@ -13,6 +13,7 @@ using Targeting;
 using CustomPlayerEffects;
 using Exiled.API.Extensions;
 using System.Runtime.CompilerServices;
+using HarmonyLib;
 
 namespace SanyaRemastered
 {
@@ -54,7 +55,7 @@ namespace SanyaRemastered
 			UpdateTimers();
 
 			CheckTraitor();
-			CheckOnPortal();
+			//CheckOnPortal();
 
 			UpdateMyCustomText();
 			UpdateRespawnCounter();
@@ -123,22 +124,17 @@ namespace SanyaRemastered
 		private void UpdateMyCustomText()
 		{
 			if (!(_timer > 1f) || !_player.IsAlive) return;
-			CustomText = string.Empty;
-			if (SanyaRemastered.Instance.Config.PlayersInfoShowHp)
-			{
-				_prevHealth = (int)_player.Health;
-				CustomText += $"{_prevHealth}/{_player.MaxHealth} HP";
-			}
+
 			if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
 			{
-				CustomText += "Main Du Serpent";
-				//_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo;
+				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "Main Du Serpent";
+				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo;
 			}
-			/*else
+			else
 			{
-				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role;
-			}*/
-			_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = CustomText;
+				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "";
+				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role | PlayerInfoArea.UnitName;
+			}
 		}
 
 		private void UpdateRespawnCounter()
@@ -171,6 +167,7 @@ namespace SanyaRemastered
 			//[LEFT_UP]
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
 				curText = curText.Replace("[STATS]", $"<b>Vous avez été mute</b>");
+			else 
 			curText = curText.Replace("([STATS])", string.Empty);
 			//[LIST]
 			if (_player.Team == Team.SCP)

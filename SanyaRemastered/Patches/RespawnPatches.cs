@@ -4,6 +4,7 @@ using Respawning.NamingRules;
 using SanyaRemastered.Functions;
 using Respawning;
 using Exiled.API.Features;
+using MapGeneration;
 
 namespace SanyaRemastered.Patches
 {
@@ -12,7 +13,7 @@ namespace SanyaRemastered.Patches
 	{
 		public static void Postfix(ref string regular)
 		{
-			if (PlayerManager.localPlayer == null || PlayerManager.localPlayer?.GetComponent<RandomSeedSync>().seed == 0) return;
+			if (PlayerManager.localPlayer == null || PlayerManager.localPlayer?.GetComponent<SeedSynchronizer>()._syncSeed == 0) return;
 			Log.Debug($"[NTFUnitPatch] unit:{regular}");
 
 			if (SanyaRemastered.Instance.Config.CassieSubtitle)

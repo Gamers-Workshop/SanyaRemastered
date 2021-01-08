@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SanyaRemastered.Patches
 {
 	//transpiler - fix
-	[HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.CallCmdUsePortal))]
+	//[HarmonyPatch(typeof(Scp106PlayerScript), nameof(Scp106PlayerScript.CallCmdUsePortal))]
 	public static class Scp106PortalAnimationPatch
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

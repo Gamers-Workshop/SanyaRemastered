@@ -19,6 +19,8 @@ using Exiled.API.Features;
 using SanyaRemastered.DissonanceControl;
 using NorthwoodLib.Pools;
 using System.Text;
+using System.Collections.ObjectModel;
+using Interactables.Interobjects.DoorUtils;
 
 namespace SanyaRemastered.Functions
 {
@@ -286,11 +288,11 @@ namespace SanyaRemastered.Functions
 			if (stop)
 			{
 				ContainClassD = false;
-				foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
+				foreach (var door in UnityEngine.Object.FindObjectsOfType<DoorVariant>())
 				{
 					if (door.name.Contains("PrisonDoor"))
 					{
-						door.SetLock(false);
+						door.NetworkActiveLocks = (ushort)DoorLockMode.FullLock;
 						yield break;
 					}
 				}
@@ -300,13 +302,13 @@ namespace SanyaRemastered.Functions
 				ContainClassD = true;
 				while (ContainClassD)
 				{
-					foreach (var door in UnityEngine.Object.FindObjectsOfType<Door>())
+					foreach (var door in UnityEngine.Object.FindObjectsOfType<DoorVariant>())
 					{
 						if (door.name.Contains("PrisonDoor"))
 						{
-							door.SetLock(true);
+							door.NetworkActiveLocks = (ushort)DoorLockMode.FullLock;
 							yield return Timing.WaitForSeconds(TimeLock);
-							door.SetLock(false);
+							door.NetworkActiveLocks = (ushort)DoorLockMode.CanOpen;
 							yield break;
 						}
 					}
@@ -319,6 +321,7 @@ namespace SanyaRemastered.Functions
 			if (isAirBombGoing && stop)
 			{
 				isAirBombGoing = false;
+				isActuallyBombGoing = false;
 				RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
 				if (SanyaRemastered.Instance.Config.CassieSubtitle)
 				{
@@ -329,7 +332,7 @@ namespace SanyaRemastered.Functions
 			}
 			else if (isAirBombGoing && !stop)
 			{
-				Log.Info("[AirSupportBomb] The AirBomb as stop");
+				Log.Info("[AirSupportBomb] The AirBomb as already true");
 				yield break;
 			}
 			isAirBombGoing = true;
@@ -403,6 +406,7 @@ namespace SanyaRemastered.Functions
 						waitforready--;
 						if (!isAirBombGoing)
 						{
+							isActuallyBombGoing = false;
 							try
 							{
 								if (!DissonanceCommsControl.IsReady)
@@ -870,6 +874,66 @@ namespace SanyaRemastered.Functions
 			return gameObject;
 		}
 	}
+	public static class Keycard
+	{
+		[Flags]
+		public enum Permissions
+		{
+			None = 0x0,
+			Checkpoints = 0x1,
+			ExitGates = 0x2,
+			Intercom = 0x4,
+			AlphaWarhead = 0x8,
+			ContainmentLevelOne = 0x10,
+			ContainmentLevelTwo = 0x20,
+			ContainmentLevelThree = 0x40,
+			ArmoryLevelOne = 0x80,
+			ArmoryLevelTwo = 0x100,
+			ArmoryLevelThree = 0x200,
+			ScpOverride = 0x400,
+
+			Pedestal = 0x800
+		}
+
+		public static readonly ReadOnlyDictionary<string, Permissions> BackwardsCompatibility = new ReadOnlyDictionary<string, Permissions>(new Dictionary<string, Permissions>
+		{
+			["CONT_LVL_1"] = Permissions.ContainmentLevelOne,
+			["CONT_LVL_2"] = Permissions.ContainmentLevelTwo,
+			["CONT_LVL_3"] = Permissions.ContainmentLevelThree,
+
+			["ARMORY_LVL_1"] = Permissions.ArmoryLevelOne,
+			["ARMORY_LVL_2"] = Permissions.ArmoryLevelTwo,
+			["ARMORY_LVL_3"] = Permissions.ArmoryLevelThree,
+
+			["INCOM_ACC"] = Permissions.Intercom,
+			["CHCKPOINT_ACC"] = Permissions.Checkpoints,
+			["EXIT_ACC"] = Permissions.ExitGates,
+
+			["PEDESTAL_ACC"] = Permissions.Pedestal,
+		});
+
+		public static Permissions ToTruthyPermissions(this KeycardPermissions keycardPermissions) => (Permissions)keycardPermissions;
+
+		public static Permissions ToTruthyPermissions(string permission)
+		{
+			if (string.IsNullOrEmpty(permission))
+				return Permissions.None;
+
+			BackwardsCompatibility.TryGetValue(permission, out var p);
+			return p;
+		}
+
+		public static Permissions ToTruthyPermissions(string[] permissions)
+		{
+			var p = Permissions.None;
+			for (var z = 0; z < permissions.Length; z++)
+				p |= ToTruthyPermissions(permissions[z]);
+
+			return p;
+		}
+
+		public static bool HasFlagFast(this Permissions permissions, Permissions flag, bool requireAll) => requireAll ? (permissions & flag) == flag : (permissions & flag) != 0;
+	}
 	internal static class Extensions
 	{
 		public static Task StartSender(this Task task)
@@ -921,10 +985,10 @@ namespace SanyaRemastered.Functions
 		}
 		public static bool IsExmode(this Player player) => player.ReferenceHub.animationController.curAnim == 1;
 
-		public static bool HasPermission(this Door.AccessRequirements value, Door.AccessRequirements flag)
+		/*public static bool HasPermission(this Door.AccessRequirements value, Door.AccessRequirements flag)
 		{
 			return (value & flag) == flag;
-		}
+		}*/
 
 		public static bool IsList(this Type type)
 		{

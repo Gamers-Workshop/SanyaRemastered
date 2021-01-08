@@ -4,7 +4,7 @@ namespace SanyaRemastered.Patches
 {
 	public static class OpenDoor
 	{
-		[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CmdOpenDoor))]
+		//[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CmdOpenDoor))]
 		public static bool Prefix(PlayerInteract __instance)
 		{
 			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106

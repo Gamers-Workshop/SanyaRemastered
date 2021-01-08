@@ -11,6 +11,10 @@ using Scp079Events = Exiled.Events.Handlers.Scp079;
 using Scp914Events = Exiled.Events.Handlers.Scp914;
 using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
+using System.Collections.Generic;
+using NorthwoodLib.Pools;
+using System.Reflection.Emit;
+using Mirror;
 
 namespace SanyaRemastered
 {
@@ -20,8 +24,6 @@ namespace SanyaRemastered
 		public override string Prefix => "sanya";
 		public override string Author => "sanyae2439";
 		public override PluginPriority Priority => (PluginPriority) 1;
-		public override Version Version => new Version(2, 9, 1);
-		public override Version RequiredExiledVersion => new Version(2, 1, 9);
 
 		public static SanyaRemastered Instance { get; private set; }
 		public EventHandlers Handlers { get; private set; }
@@ -75,6 +77,8 @@ namespace SanyaRemastered
 			WarheadEvents.Detonated += Handlers.OnDetonated;
 			
 			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
+			MapEvents.AnnouncingScpTermination += Handlers.OnAnnounceScpTerminat;
+
 			MapEvents.PlacingDecal += Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
@@ -122,6 +126,7 @@ namespace SanyaRemastered
 			WarheadEvents.Detonated -= Handlers.OnDetonated;
 			
 			MapEvents.AnnouncingDecontamination -= Handlers.OnAnnounceDecont;
+			MapEvents.AnnouncingScpTermination -= Handlers.OnAnnounceScpTerminat;
 			MapEvents.PlacingDecal -= Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
@@ -172,6 +177,46 @@ namespace SanyaRemastered
 		private void UnRegistPatch()
 		{
 			Harmony.UnpatchAll();
+		}
+		private static IEnumerable<CodeInstruction> ExiledPrefixPatch(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+		{
+			var newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
+
+			Predicate<CodeInstruction> searchPredicate = i => i.opcode == OpCodes.Ldloc_1;
+
+			var index = newInstructions.FindIndex(searchPredicate);
+			var label = newInstructions[index + 1].operand;
+
+			newInstructions.RemoveRange(index, 2);
+
+			newInstructions.InsertRange(index, new[]
+			{
+				new CodeInstruction(OpCodes.Ldarg_0),
+				new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(PlayerInteract), nameof(PlayerInteract._inv))),
+				new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Inventory), nameof(Inventory.items))),
+				new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(SyncList<Inventory.SyncItemInfo>), nameof(SyncList<Inventory.SyncItemInfo>.Count))),
+				new CodeInstruction(OpCodes.Ldc_I4_0),
+				new CodeInstruction(OpCodes.Ceq),
+				new CodeInstruction(OpCodes.Brfalse, label)
+			});
+
+			index = newInstructions.FindIndex(index, searchPredicate);
+			label = newInstructions[newInstructions.FindIndex(index, i => i.opcode == OpCodes.Br_S || i.opcode == OpCodes.Br)].operand;
+
+			var notNullLabel = generator.DefineLabel();
+			newInstructions[index].WithLabels(notNullLabel);
+			newInstructions.InsertRange(index, new[]
+			{
+				new CodeInstruction(OpCodes.Ldloc_1),
+				new CodeInstruction(OpCodes.Brtrue, notNullLabel),
+				new CodeInstruction(OpCodes.Ldc_I4_0),
+				new CodeInstruction(OpCodes.Br, label)
+			});
+
+			for (var z = 0; z < newInstructions.Count; z++)
+				yield return newInstructions[z];
+
+			ListPool<CodeInstruction>.Shared.Return(newInstructions);
 		}
 	}
 }

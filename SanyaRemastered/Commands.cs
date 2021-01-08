@@ -526,7 +526,7 @@ namespace SanyaRemastered.Commands
 						response = $"RoomList\n";
 						foreach (var doors in Map.Doors)
 						{
-							response += $"{doors.doorType} : {doors.name} : {doors.DoorName} \n";
+							response += $"{doors.name} : {doors.name} \n";
 						}
 						return true;
 					}
@@ -610,19 +610,19 @@ namespace SanyaRemastered.Commands
 						{
 							if (int.TryParse(arguments.At(1), out int duration))
 							{
-								Coroutines.StartContainClassD(false, duration);
+								//Coroutines.StartContainClassD(false, duration);
 								response = $"The classD are lock for {duration / 60}:{duration % 60}";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "false" || arguments.At(1).ToLower() == "stop")
 							{
-								Coroutines.StartContainClassD(true);
+								//Coroutines.StartContainClassD(true);
 								response = "Stop!";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "true" || arguments.At(1).ToLower() == "start")
 							{
-								Coroutines.StartContainClassD(false);
+								//Coroutines.StartContainClassD(false);
 								response = "Started!";
 								return true;
 							}

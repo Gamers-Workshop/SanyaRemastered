@@ -64,11 +64,11 @@ namespace SanyaRemastered.Patches
 						if (relativeSpeed >= __instance.breakpointDoor)
 						{
 							__instance.cooldown = __instance.cooldownDoor;
-							Door componentInParent = collider.GetComponentInParent<Door>();
+							/*Door componentInParent = collider.GetComponentInParent<Door>();
 							if (componentInParent != null && !componentInParent.GrenadesResistant)
 							{
 								componentInParent.DestroyDoor(b: true);
-							}
+							}*/
 						}
 					}
 				}

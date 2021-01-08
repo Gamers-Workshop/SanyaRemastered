@@ -91,15 +91,13 @@ namespace SanyaRemastered.Patches
 
 				if (TimeContained == 0 && draw == false)
 				{ 
-					if (time < 0.1f)
-					{
-						draw = true;
-					}
-					else
+					if (time > 0.1f)
 					{ 
 						time -= Time.deltaTime;
 						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : {(int)time / 60}:{(int)time % 60:00}</color>\n");
 					}
+					else
+						contentfix += string.Concat("Tous les générateurs du site sont activés\n");
 				}
 				else
 				{
@@ -108,8 +106,6 @@ namespace SanyaRemastered.Patches
 
 				if (totalvoltagefloat == 5000 && draw == true)
 				{
-
-					contentfix += string.Concat("Tous les générateurs du site sont activés\n");
 					draw = false;
 				}
 				else if (totalvoltagefloat != 5000)
