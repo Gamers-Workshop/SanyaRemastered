@@ -136,7 +136,7 @@ namespace SanyaRemastered.Patches
 	}
 
 	//SCP-079Extend Sprint 
-	/*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
 	public static class Scp079InteractPatch
 	{
 		public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
@@ -208,7 +208,8 @@ namespace SanyaRemastered.Patches
 				}
 				return false;
 			}
-			else if (command.Contains("DOOR:"))
+			return true;
+			/*else if (command.Contains("DOOR:"))
 			{
 				__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
 				foreach (GameObject Player in PlayerManager.players)
@@ -244,15 +245,15 @@ namespace SanyaRemastered.Patches
 					return false;
 				}
 			}
-			return true;
+			return true;*/
 		}
 		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
 			List<DoorVariant> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
 			foreach (var item in doors)
 			{
-				item.Networklocked = true;
-				item.NetworkisOpen = true;
+				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
+				item.TargetState = true;
 			}
 
 			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i -= 1)
@@ -274,8 +275,8 @@ namespace SanyaRemastered.Patches
 			}
 			foreach (var item in doors)
 			{
-				item.Networklocked = true;
-				item.NetworkisOpen = false;
+				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
+				item.TargetState = false;
 			}
 			foreach (var ply in PlayerManager.players)
 			{
@@ -307,9 +308,9 @@ namespace SanyaRemastered.Patches
 			}
 			foreach (var item in doors)
 			{
-				item.Networklocked = false;
-				item.NetworkisOpen = true;
+				item.ActiveLocks = (ushort)DoorLockMode.CanOpen;
+				item.TargetState = true;
 			}
 		}
-	}*/
+	}
 }

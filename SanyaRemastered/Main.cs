@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using NorthwoodLib.Pools;
 using System.Reflection.Emit;
 using Mirror;
+using System.Reflection;
 
 namespace SanyaRemastered
 {
@@ -27,9 +28,12 @@ namespace SanyaRemastered
 
 		public static SanyaRemastered Instance { get; private set; }
 		public EventHandlers Handlers { get; private set; }
-		public Harmony Harmony { get; private set; }
+		private Harmony Harmony = new Harmony("dev.Yamato");
 		public Random Random { get; } = new Random();
 		private int patchCounter;
+
+		private readonly MethodInfo _prefixToPatch = AccessTools.Method("Exiled.Events.Patches.Events.Player.ActivatingWarheadPanel:Prefix");
+		private readonly HarmonyMethod _transpiler = new HarmonyMethod(typeof(SanyaRemastered), nameof(ExiledPrefixPatch));
 
 		public SanyaRemastered() => Instance = this;
 
@@ -42,6 +46,7 @@ namespace SanyaRemastered
 			RegistEvents();
 			Config.ParseConfig();
 
+			Harmony.Patch(_prefixToPatch, transpiler: _transpiler);
 			RegistPatch();
 
 			Log.Info($"[OnEnabled] SanyaRemastered({Version}) Enabled Complete.");
@@ -56,6 +61,8 @@ namespace SanyaRemastered
 			Handlers.RoundCoroutines.Clear();
 
 			UnRegistEvents();
+
+			Harmony.Unpatch(_prefixToPatch, _transpiler.method);
 			UnRegistPatch();
 
 			Log.Info($"[OnDisable] SanyaRemastered({Version}) Disabled Complete.");
@@ -78,6 +85,7 @@ namespace SanyaRemastered
 			
 			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
 			MapEvents.AnnouncingScpTermination += Handlers.OnAnnounceScpTerminat;
+			MapEvents.AnnouncingNtfEntrance += Handlers.OnAnnounceNtf;
 
 			MapEvents.PlacingDecal += Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
@@ -127,6 +135,8 @@ namespace SanyaRemastered
 			
 			MapEvents.AnnouncingDecontamination -= Handlers.OnAnnounceDecont;
 			MapEvents.AnnouncingScpTermination -= Handlers.OnAnnounceScpTerminat;
+			MapEvents.AnnouncingNtfEntrance -= Handlers.OnAnnounceNtf;
+
 			MapEvents.PlacingDecal -= Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;

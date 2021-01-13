@@ -52,7 +52,6 @@
     <Compile Include="Patches\Scp096Patches.cs" />
     <Compile Include="Patches\Scp106Patches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
-    <Compile Include="Patches\SinkHolesPatches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SanyaConfig.cs" />

@@ -195,7 +195,7 @@
 
 		internal static readonly string AirbombStarting = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Danger ! Le site est compromis, lancement d'un bombardement sur lancement du site, \n le bombardement est inévitable !》\n",
+			"《Danger ! Le site est compromis, lancement d'un bombardement sur l'enssemble du site, \n le bombardement est inévitable !》\n",
 			"</size></color>"
 		);
 		internal static readonly string AirbombStartingWait30s = string.Concat(

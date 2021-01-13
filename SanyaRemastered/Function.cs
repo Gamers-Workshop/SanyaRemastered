@@ -261,12 +261,6 @@ namespace SanyaRemastered.Functions
 
 		public static bool ContainClassD = false;
 
-		public static IEnumerator<float> BigHitmark(MicroHID microHID)
-		{
-			yield return Timing.WaitForSeconds(0.1f);
-			microHID.TargetSendHitmarker(false);
-			yield break;
-		}
 		public static IEnumerator<float> CloseNukeCap()
 		{
 			var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();

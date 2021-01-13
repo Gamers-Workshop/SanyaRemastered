@@ -178,7 +178,7 @@ namespace SanyaRemastered
 					{
 						foreach(Player player in Player.List)
 						{
-							if (player.IsHuman() && (100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f) <= SanyaRemastered.Instance.Config.PainEffectStart))
+							if (player.IsHuman() || player.Role == RoleType.Tutorial && (100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f) <= SanyaRemastered.Instance.Config.PainEffectStart))
 							{
 								player.EnableEffect<Disabled>(1.2f);
 							}
@@ -243,8 +243,11 @@ namespace SanyaRemastered
 			PlayerDataManager.playersData.Clear();
 			ItemCleanupPatch.items.Clear();
 			Coroutines.isAirBombGoing = false;
+			Coroutines.isActuallyBombGoing = false;
+			Coroutines.AirBombWait = 0;
+			Coroutines.ContainClassD = false;
 
-			flickerableLightController = UnityEngine.Object.FindObjectOfType<FlickerableLightController>();
+		flickerableLightController = UnityEngine.Object.FindObjectOfType<FlickerableLightController>();
 
 			last079cam = null;
 
@@ -438,6 +441,30 @@ namespace SanyaRemastered
 			if (ev.HitInfo.Attacker == "DISCONNECT") ev.IsAllowed = false;
 		}
 
+		public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
+		{
+			if (SanyaRemastered.Instance.Config.CassieSubtitle)
+			{
+				int SCPCount = 0;
+				foreach (Player i in Player.List)
+				{
+					if (i.Team == Team.SCP && i.Role != RoleType.Scp0492)
+					{
+						SCPCount++;
+					}
+				}
+
+				if (SCPCount > 0)
+				{
+					Methods.SendSubtitle(Subtitles.MTFRespawnSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}").Replace("{1}", SCPCount.ToString()), 30);
+				}
+				else
+				{
+					Methods.SendSubtitle(Subtitles.MTFRespawnNOSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}"), 30);
+				}
+			}
+		}
+
 		public void OnPreAuth(PreAuthenticatingEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}");
@@ -605,7 +632,7 @@ namespace SanyaRemastered
 					&& ev.DamageType == DamageTypes.Grenade
 					&& ev.Target.UserId != ev.Attacker.UserId)
 				{
-					ev.Attacker.GameObject.GetComponent<MicroHID>()?.TargetSendHitmarker(false);
+					ev.Attacker.GameObject.GetComponent<Hitmarker>()?.Trigger();
 				}
 
 				//USPMultiplier
@@ -704,7 +731,7 @@ namespace SanyaRemastered
 				&& !string.IsNullOrEmpty(ev.Killer.UserId)
 				&& ev.Killer.UserId != ev.Target.UserId)
 			{
-				Timing.RunCoroutine(Coroutines.BigHitmark(ev.Killer.GameObject.GetComponent<MicroHID>()));
+				ev.Killer.GameObject.GetComponent<MicroHID>()?.TargetSendHitmarker(false);
 			}
 
 			if (SanyaRemastered.Instance.Config.CassieSubtitle
@@ -881,7 +908,7 @@ namespace SanyaRemastered
 			{
 				ev.IsAllowed = false;
 			}
-			if (plugin.Config.InventoryKeycardActivation && ev.Player.IsHuman)
+			if (plugin.Config.InventoryKeycardActivation && ev.Player.IsHuman || ev.Player.Role == RoleType.Tutorial)
 			{
 				ev.IsAllowed = false;
 
@@ -891,9 +918,6 @@ namespace SanyaRemastered
 				|| (ev.Door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
 				|| (!ev.Door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
 				|| lockMode == DoorLockMode.FullLock) return;
-
-
-
 
 				if (ev.Door.RequiredPermissions.RequiredPermissions.ToTruthyPermissions() == Keycard.Permissions.None)
 					ev.IsAllowed = true;
@@ -955,7 +979,7 @@ namespace SanyaRemastered
 
 			if (SanyaRemastered.Instance.Config.StaminaLostJump > 0f
 				&& ev.CurrentAnimation == 2
-				&& ev.Player.ReferenceHub.characterClassManager.IsHuman()
+				&& ev.Player.ReferenceHub.characterClassManager.IsHuman() || ev.Player.Role == RoleType.Tutorial
 				&& !ev.Player.ReferenceHub.fpc.staminaController._invigorated.Enabled
 				&& !ev.Player.ReferenceHub.fpc.staminaController._scp207.Enabled
 				)
@@ -966,7 +990,7 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.StaminaEffect)
 			{
 				if (ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina <= 0f
-					&& ev.Player.ReferenceHub.characterClassManager.IsHuman()
+					&& ev.Player.ReferenceHub.characterClassManager.IsHuman() || ev.Player.Role == RoleType.Tutorial
 					&& !ev.Player.ReferenceHub.fpc.staminaController._invigorated.Enabled
 					&& !ev.Player.ReferenceHub.fpc.staminaController._scp207.Enabled
 					)
@@ -1061,17 +1085,27 @@ namespace SanyaRemastered
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
-			if (plugin.Config.InventoryKeycardActivation || ev.Player.IsBypassModeEnabled)
+			if (plugin.Config.InventoryKeycardActivation)
 			{
-				foreach (var item in ev.Player.Inventory.items)
+				foreach (var item in ev.Player.Inventory.items.Where(x => x.id.IsKeycard()))
 				{
-					if (ev.Player.Inventory.GetItemByID(item.id).permissions.Contains("CONT_LVL_3"))
+					Item[] itemlist = UnityEngine.Object.FindObjectOfType<Inventory>().availableItems;
+
+					Item gameItem = Array.Find(itemlist, i => i.id == item.id);
+
+					// Relevant for items whose type was not found
+					if (gameItem == null)
+						continue;
+
+					Keycard.Permissions itemPerms = Keycard.ToTruthyPermissions(gameItem.permissions);
+
+					if (itemPerms.HasFlagFast(Keycard.Permissions.ContainmentLevelThree, false))
 					{
 						ev.IsAllowed = true;
 					}
 				}
 			}
-			if (ev.IsAllowed && SanyaRemastered.Instance.Config.Nukecapclose)
+			if (SanyaRemastered.Instance.Config.Nukecapclose)
 			{
 				Timing.RunCoroutine(Coroutines.CloseNukeCap());
 			}
@@ -1362,7 +1396,7 @@ namespace SanyaRemastered
 				}
 			}
 			if (SanyaRemastered.Instance.Config.StaminaLostLogicer > 0f
-				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman()
+				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman() || ev.Shooter.Role == RoleType.Tutorial
 				&& ItemType.GunLogicer == ev.Shooter.CurrentItem.id
 				&& ev.IsAllowed
 				&& !ev.Shooter.ReferenceHub.fpc.staminaController._invigorated.Enabled
