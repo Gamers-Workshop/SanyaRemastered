@@ -13,6 +13,9 @@ using SanyaRemastered.Functions;
 using UnityEngine;
 using SanyaRemastered.DissonanceControl;
 using System.IO;
+using MapGeneration;
+using System.Linq;
+using Interactables.Interobjects.DoorUtils;
 
 namespace SanyaRemastered.Commands
 {
@@ -27,6 +30,8 @@ namespace SanyaRemastered.Commands
 		public string Description { get; } = "SanyaRemastered Commands";
 
 		private bool isActwatchEnabled = false;
+		private DoorVariant targetdoor = null;
+
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -118,6 +123,23 @@ namespace SanyaRemastered.Commands
 						response.TrimEnd('\n');
 						return true;
 					}
+				case "doortest":
+					{
+						if (targetdoor == null)
+						{
+							var prefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+							var door = UnityEngine.Object.Instantiate(prefab.TargetPrefab, new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3))), Quaternion.Euler(Vector3.up * 180f));
+							targetdoor = door;
+							NetworkServer.Spawn(door.gameObject);
+						}
+						else
+						{
+							NetworkServer.Destroy(targetdoor.gameObject);
+							targetdoor = null;
+						}
+						response = $"doortest.";
+						return true;
+					}
 				case "hint":
 					{
 						if (player != null && !player.CheckPermission("sanya.hint"))
@@ -142,7 +164,7 @@ namespace SanyaRemastered.Commands
 								{	
 									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
 								}
-								response = $"Votre message a bien été envoyé à {PlyList}";
+								response = $"Votre message a bien été envoyé à {PlyList.Count}";
 								return true;
 							}
 							else
@@ -523,10 +545,14 @@ namespace SanyaRemastered.Commands
 					}
 				case "listdoor":
 					{
-						response = $"RoomList\n";
+						response = $"DoorList\n";
 						foreach (var doors in Map.Doors)
 						{
 							response += $"{doors.name} : {doors.name} \n";
+						}
+						foreach (var doors2 in UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>())
+						{
+							response += doors2.TargetPrefab.name;
 						}
 						return true;
 					}

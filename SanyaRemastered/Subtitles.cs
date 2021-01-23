@@ -165,7 +165,7 @@
 
 		internal static readonly string GeneratorFinish = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《{0} générateurs sur 5 activés.》\n",
+			"《{0} générateur{s} sur 5 activés.》\n",
 			"</size></color>"
 		);
 

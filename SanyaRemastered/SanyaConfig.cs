@@ -73,7 +73,8 @@ namespace SanyaRemastered
 		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
 		[Description("a test")]
 		public bool PlayersInfoDisableFollow { get; set; } = false;
-
+		[Description("Ajout de porte sur la map")]
+		public bool AddDoorsOnSurface { get; set; } = false;
 		[Description("Game config")]
 
 		public bool CassieSubtitle { get; set; } = false;

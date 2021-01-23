@@ -178,7 +178,7 @@ namespace SanyaRemastered
 					{
 						foreach(Player player in Player.List)
 						{
-							if (player.IsHuman() || player.Role == RoleType.Tutorial && (100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f) <= SanyaRemastered.Instance.Config.PainEffectStart))
+							if (player.IsHuman() && (100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f) <= SanyaRemastered.Instance.Config.PainEffectStart))
 							{
 								player.EnableEffect<Disabled>(1.2f);
 							}
@@ -221,6 +221,8 @@ namespace SanyaRemastered
 		private readonly int grenade_pickup_mask = 1049088;
 		private int prevMaxAHP = 0;
 		public bool StopRespawn = false;
+		public List<Vector3> DecalList = new List<Vector3>();
+
 		/** RoundVar **/
 		private FlickerableLightController flickerableLightController = null;
 		internal bool IsEnableBlackout = false;
@@ -267,6 +269,35 @@ namespace SanyaRemastered
 						playerlistnetid = identity.netId;
 					}
 				}
+			}
+
+			if (plugin.Config.AddDoorsOnSurface)
+			{
+				var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
+				var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
+				var HCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+				// Couloir spawn Chaos
+				var door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
+				var door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -23.25f), Quaternion.Euler(Vector3.zero));
+				// Exit
+				var door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
+				var door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
+
+				//Spawn Main du serpent 
+				var door5 = UnityEngine.Object.Instantiate(HCZprefab.TargetPrefab, new UnityEngine.Vector3(1.15f, 1000f, 4.8f), Quaternion.Euler(Vector3.up * 0f));
+				(door5 as BreakableDoor)._ignoredDamageSources |= DoorDamageType.Grenade;
+				var door6 = UnityEngine.Object.Instantiate(HCZprefab.TargetPrefab, new UnityEngine.Vector3(-1.27f, 1000f, 4.8f), Quaternion.Euler(Vector3.up * 360f));
+				(door6 as BreakableDoor)._ignoredDamageSources |= DoorDamageType.Grenade;
+
+				door5.gameObject.AddComponent<DoorNametagExtension>().UpdateName("GATE_EX_R");
+				door6.gameObject.AddComponent<DoorNametagExtension>().UpdateName("GATE_EX_L");
+
+				NetworkServer.Spawn(door1.gameObject);
+				NetworkServer.Spawn(door2.gameObject);
+				NetworkServer.Spawn(door3.gameObject);
+				NetworkServer.Spawn(door4.gameObject);
+				NetworkServer.Spawn(door5.gameObject);
+				NetworkServer.Spawn(door6.gameObject);
 			}
 			Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
 		}
@@ -908,7 +939,7 @@ namespace SanyaRemastered
 			{
 				ev.IsAllowed = false;
 			}
-			if (plugin.Config.InventoryKeycardActivation && ev.Player.IsHuman || ev.Player.Role == RoleType.Tutorial)
+			if (plugin.Config.InventoryKeycardActivation && ev.Player.IsHuman)
 			{
 				ev.IsAllowed = false;
 
@@ -940,6 +971,21 @@ namespace SanyaRemastered
 					}
 				}
 
+			}
+			if (plugin.Config.AddDoorsOnSurface && ev.Door.TryGetComponent<DoorNametagExtension>(out var nametag))
+			{
+				if (nametag._nametag.Contains("GATE_EX_"))
+				{
+					bool flagL = DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.AllowInteracting(ev.Player.ReferenceHub, 0);
+					bool flagR = DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.AllowInteracting(ev.Player.ReferenceHub, 0);
+					if (flagL && flagR)
+						if (nametag._nametag == "GATE_EX_L")
+							DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.NetworkTargetState = !DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.TargetState;
+						else
+							DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.NetworkTargetState = !DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.TargetState;
+					else
+						ev.IsAllowed = false;
+				}
 			}
 		}
 
@@ -979,7 +1025,7 @@ namespace SanyaRemastered
 
 			if (SanyaRemastered.Instance.Config.StaminaLostJump > 0f
 				&& ev.CurrentAnimation == 2
-				&& ev.Player.ReferenceHub.characterClassManager.IsHuman() || ev.Player.Role == RoleType.Tutorial
+				&& ev.Player.ReferenceHub.characterClassManager.IsHuman()
 				&& !ev.Player.ReferenceHub.fpc.staminaController._invigorated.Enabled
 				&& !ev.Player.ReferenceHub.fpc.staminaController._scp207.Enabled
 				)
@@ -990,7 +1036,7 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.StaminaEffect)
 			{
 				if (ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina <= 0f
-					&& ev.Player.ReferenceHub.characterClassManager.IsHuman() || ev.Player.Role == RoleType.Tutorial
+					&& ev.Player.ReferenceHub.characterClassManager.IsHuman()
 					&& !ev.Player.ReferenceHub.fpc.staminaController._invigorated.Enabled
 					&& !ev.Player.ReferenceHub.fpc.staminaController._scp207.Enabled
 					)
@@ -1193,7 +1239,7 @@ namespace SanyaRemastered
 			{
 				if (curgen < 5)
 				{
-					Methods.SendSubtitle(Subtitles.GeneratorFinish.Replace("{0}", curgen.ToString()), 10);
+					Methods.SendSubtitle(Subtitles.GeneratorFinish.Replace("{0}", curgen.ToString()).Replace("{s}", curgen == 1 ? "" : "s"), 10);
 				}
 				else
 				{
@@ -1203,7 +1249,7 @@ namespace SanyaRemastered
 		}
 		public void OnInteractingElevator(InteractingElevatorEventArgs ev)
 		{
-			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Type : {ev.Elevator.GetType()}");
+			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Name : {ev.Elevator.GetType().Name}");
 			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492))
 			{
 				ev.IsAllowed = false;
@@ -1214,22 +1260,7 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlacingDecal] position : {ev.Position} Owner: {ev.Owner} Type: {ev.Type}");
 			if (SanyaRemastered.Instance.Config.Coroding106 && ev.Type == 6)
 			{
-				List<Vector3> DecalList = new List<Vector3> { ev.Position };
-				while (SanyaRemastered.Instance.Config.Coroding106)
-				{
-					foreach (var ply in Player.List)
-					{
-						foreach (var Decal in DecalList)
-						{
-							var dis = Vector3.Distance(ply.Position, Decal);
-							if (dis <= 1)
-							{
-								ply.ReferenceHub.playerEffectsController.EnableEffect<SinkHole>(0.1f);
-								ply.ReferenceHub.playerEffectsController.EnableEffect<Corroding>(0.1f);
-							}
-						}
-					}
-				}
+				DecalList.Add(ev.Position);
 			}
 		}
 		public void On079LevelGain(GainingLevelEventArgs ev)
@@ -1396,7 +1427,7 @@ namespace SanyaRemastered
 				}
 			}
 			if (SanyaRemastered.Instance.Config.StaminaLostLogicer > 0f
-				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman() || ev.Shooter.Role == RoleType.Tutorial
+				&& ev.Shooter.ReferenceHub.characterClassManager.IsHuman()
 				&& ItemType.GunLogicer == ev.Shooter.CurrentItem.id
 				&& ev.IsAllowed
 				&& !ev.Shooter.ReferenceHub.fpc.staminaController._invigorated.Enabled

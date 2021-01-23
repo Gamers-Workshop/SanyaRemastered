@@ -14,6 +14,7 @@ using CustomPlayerEffects;
 using Exiled.API.Extensions;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Assets._Scripts.Dissonance;
 
 namespace SanyaRemastered
 {
@@ -55,9 +56,9 @@ namespace SanyaRemastered
 			UpdateTimers();
 
 			CheckTraitor();
-			//CheckOnPortal();
+			//CheckOnDecal();
 
-			UpdateMyCustomText();
+			//UpdateMyCustomText();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateExHud();
@@ -108,6 +109,17 @@ namespace SanyaRemastered
 			}
 			else
 				_player.SetRole(RoleType.Spectator);
+		}
+		private void CheckOnDecal()
+		{
+			if (_plugin.Handlers.DecalList.Count != 0 || !_plugin.Config.Coroding106 || _player.Team == (Team.SCP | Team.RIP) ) return;
+			foreach (Vector3 Decal in _plugin.Handlers.DecalList)
+				if (Vector3.Distance(_player.Position, Decal) < 1)
+				{
+					_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
+					_player.ReferenceHub.playerEffectsController.EnableEffect<SinkHole>(1f);
+					_player.ReferenceHub.playerEffectsController.EnableEffect<Corroding>(1f);
+				}
 		}
 		private void CheckOnPortal()
 		{
@@ -162,7 +174,7 @@ namespace SanyaRemastered
 
 		private void UpdateExHud()
 		{
-			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f) || !RoundSummary.RoundInProgress()) return;
+			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f) || !Round.IsStarted) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
