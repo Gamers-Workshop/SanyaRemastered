@@ -37,7 +37,6 @@ namespace SanyaRemastered
 		private string _hudCenterDownString = string.Empty;
 		private float _hudCenterDownTime = -1f;
 		private float _hudCenterDownTimer = 0f;
-		private int _prevHealth = -1;
 
 		private void Start()
 		{
@@ -180,7 +179,7 @@ namespace SanyaRemastered
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
 				curText = curText.Replace("[STATS]", $"<b>Vous avez été mute</b>");
 			else 
-			curText = curText.Replace("([STATS])", string.Empty);
+				curText = curText.Replace("([STATS])", string.Empty);
 			//[LIST]
 			if (_player.Team == Team.SCP)
 			{

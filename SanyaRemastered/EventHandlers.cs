@@ -939,7 +939,7 @@ namespace SanyaRemastered
 			{
 				ev.IsAllowed = false;
 			}
-			if (plugin.Config.InventoryKeycardActivation && ev.Player.IsHuman)
+			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
 			{
 				ev.IsAllowed = false;
 
@@ -992,7 +992,7 @@ namespace SanyaRemastered
 		public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
-			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation)
+			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
@@ -1131,7 +1131,7 @@ namespace SanyaRemastered
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
-			if (plugin.Config.InventoryKeycardActivation)
+			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items.Where(x => x.id.IsKeycard()))
 				{
@@ -1158,7 +1158,7 @@ namespace SanyaRemastered
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
-			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled)
+			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
