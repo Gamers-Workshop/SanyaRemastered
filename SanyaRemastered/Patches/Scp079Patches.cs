@@ -10,6 +10,7 @@ using System.Linq;
 using CustomPlayerEffects;
 using SanyaRemastered;
 using Interactables.Interobjects.DoorUtils;
+using Exiled.API.Enums;
 
 namespace SanyaRemastered.Patches
 {
@@ -208,8 +209,7 @@ namespace SanyaRemastered.Patches
 				}
 				return false;
 			}
-			return true;
-			/*else if (command.Contains("DOOR:"))
+			else if (command.Contains("DOOR:"))
 			{
 				__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep, __instance.curMana);
 				foreach (GameObject Player in PlayerManager.players)
@@ -236,16 +236,16 @@ namespace SanyaRemastered.Patches
 						}
 					}
 					var door = target.GetComponent<DoorVariant>();
-					if (door != null && door.curCooldown <= 0f)
+					if (door != null && door.syncInterval <= 0f)
 					{
-						player.ReferenceHub.playerInteract.CallRpcDenied(target);
-						door.curCooldown = 0.5f;
+						//DoorAction.AccessDenied;
+						door.syncInterval = 0.5f;
 						if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep;
 					}
 					return false;
 				}
 			}
-			return true;*/
+			return true;
 		}
 		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
@@ -255,12 +255,12 @@ namespace SanyaRemastered.Patches
 				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
 				item.TargetState = true;
 			}
-
+			/*CommsHack.AudioAPI.API.PlayFileRaw("Gasage", 0.1f, room.Position);*/
+			
 			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i -= 1)
 			{
-				foreach (var ply in PlayerManager.players)
+				foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
 				{
-					var player = Exiled.API.Features.Player.Dictionary[ply];
 					if (player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 					{
 						if (SanyaRemastered.Instance.Config.CassieSubtitle)
@@ -278,9 +278,8 @@ namespace SanyaRemastered.Patches
 				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
 				item.TargetState = false;
 			}
-			foreach (var ply in PlayerManager.players)
+			foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
 			{
-				var player = Exiled.API.Features.Player.Dictionary[ply];
 				if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 				{
 					player.Broadcast(5, Subtitles.ExtendGazActive, Broadcast.BroadcastFlags.Normal);
@@ -288,9 +287,8 @@ namespace SanyaRemastered.Patches
 			}
 			for (int i = 0; i < SanyaRemastered.Instance.Config.TimerWaitGas * 2; i++)
 			{
-				foreach (var ply in PlayerManager.players)
+				foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
 				{
-					var player = Exiled.API.Features.Player.Dictionary[ply];
 					if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
 					{
 						player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();

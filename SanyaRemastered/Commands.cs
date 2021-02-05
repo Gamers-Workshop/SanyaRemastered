@@ -11,7 +11,6 @@ using RemoteAdmin;
 using Respawning;
 using SanyaRemastered.Functions;
 using UnityEngine;
-using SanyaRemastered.DissonanceControl;
 using System.IO;
 using MapGeneration;
 using System.Linq;
@@ -52,53 +51,6 @@ namespace SanyaRemastered.Commands
 					{
 						response = "test ok.";
 						return true;
-					}
-				case "audio":
-					{
-						if (!SanyaRemastered.Instance.Config.DissonanceEnabled)
-						{
-							response = "DissonanceAudio is Disabled.";
-							return false;
-						}
-
-						if (arguments.Count < 2)
-						{
-							response = "need args. <play filename/volume float/stop>";
-							return false;
-						}
-
-						switch (arguments.At(1).ToLower())
-						{
-							case "play":
-								{
-									response = $"Play file:{Path.Combine(SanyaRemastered.Instance.Config.DissonanceDataDirectory, arguments.At(2))}";
-
-									if (!DissonanceCommsControl.IsReady)
-										DissonanceCommsControl.Init();
-
-									if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == arguments.At(2))
-										DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
-									else
-										DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = arguments.At(2);
-
-									return true;
-								}
-							case "volume":
-								{
-									response = "ok.";
-									DissonanceCommsControl.ChangeVolume(float.Parse(arguments.At(2)));
-									return true;
-								}
-							case "stop":
-								{
-									response = "ok.";
-									DissonanceCommsControl.streamCapture.StopCapture();
-									return true;
-								}
-						}
-
-						response = "invalid args.";
-						return false;
 					}
 				case "scale":
 					{
@@ -188,7 +140,7 @@ namespace SanyaRemastered.Commands
 						}
 						if (ulong.TryParse(arguments.At(1), out ulong duration))
 						{
-							foreach (Player ply in Player.List)
+							foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
 							}
@@ -223,7 +175,7 @@ namespace SanyaRemastered.Commands
 						}
 						response = "Pings:\n";
 
-						foreach(var ply in Player.List)
+						foreach(var ply in Player.List.Where((p) => p.Role != RoleType.None))
 						{
 							response += $"{ply.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId].Ping}ms\n";
 						}
@@ -445,7 +397,7 @@ namespace SanyaRemastered.Commands
 									uint.TryParse(arguments.At(3), out uint Nato762) &&
 									uint.TryParse(arguments.At(4), out uint Nato9))
 								{
-									foreach (var ply in Player.List)
+									foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 									{
 										ply.Ammo[(int)AmmoType.Nato556] = Nato556;
 										ply.Ammo[(int)AmmoType.Nato762] = Nato762;
@@ -575,7 +527,7 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 						response = $"Players List ({PlayerManager.players.Count})\n";
-						foreach (var i in Player.List)
+						foreach (var i in Player.List.Where((p) => p.Role != RoleType.None))
 						{
 							response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i.Position}\n";
 						}
@@ -683,7 +635,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List)
+								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
 									Methods.SpawnGrenade(ply.Position, false, 0.1f, ply.ReferenceHub);
 								}
@@ -734,7 +686,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List)
+								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
 									Methods.Spawn018(ply.ReferenceHub);
 								}
@@ -785,7 +737,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List)
+								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
 									Methods.SpawnGrenade(ply.Position, false, -1f, ply.ReferenceHub);
 								}
@@ -834,7 +786,7 @@ namespace SanyaRemastered.Commands
 								response = "Permission denied.";
 								return false;
 							}
-							foreach (var ply in Player.List)
+							foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								ply.ClearInventory();
 							}
@@ -877,7 +829,7 @@ namespace SanyaRemastered.Commands
 									ev.Sender.RemoteAdminMessage("Permission denied.");
 									return;
 								}
-								foreach (var ply in Player.List)
+								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
 									Methods.SpawnDummy(ply.Role,ply.Position,ply.ReferenceHub.transform.rotation);
 								}
@@ -944,7 +896,7 @@ namespace SanyaRemastered.Commands
 								&& float.TryParse(arguments.At(4), out float z))
 							{
 								Vector3 pos = new Vector3(x, y, z);
-								foreach (var ply in Player.List)
+								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
 									ply.ReferenceHub.playerMovementSync.OverridePosition(pos, 0f, true);
 								}

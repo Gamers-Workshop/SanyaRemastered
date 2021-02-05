@@ -24,7 +24,6 @@ using PlayableScps;
 using Exiled.API.Extensions;
 using System.Diagnostics;
 
-using SanyaRemastered.DissonanceControl;
 using Utf8Json.Resolvers;
 using System.Media;
 using UnityEngine.Rendering;
@@ -197,21 +196,6 @@ namespace SanyaRemastered
 		{
 			while (true)
 			{
-				try
-				{
-					if (DissonanceCommsControl.mirrorClient != null && !DissonanceCommsControl.mirrorClient._disconnected)
-					{
-						for (int i = 0; i < Dissonance.Config.DebugSettings.Instance._levels.Count; i++)
-							Dissonance.Config.DebugSettings.Instance._levels[i] = Dissonance.LogLevel.Trace;
-
-						if (DissonanceCommsControl.mirrorClient.Update() == ClientStatus.Error)
-							Log.Error($"[FixedUpdate] mirrorClient error detect.");
-					}
-				}
-				catch (Exception e)
-				{
-					Log.Error($"[FixedUpdate] {e}");
-				}
 				//FixedUpdateの次フレームへ
 				yield return Timing.WaitForOneFrame;
 			}
@@ -240,7 +224,7 @@ namespace SanyaRemastered
 				sendertask = SenderAsync().StartSender();
 
 			RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
-			RoundCoroutines.Add(Timing.RunCoroutine(FixedUpdate(), Segment.FixedUpdate));
+			//RoundCoroutines.Add(Timing.RunCoroutine(FixedUpdate(), Segment.FixedUpdate));
 
 			PlayerDataManager.playersData.Clear();
 			ItemCleanupPatch.items.Clear();
@@ -330,9 +314,6 @@ namespace SanyaRemastered
 		{
 			Log.Info($"[OnRoundRestart] Restarting...");
 
-			if (plugin.Config.DissonanceEnabled && DissonanceCommsControl.IsReady)
-				DissonanceCommsControl.Dispose();
-
 			foreach (var cor in RoundCoroutines)
 				Timing.KillCoroutines(cor);
 			RoundCoroutines.Clear();
@@ -411,7 +392,7 @@ namespace SanyaRemastered
 				{
 					case 0:
 						{
-							foreach (Player player in Player.List)
+							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
 									Methods.SendSubtitle(player, Subtitles.DecontaminationInit, 20, player.ReferenceHub);
@@ -420,7 +401,7 @@ namespace SanyaRemastered
 						}
 					case 1:
 						{
-							foreach (Player player in Player.List)
+							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
 									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15, player.ReferenceHub);
@@ -429,7 +410,7 @@ namespace SanyaRemastered
 						}
 					case 2:
 						{
-							foreach (Player player in Player.List)
+							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
 									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15, player.ReferenceHub);
@@ -438,19 +419,19 @@ namespace SanyaRemastered
 						}
 					case 3:
 						{
-							foreach (Player player in Player.List)
+							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15, player.ReferenceHub);
+									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15,player.ReferenceHub);
 							}
 							break;
 						}
 					case 4:
 						{
-							foreach (Player player in Player.List)
+							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
 							{
 								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(Subtitles.Decontamination30s, 45 , player.ReferenceHub);
+									Methods.SendSubtitle(player,Subtitles.Decontamination30s, 45, player.ReferenceHub);
 							}
 							break;
 						}
@@ -520,7 +501,7 @@ namespace SanyaRemastered
 			}
 		}
 
-		public void OnPlayerJoin(JoinedEventArgs ev)
+		public void OnPlayerVerified(VerifiedEventArgs ev)
 		{
 			if (ev.Player.ReferenceHub.characterClassManager.IsHost) return;
 			Log.Info($"[OnPlayerJoin] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
@@ -567,19 +548,19 @@ namespace SanyaRemastered
 			ev.Player.GameObject.AddComponent<SanyaRemasteredComponent>();
 		}
 
-		public void OnPlayerLeave(LeftEventArgs ev)
+		public void OnPlayerDestroying(DestroyingEventArgs ev)
 		{
 			if (ev.Player.IsHost) return;
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
 			if (SanyaRemasteredComponent._scplists.Contains(ev.Player))
 				SanyaRemasteredComponent._scplists.Remove(ev.Player);
 			
-			if (SanyaRemastered.Instance.Config.CassieSubtitle
+			/*if (SanyaRemastered.Instance.Config.CassieSubtitle
 				&& ev.Player.Team == Team.SCP
 				&& ev.Player.Role != RoleType.Scp0492)
 			{
-				Subtitles.SCPDeathUnknown.Replace("{0}", CharacterClassManager._staticClasses.Get(ev.Player.Role).fullName);
-			}
+				Methods.SendSubtitle(Subtitles.SCPDeathUnknown.Replace("{0}", CharacterClassManager._staticClasses.Get(ev.Player.Role).fullName),10);
+			}*/
 		}
 
 		public void OnPlayerSetClass(ChangingRoleEventArgs ev)
@@ -593,11 +574,8 @@ namespace SanyaRemastered
 			}
 			if (SanyaRemastered.Instance.Config.Scp049_add_time_res_success && ev.NewRole == RoleType.Scp0492)
 			{
-				foreach (Player Exiledspec in Player.List)
-				{
-					if (Exiledspec.Role == RoleType.Spectator)
-						Methods.AddDeathTimeForScp049(Exiledspec.ReferenceHub);
-				}
+				foreach (Player Exiledspec in Player.List.Where((p) => p.Role == RoleType.Spectator))
+					Methods.AddDeathTimeForScp049(Exiledspec.ReferenceHub);
 			}
 			//Scp939Extend
 			if (ev.NewRole.Is939())
@@ -663,7 +641,7 @@ namespace SanyaRemastered
 					&& ev.DamageType == DamageTypes.Grenade
 					&& ev.Target.UserId != ev.Attacker.UserId)
 				{
-					ev.Attacker.GameObject.GetComponent<Hitmarker>()?.Trigger();
+					ev.Attacker.GameObject.GetComponent<Hitmarker>().Trigger();
 				}
 
 				//USPMultiplier
@@ -1007,6 +985,16 @@ namespace SanyaRemastered
 				ev.IsAllowed = false;
 			}
 			if (SanyaRemastered.Instance.Config.Scp939And096DontOpenlockerAndGenerator && (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989 || ev.Player.Role == RoleType.Scp096))
+			{
+				ev.IsAllowed = false;
+			}
+		}
+		public void OnIntercomSpeaking(IntercomSpeakingEventArgs ev)
+		{
+			if (!SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout) return;
+
+			Map.Rooms.ToList().TryGet((int)RoomType.EzIntercom, out Room RoomIntercom);
+			if (!RoomIntercom.LightsOff)
 			{
 				ev.IsAllowed = false;
 			}
@@ -2074,13 +2062,10 @@ namespace SanyaRemastered
 										if (TEST != 1)
 										{
 											{
-												foreach (var ply in Player.List)
+												foreach (var ply in Player.List.Where((p) => p.Role == RoleType.Scp106))
 												{
-													if (ply.Role == RoleType.Scp106)
-													{
-														ev.Player.SendConsoleMessage("Tu ne peux pas te faire reconfiner ici car SCP-106 est pas confiné", "default");
-														return;
-													}
+													ev.Player.SendConsoleMessage("Tu ne peux pas te faire reconfiner ici car SCP-106 n'est pas confiné", "default");
+													return;
 												}
 												{
 													Vector3 end;

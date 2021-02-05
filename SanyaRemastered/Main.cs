@@ -93,8 +93,8 @@ namespace SanyaRemastered
 			
 			PlayerEvents.InteractingElevator += Handlers.OnInteractingElevator;
 			PlayerEvents.PreAuthenticating += Handlers.OnPreAuth;
-			PlayerEvents.Joined += Handlers.OnPlayerJoin;
-			PlayerEvents.Left += Handlers.OnPlayerLeave;
+			PlayerEvents.Verified += Handlers.OnPlayerVerified;
+			PlayerEvents.Destroying += Handlers.OnPlayerDestroying;
 			PlayerEvents.ChangingRole += Handlers.OnPlayerSetClass;
 			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
@@ -105,7 +105,8 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
-			
+			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
+
 			PlayerEvents.Shooting += Handlers.OnShoot;
 			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
 			PlayerEvents.EjectingGeneratorTablet += Handlers.OnEjectingGeneratorTablet;
@@ -143,8 +144,8 @@ namespace SanyaRemastered
 			
 			PlayerEvents.InteractingElevator -= Handlers.OnInteractingElevator;
 			PlayerEvents.PreAuthenticating -= Handlers.OnPreAuth;
-			PlayerEvents.Joined -= Handlers.OnPlayerJoin;
-			PlayerEvents.Left -= Handlers.OnPlayerLeave;
+			PlayerEvents.Verified -= Handlers.OnPlayerVerified;
+			PlayerEvents.Destroying -= Handlers.OnPlayerDestroying;
 			PlayerEvents.ChangingRole -= Handlers.OnPlayerSetClass;
 			PlayerEvents.Spawning -= Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting -= Handlers.OnPlayerHurt;
@@ -154,7 +155,8 @@ namespace SanyaRemastered
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
-			
+			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
+
 			PlayerEvents.Shooting -= Handlers.OnShoot;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;

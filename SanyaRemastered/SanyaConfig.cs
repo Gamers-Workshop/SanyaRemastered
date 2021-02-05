@@ -79,6 +79,7 @@ namespace SanyaRemastered
 
 		public bool CassieSubtitle { get; set; } = false;
 		public bool IntercomInformation { get; set; } = false;
+		public bool IntercomBrokenOnBlackout { get; set; } = false;
 		public bool CloseDoorsOnNukecancel { get; set; } = false;
 		public bool Scp049_add_time_res_success { get; set; } = false;
 		public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;

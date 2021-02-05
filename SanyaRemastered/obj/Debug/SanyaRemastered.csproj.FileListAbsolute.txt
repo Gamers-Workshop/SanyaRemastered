@@ -227,3 +227,4 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Numerics.Vectors.dl
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHandExiled.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHandExiled.pdb
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.dll.config

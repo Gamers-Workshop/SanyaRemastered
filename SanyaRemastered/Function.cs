@@ -16,7 +16,6 @@ using Dissonance.Integrations.MirrorIgnorance;
 using UnityEngine.Networking;
 using Respawning;
 using Exiled.API.Features;
-using SanyaRemastered.DissonanceControl;
 using NorthwoodLib.Pools;
 using System.Text;
 using System.Collections.ObjectModel;
@@ -372,13 +371,7 @@ namespace SanyaRemastered.Functions
 				Log.Info($"[AirSupportBomb] booting...");
 				try
 				{
-					if (!DissonanceCommsControl.IsReady)
-						DissonanceCommsControl.Init();
 
-					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "Siren.raw")
-						DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
-					else
-						DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "Siren.raw";
 				}
 				catch (Exception)
 				{
@@ -403,13 +396,7 @@ namespace SanyaRemastered.Functions
 							isActuallyBombGoing = false;
 							try
 							{
-								if (!DissonanceCommsControl.IsReady)
-									DissonanceCommsControl.Init();
 
-								if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
-									DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
-								else
-									DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "";
 							}
 							catch (Exception)
 							{
@@ -443,13 +430,7 @@ namespace SanyaRemastered.Functions
 
 				try
 				{
-					if (!DissonanceCommsControl.IsReady)
-						DissonanceCommsControl.Init();
-
-					if (DissonanceCommsControl.dissonanceComms._capture.MicrophoneName == "")
-						DissonanceCommsControl.dissonanceComms._capture.RestartTransmissionPipeline("Command");
-					else
-						DissonanceCommsControl.dissonanceComms._capture.MicrophoneName = "";
+					
 				}
 				catch (Exception)
 				{

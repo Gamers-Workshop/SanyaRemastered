@@ -4,6 +4,8 @@ using System;
 using UnityEngine;
 using Respawning;
 using Exiled.API.Features;
+using System.Linq;
+using Exiled.API.Enums;
 
 namespace SanyaRemastered.Patches
 {
@@ -17,7 +19,8 @@ namespace SanyaRemastered.Patches
 		{	
 		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
 		{
-			if (true)
+			Map.Rooms.ToList().TryGet((int)RoomType.EzIntercom, out Room RoomIntercom);
+			if (!RoomIntercom.LightsOff)
 			{
 
 				int leftdecont = (int)Math.Truncate((DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger) - Math.Truncate(DecontaminationController.GetServerTime));
@@ -49,20 +52,26 @@ namespace SanyaRemastered.Patches
 								$"Nine-Tailed Fox restants : {RoundSummary.singleton.CountTeam(Team.MTF):00}\n"
 								);
 				//SCP-106 Femur
-				if (isContain)
-				{
-					if (OneOhSixContainer.used)
+				Map.Rooms.ToList().TryGet((int)RoomType.Hcz106, out Room Room106);
+				if (!Room106.LightsOff)
+					if (isContain)
 					{
-						contentfix += string.Concat($"Statut du briseur de fémur : <color=#228B22>Utilisé</color>\n");
+						if (OneOhSixContainer.used)
+						{
+							contentfix += string.Concat($"Statut du briseur de fémur : <color=#228B22>Utilisé</color>\n");
+						}
+						else
+						{
+							contentfix += string.Concat($"<color=#ff0000>Statut du briseur de fémur : Prêt</color>\n");
+						}
 					}
 					else
 					{
-						contentfix += string.Concat($"<color=#ff0000>Statut du briseur de fémur : Prêt</color>\n");
+						contentfix += string.Concat($"Statut du briseur de fémur : Vide\n");
 					}
-				}
 				else
 				{
-					contentfix += string.Concat($"Statut du briseur de fémur : Vide\n");
+					contentfix += string.Concat($"Statut du briseur de fémur : <color=#228B22>No Data</color>\n");
 				}
 
 				//warhead
@@ -117,13 +126,13 @@ namespace SanyaRemastered.Patches
 				if (!DecontaminationController.Singleton._decontaminationBegun)
 				{
 					if (leftdecont > 30)
-						{
-							contentfix += string.Concat($"Temps restant avant la décontamination de la LCZ :  {leftdecont / 60:00}:{leftdecont % 60:00}\n");
-						}
+					{
+						contentfix += string.Concat($"Temps restant avant la décontamination de la LCZ :  {leftdecont / 60:00}:{leftdecont % 60:00}\n");
+					}
 					else if (leftdecont <= 30)
-						{
-							contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
-						}
+					{
+						contentfix += string.Concat($"<color=#ff0000>Temps restant avant la décontamination de la LCZ : {leftdecont / 60:00}:{leftdecont % 60:00}</color>\n");
+					}
 				}
 				else if (DecontaminationController.Singleton._decontaminationBegun)
 				{
