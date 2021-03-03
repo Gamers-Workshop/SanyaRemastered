@@ -39,7 +39,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
-    <Compile Include="Patches\DecontaminationPatches.cs" />
+    <Compile Include="Patches\AntiCheatPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\ItemCleanupPatch.cs" />
     <Compile Include="Patches\PlayerInteractPatch.cs" />
@@ -73,13 +73,6 @@
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CommsHack">
-      <HintPath>..\..\CommsHack-main\CommsHack\CommsHack\bin\Debug\CommsHack.dll</HintPath>
-    </Reference>
-    <Reference Include="DissonanceVoip_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\VIRTUAL BOX\Debian\Shared\server_scp\SCPSL_Data\Managed\publicized_assemblies\DissonanceVoip_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.API, Version=2.1.18.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>

@@ -9,7 +9,6 @@ using LightContainmentZoneDecontamination;
 using LiteNetLib.Utils;
 using MEC;
 using Mirror;
-using Dissonance.Networking.Client;
 using SanyaRemastered.Data;
 using SanyaRemastered.Patches;
 using UnityEngine;
@@ -392,46 +391,46 @@ namespace SanyaRemastered
 				{
 					case 0:
 						{
-							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
 							{
-								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationInit, 20, player.ReferenceHub);
+								player.ClearBroadcasts();
+								player.Broadcast(20, Subtitles.DecontaminationInit);
 							}
 							break;
 						}
 					case 1:
 						{
-							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
 							{
-								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), 15, player.ReferenceHub);
+								player.ClearBroadcasts();
+								player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"));
 							}
 							break;
 						}
 					case 2:
 						{
-							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
 							{
-								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), 15, player.ReferenceHub);
+								player.ClearBroadcasts();
+								player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"));
 							}
 							break;
 						}
 					case 3:
 						{
-							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
 							{
-								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), 15,player.ReferenceHub);
+								player.ClearBroadcasts();
+								player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"));
 							}
 							break;
 						}
 					case 4:
 						{
-							foreach (Player player in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
 							{
-								if (player.CurrentRoom.Name.StartsWith("LCZ_"))
-									Methods.SendSubtitle(player,Subtitles.Decontamination30s, 45, player.ReferenceHub);
+								player.ClearBroadcasts();
+								player.Broadcast(45, Subtitles.Decontamination30s.Replace("{0}", "10"));
 							}
 							break;
 						}
@@ -447,10 +446,6 @@ namespace SanyaRemastered
 						}
 				}
 			}
-		}
-		public void OnAnnounceScpTerminat(AnnouncingScpTerminationEventArgs ev)
-		{
-			if (ev.HitInfo.Attacker == "DISCONNECT") ev.IsAllowed = false;
 		}
 
 		public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
@@ -554,13 +549,6 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
 			if (SanyaRemasteredComponent._scplists.Contains(ev.Player))
 				SanyaRemasteredComponent._scplists.Remove(ev.Player);
-			
-			/*if (SanyaRemastered.Instance.Config.CassieSubtitle
-				&& ev.Player.Team == Team.SCP
-				&& ev.Player.Role != RoleType.Scp0492)
-			{
-				Methods.SendSubtitle(Subtitles.SCPDeathUnknown.Replace("{0}", CharacterClassManager._staticClasses.Get(ev.Player.Role).fullName),10);
-			}*/
 		}
 
 		public void OnPlayerSetClass(ChangingRoleEventArgs ev)
@@ -1286,7 +1274,17 @@ namespace SanyaRemastered
 		public void On914Upgrade(UpgradingItemsEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
-
+			if (false)
+			{
+				foreach(Player player in ev.Players) 
+				{ 
+					if (player.CurrentItem != null)
+					{
+						
+					//	ev.Scp914.recipesDict.TryGetValue((ItemType)player.CurrentItemIndex,);
+					}
+				}
+			}
 			if (SanyaRemastered.Instance.Config.Scp914Effect)
 			{
 				switch (ev.KnobSetting)

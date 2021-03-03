@@ -84,7 +84,6 @@ namespace SanyaRemastered
 			WarheadEvents.Detonated += Handlers.OnDetonated;
 			
 			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
-			MapEvents.AnnouncingScpTermination += Handlers.OnAnnounceScpTerminat;
 			MapEvents.AnnouncingNtfEntrance += Handlers.OnAnnounceNtf;
 
 			MapEvents.PlacingDecal += Handlers.OnPlacingDecal;
@@ -135,7 +134,6 @@ namespace SanyaRemastered
 			WarheadEvents.Detonated -= Handlers.OnDetonated;
 			
 			MapEvents.AnnouncingDecontamination -= Handlers.OnAnnounceDecont;
-			MapEvents.AnnouncingScpTermination -= Handlers.OnAnnounceScpTerminat;
 			MapEvents.AnnouncingNtfEntrance -= Handlers.OnAnnounceNtf;
 
 			MapEvents.PlacingDecal -= Handlers.OnPlacingDecal;

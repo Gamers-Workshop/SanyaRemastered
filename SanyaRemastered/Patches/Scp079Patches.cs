@@ -255,8 +255,6 @@ namespace SanyaRemastered.Patches
 				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
 				item.TargetState = true;
 			}
-			/*CommsHack.AudioAPI.API.PlayFileRaw("Gasage", 0.1f, room.Position);*/
-			
 			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i -= 1)
 			{
 				foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))

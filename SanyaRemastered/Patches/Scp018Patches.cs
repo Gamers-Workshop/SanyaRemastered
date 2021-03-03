@@ -1,6 +1,7 @@
 ﻿using Exiled.API.Features;
 using Grenades;
 using HarmonyLib;
+using Interactables.Interobjects.DoorUtils;
 using Mirror;
 using SanyaRemastered;
 using UnityEngine;
@@ -45,39 +46,35 @@ namespace SanyaRemastered.Patches
 				Collider collider = collision.collider;
 				int num2 = 1 << collider.gameObject.layer;
 
-				if (!SanyaRemastered.Instance.Config.Scp018CantDestroyObject)
+				if (num2 == __instance.layerGlass)
 				{
-					if (num2 == __instance.layerGlass)
+					if (__instance.actionAllowed && relativeSpeed >= __instance.breakpointGlass)
 					{
-						if (__instance.actionAllowed && relativeSpeed >= __instance.breakpointGlass)
+						__instance.cooldown = __instance.cooldownGlass;
+						BreakableWindow component = collider.GetComponent<BreakableWindow>();
+						if (component != null)
 						{
-							__instance.cooldown = __instance.cooldownGlass;
-							BreakableWindow component = collider.GetComponent<BreakableWindow>();
-							if (component != null)
-							{
-								component.ServerDamageWindow(relativeSpeed * __instance.damageGlass);
-							}
-						}
-					}
-					else if (num2 == __instance.layerDoor)
-					{
-						if (relativeSpeed >= __instance.breakpointDoor)
-						{
-							__instance.cooldown = __instance.cooldownDoor;
-							/*Door componentInParent = collider.GetComponentInParent<Door>();
-							if (componentInParent != null && !componentInParent.GrenadesResistant)
-							{
-								componentInParent.DestroyDoor(b: true);
-							}*/
+							component.ServerDamageWindow(relativeSpeed * __instance.damageGlass);
 						}
 					}
 				}
-
-				if ((num2 == __instance.layerHitbox || num2 == __instance.layerIgnoreRaycast) && __instance.actionAllowed && relativeSpeed >= __instance.breakpointHurt)
+				else if (num2 == __instance.layerDoor)
+				{
+					if (relativeSpeed >= __instance.breakpointDoor)
+					{
+						__instance.cooldown = __instance.cooldownDoor;
+						IDamageableDoor damageableDoor;
+						if ((damageableDoor = (collider.GetComponentInParent<DoorVariant>() as IDamageableDoor)) != null)
+						{
+							damageableDoor.ServerDamage(100f, DoorDamageType.Grenade);
+						}
+					}
+				}
+				else if ((num2 == __instance.layerHitbox || num2 == __instance.layerIgnoreRaycast) && __instance.actionAllowed && relativeSpeed >= __instance.breakpointHurt)
 				{
 					__instance.cooldown = __instance.cooldownHurt;
 					ReferenceHub componentInParent2 = collider.GetComponentInParent<ReferenceHub>();
-					if (componentInParent2 != null && (ServerConsole.FriendlyFire || componentInParent2.gameObject == __instance.thrower.gameObject || componentInParent2.weaponManager.GetShootPermission(__instance.throwerTeam)))
+					if (componentInParent2 != null && (ServerConsole.FriendlyFire || componentInParent2.gameObject == __instance.thrower.gameObject || componentInParent2.weaponManager.GetShootPermission(__instance.throwerTeam, false)))
 					{
 						float num3 = relativeSpeed * __instance.damageHurt * SanyaRemastered.Instance.Config.Scp018DamageMultiplier;
 
@@ -87,7 +84,7 @@ namespace SanyaRemastered.Patches
 							num3 *= __instance.damageScpMultiplier;
 						}
 
-						componentInParent2.playerStats.HurtPlayer(new PlayerStats.HitInfo(num3, __instance.logName, DamageTypes.Grenade, Player.Dictionary[__instance.throwerGameObject.gameObject].Id), componentInParent2.playerStats.gameObject);
+						componentInParent2.playerStats.HurtPlayer(new PlayerStats.HitInfo(num3, __instance.logName, DamageTypes.Grenade, Player.Get(__instance.throwerGameObject).Id), componentInParent2.playerStats.gameObject);
 					}
 				}
 
@@ -97,7 +94,6 @@ namespace SanyaRemastered.Patches
 					__instance.hasHitMaxSpeed = true;
 				}
 			}
-			//__instance.OnSpeedCollisionEnter(collision, relativeSpeed);
 			return false;
 		}
 	}

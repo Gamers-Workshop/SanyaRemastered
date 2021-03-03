@@ -522,20 +522,6 @@ namespace SanyaRemastered.Functions
 				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
 			}
 		}
-		public static void SendSubtitle(Player player, string text, ushort time, ReferenceHub target = null)
-		{
-			Broadcast brd = player.GameObject.GetComponent<Broadcast>();
-			if (target != null)
-			{
-				brd.TargetClearElements(target.characterClassManager.connectionToClient);
-				brd.TargetAddElement(target.characterClassManager.connectionToClient, text, time, Broadcast.BroadcastFlags.Normal);
-			}
-			else
-			{
-				brd.RpcClearElements();
-				brd.RpcAddElement(text, time, Broadcast.BroadcastFlags.Normal);
-			}
-		}
 
 		public static void PlayAmbientSound(int id)
 		{
