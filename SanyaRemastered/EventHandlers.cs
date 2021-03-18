@@ -1347,7 +1347,6 @@ namespace SanyaRemastered
 					case Scp914Knob.Fine:
 						foreach (var player in ev.Players)
 						{
-							player.ReferenceHub.fpc.sprintToggle = true;
 							player.ReferenceHub.fpc.effectScp207.Intensity = 20;
 						}
 						break;

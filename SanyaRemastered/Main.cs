@@ -32,8 +32,8 @@ namespace SanyaRemastered
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
-		private readonly MethodInfo _prefixToPatch = AccessTools.Method("Exiled.Events.Patches.Events.Player.ActivatingWarheadPanel:Prefix");
 		private readonly HarmonyMethod _transpiler = new HarmonyMethod(typeof(SanyaRemastered), nameof(ExiledPrefixPatch));
+		private readonly MethodInfo _methodToPatch = AccessTools.Method("PlayerInteract:CallCmdSwitchAWButton");
 
 		public SanyaRemastered() => Instance = this;
 
@@ -46,8 +46,8 @@ namespace SanyaRemastered
 			RegistEvents();
 			Config.ParseConfig();
 
-			Harmony.Patch(_prefixToPatch, transpiler: _transpiler);
 			RegistPatch();
+			Harmony.Patch(_methodToPatch, transpiler: _transpiler);
 
 			Log.Info($"[OnEnabled] SanyaRemastered({Version}) Enabled Complete.");
 		}
@@ -62,8 +62,8 @@ namespace SanyaRemastered
 
 			UnRegistEvents();
 
-			Harmony.Unpatch(_prefixToPatch, _transpiler.method);
 			UnRegistPatch();
+			Harmony.Unpatch(_methodToPatch, _transpiler.method);
 
 			Log.Info($"[OnDisable] SanyaRemastered({Version}) Disabled Complete.");
 		}

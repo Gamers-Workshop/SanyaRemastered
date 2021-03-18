@@ -136,7 +136,7 @@ namespace SanyaRemastered
 		{
 			if (!(_timer > 1f) || !_player.IsAlive) return;
 
-			if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
+			/*if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
 			{
 				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "Main Du Serpent";
 				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo;
@@ -145,7 +145,7 @@ namespace SanyaRemastered
 			{
 				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "";
 				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role | PlayerInfoArea.UnitName;
-			}
+			}*/
 		}
 
 		private void UpdateRespawnCounter()
@@ -205,6 +205,29 @@ namespace SanyaRemastered
 			//[CENTER_UP]
 			if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
+			/*else if (_player.Role == RoleType.Scp096 && _player.CurrentScp is PlayableScps.Scp096 scp096)
+				switch (scp096.PlayerState)
+				{
+					case PlayableScps.Scp096PlayerState.Docile:
+						if (!scp096.CanEnrage) curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Docile:{ Mathf.RoundToInt(scp096.RemainingEnrageCooldown)}s", 6));
+						else if (scp096._preWindupTime > 0f) curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"PreWindup:{ Mathf.RoundToInt(scp096._preWindupTime)}s", 6));
+						else curText = curText.Replace("[CENTER_UP]", FormatStringForHud("Ready", 6));
+						break;
+					case PlayableScps.Scp096PlayerState.Enraging:
+						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Enraging:{ Mathf.RoundToInt(scp096._enrageWindupRemaining)}s", 6));
+						break;
+					case PlayableScps.Scp096PlayerState.Enraged:
+					case PlayableScps.Scp096PlayerState.Attacking:
+					case PlayableScps.Scp096PlayerState.Charging:
+						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Enraging:{Mathf.RoundToInt(scp096.EnrageTimeLeft)}s", 6));
+						break;
+					case PlayableScps.Scp096PlayerState.Calming:
+						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Calming:{Mathf.RoundToInt(scp096._calmingTime)}s", 6));
+						break;
+					default:
+						curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
+						break;
+				}*/
 			else
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
