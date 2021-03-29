@@ -5,10 +5,10 @@
 
 		internal static readonly string NoProfileKickMessage = string.Concat(
 			"Votre SteamID n'a pas de profil créé. Ce serveur n'autorise pas les utilisateurs sans profil. \n",
-			"Venez sur le serveur discord pour avoir plus de détail"
+			"Venez sur le serveur discord pour avoir plus de détails."
 			);
 		internal static readonly string LimitedKickMessage = string.Concat(
-			"Vous avez été Kick, Venez sur le serveur Discord pour étre WhiteList : https://discord.gg/ZsyeBED"
+			"Vous avez été Kick, venez sur le serveur Discord pour être whiteList : https://discord.gg/ZsyeBED"
 			);
 
 		internal static readonly string ExtendEnabled = string.Concat(
@@ -69,12 +69,12 @@
 			);
 		internal static readonly string Extend079GazFail = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Le gaz n'est pas disponible pour cette sale》\n",
+			"《Le gaz n'est pas disponible pour cette salle.》\n",
 			"</size></color>"
 			);
 		internal static readonly string Extend079SuccessGaz = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Gazage en cours》\n",
+			"《Gazage en cours.》\n",
 			"</size></color>"
 			);
 		internal static readonly string ExtendGazWarn = string.Concat(
@@ -84,36 +84,36 @@
 		);
 		internal static readonly string ExtendGazActive = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Gazage En Cours》\n",
+			"《Gazage en cours.》\n",
 			"</size></color>"
 		);
 		internal static readonly string MTFRespawnSCPs = string.Concat(
 			"<color=#6c80ff><size=25>",
-			"《L'unité mobile d'intervention,Epsilon-11, désignée,「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuations standards jusqu'à qu'une équipe MTF atteigne sa destination dans le site : Il reste sur site {1} SCP.》\n",
+			"《L'unité mobile d'intervention, Epsilon-11, désignée,「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuation standards jusqu'à ce qu'une équipe MTF atteigne sa destination dans le site : Il reste sur site {1} SCP.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string MTFRespawnNOSCPs = string.Concat(
 			"<color=#6c80ff><size=25>",
-			"《L'unité mobile d'intervention, Epsilon-11, désignée, 「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuation standard, jusqu'à ce que l'équipe MTF ait atteint sa destination.》\n",
+			"《L'unité mobile d'intervention, Epsilon-11, désignée,「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuation standards jusqu'à ce qu'une équipe MTF atteigne sa destination dans le site.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string SCPDeathTesla = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《{0} éliminé avec succès par le système de sécurité automatique. {-1}》\n",
+			"《{0} a été éliminé avec succès par le système de sécurité automatique. {-1}》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string SCPDeathDecont = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《{0} à était décontaminé. {-1}》\n",
+			"《{0} a été décontaminé. {-1}》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string SCPDeathWarhead = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《{0} anéanti par une ogive alpha. {-1}》\n",
+			"《{0} a été anéantit par une ogive alpha. {-1}》\n",
 			"</size></color>"
 		);
 
@@ -131,96 +131,96 @@
 
 		internal static readonly string SCPDeathUnknown = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《{0} fut éliminé avec succès. Cause du re-confinement inconnu.{-1}》\n",
+			"《{0} a été éliminé avec succès. Cause du re-confinement inconnu.{-1}》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string StartNightMode = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Avertissement, le système électrique de l'installation a été attaqué. \nLa lumière de la plupart des zones de confinement n'est plus disponible tant que le générateur n'est pas activé.》\n",
+			"《Attention, le système électrique de l'installation a été attaqué. \nLa lumière de la plupart des zones de confinement n'est plus disponible tant que le générateur ne sera pas ré-activé.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string DecontaminationInit = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Votre attention, à tout le personnel. Le processus de décontamination de la Light Containement Zone se déroulera dans moins de 15 minutes. \nToutes les substances biologiques doivent évacué afin d'éviter la décontamination.》\n",
+			"《Votre attention, à tout le personnel. Le processus de décontamination de la Light Containment Zone se déroulera dans moins de 15 minutes. \nToutes les substances biologiques doivent évacuées afin d'éviter la décontamination.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string DecontaminationMinutesCount = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Danger ! Décontamination de la Light Containement Zone dans moins de {0} minutes》\n",
+			"《Danger ! Décontamination de la Light Containment Zone dans moins de {0} minutes.》\n",
 			"</size></color>"
 		);
 		internal static readonly string Decontamination30s = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Danger, décontamination de la Light Containment Zone dans moins de 30 secondes. Toutes les portes et points de contrôle ont été ouvertes. Veuillez évacuer immédiatement.》\n",
+			"《Danger ! Décontamination de la Light Containment Zone dans moins de 30 secondes. Toutes les portes et points de contrôle ont été ouverts. Veuillez évacuer immédiatement.》\n",
 			"</size></color>"
 		);
 		internal static readonly string DecontaminationLockdown = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《La Light Containement Zone est verrouillée et prête pour la décontamination. L'élimination des substances organiques à maintenant débuté.》\n",
+			"《La Light Containment Zone est verrouillée et prête pour la décontamination. L'élimination des substances organiques a maintenant débuté.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string GeneratorFinish = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《{0} générateur{s} sur 5 activés.》\n",
+			"《{0} générateur{s} sur 5 activé(s).》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string GeneratorComplete = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《5 des 5 générateurs sont activés.\nTous les générateurs ont été engagés avec succès.Finalisation de la séquence de confinement. La Heavy Containement sera surchargée dans t-moins 1 minute.》\n",
+			"《5 sur 5 générateurs sont activés.\nTous les générateurs ont été engagés avec succès. Finalisation de la séquence de confinement. La Heavy Containment sera surchargée dans t-moins 1 minute.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string AlphaWarheadStart = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《L'Alpha Warhead vient d'être enclenchée, tout le personnel doit évacuer par les sorties les plus proches.\nLa section souterraine du site sera anéanti dans t-moins {0} secondes.》\n",
+			"《L'ogive Alpha vient d'être activée, tout le personnel doit évacuer par les sorties les plus proches.\nLa section souterraine du site sera détruite dans t-moins {0} secondes.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string AlphaWarheadResume = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《La séquence de détonation vient de reprendre dû à sa réactivation. Temps restant t-moins {0} secondes.》\n",
+			"《La séquence de détonation de l'ogive Alpha vient de reprendre dû à sa réactivation. Temps restant avant la détonation : t-moins {0} secondes.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string AlphaWarheadCancel = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《La détonation à été annulée. Le redémarrage des systèmes à été accompli.》\n",
+			"《La détonation a été annulé. Le redémarrage des systèmes a été accomplit.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string AirbombStarting = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Danger ! Le site est compromis, lancement d'un bombardement sur l'enssemble du site, \n le bombardement est inévitable !》\n",
+			"《Danger ! La sécurité du site est compromise, lancement d'un bombardement sur l'ensemble du site, \n le bombardement est inévitable !》\n",
 			"</size></color>"
 		);
 		internal static readonly string AirbombStartingWait30s = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Danger ! Le site vas recevoir un bombardement aérien dans t-moins 30 seconds !》\n",
+			"《Danger ! La surface du site va recevoir un bombardement aérien dans t-moins 30 seconds !》\n",
 			"</size></color>"
 		);
 		internal static readonly string AirbombStartingWaitMinutes = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Danger ! Le site vas recevoir un bombardement aérien dans t-moins {0} minutes !》\n",
+			"《Danger ! La surface du site va recevoir un bombardement aérien dans t-moins {0} minutes !》\n",
 			"</size></color>"
 		);
 		internal static readonly string AirbombStop = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Le bombardement a été annulé !》\n",
+			"《Le bombardement aérien du site a été annulé !》\n",
 			"</size></color>"
 		);
 		internal static readonly string AirbombEnded = string.Concat(
 			"<color=#ff0000><size=25>",
-			"《Le bombardement de l'ensemble du site à été effectué et c'est terminé avec succès !》\n",
+			"《Le bombardement de l'ensemble du site à été effectué et s'est terminé avec succès !》\n",
 			"</size></color>"
 		);
 		internal static readonly string DecontEvent = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Le protocole de décontamination de la Light Containement Zone a commencé. Les objets SCP dans la zone seront décontaminés.》\n",
+			"《Le protocole de décontamination de la Light Containment Zone a commencé. Les substances organiques dans la zone seront décontaminées.》\n",
 			"</size></color>"
 		);
 	}											

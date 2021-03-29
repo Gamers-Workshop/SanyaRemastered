@@ -106,6 +106,7 @@ namespace SanyaRemastered
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
+			PlayerEvents.ChangingItem += Handlers.OnChangingItem;
 			PlayerEvents.Shooting += Handlers.OnShoot;
 			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
 			PlayerEvents.EjectingGeneratorTablet += Handlers.OnEjectingGeneratorTablet;
@@ -155,6 +156,7 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
+			PlayerEvents.ChangingItem += Handlers.OnChangingItem;
 			PlayerEvents.Shooting -= Handlers.OnShoot;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;

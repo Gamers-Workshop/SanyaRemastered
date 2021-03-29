@@ -904,8 +904,8 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-			}
-			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
+			}//TRUE && ()= true && true
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
 			{
 				ev.IsAllowed = false;
 
@@ -958,7 +958,7 @@ namespace SanyaRemastered
 		public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
-			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP)
+			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsStaffBypassEnabled)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
@@ -982,7 +982,7 @@ namespace SanyaRemastered
 			if (!SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout) return;
 
 			Map.Rooms.ToList().TryGet((int)RoomType.EzIntercom, out Room RoomIntercom);
-			if (!RoomIntercom.LightsOff)
+			if (RoomIntercom.LightsOff)
 			{
 				ev.IsAllowed = false;
 			}
@@ -1043,8 +1043,8 @@ namespace SanyaRemastered
 				{
 					List<Vector3> poslist = new List<Vector3>
 					{
-						RoleType.Scp049.GetRandomSpawnPoint(),
-						RoleType.Scp93953.GetRandomSpawnPoint()
+						Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp049),
+						Exiled.API.Extensions.Role.GetRandomSpawnPoint(RoleType.Scp93953),
 					};
 
 					if (!Map.IsLCZDecontaminated && DecontaminationController.Singleton._nextPhase < 4)
@@ -1107,7 +1107,7 @@ namespace SanyaRemastered
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
-			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items.Where(x => x.id.IsKeycard()))
 				{
@@ -1134,7 +1134,7 @@ namespace SanyaRemastered
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
-			if (plugin.Config.InventoryKeycardActivation && (!ev.Player.IsBypassModeEnabled || !ev.Player.IsStaffBypassEnabled) && ev.Player.Team != Team.SCP)
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
@@ -1361,6 +1361,15 @@ namespace SanyaRemastered
 				}
 			}
 
+		}
+		public void OnChangingItem(ChangingItemEventArgs ev)
+		{
+			if (ev.Player.ReferenceHub.weaponManager._reloadingWeapon == ev.Player.ReferenceHub.weaponManager.curWeapon
+				&& ev.Player.ReferenceHub.weaponManager._reloadingWeapon != -100)
+			{
+				ev.Player.ReferenceHub.weaponManager._reloadingWeapon = -100;
+				ev.Player.ReferenceHub.weaponManager._reloadCooldown = -1f;
+			}
 		}
 		public void OnShoot(ShootingEventArgs ev)
 		{
