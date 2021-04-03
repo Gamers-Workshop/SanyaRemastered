@@ -20,6 +20,7 @@ using NorthwoodLib.Pools;
 using System.Text;
 using System.Collections.ObjectModel;
 using Interactables.Interobjects.DoorUtils;
+using Assets._Scripts.Dissonance;
 
 namespace SanyaRemastered.Functions
 {
@@ -901,6 +902,7 @@ namespace SanyaRemastered.Functions
 		{
 			return task.ContinueWith((x) => { Log.Error($"[Sender] {x}"); }, TaskContinuationOptions.OnlyOnFaulted);
 		}
+		
 		public static bool IsHuman(this Player player)
 		{
 			return player.Team != Team.SCP && player.Team != Team.RIP;
@@ -926,10 +928,6 @@ namespace SanyaRemastered.Functions
 		public static void SendToTargetSound(this Player player)
 		{
 			NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new PlayableScps.Messages.Scp096ToTargetMessage(player.ReferenceHub));
-		}
-		public static void SendTextHintNotEffect(this Player player, string text, float time)
-		{
-			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(text) }, null, time));
 		}
 
 		public static IEnumerable<Camera079> GetNearCams(this ReferenceHub player)

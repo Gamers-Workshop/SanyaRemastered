@@ -175,5 +175,4 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\obj\Debug\SanyaRemastered.pdb
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Memory.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Numerics.Vectors.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
-D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHandExiled.pdb
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.dll.config

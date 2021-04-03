@@ -30,6 +30,7 @@ using System.Security.Permissions;
 using Interactables.Interobjects.DoorUtils;
 using Interactables.Interobjects;
 using Exiled.API.Enums;
+using System.IO;
 
 namespace SanyaRemastered
 {
@@ -291,6 +292,10 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.ClassD_container_locked)
 			{
 				//Coroutines.StartContainClassD(false, SanyaRemastered.Instance.Config.ClassD_container_Unlocked);
+			}
+			if (true)
+			{
+				
 			}
 		}
 
@@ -904,8 +909,8 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106 && (ev.Player.Role == RoleType.Scp0492 || ev.Player.Role == RoleType.Scp106))
 			{
 				ev.IsAllowed = false;
-			}//TRUE && ()= true && true
-			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
+			}
+			if (plugin.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled)
 			{
 				ev.IsAllowed = false;
 
@@ -936,7 +941,6 @@ namespace SanyaRemastered
 						ev.IsAllowed = true;
 					}
 				}
-
 			}
 			if (plugin.Config.AddDoorsOnSurface && ev.Door.TryGetComponent<DoorNametagExtension>(out var nametag))
 			{
@@ -958,7 +962,7 @@ namespace SanyaRemastered
 		public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
-			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsStaffBypassEnabled)
+			if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
@@ -1107,7 +1111,7 @@ namespace SanyaRemastered
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
-			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items.Where(x => x.id.IsKeycard()))
 				{
@@ -1134,7 +1138,7 @@ namespace SanyaRemastered
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{
-			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsStaffBypassEnabled && ev.Player.Team != Team.SCP)
+			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items)
 				{
@@ -1404,19 +1408,21 @@ namespace SanyaRemastered
 				if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
 				{
 					var door = raycastHit.transform.GetComponentInParent<DoorVariant>();
+					if (door != null)
+					{ 
+						DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.ActiveLocks);
 
-					DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.ActiveLocks);
+						if (((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
+						|| (door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
+						|| (!door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
+						|| lockMode == DoorLockMode.FullLock
+						|| door.NetworkTargetState && door.GetExactState() != 1f || !door.NetworkTargetState && door.GetExactState() != 0f
+						) return;
 
-					if (((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
-					|| (door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
-					|| (!door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
-					|| lockMode == DoorLockMode.FullLock
-					|| door.NetworkTargetState && door.GetExactState() != 1f || !door.NetworkTargetState && door.GetExactState() != 0f
-					) return;
-
-					if (door.RequiredPermissions.RequiredPermissions.ToTruthyPermissions() == Keycard.Permissions.None && !(door is PryableDoor))
-					{
-						door.NetworkTargetState = !door.NetworkTargetState;
+						if (door.RequiredPermissions.RequiredPermissions.ToTruthyPermissions() == Keycard.Permissions.None && !(door is PryableDoor))
+						{
+							door.NetworkTargetState = !door.NetworkTargetState;
+						}
 					}
 				}
 			}

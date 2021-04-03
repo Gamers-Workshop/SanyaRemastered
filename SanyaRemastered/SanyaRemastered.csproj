@@ -98,9 +98,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
     </Reference>
-    <Reference Include="SerpentsHandExiled">
-      <HintPath>..\..\SerpentsHandExiled\obj\Debug\SerpentsHandExiled.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections" />
     <Reference Include="System.Net.Http" />

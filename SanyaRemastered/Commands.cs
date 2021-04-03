@@ -82,9 +82,9 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						if (ulong.TryParse(arguments.At(1), out ulong duration))
+						if (ulong.TryParse(arguments.At(2), out ulong duration))
 						{
-							string[] Users = arguments.At(2).Split('.');
+							string[] Users = arguments.At(1).Split('.');
 							List<Player> PlyList = new List<Player>();
 							foreach (string s in Users)
 							{
@@ -104,13 +104,13 @@ namespace SanyaRemastered.Commands
 							}
 							else
 							{
-								response = $"Sanya hint <durée> <player> <message> \\\\ Sanya hint <durée> <Player.Otherplayer.AnotherPlayerAgain> <message>";
+								response = $"Sanya hint <durée> <player> <message> \\\\ Sanya hint <Player.Otherplayer.AnotherPlayerAgain> <durée> <message>";
 								return false;
 							}
 						}
 						else
 						{
-							response = "Sanya hint <durée> <player> <message>";
+							response = "Sanya hint <player> <durée> <message>";
 							return false;
 						}
 					}

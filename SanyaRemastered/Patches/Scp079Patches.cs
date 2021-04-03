@@ -264,7 +264,7 @@ namespace SanyaRemastered.Patches
 						if (SanyaRemastered.Instance.Config.CassieSubtitle)
 						{
 							player.ClearBroadcasts();
-							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{2}", $"{(i <= 1 ? "" : "s")}"));
+							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"));
 						}
 						Methods.PlayAmbientSound(7);
 					}

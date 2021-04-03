@@ -154,9 +154,9 @@ namespace SanyaRemastered
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
-			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
+			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
 
-			PlayerEvents.ChangingItem += Handlers.OnChangingItem;
+			PlayerEvents.ChangingItem -= Handlers.OnChangingItem;
 			PlayerEvents.Shooting -= Handlers.OnShoot;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;

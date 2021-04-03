@@ -173,7 +173,7 @@ namespace SanyaRemastered
 
 		private void UpdateExHud()
 		{
-			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f) || !Round.IsStarted) return;
+			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
@@ -237,7 +237,7 @@ namespace SanyaRemastered
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
-			else if (_player.Team == Team.RIP)
+			else if (_player.Role == RoleType.Spectator)
 			{
 				if (Coroutines.isActuallyBombGoing)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn tant que le bombardement est activé", 6));
@@ -252,18 +252,22 @@ namespace SanyaRemastered
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn Il n'y a plus de ticket", 6));
 				else if (_respawnCounter == 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours", 6));
-				else
+				else if (_respawnCounter != -1)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}", 6));
+				else
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
 			}
 			else
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
 
 			//[BOTTOM]
 			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
-			
+
+			//Don't Send if you have nothing to send
+			if (curText.Length != 157)
 			{
 				_hudText = curText;
-				_player.SendTextHintNotEffect(_hudText, 2);
+				_player.ShowHint(_hudText, 2);
 			}
 		}
 
