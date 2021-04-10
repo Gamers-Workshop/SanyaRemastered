@@ -738,7 +738,8 @@ namespace SanyaRemastered
 
 			if (SanyaRemastered.Instance.Config.CassieSubtitle
 				&& ev.Target.Team == Team.SCP
-				&& ev.Target.Role != RoleType.Scp0492)
+				&& ev.Target.Role != RoleType.Scp0492
+				&& ev.HitInformations.Attacker != "DISCONNECT")
 			{
 				string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
 				string str;

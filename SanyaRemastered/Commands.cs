@@ -54,6 +54,11 @@ namespace SanyaRemastered.Commands
 					}
 				case "scale":
 					{
+						if (player != null && !player.CheckPermission("sanya.scale"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
 						var target = Player.Get(int.Parse(arguments.At(1)));
 
 						target.Scale = new UnityEngine.Vector3(
@@ -166,6 +171,11 @@ namespace SanyaRemastered.Commands
 					}
 				case "actwatch":
 					{
+						if (player != null && !player.CheckPermission("sanya.actwatch"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
 						if (player == null)
 						{
 							response = "Only can use with RemoteAdmin.";
@@ -343,6 +353,11 @@ namespace SanyaRemastered.Commands
 					}
 				case "ammo":
 					{
+						if (player != null && !player.CheckPermission("sanya.ammo"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
 						if (player == null)
 						{
 							response = "Only can use with RemoteAdmin.";
@@ -466,7 +481,7 @@ namespace SanyaRemastered.Commands
 					}
 				case "playambiant":
 					{
-						if (player != null && !player.CheckPermission("sanya.dev"))
+						if (player != null && !player.CheckPermission("sanya.playambiant"))
 						{
 							response = "Permission denied.";
 							return false;
@@ -480,6 +495,11 @@ namespace SanyaRemastered.Commands
 					}
 				case "listdoor":
 					{
+						if (player != null && !player.CheckPermission("sanya.dev"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
 						response = $"DoorList\n";
 						foreach (var doors in Map.Doors)
 						{
