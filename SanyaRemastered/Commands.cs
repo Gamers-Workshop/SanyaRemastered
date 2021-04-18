@@ -41,7 +41,7 @@ namespace SanyaRemastered.Commands
 
 			if (arguments.Count == 0)
 			{
-				response = "sanya plugins command params: <hud/ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forcend/now/config>";
+				response = "sanya plugins command params: <ping/override/actwatch/106/914/nukecap/nukelock/femur/blackout/addscps/ammo/forcend/now/config>";
 				return true;
 			}
 
@@ -82,62 +82,67 @@ namespace SanyaRemastered.Commands
 					}
 				case "hint":
 					{
+						ulong duration;
 						if (player != null && !player.CheckPermission("sanya.hint"))
 						{
 							response = "Permission denied.";
 							return false;
 						}
-						if (ulong.TryParse(arguments.At(2), out ulong duration))
+						if (ulong.TryParse(arguments.At(2), out duration))
 						{
-							string[] Users = arguments.At(1).Split('.');
-							List<Player> PlyList = new List<Player>();
-							foreach (string s in Users)
+							if (arguments.At(2) == "all")
 							{
-								if (int.TryParse(s, out int id) && Player.Get(id) != null)
-									PlyList.Add(Player.Get(id));
-								else if (Player.Get(s) != null)
-									PlyList.Add(Player.Get(s));
-							}
-							if (PlyList.Count != 0)
-							{
-								foreach (Player ply in PlyList)
-								{	
-									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+								if (player != null && !player.CheckPermission("sanya.hintall"))
+								{
+									response = "Permission denied.";
+									return false;
 								}
-								response = $"Votre message a bien été envoyé à {PlyList.Count}";
-								return true;
+								else if (ulong.TryParse(arguments.At(1), out duration))
+								{
+									foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
+									{
+										ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
+									}
+									response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
+									return true;
+								}
+								else
+								{
+									response = $"Sanya hint <player/all> <durée> <message> // Sanya hint <id.id.id> <durée> <message>";
+									return false;
+								}
 							}
 							else
-							{
-								response = $"Sanya hint <durée> <player> <message> \\\\ Sanya hint <Player.Otherplayer.AnotherPlayerAgain> <durée> <message>";
-								return false;
+                            {
+								string[] Users = arguments.At(1).Split('.');
+								List<Player> PlyList = new List<Player>();
+								foreach (string s in Users)
+								{
+									if (int.TryParse(s, out int id) && Player.Get(id) != null)
+										PlyList.Add(Player.Get(id));
+									else if (Player.Get(s) != null)
+										PlyList.Add(Player.Get(s));
+								}
+								if (PlyList.Count != 0)
+								{
+									response = $"Votre message a bien été envoyé à :\n";
+									foreach (Player ply in PlyList)
+									{
+										ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+										response += $" - {ply.Nickname}\n";
+									}
+									return true;
+								}
+								else
+								{
+									response = $"Sanya hint <player/all> <durée> <message> // Sanya hint <id.id.id> <durée> <message>";
+									return false;
+								}
 							}
 						}
 						else
 						{
 							response = "Sanya hint <player> <durée> <message>";
-							return false;
-						}
-					}
-				case "hintall":
-					{
-						if (player != null && !player.CheckPermission("sanya.hintall"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						if (ulong.TryParse(arguments.At(1), out ulong duration))
-						{
-							foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
-							{
-								ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
-							}
-							response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
-							return true;
-						}
-						else
-						{
-							response = "Sanya hintall <durée> <message>";
 							return false;
 						}
 					}

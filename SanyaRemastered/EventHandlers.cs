@@ -1112,6 +1112,8 @@ namespace SanyaRemastered
 		public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
+
+
 			if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled && ev.Player.Team != Team.SCP)
 			{
 				foreach (var item in ev.Player.Inventory.items.Where(x => x.id.IsKeycard()))
@@ -1132,10 +1134,15 @@ namespace SanyaRemastered
 					}
 				}
 			}
-			if (SanyaRemastered.Instance.Config.Nukecapclose)
+			var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
+			if (SanyaRemastered.Instance.Config.Nukecapclose && outsite.keycardEntered)
 			{
 				Timing.RunCoroutine(Coroutines.CloseNukeCap());
 			}
+			else if (outsite.keycardEntered)
+            {
+				ev.IsAllowed = false;
+            }
 		}
 		public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
 		{

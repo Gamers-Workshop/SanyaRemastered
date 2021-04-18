@@ -264,7 +264,6 @@ namespace SanyaRemastered.Functions
 		public static IEnumerator<float> CloseNukeCap()
 		{
 			var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
-			if (!outsite.keycardEntered) yield break;
 			yield return Timing.WaitForSeconds(0.1f);
 				outsite.NetworkkeycardEntered = false;
 			yield break;
