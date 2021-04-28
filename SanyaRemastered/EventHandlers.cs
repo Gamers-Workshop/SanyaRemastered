@@ -388,10 +388,6 @@ namespace SanyaRemastered
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}");
 
 			if (SanyaRemastered.Instance.Config.CassieSubtitle)
-			{
-
-				ev.IsGlobal = true;
-
 				switch (ev.Id)
 				{
 					case 0:
@@ -450,9 +446,8 @@ namespace SanyaRemastered
 							break;
 						}
 				}
-			}
 		}
-
+		
 		public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.CassieSubtitle)
@@ -663,8 +658,9 @@ namespace SanyaRemastered
 					Methods.Blink();
 				}
 
-				//SCPsDivisor
-				if (ev.DamageType != DamageTypes.Contain
+				//SCPsMultiplicator
+				if (ev.Target.IsScp 
+					&& ev.DamageType != DamageTypes.Contain
 					&& ev.DamageType != DamageTypes.Decont
 					&& ev.DamageType != DamageTypes.Flying
 					&& ev.DamageType != DamageTypes.Poison
@@ -1096,7 +1092,6 @@ namespace SanyaRemastered
 		}
 		public void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
 		{
-			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnExplodingGrenade] {ev.Grenade.transform.position}");
 			if (SanyaRemastered.Instance.Config.GrenadeEffect)
 			{
 				foreach (var ply in Player.List)
@@ -1286,17 +1281,6 @@ namespace SanyaRemastered
 		public void On914Upgrade(UpgradingItemsEventArgs ev)
 		{
 			if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On914Upgrade] {ev.KnobSetting} Players:{ev.Players.Count} Items:{ev.Items.Count}");
-			if (false)
-			{
-				foreach(Player player in ev.Players) 
-				{ 
-					if (player.CurrentItem != null)
-					{
-						
-					//	ev.Scp914.recipesDict.TryGetValue((ItemType)player.CurrentItemIndex,);
-					}
-				}
-			}
 			if (SanyaRemastered.Instance.Config.Scp914Effect)
 			{
 				switch (ev.KnobSetting)
@@ -1455,7 +1439,7 @@ namespace SanyaRemastered
 				effort += $"{s} ";
 
 			args = effort.Split(' ');
-			/*if (SanyaRemastered.Instance.Config.ContainCommand && ev.Player.Team == Team.SCP && args[0] == "contain")
+			if (SanyaRemastered.Instance.Config.ContainCommand && ev.Player.Team == Team.SCP && args[0] == "contain")
 			{
 				switch (ev.Player.Role)
 				{
@@ -1527,12 +1511,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("914"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("914"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -1643,12 +1627,12 @@ namespace SanyaRemastered
 										{
 											break;
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("012"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("012"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -1716,12 +1700,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("HCZ_ARMORY"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("HCZ_ARMORY"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -1789,12 +1773,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("LCZ_ARMORY"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("LCZ_ARMORY"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -1863,12 +1847,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("NUKE_ARMORY"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("NUKE_ARMORY"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -1937,12 +1921,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("HID") && doors.PermissionLevels == Door.AccessRequirements.ArmoryLevelThree)
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("HID") && door.RequiredPermissions.RequiredPermissions.ToTruthyPermissions() == Keycard.Permissions.ArmoryLevelThree)
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -2010,12 +1994,12 @@ namespace SanyaRemastered
 												break;
 											}
 										}
-										foreach (var doors in Map.Doors)
+										foreach (var door in Map.Doors)
 										{
-											if (doors.name.Equals("049_ARMORY"))
-												if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+											if (door.name.Equals("049_ARMORY"))
+												if (!door.NetworkTargetState && door.GetExactState() == 0f)
 												{
-													doors.Networklocked = true;
+													door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 													success = true;
 												}
 										}
@@ -2135,13 +2119,13 @@ namespace SanyaRemastered
 										}
 										if (TEST == 1)
 										{
-											foreach (var doors in Map.Doors)
+											foreach (var door in Map.Doors)
 											{
-												if (doors.name.Equals("106_BOTTOM"))
+												if (door.name.Equals("106_BOTTOM"))
 												{
-													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+													if (!door.NetworkTargetState && door.GetExactState() == 0f)
 													{
-														doors.Networklocked = true;
+														door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 														success = true;
 													}
 												}
@@ -2149,13 +2133,13 @@ namespace SanyaRemastered
 										}
 										if (TEST == 2)
 										{
-											foreach (var doors in Map.Doors)
+											foreach (var door in Map.Doors)
 											{
-												if (doors.name.Equals("106_PRIMARY") || doors.name.Equals("106_SECONDARY"))
+												if (door.name.Equals("106_PRIMARY") || door.name.Equals("106_SECONDARY"))
 												{
-													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+													if (!door.NetworkTargetState && door.GetExactState() == 0f)
 													{
-														doors.Networklocked = true;
+														door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 														success = true;
 													}
 													else
@@ -2273,24 +2257,24 @@ namespace SanyaRemastered
 										}
 										if (TEST == 1)
 										{
-											foreach (var doors in Map.Doors)
+											foreach (var door in Map.Doors)
 											{
-												if (doors.name.Equals("079_SECOND"))
-													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+												if (door.name.Equals("079_SECOND"))
+													if (!door.NetworkTargetState && door.GetExactState() == 0f)
 													{
-														doors.NetworkActiveLocks = true;
+														door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 														success = true;
 													}
 											}
 										}
 										if (TEST == 2)
 										{
-											foreach (var doors in Map.Doors)
+											foreach (var door in Map.Doors)
 											{
-												if (doors.name.Equals("079_FIRST") && TEST == 2)
-													if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+												if (door.name.Equals("079_FIRST") && TEST == 2)
+													if (!door.NetworkTargetState && door.GetExactState() == 0f)
 													{
-														doors.NetworkActiveLocks = true;
+														door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 														success = true;
 													}
 											}
@@ -2379,12 +2363,12 @@ namespace SanyaRemastered
 										break;
 									}
 								}
-								foreach (var doors in Map.Doors)
+								foreach (var door in Map.Doors)
 								{
-									if (doors.name.Equals("096"))
-										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+									if (door.name.Equals("096"))
+										if (!door.NetworkTargetState && door.GetExactState() == 0f)
 										{
-											doors.Networklocked = true;
+											door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 											success = true;
 										}
 								}
@@ -2452,12 +2436,12 @@ namespace SanyaRemastered
 										break;
 									}
 								}
-								foreach (var doors in Map.Doors)
+								foreach (var door in Map.Doors)
 								{
-									if (doors.name.Equals("HCZ_ARMORY"))
-										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+									if (door.name.Equals("HCZ_ARMORY"))
+										if (!door.NetworkTargetState && door.GetExactState() == 0f)
 										{
-											doors.Networklocked = true;
+											door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 											success = true;
 										}
 								}
@@ -2532,14 +2516,14 @@ namespace SanyaRemastered
 										break;
 									}
 								}
-								foreach (var doors in Map.Doors)
+								foreach (var door in Map.Doors)
 								{
-									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
-									if (doors.doorType == Door.DoorTypes.Standard && doors.name == "ContDoor" && dis < 25)
+									float dis = Vector3.Distance(door.transform.position, ev.Player.Position);
+									if (door.name == "ContDoor" && dis < 25)
 									{
-										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+										if (!door.NetworkTargetState && door.GetExactState() == 0f)
 										{
-											doors.Networklocked = true;
+											door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 											success = true;
 										}
 										else
@@ -2612,14 +2596,14 @@ namespace SanyaRemastered
 										break;
 									}
 								}
-								foreach (var doors in Map.Doors)
+								foreach (var door in Map.Doors)
 								{
-									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
-									if (doors.name.Equals("106_BOTTOM"))
+									float dis = Vector3.Distance(door.transform.position, ev.Player.Position);
+									if (door.name.Equals("106_BOTTOM"))
 									{
-										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+										if (!door.NetworkTargetState && door.GetExactState() == 0f)
 										{
-											doors.Networklocked = true;
+											door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 											success = true;
 										}
 										else
@@ -2691,14 +2675,14 @@ namespace SanyaRemastered
 										break;
 									}
 								}
-								foreach (var doors in Map.Doors)
+								foreach (var door in Map.Doors)
 								{
-									float dis = Vector3.Distance(doors.transform.position, ev.Player.Position);
-									if (doors.name.Equals("106_BOTTOM"))
+									float dis = Vector3.Distance(door.transform.position, ev.Player.Position);
+									if (door.name.Equals("106_BOTTOM"))
 									{
-										if (doors.status != Door.DoorStatus.Open && doors.status != Door.DoorStatus.Moving)
+										if (!door.NetworkTargetState && door.GetExactState() == 0f)
 										{
-											doors.Networklocked = true;
+											door.ActiveLocks = (ushort)DoorLockReason.SpecialDoorFeature;
 											success = true;
 										}
 										else
@@ -2716,12 +2700,8 @@ namespace SanyaRemastered
 							}
 							break;
 						}
-					default:
-						{
-							break;
-						}
 				}
-			}*/
+			}
 		}
 	}	
 }

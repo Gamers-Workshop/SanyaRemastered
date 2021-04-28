@@ -213,26 +213,30 @@ namespace SanyaRemastered
 		public int Scp079ExLevelGaz { get; set; } = 4;
 
 		[Description("SCP-079 Config")]
-		public float Scp079CostCamera { get; set; } = 1f;
-		public float Scp079CostLock { get; set; } = 4f;
-		public float Scp079CostLockStart { get; set; } = 5f;
-		public float Scp079RequiredLockStart { get; set; } = 10f;
-		public float Scp079CostDoorDefault { get; set; } = 5f;
-		public float Scp079CostDoorContlv1 { get; set; } = 50f;
-		public float Scp079CostDoorContlv2 { get; set; } = 40f;
-		public float Scp079CostDoorContlv3 { get; set; } = 110f;
-		public float Scp079CostDoorArmlv1 { get; set; } = 50f;
-		public float Scp079CostDoorArmlv2 { get; set; } = 60f;
-		public float Scp079CostDoorArmlv3 { get; set; } = 70f;
-		public float Scp079CostDoorGate { get; set; } = 60f;
-		public float Scp079CostDoorIntercom { get; set; } = 30f;
-		public float Scp079CostDoorCheckpoint { get; set; } = 10f;
-		public float Scp079CostLockDown { get; set; } = 60f;
-		public float Scp079CostTesla { get; set; } = 50f;
-		public float Scp079CostElevatorTeleport { get; set; } = 30f;
-		public float Scp079CostElevatorUse { get; set; } = 10f;
-		public float Scp079CostSpeakerStart { get; set; } = 10f;
-		public float Scp079CostSpeakerUpdate { get; set; } = 0.8f;
+		public Dictionary<string, float> Scp079ManaCost { get; set; } = new Dictionary<string, float>()
+		{
+			{"Camera Switch",                   1f },
+			{"Door Lock",                       4f },
+			{"Door Lock Start",                 5f },
+			{"Door Lock Minimum",              10f },
+			{"Door Interaction DEFAULT",        5f },
+			{"Door Interaction CONT_LVL_1",    50f },
+			{"Door Interaction CONT_LVL_2",    40f },
+			{"Door Interaction CONT_LVL_3",   110f },
+			{"Door Interaction ARMORY_LVL_1",  50f },
+			{"Door Interaction ARMORY_LVL_2",  60f },
+			{"Door Interaction ARMORY_LVL_3",  70f },
+			{"Door Interaction EXIT_ACC",      60f },
+			{"Door Interaction INCOM_ACC",     30f },
+			{"Door Interaction CHCKPOINT_ACC", 10f },
+			{"Room Lockdown",                  60f },
+			{"Tesla Gate Burst",               50f },
+			{"Elevator Teleport",              30f },
+			{"Elevator Use",                   10f },
+			{"Speaker Start",                  10f },
+			{"Speaker Update",                0.8f }
+		};
+
 
 		public string GetConfigs()
 		{

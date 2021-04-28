@@ -52,6 +52,47 @@ namespace SanyaRemastered.Commands
 						response = "test ok.";
 						return true;
 					}
+				case "audio":
+                    {
+						if (player != null && !player.CheckPermission("sanya.dev"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						Methods.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/049_Ringo_Ringo_Roses.raw", 9997, 1, true, player.Position);
+
+						response = "test ok.";
+						return true;
+					}
+				case "checkobj":
+					{
+						if (player != null && !player.CheckPermission("sanya.dev"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						response = "ok.";
+						if (Physics.Raycast(player.Position + player.CameraTransform.forward, player.CameraTransform.forward, out var casy))
+						{
+							Log.Warn($"{casy.transform.name} (layer{casy.transform.gameObject.layer})");
+							Log.Warn($"HasComponents:");
+							foreach (var i in casy.transform.gameObject.GetComponents<Component>())
+							{
+								Log.Warn($"    {i.name}:{i.GetType()}");
+							}
+							Log.Warn($"HasComponentsInChildren:");
+							foreach (var i in casy.transform.gameObject.GetComponentsInChildren<Component>())
+							{
+								Log.Warn($"    {i.name}:{i.GetType()}");
+							}
+							Log.Warn($"HasComponentsInParent:");
+							foreach (var i in casy.transform.gameObject.GetComponentsInParent<Component>())
+							{
+								Log.Warn($"    {i.name}:{i.GetType()}");
+							}
+						}
+						return true;
+					}
 				case "scale":
 					{
 						if (player != null && !player.CheckPermission("sanya.scale"))

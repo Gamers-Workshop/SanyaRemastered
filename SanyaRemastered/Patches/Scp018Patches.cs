@@ -13,8 +13,6 @@ namespace SanyaRemastered.Patches
 	{
 		public static void Prefix(Grenade __instance, ref Team value)
 		{
-			Log.Debug($"[GrenadeThrowerPatch] value:{value} isscp018:{__instance is Scp018Grenade}");
-
 			if (SanyaRemastered.Instance.Config.Scp018FriendlyFire&& __instance is Scp018Grenade) value = Team.TUT;
 		}
 	}

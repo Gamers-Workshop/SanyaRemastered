@@ -20,71 +20,8 @@ namespace SanyaRemastered.Patches
 		public static void Postfix(Scp079PlayerScript __instance)
 		{
 			foreach (Scp079PlayerScript.Ability079 ability in __instance.abilities)
-			{
-				switch (ability.label)
-				{
-					case "Camera Switch":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostCamera;
-						break;
-					case "Door Lock":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLock;
-						break;
-					case "Door Lock Start":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLockStart;
-						break;
-					case "Door Lock Minimum":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079RequiredLockStart;
-						break;
-					case "Door Interaction DEFAULT":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorDefault;
-						break;
-					case "Door Interaction CONT_LVL_1":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv1;
-						break;
-					case "Door Interaction CONT_LVL_2":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv2;
-						break;
-					case "Door Interaction CONT_LVL_3":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorContlv3;
-						break;
-					case "Door Interaction ARMORY_LVL_1":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv1;
-						break;
-					case "Door Interaction ARMORY_LVL_2":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv2;
-						break;
-					case "Door Interaction ARMORY_LVL_3":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorArmlv3;
-						break;
-					case "Door Interaction EXIT_ACC":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorGate;
-						break;
-					case "Door Interaction INCOM_ACC":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorIntercom;
-						break;
-					case "Door Interaction CHCKPOINT_ACC":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostDoorCheckpoint;
-						break;
-					case "Room Lockdown":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostLockDown;
-						break;
-					case "Tesla Gate Burst":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostTesla;
-						break;
-					case "Elevator Teleport":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostElevatorTeleport;
-						break;
-					case "Elevator Use":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostElevatorUse;
-						break;
-					case "Speaker Start":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostSpeakerStart;
-						break;
-					case "Speaker Update":
-						ability.mana = SanyaRemastered.Instance.Config.Scp079CostSpeakerUpdate;
-						break;
-				}
-			}
+				if (SanyaRemastered.Instance.Config.Scp079ManaCost.TryGetValue(ability.label, out var value))
+					ability.mana = value;
 		}
 	}
 
@@ -264,7 +201,7 @@ namespace SanyaRemastered.Patches
 						if (SanyaRemastered.Instance.Config.CassieSubtitle)
 						{
 							player.ClearBroadcasts();
-							player.Broadcast(2, Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"));
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"),2);
 						}
 						Methods.PlayAmbientSound(7);
 					}
