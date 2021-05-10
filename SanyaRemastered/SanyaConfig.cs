@@ -15,48 +15,29 @@ namespace SanyaRemastered
 		public Configs()
 		{
 			DataDirectory = Path.Combine(Paths.Plugins, "SanyaRemastered");
-			DissonanceDataDirectory = Path.Combine(Paths.Configs, "Dissonance");
 		}
 		[Description("Activation du SanyaRemastered")]
 		public bool IsEnabled { get; set; }
+		public bool IsBeta { get; set; } = false;
+
 
 		[Description("WIP")]
 		public bool IsDebugged { get; set; } = false;
-		public bool Scp106PortalExtensionEnabled { get; set; } = false;
-		public bool TeslaExplodeGrenade { get; set; } = false;
 		public bool Coroding106 { get; set; } = false;
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
 		[Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
 		public string DataDirectory { get; private set; } = string.Empty;
-		[Description("Activation du fichier Audio")]
-		public bool DissonanceEnabled { get; set; } = false;
-		[Description("localisation du fichier Audio")]
-		public string DissonanceDataDirectory { get; private set; } = string.Empty;
-
-		[Description("Volume du fichier Audio")]
-		public float DissonanceVolume { get; set; } = 0.1f;
-
-		[Description("Informations sur le serveur Adresse IP de destination")]
-		public string InfosenderIp { get; set; } = "none";
-
-		[Description("Port UDP vers lequel les informations du serveur sont envoyées")]
-		public int InfosenderPort { get; set; } = -1;
-
-		[Description("Kick Player")]
-		public bool KickSteamLimited { get; set; } = false;
 
 		[Description("Hud Activé")]
 		public bool ExHudEnabled { get; set; } = false;
 
 		[Description("Hud Scp-079 auras plus d'info")]
 		public bool ExHudScp079Moreinfo { get; set; } = false;
-		[Description("Hud Scp-079 auras plus d'info")]
-		public bool ExHudScp096SeeTargetZone { get; set; } = false;
+		[Description("Hud Scp-096 auras plus d'info")]
+		public bool ExHudScp096 { get; set; } = false;
 
-		[Description("Message de Bienvenue")]
-		public string MotdMessage { get; set; } = string.Empty;
 		[Description("Disable Player lists")]
 		public bool DisablePlayerLists { get; set; } = false;
 		[Description("NukeCap peut étre refermer")]
@@ -71,8 +52,6 @@ namespace SanyaRemastered
 		public int ItemCleanup { get; set; } = -1;
 		public List<string> ItemCleanupIgnore { get; set; } = new List<string>();
 		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
-		[Description("a test")]
-		public bool PlayersInfoDisableFollow { get; set; } = false;
 		[Description("Ajout de porte sur la map")]
 		public bool AddDoorsOnSurface { get; set; } = false;
 		[Description("Game config")]
@@ -101,11 +80,7 @@ namespace SanyaRemastered
 
 		[Description("Donne un effect d'assourdissement quand on est proche de l'explosion d'une grenade")]
 		public bool GrenadeEffect { get; set; } = false;
-		
-		[Description("ClassD Contain")]
-		public bool ClassD_container_locked { get; set; } = false;
-		public float ClassD_container_Unlocked { get; set; } = 10f;
-		
+				
 		[Description("Stamina Add \n  # Stamina effect ajoute un leger ralentissement quand la personne n'as pas de stamina")]
 		public bool StaminaEffect { get; set; } = false;
 		public float StaminaLostJump { get; set; } = 0.05f;
@@ -147,12 +122,7 @@ namespace SanyaRemastered
 		public bool Scp018FriendlyFire { get; set; } = false;
 		public bool Scp018CantDestroyObject { get; set; } = false;
 
-		[Description("% de chance de blink quand on lui tire dessus")]
-		public int Scp173ForceBlinkPercent { get; set; } = -1;
-
 		[Description("SCP-939 Patches")]
-		public bool Scp939AttackBleeding { get; set; } = false;
-		public float Scp939AttackBleedingTime { get; set; } = 60f;
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
 
 		public float Scp939Size { get; set; } = 1f;
@@ -163,20 +133,25 @@ namespace SanyaRemastered
 		public float UspDamageMultiplierScp { get; set; } = 1f;
 
 		[Description("Recovery Amount")]
-		public int Scp096RecoveryAmount { get; set; } = 0;
-		public int Scp106RecoveryAmount { get; set; } = 0;
-		public int Scp049RecoveryAmount { get; set; } = 0;
-		public int Scp0492RecoveryAmount { get; set; } = 0;
-		public int Scp173RecoveryAmount { get; set; } = 0;
-		public int Scp939RecoveryAmount { get; set; } = 0;
-
+		public Dictionary<DamageTypes.DamageType, int> ScpRecoveryAmount { get; set; } = new Dictionary<DamageTypes.DamageType, int>()
+		{
+			{DamageTypes.Scp049, 0},
+			{DamageTypes.Scp0492, 0},
+			{DamageTypes.Scp096, 0},
+			{DamageTypes.Scp106, 0},
+			{DamageTypes.Scp173, 0},
+			{DamageTypes.Scp939, 0}
+		};
 		[Description("Multiplicateur de dégats")]
-		public float Scp096DamageMultiplicator { get; set; } = 1f;
-		public float Scp173DamageMultiplicator { get; set; } = 1f;
-		public float Scp049DamageMultiplicator { get; set; } = 1f;
-		public float Scp0492DamageMultiplicator { get; set; } = 1f;
-		public float Scp939DamageMultiplicator { get; set; } = 1f;
-
+		public Dictionary<RoleType, float> ScpDamageMultiplicator { get; set; } = new Dictionary<RoleType, float>()
+		{
+			{RoleType.Scp049, 1f},
+			{RoleType.Scp0492, 1f},
+			{RoleType.Scp096, 1f},
+			{RoleType.Scp173, 1f},          
+			{RoleType.Scp93953, 1f},
+			{RoleType.Scp93989, 1f},
+		};
 		[Description("Ne comprends pas la MicroHid Ni la Tesla")]
 		public float Scp106DamageMultiplicator { get; set; } = 1f;
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
@@ -186,8 +161,6 @@ namespace SanyaRemastered
 		public List<RoleType> AltvoicechatScpsParsed = new List<RoleType>();
 
 		[Description("SCP Activé les mode étendue")]
-		public bool Scp106Exmode { get; set; } = false;
-
 		public bool Scp079ExtendEnabled { get; set; } = false;
 		[Description("SCP-106 Config \n  # Quand vous marcher sur le portail de 106 vous tomber dans la dimmenssion de poche")]
 		public bool Scp106PortalEffect { get; set; } = false;

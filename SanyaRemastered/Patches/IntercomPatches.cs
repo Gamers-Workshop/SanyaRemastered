@@ -19,8 +19,9 @@ namespace SanyaRemastered.Patches
 		{	
 		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
 		{
-			Map.Rooms.ToList().TryGet((int)RoomType.EzIntercom, out Room RoomIntercom);
-			if (!RoomIntercom.LightsOff)
+			Room Hcz106 = Map.Rooms.Where(x => x.Type == RoomType.Hcz106).Single();
+			Room RoomIntercom = Map.Rooms.Where(x => x.Type == RoomType.EzIntercom).Single();
+			if (!RoomIntercom.LightsOff && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
 			{
 				int leftdecont = (int)Math.Truncate((DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger) - Math.Truncate(DecontaminationController.GetServerTime));
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
@@ -50,9 +51,8 @@ namespace SanyaRemastered.Patches
 								$"Scientifique restants : {RoundSummary.singleton.CountTeam(Team.RSC):00}/{RoundSummary.singleton.classlistStart.scientists:00}\n",
 								$"Nine-Tailed Fox restants : {RoundSummary.singleton.CountTeam(Team.MTF):00}\n"
 								);
-				//SCP-106 Femur
-				Map.Rooms.ToList().TryGet((int)RoomType.Hcz106, out Room Room106);
-				if (!Room106.LightsOff)
+					//SCP-106 Femur
+				if (!Hcz106.LightsOff)
 					if (isContain)
 					{
 						if (OneOhSixContainer.used)
@@ -177,6 +177,7 @@ namespace SanyaRemastered.Patches
 
 				return;
 				}
+				__instance.CustomContent = " ";
 			}
 		}
 	}

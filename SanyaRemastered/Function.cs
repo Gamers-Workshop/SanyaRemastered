@@ -22,50 +22,6 @@ using UnityEngine.Networking;
 
 namespace SanyaRemastered.Functions
 {
-    internal static class PlayerDataManager
-    {
-        public static Dictionary<string, PlayerData> playersData = new Dictionary<string, PlayerData>();
-
-        public static PlayerData LoadPlayerData(string userid)
-        {
-            string targetuseridpath = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, $"{userid}.txt");
-            if (!Directory.Exists(SanyaRemastered.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaRemastered.Instance.Config.DataDirectory);
-            if (!File.Exists(targetuseridpath)) return new PlayerData(DateTime.Now, userid, true, 0, 0, 0);
-            else return ParsePlayerData(targetuseridpath);
-        }
-
-        public static void SavePlayerData(PlayerData data)
-        {
-            string targetuseridpath = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, $"{data.userid}.txt");
-
-            if (!Directory.Exists(SanyaRemastered.Instance.Config.DataDirectory)) Directory.CreateDirectory(SanyaRemastered.Instance.Config.DataDirectory);
-
-            string[] textdata = new string[] {
-                data.lastUpdate.ToString("yyyy-MM-ddTHH:mm:sszzzz"),
-                data.userid,
-                data.limited.ToString(),
-                data.level.ToString(),
-                data.exp.ToString(),
-                data.playingcount.ToString()
-            };
-
-            File.WriteAllLines(targetuseridpath, textdata);
-        }
-
-        private static PlayerData ParsePlayerData(string path)
-        {
-            var text = File.ReadAllLines(path);
-            return new PlayerData(
-                DateTime.Parse(text[0]),
-                text[1],
-                bool.Parse(text[2]),
-                int.Parse(text[3]),
-                int.Parse(text[4]),
-                int.Parse(text[5])
-                );
-        }
-    }
-
     internal static class ShitChecker
     {
         private static readonly string whitelist_path = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
@@ -126,75 +82,7 @@ namespace SanyaRemastered.Functions
 			}
 		}
 		*/
-        public static IEnumerator<float> CheckIsLimitedSteam(string userid)
-        {
-            PlayerData data = null;
-
-            string xmlurl = string.Concat(
-                "https://steamcommunity.com/profiles/",
-                userid.Replace("@steam", string.Empty),
-                "?xml=1"
-            );
-            using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(xmlurl))
-            {
-                yield return Timing.WaitUntilDone(unityWebRequest.SendWebRequest());
-                if (!unityWebRequest.isNetworkError)
-                {
-                    XmlReaderSettings xmlReaderSettings = new XmlReaderSettings() { IgnoreComments = true, IgnoreWhitespace = true };
-                    XmlReader xmlReader = XmlReader.Create(new MemoryStream(unityWebRequest.downloadHandler.data), xmlReaderSettings);
-                    while (xmlReader.Read())
-                    {
-                        if (xmlReader.ReadToFollowing("isLimitedAccount"))
-                        {
-                            string isLimited = xmlReader.ReadElementContentAsString();
-                            if (isLimited == "0")
-                            {
-                                Log.Info($"[SteamCheck] OK:{userid}");
-                                if (data != null)
-                                {
-                                    data.limited = false;
-                                    PlayerDataManager.SavePlayerData(data);
-                                }
-                                yield break;
-                            }
-                            else
-                            {
-                                Log.Warn($"[SteamCheck] NG:{userid}");
-                                var player = Player.Get(userid);
-                                if (player != null)
-                                {
-                                    ServerConsole.Disconnect(player.Connection, Subtitles.LimitedKickMessage);
-                                }
-
-                                if (!EventHandlers.kickedbyChecker.ContainsKey(userid))
-                                    EventHandlers.kickedbyChecker.Add(userid, "steam");
-
-                                yield break;
-                            }
-                        }
-                        else
-                        {
-                            Log.Warn($"[SteamCheck] Falied(NoProfile):{userid}");
-                            var player = Player.Get(userid);
-                            if (player != null)
-                            {
-                                ServerConsole.Disconnect(player.Connection, Subtitles.NoProfileKickMessage);
-                            }
-                            if (!EventHandlers.kickedbyChecker.ContainsKey(userid))
-                                EventHandlers.kickedbyChecker.Add(userid, "steam");
-                            yield break;
-                        }
-                    }
-                }
-                else
-                {
-                    Log.Error($"[SteamCheck] Failed(NetworkError):{userid}:{unityWebRequest.error}");
-                    yield break;
-                }
-            }
-            yield break;
-        }
-
+        
         public static void LoadLists()
         {
             whitelist.Clear();
@@ -256,9 +144,6 @@ namespace SanyaRemastered.Functions
         public static bool isAirBombGoing = false;
         public static bool isActuallyBombGoing = false;
         public static int AirBombWait = 0;
-
-        public static bool ContainClassD = false;
-
         public static IEnumerator<float> CloseNukeCap()
         {
             var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
@@ -266,46 +151,7 @@ namespace SanyaRemastered.Functions
             outsite.NetworkkeycardEntered = false;
             yield break;
         }
-        public static IEnumerator<float> Calm096(PlayableScps.Scp096 scp)
-        {
-            if (scp.Enraged && !scp._targets.Any())
-            {
-                scp.PlayerState = PlayableScps.Scp096PlayerState.Calming;
-            }
-            yield break;
-        }
-        public static IEnumerator<float> StartContainClassD(bool stop, float TimeLock = 0)
-        {
-            if (stop)
-            {
-                ContainClassD = false;
-                foreach (var door in UnityEngine.Object.FindObjectsOfType<DoorVariant>())
-                {
-                    if (door.name.Contains("PrisonDoor"))
-                    {
-                        door.NetworkActiveLocks = (ushort)DoorLockMode.FullLock;
-                        yield break;
-                    }
-                }
-            }
-            else
-            {
-                ContainClassD = true;
-                while (ContainClassD)
-                {
-                    foreach (var door in UnityEngine.Object.FindObjectsOfType<DoorVariant>())
-                    {
-                        if (door.name.Contains("PrisonDoor"))
-                        {
-                            door.NetworkActiveLocks = (ushort)DoorLockMode.FullLock;
-                            yield return Timing.WaitForSeconds(TimeLock);
-                            door.NetworkActiveLocks = (ushort)DoorLockMode.CanOpen;
-                            yield break;
-                        }
-                    }
-                }
-            }
-        }
+
         public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
         {
             AirBombWait = timewait;
@@ -318,6 +164,7 @@ namespace SanyaRemastered.Functions
                 {
                     Methods.SendSubtitle(Subtitles.AirbombStop, 10);
                 }
+                DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 Log.Info("[AirSupportBomb] The AirBomb as stop");
                 yield break;
             }
@@ -326,6 +173,8 @@ namespace SanyaRemastered.Functions
                 Log.Info("[AirSupportBomb] The AirBomb as already true");
                 yield break;
             }
+            DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {RoundSummary.roundTime / 60:00}min {RoundSummary.roundTime % 60:00}sec\n";
+
             isAirBombGoing = true;
             while (AirBombWait > 0)
             {
@@ -352,11 +201,13 @@ namespace SanyaRemastered.Functions
                 }
                 if (!isAirBombGoing)
                 {
+                    DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                     RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
                         Methods.SendSubtitle(Subtitles.AirbombStop, 10);
                     }
+                    DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                     Log.Info($"[AirSupportBomb] The AirBomb as stop");
                     yield break;
                 }
@@ -367,7 +218,7 @@ namespace SanyaRemastered.Functions
             {
                 isActuallyBombGoing = true;
                 Log.Info($"[AirSupportBomb] booting...");
-
+                DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
                 SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound()));
                 RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
@@ -413,6 +264,7 @@ namespace SanyaRemastered.Functions
                     Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
                 RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
                 isActuallyBombGoing = false;
+                DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 Log.Info($"[AirSupportBomb] Ended.");
                 yield break;
             }
@@ -517,20 +369,6 @@ namespace SanyaRemastered.Functions
             writer.WriteBoolean(achieve);
             target.TargetSendRpc(AlphaWarheadController.Host, nameof(AlphaWarheadController.RpcShake), writer);
             NetworkWriterPool.Recycle(writer);
-        }
-        public static bool IsStuck(Vector3 pos)
-        {
-            bool result = false;
-            foreach (Collider collider in Physics.OverlapBox(pos, new Vector3(0.4f, 1f, 0.4f), new Quaternion(0f, 0f, 0f, 0f)))
-            {
-                bool flag = collider.name.Contains("Hitbox") || collider.name.Contains("mixamorig") || collider.name.Equals("Player") || collider.name.Equals("PlyCenter") || collider.name.Equals("Antijumper");
-                if (!flag)
-                {
-                    Log.Warn($"Detect:{collider.name}");
-                    result = true;
-                }
-            }
-            return result;
         }
         public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
         {
@@ -880,11 +718,6 @@ namespace SanyaRemastered.Functions
     }
     internal static class Extensions
     {
-        public static Task StartSender(this Task task)
-        {
-            return task.ContinueWith((x) => { Log.Error($"[Sender] {x}"); }, TaskContinuationOptions.OnlyOnFaulted);
-        }
-
         public static bool IsHuman(this Player player)
         {
             return player.Team != Team.SCP && player.Team != Team.RIP;

@@ -34,9 +34,14 @@ namespace SanyaRemastered
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
 		private string _hudText = string.Empty;
+		//HudCenterDown
 		private string _hudCenterDownString = string.Empty;
 		private float _hudCenterDownTime = -1f;
 		private float _hudCenterDownTimer = 0f;
+		//HudBottom
+		private string _hudBottomString = string.Empty;
+		private float _hudBottomTime = -1f;
+		private float _hudBottomTimer = 0f;
 
 		private void Start()
 		{
@@ -78,12 +83,29 @@ namespace SanyaRemastered
 			_hudCenterDownTime = -1f;
 		}
 
-		public void UpdateTimers()
+		public void AddHudBottomText(string text, ulong timer)
+		{
+			_hudBottomString = text;
+			_hudBottomTime = timer;
+			_hudBottomTimer = 0f;
+		}
+
+		public void ClearHudBottomText()
+		{
+			_hudBottomTime = -1f;
+		}
+
+		private void UpdateTimers()
 		{
 			if (_hudCenterDownTimer < _hudCenterDownTime)
 				_hudCenterDownTimer += Time.deltaTime;
 			else
-				_hudCenterDownString = string.Empty;
+				_hudCenterDownString = string.Empty; 
+
+			if (_hudBottomTimer < _hudBottomTime)
+				_hudBottomTimer += Time.deltaTime;
+			else
+				_hudBottomString = string.Empty;
 		}
 
 		private void CheckTraitor()
@@ -194,7 +216,7 @@ namespace SanyaRemastered
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
 					list.TrimEnd('\n');
 				}
-				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096SeeTargetZone && Scp096.TurnedPlayers.ToList().Count() != 0)
+				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && Scp096.TurnedPlayers.ToList().Count() != 0)
 				{
 					list += "Target\n";
 					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => Scp096.TurnedPlayers.Contains(p)).Count() != 0))
@@ -209,29 +231,6 @@ namespace SanyaRemastered
 			//[CENTER_UP]
 			if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
-			/*else if (_player.Role == RoleType.Scp096 && _player.CurrentScp is PlayableScps.Scp096 scp096)
-				switch (scp096.PlayerState)
-				{
-					case PlayableScps.Scp096PlayerState.Docile:
-						if (!scp096.CanEnrage) curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Docile:{ Mathf.RoundToInt(scp096.RemainingEnrageCooldown)}s", 6));
-						else if (scp096._preWindupTime > 0f) curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"PreWindup:{ Mathf.RoundToInt(scp096._preWindupTime)}s", 6));
-						else curText = curText.Replace("[CENTER_UP]", FormatStringForHud("Ready", 6));
-						break;
-					case PlayableScps.Scp096PlayerState.Enraging:
-						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Enraging:{ Mathf.RoundToInt(scp096._enrageWindupRemaining)}s", 6));
-						break;
-					case PlayableScps.Scp096PlayerState.Enraged:
-					case PlayableScps.Scp096PlayerState.Attacking:
-					case PlayableScps.Scp096PlayerState.Charging:
-						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Enraging:{Mathf.RoundToInt(scp096.EnrageTimeLeft)}s", 6));
-						break;
-					case PlayableScps.Scp096PlayerState.Calming:
-						curText = curText.Replace("[CENTER_UP]", FormatStringForHud($"Calming:{Mathf.RoundToInt(scp096._calmingTime)}s", 6));
-						break;
-					default:
-						curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
-						break;
-				}*/
 			else
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
@@ -265,10 +264,16 @@ namespace SanyaRemastered
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
 
 			//[BOTTOM]
-			curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
+			if (!string.IsNullOrEmpty(_hudBottomString))
+				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudBottomString, 6));
+
+			else if (SanyaRemastered.Instance.Config.IsBeta)
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud("", 6));
+			else
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
 
 			//Don't Send if you have nothing to send
-			if (curText.Length != 157)
+			if (string.IsNullOrEmpty(curText.Replace("\n",string.Empty).Replace("<align=left><voffset=38em><size=50%><alpha=#44><alpha=#ff></size></align><align=right></align><align=center></align></voffset>", string.Empty)))
 			{
 				_hudText = curText;
 				_player.ShowHint(_hudText, 2);

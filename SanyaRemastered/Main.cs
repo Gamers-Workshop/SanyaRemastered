@@ -71,7 +71,7 @@ namespace SanyaRemastered
 		private void RegistEvents()
 		{
 			Handlers = new EventHandlers(this);
-			new Scp096Helper();
+
 			ServerEvents.SendingConsoleCommand += Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers += Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted += Handlers.OnRoundStart;
@@ -119,6 +119,7 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems += Handlers.On914Upgrade;
+			Scp096Events.CalmingDown += Handlers.OnCalmingDown;
 		}
 
 		private void UnRegistEvents()
@@ -169,7 +170,7 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems -= Handlers.On914Upgrade;
-
+			Scp096Events.CalmingDown -= Handlers.OnCalmingDown;
 			Handlers = null;
 		}
 

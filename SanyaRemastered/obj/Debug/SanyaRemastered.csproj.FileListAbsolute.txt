@@ -176,3 +176,11 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Memory.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\System.Numerics.Vectors.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SanyaRemastered.dll.config
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\CommsHack.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\DiscordLog.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Newtonsoft.Json.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHand.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Exiled.CustomItems.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\DiscordLog.pdb
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\DiscordLog.dll.config
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\Newtonsoft.Json.xml
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\SerpentsHand.pdb
