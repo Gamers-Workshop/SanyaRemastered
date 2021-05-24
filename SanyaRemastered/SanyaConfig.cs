@@ -18,12 +18,13 @@ namespace SanyaRemastered
 		}
 		[Description("Activation du SanyaRemastered")]
 		public bool IsEnabled { get; set; }
-		public bool IsBeta { get; set; } = false;
+		public string IsBeta { get; set; } = string.Empty;
 
 
 		[Description("WIP")]
 		public bool IsDebugged { get; set; } = false;
 		public bool Coroding106 { get; set; } = false;
+		public bool ExplodingGrenadeTesla { get; set; } = false;
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
@@ -126,21 +127,22 @@ namespace SanyaRemastered
 		public int Scp939SeeingAhpAmount { get; set; } = -1;
 
 		public float Scp939Size { get; set; } = 1f;
-		[Description("SCP-096 Patches")]
+		[Description("RP")]
 		public bool Scp096Real { get; set; } = false;
+		public bool Scp049Real { get; set; } = false;
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;
 
 		[Description("Recovery Amount")]
-		public Dictionary<DamageTypes.DamageType, int> ScpRecoveryAmount { get; set; } = new Dictionary<DamageTypes.DamageType, int>()
+		public Dictionary<string, int> ScpRecoveryAmount { get; set; } = new Dictionary<string, int>()
 		{
-			{DamageTypes.Scp049, 0},
-			{DamageTypes.Scp0492, 0},
-			{DamageTypes.Scp096, 0},
-			{DamageTypes.Scp106, 0},
-			{DamageTypes.Scp173, 0},
-			{DamageTypes.Scp939, 0}
+			{"Scp049", 0},
+			{"Scp0492", 0},
+			{"Scp096", 0},
+			{"Scp106", 0},
+			{"Scp173", 0},
+			{"Scp939", 0}
 		};
 		[Description("Multiplicateur de dégats")]
 		public Dictionary<RoleType, float> ScpDamageMultiplicator { get; set; } = new Dictionary<RoleType, float>()

@@ -11,6 +11,8 @@ using Scp079Events = Exiled.Events.Handlers.Scp079;
 using Scp914Events = Exiled.Events.Handlers.Scp914;
 using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
+using Scp049Events = Exiled.Events.Handlers.Scp049;
+
 using System.Collections.Generic;
 using NorthwoodLib.Pools;
 using System.Reflection.Emit;
@@ -119,7 +121,10 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems += Handlers.On914Upgrade;
-			Scp096Events.CalmingDown += Handlers.OnCalmingDown;
+			Scp096Events.Enraging += Handlers.OnEnraging;
+			Scp096Events.CalmingDown += Handlers.On096CalmingDown;
+			Scp049Events.FinishingRecall += Handlers.On049FinishingRecall;
+			Scp049Events.StartingRecall += Handlers.StartingRecall;
 		}
 
 		private void UnRegistEvents()
@@ -165,12 +170,14 @@ namespace SanyaRemastered
 			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
 			PlayerEvents.InsertingGeneratorTablet -= Handlers.OnGeneratorInsert;
 			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
-
 			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems -= Handlers.On914Upgrade;
-			Scp096Events.CalmingDown -= Handlers.OnCalmingDown;
+			Scp096Events.Enraging -= Handlers.OnEnraging;
+			Scp096Events.CalmingDown -= Handlers.On096CalmingDown;
+			Scp049Events.FinishingRecall -= Handlers.On049FinishingRecall;
+			Scp049Events.StartingRecall -= Handlers.StartingRecall;
 			Handlers = null;
 		}
 

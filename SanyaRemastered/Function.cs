@@ -1,4 +1,5 @@
 ﻿using Dissonance.Integrations.MirrorIgnorance;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
@@ -173,7 +174,7 @@ namespace SanyaRemastered.Functions
                 Log.Info("[AirSupportBomb] The AirBomb as already true");
                 yield break;
             }
-            DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {RoundSummary.roundTime / 60:00}min {RoundSummary.roundTime % 60:00}sec\n";
+            DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n";
 
             isAirBombGoing = true;
             while (AirBombWait > 0)
@@ -201,7 +202,6 @@ namespace SanyaRemastered.Functions
                 }
                 if (!isAirBombGoing)
                 {
-                    DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                     RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
@@ -219,7 +219,7 @@ namespace SanyaRemastered.Functions
                 isActuallyBombGoing = true;
                 Log.Info($"[AirSupportBomb] booting...");
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-                SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound()));
+                SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
                 RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 {
@@ -735,7 +735,6 @@ namespace SanyaRemastered.Functions
                 ((player.Team != Team.CDP && player.Team != Team.CHI) || (target != Team.CDP && target != Team.CHI))
             ;
         }
-
         public static int GetHealthAmountPercent(this Player player)
         {
             return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));

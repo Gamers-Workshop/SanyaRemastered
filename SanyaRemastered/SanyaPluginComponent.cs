@@ -206,7 +206,7 @@ namespace SanyaRemastered
 			if (_player.Team == Team.SCP)
 			{
 				string list = string.Empty;
-				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && Player.Get(Exiled.API.Enums.Side.Scp).Count() > 1)
+				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
 					list += "SCP\n";
 					foreach (var scp in _scplists)
@@ -216,11 +216,13 @@ namespace SanyaRemastered
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
 					list.TrimEnd('\n');
 				}
-				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && Scp096.TurnedPlayers.ToList().Count() != 0)
+				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
 				{
-					list += "Target\n";
-					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => Scp096.TurnedPlayers.Contains(p)).Count() != 0))
-						list += $"{room.Name} : {room.Players.Where(x => Scp096.TurnedPlayers.Contains(x)).Count()}\n";
+					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
+					list += $"Target : {TargetList.Count()}\n";
+					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m";
+					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => TargetList.Contains(p.ReferenceHub)).Count() != 0))
+						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
 					list.TrimEnd('\n');
 				}
 				curText = curText.Replace("[LIST]", FormatStringForHud(list, 6));
@@ -239,45 +241,43 @@ namespace SanyaRemastered
 
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
-				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 6));
+				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
 			else if (_player.Role == RoleType.Spectator)
 			{
 				if (Coroutines.isActuallyBombGoing)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn tant que le bombardement est activé.", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn tant que le bombardement est activé.", 5));
 				else if (Coroutines.AirBombWait != 0 && Coroutines.AirBombWait < 60)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 5));
 				else if (Warhead.IsDetonated && SanyaRemastered.Instance.Config.StopRespawnAfterDetonated)
 					if (Coroutines.AirBombWait != 0)
-						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site, un bombardement vas être effectuer.", 6));
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
 					else
-						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site.", 6));
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site.", 5));
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Il n'y a plus de tickets disponibles.", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Il n'y a plus de tickets disponibles.", 5));
 				else if (_respawnCounter == 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 5));
 				else if (_respawnCounter != -1)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}.", 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}.", 5));
 				else
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 5));
 			}
 			else
-				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 6));
+				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 5));
 
 			//[BOTTOM]
 			if (!string.IsNullOrEmpty(_hudBottomString))
-				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudBottomString, 6));
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(_hudBottomString, 6));
 
-			else if (SanyaRemastered.Instance.Config.IsBeta)
-				curText = curText.Replace("[BOTTOM]", FormatStringForHud("", 6));
+			else if (!string.IsNullOrWhiteSpace(SanyaRemastered.Instance.Config.IsBeta))
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 6));
 			else
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
+			
+			
+			_hudText = curText;
+			_player.ShowHint(_hudText, 2);
 
-			//Don't Send if you have nothing to send
-			if (string.IsNullOrEmpty(curText.Replace("\n",string.Empty).Replace("<align=left><voffset=38em><size=50%><alpha=#44><alpha=#ff></size></align><align=right></align><align=center></align></voffset>", string.Empty)))
-			{
-				_hudText = curText;
-				_player.ShowHint(_hudText, 2);
-			}
 		}
 
 		private string FormatStringForHud(string text, int needNewLine)

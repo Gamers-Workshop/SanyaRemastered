@@ -141,7 +141,7 @@ namespace SanyaRemastered.Patches
 						}
 						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
 						if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.curMana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
-						Timing.RunCoroutine(GasRoom(room, player.ReferenceHub));
+						Timing.RunCoroutine(GasRoom(room, player.ReferenceHub), Segment.FixedUpdate);
 					}
 				}
 				return false;
