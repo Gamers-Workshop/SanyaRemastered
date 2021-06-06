@@ -4,6 +4,7 @@ using Exiled.API.Features;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
 using Mirror;
+using NorthwoodLib;
 using NorthwoodLib.Pools;
 using RemoteAdmin;
 using Respawning;
@@ -308,7 +309,27 @@ namespace SanyaRemastered.Functions
             component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity, player == null ? Team.TUT : player.characterClassManager.CurRole.team);
             NetworkServer.Spawn(component.gameObject);
         }
+        public static Transform NameOfGeneratorRoom(this Generator079 gen)
+        {
+            Transform transform = gen.transform;
+            Physics.Raycast(new Ray(transform.position - transform.forward, Vector3.up), out RaycastHit raycastHit, 5f, global::Interface079.singleton.roomDetectionMask);
+            Transform transform2 = raycastHit.transform;
+            if (!transform2)
+            {
+                RaycastHit raycastHit2;
+                Physics.Raycast(new Ray(transform.position - transform.forward, Vector3.down), out raycastHit2, 5f, global::Interface079.singleton.roomDetectionMask);
+                transform2 = raycastHit2.transform;
+            }
+            if (transform2)
+            {
+                while (transform2 != null && !transform2.transform.name.Contains("ROOT", StringComparison.OrdinalIgnoreCase) && !transform2.gameObject.CompareTag("Room"))
+                {
+                    transform2 = transform2.transform.parent;
+                }
+            }
+            return transform2;
 
+        }
         public static void Spawn018(ReferenceHub player)
         {
             var gm = player.GetComponent<Grenades.GrenadeManager>();
@@ -743,7 +764,10 @@ namespace SanyaRemastered.Functions
         {
             NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new PlayableScps.Messages.Scp096ToTargetMessage(player.ReferenceHub));
         }
-
+        public static void OpenReportWindow(this Player player, string text)
+        {
+            player.ReferenceHub.GetComponent<GameConsoleTransmission>().SendToClient(player.Connection, "[REPORTING] " + text, "white");
+        }
         public static IEnumerable<Camera079> GetNearCams(this ReferenceHub player)
         {
             Player EPlayer = Player.Dictionary[player.gameObject];

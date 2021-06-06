@@ -100,6 +100,7 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
 			PlayerEvents.Died += Handlers.OnDied;
+			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed += Handlers.OnPlayerUsedMedicalItem;
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
@@ -121,10 +122,11 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems += Handlers.On914Upgrade;
-			Scp096Events.Enraging += Handlers.OnEnraging;
+			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
+			Scp096Events.Enraging += Handlers.On096Enraging;
 			Scp096Events.CalmingDown += Handlers.On096CalmingDown;
 			Scp049Events.FinishingRecall += Handlers.On049FinishingRecall;
-			Scp049Events.StartingRecall += Handlers.StartingRecall;
+			Scp049Events.StartingRecall += Handlers.On049StartingRecall;
 		}
 
 		private void UnRegistEvents()
@@ -155,6 +157,7 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning -= Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting -= Handlers.OnPlayerHurt;
 			PlayerEvents.Died -= Handlers.OnDied;
+			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
 			PlayerEvents.MedicalItemUsed -= Handlers.OnPlayerUsedMedicalItem;
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
@@ -174,10 +177,12 @@ namespace SanyaRemastered
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp914Events.UpgradingItems -= Handlers.On914Upgrade;
-			Scp096Events.Enraging -= Handlers.OnEnraging;
+
+			Scp096Events.AddingTarget -= Handlers.On096AddingTarget;
+			Scp096Events.Enraging -= Handlers.On096Enraging;
 			Scp096Events.CalmingDown -= Handlers.On096CalmingDown;
 			Scp049Events.FinishingRecall -= Handlers.On049FinishingRecall;
-			Scp049Events.StartingRecall -= Handlers.StartingRecall;
+			Scp049Events.StartingRecall -= Handlers.On049StartingRecall;
 			Handlers = null;
 		}
 

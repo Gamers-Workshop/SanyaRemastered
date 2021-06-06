@@ -25,6 +25,9 @@ namespace SanyaRemastered
 		public bool IsDebugged { get; set; } = false;
 		public bool Coroding106 { get; set; } = false;
 		public bool ExplodingGrenadeTesla { get; set; } = false;
+		public bool TeslaDestroyName { get; set; } = false;
+		public bool ScpTakeFallDamage { get; set; } = false;
+		public string BoxMessageOnJoin { get; set; } = string.Empty;
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
@@ -102,7 +105,7 @@ namespace SanyaRemastered
 		public bool ContainCommand { get; set; } = false;
 
 		[Description("Le cadavre n'apparait pas quand on se fait tuer par")]
-		public bool Scp939RemoveRagdoll { get; set; } = false;
+		public bool Scp106RemoveRagdoll { get; set; } = false;
 		public bool Scp096RemoveRagdoll { get; set; } = false;
 		[Description("Scp106 est ralentie")]
 		public bool Scp106slow { get; set; } = false;

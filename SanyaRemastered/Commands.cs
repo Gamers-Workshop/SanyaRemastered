@@ -29,8 +29,6 @@ namespace SanyaRemastered.Commands
 		public string Description { get; } = "SanyaRemastered Commands";
 
 		private bool isActwatchEnabled = false;
-		private DoorVariant targetdoor = null;
-
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -49,6 +47,17 @@ namespace SanyaRemastered.Commands
 			{
 				case "test":
 					{
+						response = "test ok.";
+						return true;
+					}
+				case "SpawnObject":
+                    {
+						if (player != null && !player.CheckPermission("sanya.dev"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						NetworkServer.Spawn(UnityEngine.Object.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), player.Position, player.GameObject.transform.rotation));
 						response = "test ok.";
 						return true;
 					}
@@ -123,37 +132,36 @@ namespace SanyaRemastered.Commands
 					}
 				case "hint":
 					{
-						ulong duration;
 						if (player != null && !player.CheckPermission("sanya.hint"))
 						{
 							response = "Permission denied.";
 							return false;
 						}
-						if (ulong.TryParse(arguments.At(2), out duration))
+
+						if (arguments.At(2).ToLower() == "all")
 						{
-							if (arguments.At(2) == "all")
+							if (player != null && !player.CheckPermission("sanya.hintall"))
 							{
-								if (player != null && !player.CheckPermission("sanya.hintall"))
+								response = "Permission denied.";
+								return false;
+							}
+							else if (ulong.TryParse(arguments.At(1), out ulong duration))
+							{
+								foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									response = "Permission denied.";
-									return false;
+									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
 								}
-								else if (ulong.TryParse(arguments.At(1), out duration))
-								{
-									foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
-									{
-										ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
-									}
-									response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
-									return true;
-								}
-								else
-								{
-									response = $"Sanya hint <player/all> <durée> <message> // Sanya hint <id.id.id> <durée> <message>";
-									return false;
-								}
+								response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
+								return true;
 							}
 							else
+							{
+								response = $"Sanya hint <player/all> <durée> <message> // Sanya hint <id.id.id> <durée> <message>";
+								return false;
+							}
+						}
+						else if (ulong.TryParse(arguments.At(2), out ulong duration))
+						{
                             {
 								string[] Users = arguments.At(1).Split('.');
 								List<Player> PlyList = new List<Player>();
@@ -194,10 +202,17 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						var comp = player.GameObject.GetComponent<SanyaRemasteredComponent>();
-						response = $"ok.{comp.DisableHud} -> ";
-						comp.DisableHud = !comp.DisableHud;
-						response += $"{comp.DisableHud}";
+                        try
+						{
+							var comp = player.GameObject.GetComponent<SanyaRemasteredComponent>();
+							foreach (Player p in Player.List)
+								p.GameObject.GetComponent<SanyaRemasteredComponent>().DisableHud = bool.Parse(arguments.At(2).ToLower());
+							response = $"all hud is = {bool.Parse(arguments.At(2).ToLower())}";
+						} catch (Exception) 
+						{
+							response = "hud true/false";
+						}
+
 						return true;
 					}
 				case "ping":
@@ -312,9 +327,16 @@ namespace SanyaRemastered.Commands
 								response += $"[{Scp914.Scp914Machine.singleton.knobState}]";
 								return true;
 							}
+							else if (Enum.TryParse(arguments.At(1),out Scp914.Scp914Knob knob))
+                            {
+								response = $"ok. [{Scp914.Scp914Machine.singleton.knobState}] -> ";
+								Scp914.Scp914Machine.singleton.knobState = knob;
+								response += $"[{Scp914.Scp914Machine.singleton.knobState}]";
+								return true;
+							}
 							else
 							{
-								response = "invalid parameters. (use/knob)";
+								response = "invalid parameters. (use/knob) or (Coarse/OneToOne/Fine/VeryFine)";
 								return false;
 							}
 						}
@@ -367,14 +389,14 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}		
-						if (arguments.Count > 1 && arguments.At(1) == "hcz")
+						if (arguments.Count > 1 && arguments.At(1).ToLower() == "hcz")
 						{
 							if (float.TryParse(arguments.At(2), out float duration))
 								Generator079.mainGenerator.ServerOvercharge(duration, true);
 							response = "HCZ blackout!";
 							return true;
 						}
-						if (arguments.Count > 1 && arguments.At(1) == "all")
+						if (arguments.Count > 1 && arguments.At(1).ToLower() == "all")
 						{
 							if (float.TryParse(arguments.At(2), out float duration))
 								Generator079.mainGenerator.ServerOvercharge(duration, false);
@@ -596,20 +618,20 @@ namespace SanyaRemastered.Commands
 							{
 								if (float.TryParse(arguments.At(3), out float duration2))
 								{
-									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2)));
+									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2), Segment.FixedUpdate));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
 									return true;
 								}
 								else
 								{
-									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration)));
+									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration), Segment.FixedUpdate));
 									response = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 									return true;
 								}
 							}
 							else
 							{
-								SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false)));
+								SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false), Segment.FixedUpdate));
 								response = "Started!";
 								return true;
 							}
@@ -625,39 +647,6 @@ namespace SanyaRemastered.Commands
 						{
 							response = $"sanya air start/stop";
 							return false;
-						}
-					}
-				case "dlock":
-					{
-						if (player != null && !player.CheckPermission("sanya.dlock"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						{
-							if (int.TryParse(arguments.At(1), out int duration))
-							{
-								//Coroutines.StartContainClassD(false, duration);
-								response = $"The classD are lock for {duration / 60}:{duration % 60}";
-								return true;
-							}
-							else if (arguments.At(1).ToLower() == "false" || arguments.At(1).ToLower() == "stop")
-							{
-								//Coroutines.StartContainClassD(true);
-								response = "Stop!";
-								return true;
-							}
-							else if (arguments.At(1).ToLower() == "true" || arguments.At(1).ToLower() == "start")
-							{
-								//Coroutines.StartContainClassD(false);
-								response = "Started!";
-								return true;
-							}
-							else
-							{
-								response = "dlock {durée du lock} ou start/stop";
-								return false;
-							}
 						}
 					}
 				case "expl":
@@ -854,60 +843,6 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 					}
-				/*case "dummy":
-					{
-						if (!perm.CheckPermission("sanya.dummy"))
-						{
-							ev.Sender.RemoteAdminMessage("Permission denied.");
-							return;
-						}
-						if (arguments.Count > 1)
-						{
-							Player target = Player.Get(arguments.At(1));
-							var roletype = target.Role;
-							if (target != null && target.Role != RoleType.Spectator)
-							{
-							Methods.SpawnDummy(target.Role , target.Position, target.ReferenceHub.transform.rotation);
-							response = $"{target.Role}'s Dummy Created. pos:{target.Position} rot:{target.ReferenceHub.transform.rotation}";
-							return;
-							}
-							if (arguments.At(1) == "all")
-							{
-								if (!perm.CheckPermission("sanya.alldummy"))
-								{
-									ev.Sender.RemoteAdminMessage("Permission denied.");
-									return;
-								}
-								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
-								{
-									Methods.SpawnDummy(ply.Role,ply.Position,ply.ReferenceHub.transform.rotation);
-								}
-								response = "success spawn grenade on all player";
-								return;
-							}
-							else
-							{
-								isSuccess = false;
-								response = "[explode] missing target.";
-								return;
-							}
-						}
-						else
-						{
-							if (player != null)
-							{
-								Methods.SpawnDummy(RoleType.ClassD , perm.Position, player.transform.rotation);
-								response = $"{perm.Role}'s Dummy Created. pos:{perm.Position} rot:{player.transform.rotation}";
-								return;
-							}
-							else
-							{
-								isSuccess = false;
-								response = "[explode] missing target.";
-								return;
-							}
-						}
-					}*/
 				case "tppos":
 					{
 						if (player != null && !player.CheckPermission("sanya.tppos"))
@@ -915,7 +850,7 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						ReferenceHub target = Player.UserIdsCache[arguments.At(1)].ReferenceHub;
+						ReferenceHub target = Player.Get(arguments.At(1)).ReferenceHub;
 						if (target != null)
 						{
 							if (float.TryParse(arguments.At(2), out float x)
@@ -1049,106 +984,6 @@ namespace SanyaRemastered.Commands
 						{
 							response = "[gen] Parameters : gen <unlock/door/set/once/eject>";
 							return false;
-						}
-					}
-				case "spawn":
-					{
-						if (player != null && !player.CheckPermission("sanya.spawn"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						var mtfRespawn = RespawnManager.Singleton;
-						if (arguments.Count > 3)
-						{
-							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
-							{
-								mtfRespawn._timeForNextSequence = 0f;
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-								response = $"force spawn ChaosInsurgency";
-								return true;
-							}
-							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
-							{
-								mtfRespawn._timeForNextSequence = 0f;
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-								response = $"force spawn NineTailedFox";
-								return true;
-							}
-							else if (arguments.At(1).ToLower() == "stop")
-							{
-								response = $"ok.[{SanyaRemastered.Instance.Handlers.StopRespawn}] -> ";
-								SanyaRemastered.Instance.Handlers.StopRespawn = !SanyaRemastered.Instance.Handlers.StopRespawn;
-								response += $"[{SanyaRemastered.Instance.Handlers.StopRespawn}]";
-								return true;
-							}
-							else
-							{
-								response = $"ntf/mtf ou ci/ic ou rien";
-								return false;
-							}
-						}
-						else
-						{
-							if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
-							{
-								mtfRespawn._timeForNextSequence = 0f;
-								response = $"Spawn. Chaos Insurgency";
-								return true;
-							}
-							else
-							{
-								mtfRespawn._timeForNextSequence = 0f;
-								response = $"Spawn. Nine Tailed Fox";
-								return true;
-							}
-						}
-					}
-				case "next":
-					{
-						if (player != null && !player.CheckPermission("sanya.next"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
-						var mtfRespawn = RespawnManager.Singleton;
-						if (arguments.Count > 3)
-						{
-							if (arguments.At(1).ToLower() == "ci" || arguments.At(1).ToLower() == "ic")
-							{
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-								response = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency}\n ";
-								response += $"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-								return true;
-							}
-							else if (arguments.At(1).ToLower() == "mtf" || arguments.At(1).ToLower() == "ntf")
-							{
-								mtfRespawn.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-								response = $"Is Success:{mtfRespawn.NextKnownTeam == SpawnableTeamType.NineTailedFox}";
-								response += $"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-								return true;
-							}
-							else
-							{
-								response = "ntf/mtf ou ci/ic";
-								return false;
-							}
-						}
-						else
-						{
-							if (mtfRespawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
-							{
-								response = $"\nProchain Respawn = ChaosInsurgency";
-								response += $"\nProchains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-								return true;
-							}
-							else
-							{
-								response = $"\nProchain Respawn = NineTailedFox";
-								response += $"\nProchains renforts : {respawntime / 60:00}:{respawntime % 60:00}";
-								return true;
-							}
 						}
 					}
 				case "van":

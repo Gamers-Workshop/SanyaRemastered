@@ -2,15 +2,18 @@
 using HarmonyLib;
 namespace SanyaRemastered.Patches
 {
-	public static class OpenDoor
+	//[HarmonyPatch(typeof(Interactables.Interobjects.DoorUtils.DoorVariant), nameof(Interactables.Interobjects.DoorUtils.DoorVariant.AllowInteracting))]
+	public class Change914Knob
 	{
-		//[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.CmdOpenDoor))]
-		public static bool Prefix(PlayerInteract __instance)
-		{
-			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106
-				&& (__instance._ccm.CurRole.roleId == RoleType.Scp106
-				|| __instance._ccm.CurRole.roleId == RoleType.Scp0492))
+		public bool Prefix(Interactables.Interobjects.DoorUtils.DoorVariant __instance,
+			ReferenceHub ply,
+			byte colliderId)
 			{
+			if (SanyaRemastered.Instance.Config.Scp049_2DontOpenDoorAnd106
+				&& (ply.characterClassManager.CurRole.roleId == RoleType.Scp106
+				|| ply.characterClassManager.CurRole.roleId == RoleType.Scp0492))
+			{
+				ply.GetComponent<SanyaRemasteredComponent>().AddHudBottomText("Test yamato", 5);
 				return false;
 			}
 			return true;

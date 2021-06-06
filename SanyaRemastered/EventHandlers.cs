@@ -126,6 +126,7 @@ namespace SanyaRemastered
         private int prevMaxAHP = 0;
         public bool StopRespawn = false;
         public List<Vector3> DecalList = new List<Vector3>();
+        //private List<GameObject> PlayerHasEnrage096InPocket = new List<GameObject>();
 
         /** RoundVar **/
         private FlickerableLightController flickerableLightController = null;
@@ -197,6 +198,21 @@ namespace SanyaRemastered
                 NetworkServer.Spawn(door4.gameObject);
                 NetworkServer.Spawn(door5.gameObject);
                 NetworkServer.Spawn(door6.gameObject);
+                /*try
+                {
+                    var teslaGate = UnityEngine.Object.FindObjectOfType<TeslaGateController>().TeslaGates.First();
+                    foreach (Room room in Map.Rooms.Where(x => x.Type == RoomType.LczStraight))
+                    {
+                        var SpawnTesla = UnityEngine.Object.Instantiate(teslaGate, room.Position, room.transform.rotation);
+                        NetworkServer.Spawn(SpawnTesla.gameObject);
+                        UnityEngine.Object.FindObjectOfType<TeslaGateController>().TeslaGates.Add(SpawnTesla);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Sanya Plugin [Spawn Tesla]" + e);
+                }*/
+
             }
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
@@ -407,7 +423,10 @@ namespace SanyaRemastered
                 };
                 ev.Player.Connection.Send(objectDestroyMessage, 0);
             }
-
+            if (!string.IsNullOrWhiteSpace(plugin.Config.BoxMessageOnJoin))
+            {
+                ev.Player.OpenReportWindow(plugin.Config.BoxMessageOnJoin);
+            }
             //MuteFixer
             foreach (var player in Player.List)
                 if (player.IsMuted)
@@ -420,8 +439,6 @@ namespace SanyaRemastered
         {
             if (ev.Player.IsHost) return;
             if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
-            if (SanyaRemasteredComponent._scplists.Contains(ev.Player))
-                SanyaRemasteredComponent._scplists.Remove(ev.Player);
         }
 
         public void OnPlayerSetClass(ChangingRoleEventArgs ev)
@@ -452,6 +469,18 @@ namespace SanyaRemastered
                 ev.Player.ReferenceHub.playerStats.NetworkartificialHpDecay = 0.75f;
                 ev.Player.ReferenceHub.playerStats.NetworkartificialNormalRatio = 0.7f;
             }
+            if (ev.IsEscaped && plugin.Config.Scp096Real)
+            {
+                bool IsAnTarget = false;
+                foreach (Player scp096 in Player.List.Where(x=> x.Role == RoleType.Scp096))
+                    if (scp096.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096.HasTarget(ev.Player.ReferenceHub))
+                        IsAnTarget = true;
+                if (IsAnTarget)
+                {
+                    ev.NewRole = RoleType.Spectator;
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudBottomText("Vous avez été abatue a la sortie car vous avez vue le visage de SCP-096", 10);
+                }
+            }
         }
 
 
@@ -480,8 +509,8 @@ namespace SanyaRemastered
         {
             if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformations.GetDamageName()}({ev.HitInformations.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
-
-            if (ev.Attacker == null) return;
+            
+            if (ev.Target == null) return;
 
             if (ev.DamageType != DamageTypes.Nuke
                 && ev.DamageType != DamageTypes.Decont
@@ -490,12 +519,13 @@ namespace SanyaRemastered
                 && ev.DamageType != DamageTypes.Scp207)
             {
                 //GrenadeHitmark
-                if (SanyaRemastered.Instance.Config.HitmarkGrenade
+                if (ev.Attacker != null)
+                    if (SanyaRemastered.Instance.Config.HitmarkGrenade
                     && ev.DamageType == DamageTypes.Grenade
                     && ev.Target.UserId != ev.Attacker.UserId)
-                {
-                    ev.Attacker.GameObject.GetComponent<Hitmarker>().Trigger();
-                }
+                    {
+                        ev.Attacker.GameObject.GetComponent<Hitmarker>().Trigger();
+                    }
 
                 //USPMultiplier
                 if (ev.DamageType == DamageTypes.Usp)
@@ -663,10 +693,23 @@ namespace SanyaRemastered
                 ev.Target.Inventory.Clear();
             }
         }
+        public void OnEscapingPocketDimension(EscapingPocketDimensionEventArgs ev)
+        {
+            /*if (SanyaRemastered.Instance.Config.Scp096Real && PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
+            {
+                foreach (Player player in Player.List.Where(x=>x.Role == RoleType.Scp096))
+                    if (player.CurrentScp is PlayableScps.Scp096 Scp096)
+                    {
+                        Scp096.Enrage();
+                        Scp096.AddTarget(ev.Player.GameObject);
+                    }
+            }*/
+        }
         public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
-
+            /*if (PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
+                PlayerHasEnrage096InPocket.Remove(ev.Player.GameObject);*/
             if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue("Scp106" , out int heal))
             {
                 foreach (Player player in Player.List.Where(x => x.Role == RoleType.Scp106))
@@ -1198,15 +1241,27 @@ namespace SanyaRemastered
                 }
             }
         }
-        public void OnEnraging(EnragingEventArgs ev)
+        public void On096AddingTarget(AddingTargetEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                ev.Scp096.EnrageTimeLeft = 1;
+                ev.EnrageTimeToAdd = 0;
+            }
+        }
+        public void On096Enraging(EnragingEventArgs ev)
+        {
+            if (SanyaRemastered.Instance.Config.Scp096Real)
+            {
+                ev.Scp096.EnrageTimeLeft = 0;
             }
         }
         public void On096CalmingDown(CalmingDownEventArgs ev)
         {
+            /*foreach (ReferenceHub Ref in ev.Scp096._targets.ToList().Where(x => Player.Get(x.playerId).IsInPocketDimension))
+            {
+                PlayerHasEnrage096InPocket.Add(Ref.gameObject);
+                ev.Scp096._targets.Remove(Ref);
+            }*/
             if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
             {
                  ev.IsAllowed = false;
@@ -1223,7 +1278,7 @@ namespace SanyaRemastered
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.2f);
             }
         }
-        public void StartingRecall(StartingRecallEventArgs ev)
+        public void On049StartingRecall(StartingRecallEventArgs ev)
         {
             if (ev.Target.GameObject.GetComponent<PlayerStats>().lastHitInfo.GetDamageType() == DamageTypes.Scp049 && SanyaRemastered.Instance.Config.Scp049Real)
             {

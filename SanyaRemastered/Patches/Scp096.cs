@@ -1,0 +1,19 @@
+﻿using HarmonyLib;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SanyaRemastered.Patches
+{
+    [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.OnDamage))]
+    public static class Scp096CancelEnrage
+    {
+        public static bool Prefix(PlayableScps.Scp096 __instance)
+        {
+            if (SanyaRemastered.Instance.Config.Scp096Real) return false;
+            return true;
+        }
+    }
+}

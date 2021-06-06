@@ -48,36 +48,55 @@ namespace SanyaRemastered.Patches
 		}
 		//override - 10.0.0 checked
 		[HarmonyPatch(typeof(Grenade), nameof(Grenade.ServersideExplosion))]
-	public static class GrenadeLogPatch
-	{
-		public static bool Prefix(Grenade __instance, ref bool __result)
+		public static class GrenadeLogPatch
 		{
-			try
+			public static bool Prefix(Grenade __instance, ref bool __result)
 			{
-				if (__instance.thrower?.name != "Host")
+				try
 				{
-					string text = (__instance.thrower != null) ? (__instance.thrower.hub.characterClassManager.UserId + " (" + __instance.thrower.hub.nicknameSync.MyNick + ")") : "(UNKNOWN)";
-					ServerLogs.AddLog(ServerLogs.Modules.Logger, "Player " + text + "'s " + __instance.logName + " grenade exploded.", ServerLogs.ServerLogType.GameEvent);
+					if (__instance.thrower?.name != "Host")
+					{
+						string text = (__instance.thrower != null) ? (__instance.thrower.hub.characterClassManager.UserId + " (" + __instance.thrower.hub.nicknameSync.MyNick + ")") : "(UNKNOWN)";
+						ServerLogs.AddLog(ServerLogs.Modules.Logger, "Player " + text + "'s " + __instance.logName + " grenade exploded.", ServerLogs.ServerLogType.GameEvent);
+					}
+					__result = true;
+					return false;
 				}
-				__result = true;
-				return false;
-			}
-			catch (Exception)
-			{
-				return true;
+				catch (Exception)
+				{
+					return true;
+				}
 			}
 		}
-		}/*
-	[HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate.IsInvoking))]
-	public static class TeslaExplodeGrenade
-	{
-		public static bool Prefix()
-		{
-			if (!SanyaRemastered.Instance.Config.TeslaExplodeGrenade) return true;
-			{
-				return true;
-			}
-		}*/
 	}
-	
+
+	//A corriger
+	//[HarmonyPatch(typeof(TeslaGate), nameof(TeslaGate._InstantAnimation))]
+	public static class TeslaRemoveObject
+	{
+		public static void Prefix(TeslaGate __instance)
+		{
+			if (SanyaRemastered.Instance.Config.ExplodingGrenadeTesla)
+			{
+				Collider[] array = Physics.OverlapBox(__instance.gameObject.transform.position + Vector3.up * (__instance.sizeOfKiller.y / 2f), __instance.sizeOfKiller / 2f, __instance.gameObject.transform.rotation, __instance.killerMask);
+				for (int j = 0; j < array.Length; j++)
+				{
+					Pickup componentInParent = array[j].GetComponentInParent<Pickup>();
+					if (componentInParent != null)
+					{
+						if (componentInParent.itemId == ItemType.GrenadeFrag)
+						{
+							Functions.Methods.SpawnGrenade(componentInParent.position, false, 0.1f);
+						}
+						else if (componentInParent.itemId == ItemType.GrenadeFlash)
+						{
+							Functions.Methods.SpawnGrenade(componentInParent.position, true, 0.1f);
+						}
+						componentInParent.Delete();
+					}
+				}
+
+			}
+		}
+	}
 }

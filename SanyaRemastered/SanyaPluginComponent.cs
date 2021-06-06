@@ -50,6 +50,11 @@ namespace SanyaRemastered
 			_player = Player.Get(gameObject);
 			_espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 		}
+		private void OnDestroy()
+		{
+			if (_scplists.Contains(_player))
+				_scplists.Remove(_player);
+		}
 
 		private void FixedUpdate()
 		{
@@ -220,7 +225,7 @@ namespace SanyaRemastered
 				{
 					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
 					list += $"Target : {TargetList.Count()}\n";
-					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m";
+					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n";
 					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => TargetList.Contains(p.ReferenceHub)).Count() != 0))
 						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
 					list.TrimEnd('\n');
@@ -237,6 +242,14 @@ namespace SanyaRemastered
 				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
+			if (_player.Role == RoleType.Scp079 && _player.Zone == Exiled.API.Enums.ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
+            {
+				string InfoGen = null;
+				foreach (Generator079 gen in Generator079.Generators.Where(x=>x.isTabletConnected).OrderBy(x => x.remainingPowerup))
+                {
+					InfoGen += $"<color=#ffff00>({Map.FindParentRoom(Methods.NameOfGeneratorRoom(gen).gameObject).Type}){Mathf.FloorToInt(gen.remainingPowerup) / 60:00} : {Mathf.FloorToInt(gen.remainingPowerup) % 60:00}</color>\n";
+				}
+			}
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER_DOWN]
@@ -277,7 +290,6 @@ namespace SanyaRemastered
 			
 			_hudText = curText;
 			_player.ShowHint(_hudText, 2);
-
 		}
 
 		private string FormatStringForHud(string text, int needNewLine)

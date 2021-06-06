@@ -38,6 +38,7 @@
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
+    <Compile Include="Patches\FallDamagePatch.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\AntiCheatPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
+    <Compile Include="Patches\Scp096.cs" />
     <Compile Include="Patches\Scp106Patches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
