@@ -15,6 +15,9 @@ using Exiled.API.Extensions;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Assets._Scripts.Dissonance;
+using Dissonance;
+using Dissonance.Integrations.MirrorIgnorance;
+using Dissonance.Audio.Playback;
 
 namespace SanyaRemastered
 {
@@ -67,7 +70,7 @@ namespace SanyaRemastered
 			CheckTraitor();
 			//CheckOnDecal();
 
-			//UpdateMyCustomText();
+			//SoundVolume();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateExHud();
@@ -156,23 +159,11 @@ namespace SanyaRemastered
 				if (_player.IsHuman())
 					_player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(4f, "Corroding", DamageTypes.Scp106, 0), _player.GameObject);
 				_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
-				Log.Debug($"[CorrodingOnPortal]", SanyaRemastered.Instance.Config.IsDebugged);
 			}
 		}
-		private void UpdateMyCustomText()
+		private void SoundVolume()
 		{
 			if (!(_timer > 1f) || !_player.IsAlive) return;
-
-			/*if (SerpentsHand.API.SerpentsHand.GetSHPlayers().Contains(_player))
-			{
-				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "Main Du Serpent";
-				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo;
-			}
-			else
-			{
-				_player.ReferenceHub.nicknameSync.Network_customPlayerInfoString = "";
-				_player.ReferenceHub.nicknameSync.Network_playerInfoToShow = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role | PlayerInfoArea.UnitName;
-			}*/
 		}
 
 		private void UpdateRespawnCounter()
@@ -203,10 +194,15 @@ namespace SanyaRemastered
 			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
+			string info = null;
 			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
-				curText = curText.Replace("[STATS]", $"<b>Vous avez été mute</b>");
-			else 
-				curText = curText.Replace("([STATS])", string.Empty);
+				info += $"<b>Vous avez été mute</b> ";
+			if (_player.IsInvisible)
+				info += $"<b>vous êtes invisible</b> ";
+
+            {
+				curText = curText.Replace("([STATS])", info);
+			}
 			//[LIST]
 			if (_player.Team == Team.SCP)
 			{

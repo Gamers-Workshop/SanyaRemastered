@@ -278,7 +278,13 @@ namespace SanyaRemastered.Functions
                 yield return Timing.WaitForSeconds(11);
             }
         }
+        /*public static IEnumerator<float> Scp914()
+        {
+            while ()
+            {
 
+            }
+        }*/
         public static IEnumerator<float> Scp106CustomTeleport(Scp106PlayerScript scp106PlayerScript, Vector3 position)
         {
             if (!scp106PlayerScript.goingViaThePortal)
@@ -300,6 +306,20 @@ namespace SanyaRemastered.Functions
         public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
 
         public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
+        public static bool IsStuck(Vector3 pos)
+        {
+            bool result = false;
+            foreach (Collider collider in Physics.OverlapBox(pos, new Vector3(0.4f, 1f, 0.4f), new Quaternion(0f, 0f, 0f, 0f)))
+            {
+                bool flag = collider.name.Contains("Hitbox") || collider.name.Contains("mixamorig") || collider.name.Equals("Player") || collider.name.Equals("PlyCenter") || collider.name.Equals("Antijumper");
+                if (!flag)
+                {
+                    Log.Debug($"Detect:{collider.name}", SanyaRemastered.Instance.Config.IsDebugged);
+                    result = true;
+                }
+            }
+            return result;
+        }
         public static void SpawnGrenade(Vector3 position, bool isFlash = false, float fusedur = -1, ReferenceHub player = null)
         {
             if (player == null) player = ReferenceHub.GetHub(PlayerManager.localPlayer);

@@ -28,6 +28,9 @@ namespace SanyaRemastered
 		public bool TeslaDestroyName { get; set; } = false;
 		public bool ScpTakeFallDamage { get; set; } = false;
 		public string BoxMessageOnJoin { get; set; } = string.Empty;
+		[Description("Jump attaque")]
+		public bool JumpingKickAttack { get; set; } = false;
+
 
 		[Description("RandomRespawnPosPercent")]
 		public int RandomRespawnPosPercent { get; set; } = -1;
@@ -133,6 +136,14 @@ namespace SanyaRemastered
 		[Description("RP")]
 		public bool Scp096Real { get; set; } = false;
 		public bool Scp049Real { get; set; } = false;
+		public List<string> ScpFallDamage { get; set; } = new List<string> 
+		{
+			"Scp049",
+			"Scp0492",
+			"Scp93989",
+			"Scp93953"
+		};
+
 		[Description("Dégats Usp")]
 		public float UspDamageMultiplierHuman { get; set; } = 1f;
 		public float UspDamageMultiplierScp { get; set; } = 1f;

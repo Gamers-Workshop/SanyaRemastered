@@ -50,7 +50,7 @@ namespace SanyaRemastered.Commands
 						response = "test ok.";
 						return true;
 					}
-				case "SpawnObject":
+				case "spawnobject":
                     {
 						if (player != null && !player.CheckPermission("sanya.dev"))
 						{
@@ -102,6 +102,58 @@ namespace SanyaRemastered.Commands
 						}
 						return true;
 					}
+				case "box":
+					{
+						{
+							if (player != null && !player.CheckPermission("sanya.hint"))
+							{
+								response = "Permission denied.";
+								return false;
+							}
+
+							if (arguments.At(1).ToLower() == "all")
+							{
+								if (player != null && !player.CheckPermission("sanya.hintall"))
+								{
+									response = "Permission denied.";
+									return false;
+								}
+								foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
+								{
+									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 1));
+								}
+								response = $"La box avec : {Extensions.FormatArguments(arguments, 1)} a bien été envoyé a tout le monde ";
+								return true;
+							}
+							
+							string[] Users = arguments.At(1).Split('.');
+							List<Player> PlyList = new List<Player>();
+							foreach (string s in Users)
+							{
+								if (int.TryParse(s, out int id) && Player.Get(id) != null)
+									PlyList.Add(Player.Get(id));
+								else if (Player.Get(s) != null)
+									PlyList.Add(Player.Get(s));
+							}
+							if (PlyList.Count != 0)
+							{
+								response = $"Votre message a bien été envoyé à :\n";
+								foreach (Player ply in PlyList)
+								{
+									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 2));
+									response += $" - {ply.Nickname}\n";
+								}
+								return true;
+							}
+							else
+							{
+								response = $"Sanya box <player/all> <message> // Sanya box <id.id.id> <message>";
+								return false;
+							}
+							
+							
+						}
+					}
 				case "scale":
 					{
 						if (player != null && !player.CheckPermission("sanya.scale"))
@@ -138,18 +190,18 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 
-						if (arguments.At(2).ToLower() == "all")
+						if (arguments.At(1).ToLower() == "all")
 						{
 							if (player != null && !player.CheckPermission("sanya.hintall"))
 							{
 								response = "Permission denied.";
 								return false;
 							}
-							else if (ulong.TryParse(arguments.At(1), out ulong duration))
+							else if (ulong.TryParse(arguments.At(2), out ulong duration))
 							{
 								foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 2), duration);
+									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
 								}
 								response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
 								return true;
@@ -211,6 +263,7 @@ namespace SanyaRemastered.Commands
 						} catch (Exception) 
 						{
 							response = "hud true/false";
+							return false;
 						}
 
 						return true;

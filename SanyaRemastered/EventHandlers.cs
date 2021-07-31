@@ -32,9 +32,9 @@ namespace SanyaRemastered
         internal List<CoroutineHandle> roundCoroutines = new List<CoroutineHandle>();
         internal bool loaded = false;
 
-        /** Infosender **/
+        /** Infosender **//*
         private readonly UdpClient udpClient = new UdpClient();
-        internal Task sendertask;
+        internal Task sendertask;*/
 
         /** AuthChecker **/
         internal const byte BypassFlags = (1 << 1) | (1 << 3);
@@ -126,6 +126,7 @@ namespace SanyaRemastered
         private int prevMaxAHP = 0;
         public bool StopRespawn = false;
         public List<Vector3> DecalList = new List<Vector3>();
+        public List<Dictionary<Player, int>> Scp914Effect = new List<Dictionary<Player, int>>();
         //private List<GameObject> PlayerHasEnrage096InPocket = new List<GameObject>();
 
         /** RoundVar **/
@@ -176,6 +177,7 @@ namespace SanyaRemastered
                 var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
                 var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
                 var HCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+
                 // Couloir spawn Chaos
                 var door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
                 var door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -23.25f), Quaternion.Euler(Vector3.zero));
@@ -196,8 +198,8 @@ namespace SanyaRemastered
                 NetworkServer.Spawn(door2.gameObject);
                 NetworkServer.Spawn(door3.gameObject);
                 NetworkServer.Spawn(door4.gameObject);
-                NetworkServer.Spawn(door5.gameObject);
-                NetworkServer.Spawn(door6.gameObject);
+                /*NetworkServer.Spawn(door5.gameObject);
+                NetworkServer.Spawn(door6.gameObject);*/
                 /*try
                 {
                     var teslaGate = UnityEngine.Object.FindObjectOfType<TeslaGateController>().TeslaGates.First();
@@ -524,7 +526,7 @@ namespace SanyaRemastered
                     && ev.DamageType == DamageTypes.Grenade
                     && ev.Target.UserId != ev.Attacker.UserId)
                     {
-                        ev.Attacker.GameObject.GetComponent<Hitmarker>().Trigger();
+                        ev.Attacker.ReferenceHub.GetComponent<Scp173PlayerScript>().TargetHitMarker(ev.Attacker.Connection);
                     }
 
                 //USPMultiplier
@@ -556,8 +558,7 @@ namespace SanyaRemastered
                     if (ev.Target.Role == RoleType.Scp106)
                     {
                         if (ev.DamageType == DamageTypes.Grenade) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
-                        if (ev.DamageType != DamageTypes.MicroHid
-                            && ev.DamageType != DamageTypes.Tesla)
+                        if (ev.DamageType != DamageTypes.MicroHid && ev.DamageType != DamageTypes.Tesla)
                             ev.Amount *= SanyaRemastered.Instance.Config.Scp106DamageMultiplicator;
                     }
                 }
@@ -586,7 +587,7 @@ namespace SanyaRemastered
                 && !string.IsNullOrEmpty(ev.Killer.UserId)
                 && ev.Killer.UserId != ev.Target.UserId)
             {
-                ev.Killer.GameObject.GetComponent<Hitmarker>().Trigger(2);
+                ev.Killer.GameObject.GetComponent<MicroHID>().TargetSendHitmarker(false);
             }
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle
@@ -710,13 +711,17 @@ namespace SanyaRemastered
             if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
             /*if (PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
                 PlayerHasEnrage096InPocket.Remove(ev.Player.GameObject);*/
+            List<Player> Scp106 = (List<Player>)Player.List.Where(x => x.Role == RoleType.Scp106);
             if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue("Scp106" , out int heal))
             {
-                foreach (Player player in Player.List.Where(x => x.Role == RoleType.Scp106))
+                foreach (Player player in Scp106)
                 {
                     player.ReferenceHub.playerStats.HealHPAmount(heal);
-                    player.GameObject.GetComponent<Hitmarker>().Trigger(2);
                 }
+            }
+            foreach (Player player in Scp106)
+            {
+                player.ReferenceHub.GetComponent<Scp173PlayerScript>().TargetHitMarker(player.Connection);
             }
         }
 
@@ -1222,8 +1227,9 @@ namespace SanyaRemastered
                         foreach (var player in ev.Players)
                         {
                             player.ReferenceHub.fpc.effectScp207.Intensity = 4;
-                            Timing.CallDelayed(60, () => { 
-                                player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(99999, "Scp-914", DamageTypes.Scp207, 0), player.ReferenceHub.gameObject);
+                            Timing.CallDelayed(60, () => 
+                            { 
+                                player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "Scp-914", DamageTypes.Scp207, 0), player.ReferenceHub.gameObject);
                                 player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous étes mort d'un arret cardiaque", 30);
                             });
                         }
@@ -1232,8 +1238,8 @@ namespace SanyaRemastered
                         foreach (var player in ev.Players)
                         {
                             player.ReferenceHub.fpc.effectScp207.Intensity = 4;
-                            Timing.CallDelayed(1, () => {
-                                player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(99999, "Scp-914", DamageTypes.Scp096, 0), player.ReferenceHub.gameObject);
+                            Timing.CallDelayed(5, () => {
+                                player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "Scp-914", DamageTypes.Scp096, 0), player.ReferenceHub.gameObject);
                                 player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("L'analyse chimique de la substance a l'intérieur de SCP-914 reste non concluante.", 30);
                             });
                         }
@@ -1280,11 +1286,11 @@ namespace SanyaRemastered
         }
         public void On049StartingRecall(StartingRecallEventArgs ev)
         {
-            if (ev.Target.GameObject.GetComponent<PlayerStats>().lastHitInfo.GetDamageType() == DamageTypes.Scp049 && SanyaRemastered.Instance.Config.Scp049Real)
+            /*if (ev.Target.GameObject.GetComponent<PlayerStats>().lastHitInfo.GetDamageType() == DamageTypes.Scp049 && SanyaRemastered.Instance.Config.Scp049Real)
             {
                 ev.Scp049.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous ne pouvez pas soigné se corps",5);
                 ev.IsAllowed = false;
-            }
+            }*/
         }
         public void OnChangingItem(ChangingItemEventArgs ev)
         {

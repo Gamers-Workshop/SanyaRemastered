@@ -186,45 +186,44 @@ namespace SanyaRemastered.Patches
 		}
 		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
-			List<DoorVariant> doors = Map.Doors.Where((d) => Vector3.Distance(d.transform.position, room.Position) <= 11f).ToList();
-			foreach (var item in doors)
+			List<DoorVariant> doors = room.Doors.ToList();
+			foreach (var door in doors)
 			{
-				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
-				item.TargetState = true;
+				door.ServerChangeLock(DoorLockReason.Lockdown079,true);
+				door.TargetState = true;
 			}
-			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i -= 1)
+			for (int i = SanyaRemastered.Instance.Config.GasDuration * 2; i > 0f; i--)
 			{
-				foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
+				foreach (var player in Player.List)
 				{
-					if (player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+					if (player.CurrentRoom != null && player.CurrentRoom == room)
 					{
 						if (SanyaRemastered.Instance.Config.CassieSubtitle)
 						{
-							player.ClearBroadcasts();
 							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"),2);
 						}
 						Methods.PlayAmbientSound(7);
 					}
 				}
-				yield return Timing.WaitForSeconds(1);
+				yield return Timing.WaitForSeconds(0.5f);
 			}
-			foreach (var item in doors)
+			foreach (var door in doors)
 			{
-				item.ActiveLocks = (ushort)DoorLockMode.FullLock;
-				item.TargetState = false;
+				door.ServerChangeLock(DoorLockReason.Lockdown079, true);
+				door.TargetState = true;
 			}
 			foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
 			{
-				if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+				if (player.Team != Team.SCP && player.CurrentRoom != null && player.CurrentRoom == room)
 				{
 					player.Broadcast(5, Subtitles.ExtendGazActive, Broadcast.BroadcastFlags.Normal);
 				}
 			}
 			for (int i = 0; i < SanyaRemastered.Instance.Config.TimerWaitGas * 2; i++)
 			{
-				foreach (var player in Player.List.Where((p) => p.Role != RoleType.None))
+				foreach (var player in Player.List)
 				{
-					if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom != null && player.CurrentRoom.Transform == room.Transform)
+					if (player.Team != Team.SCP && player.Role != RoleType.Spectator && player.CurrentRoom == room)
 					{
 						player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
 						player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>();
@@ -239,10 +238,10 @@ namespace SanyaRemastered.Patches
 				}
 				yield return Timing.WaitForSeconds(0.5f);
 			}
-			foreach (var item in doors)
+			foreach (var door in doors)
 			{
-				item.ActiveLocks = (ushort)DoorLockMode.CanOpen;
-				item.TargetState = true;
+				door.ServerChangeLock(DoorLockReason.Lockdown079, false);
+				door.TargetState = true;
 			}
 		}
 	}
