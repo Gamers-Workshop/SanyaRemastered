@@ -486,6 +486,16 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.Count > 1)
 						{
+							if (arguments.At(1).ToLower() == "inf")
+							{
+								if (player.SessionVariables.ContainsKey("InfAmmo"))
+									player.SessionVariables.Remove("InfAmmo");
+								else
+									player.SessionVariables.Add("InfAmmo", null);
+								response = $"Inf Ammo: {player.SessionVariables.ContainsKey("InfAmmo")}.";
+
+								return true;
+							}
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{

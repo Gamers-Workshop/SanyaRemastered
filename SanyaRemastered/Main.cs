@@ -6,6 +6,8 @@ using HarmonyLib;
 using ServerEvents = Exiled.Events.Handlers.Server;
 using MapEvents = Exiled.Events.Handlers.Map;
 using WarheadEvents = Exiled.Events.Handlers.Warhead;
+using ItemEvents = Exiled.Events.Handlers.Item;
+
 using PlayerEvents = Exiled.Events.Handlers.Player;
 using Scp079Events = Exiled.Events.Handlers.Scp079;
 using Scp914Events = Exiled.Events.Handlers.Scp914;
@@ -173,6 +175,7 @@ namespace SanyaRemastered
 			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
 			PlayerEvents.InsertingGeneratorTablet -= Handlers.OnGeneratorInsert;
 			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
+
 			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;

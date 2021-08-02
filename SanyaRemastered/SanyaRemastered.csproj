@@ -42,6 +42,7 @@
     <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\AntiCheatPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
+    <Compile Include="Patches\InfAmmoPatches.cs" />
     <Compile Include="Patches\ItemCleanupPatch.cs" />
     <Compile Include="Patches\JumpAttackPatches.cs" />
     <Compile Include="Patches\PlayerInteractPatch.cs" />
