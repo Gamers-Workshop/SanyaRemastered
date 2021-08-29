@@ -1,12 +1,11 @@
 ﻿using System;
-using Grenades;
 using HarmonyLib;
 using Mirror;
 using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(FragGrenade), nameof(FragGrenade.ChangeIntoGrenade))]
+	/*[HarmonyPatch(typeof(FragGrenade), nameof(FragGrenade.ChangeIntoGrenade))]
 	public static class FragGrenadeChainPatch
 	{
 		public static bool Prefix(FragGrenade __instance, Pickup item, ref bool __result)
@@ -98,5 +97,5 @@ namespace SanyaRemastered.Patches
 
 			}
 		}
-	}
+	}*/
 }

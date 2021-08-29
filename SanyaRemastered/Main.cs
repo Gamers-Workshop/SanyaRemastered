@@ -36,7 +36,6 @@ namespace SanyaRemastered
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
-		private readonly HarmonyMethod _transpiler = new HarmonyMethod(typeof(SanyaRemastered), nameof(ExiledPrefixPatch));
 		private readonly MethodInfo _methodToPatch = AccessTools.Method("PlayerInteract:CallCmdSwitchAWButton");
 
 		public SanyaRemastered() => Instance = this;
@@ -48,10 +47,8 @@ namespace SanyaRemastered
 			base.OnEnabled();
 
 			RegistEvents();
-			Config.ParseConfig();
 
 			RegistPatch();
-			Harmony.Patch(_methodToPatch, transpiler: _transpiler);
 
 			Log.Info($"[OnEnabled] SanyaRemastered({Version}) Enabled Complete.");
 		}
@@ -67,7 +64,6 @@ namespace SanyaRemastered
 			UnRegistEvents();
 
 			UnRegistPatch();
-			Harmony.Unpatch(_methodToPatch, _transpiler.method);
 
 			Log.Info($"[OnDisable] SanyaRemastered({Version}) Disabled Complete.");
 		}
@@ -76,7 +72,6 @@ namespace SanyaRemastered
 		{
 			Handlers = new EventHandlers(this);
 
-			ServerEvents.SendingConsoleCommand += Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers += Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted += Handlers.OnRoundStart;
 			ServerEvents.RoundEnded += Handlers.OnRoundEnd;
@@ -90,7 +85,6 @@ namespace SanyaRemastered
 			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
 			MapEvents.AnnouncingNtfEntrance += Handlers.OnAnnounceNtf;
 
-			MapEvents.PlacingDecal += Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
 			
@@ -104,26 +98,27 @@ namespace SanyaRemastered
 			PlayerEvents.Died += Handlers.OnDied;
 			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
-			PlayerEvents.MedicalItemUsed += Handlers.OnPlayerUsedMedicalItem;
+			PlayerEvents.ItemUsed += Handlers.OnPlayerItemUsed;
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
-			PlayerEvents.ChangingItem += Handlers.OnChangingItem;
 			PlayerEvents.Shooting += Handlers.OnShoot;
 			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
-			PlayerEvents.EjectingGeneratorTablet += Handlers.OnEjectingGeneratorTablet;
+			//PlayerEvents.StoppingGenerator += Handlers.OnStoppingGenerator;
 			PlayerEvents.OpeningGenerator  += Handlers.OnGeneratorOpen;
 			PlayerEvents.ClosingGenerator += Handlers.OnGeneratorClose;
-			PlayerEvents.InsertingGeneratorTablet += Handlers.OnGeneratorInsert;
+			//PlayerEvents.ActivatingGenerator += Handlers.OnActivatingGenerator;
 			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
+			PlayerEvents.Handcuffing += Handlers.OnHandcuffing;
 
 			Scp106Events.CreatingPortal += Handlers.On106MakePortal;
 			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
-			Scp914Events.UpgradingItems += Handlers.On914Upgrade;
+			Scp914Events.UpgradingPlayer += Handlers.On914UpgradingPlayer;
+
 			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
 			Scp096Events.Enraging += Handlers.On096Enraging;
 			Scp096Events.CalmingDown += Handlers.On096CalmingDown;
@@ -133,7 +128,6 @@ namespace SanyaRemastered
 
 		private void UnRegistEvents()
 		{
-			ServerEvents.SendingConsoleCommand -= Handlers.OnCommand;
 			ServerEvents.WaitingForPlayers -= Handlers.OnWaintingForPlayers;
 			ServerEvents.RoundStarted -= Handlers.OnRoundStart;
 			ServerEvents.RoundEnded -= Handlers.OnRoundEnd;
@@ -147,7 +141,6 @@ namespace SanyaRemastered
 			MapEvents.AnnouncingDecontamination -= Handlers.OnAnnounceDecont;
 			MapEvents.AnnouncingNtfEntrance -= Handlers.OnAnnounceNtf;
 
-			MapEvents.PlacingDecal -= Handlers.OnPlacingDecal;
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
 			
@@ -161,25 +154,26 @@ namespace SanyaRemastered
 			PlayerEvents.Died -= Handlers.OnDied;
 			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
-			PlayerEvents.MedicalItemUsed -= Handlers.OnPlayerUsedMedicalItem;
+			PlayerEvents.ItemUsed -= Handlers.OnPlayerItemUsed;
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
 			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
 
-			PlayerEvents.ChangingItem -= Handlers.OnChangingItem;
 			PlayerEvents.Shooting -= Handlers.OnShoot;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
+			//PlayerEvents.StoppingGenerator -= Handlers.OnStoppingGenerator;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;
 			PlayerEvents.OpeningGenerator -= Handlers.OnGeneratorOpen;
 			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
-			PlayerEvents.InsertingGeneratorTablet -= Handlers.OnGeneratorInsert;
+			//PlayerEvents.ActivatingGenerator -= Handlers.OnActivatingGenerator;
 			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
+			PlayerEvents.Handcuffing -= Handlers.OnHandcuffing;
 
 			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
-			Scp914Events.UpgradingItems -= Handlers.On914Upgrade;
+			Scp914Events.UpgradingPlayer -= Handlers.On914UpgradingPlayer;
 
 			Scp096Events.AddingTarget -= Handlers.On096AddingTarget;
 			Scp096Events.Enraging -= Handlers.On096Enraging;
@@ -204,47 +198,7 @@ namespace SanyaRemastered
 
 		private void UnRegistPatch()
 		{
-			Harmony.UnpatchAll();
-		}
-		private static IEnumerable<CodeInstruction> ExiledPrefixPatch(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
-		{
-			var newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
-
-			Predicate<CodeInstruction> searchPredicate = i => i.opcode == OpCodes.Ldloc_1;
-
-			var index = newInstructions.FindIndex(searchPredicate);
-			var label = newInstructions[index + 1].operand;
-
-			newInstructions.RemoveRange(index, 2);
-
-			newInstructions.InsertRange(index, new[]
-			{
-				new CodeInstruction(OpCodes.Ldarg_0),
-				new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(PlayerInteract), nameof(PlayerInteract._inv))),
-				new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Inventory), nameof(Inventory.items))),
-				new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(SyncList<Inventory.SyncItemInfo>), nameof(SyncList<Inventory.SyncItemInfo>.Count))),
-				new CodeInstruction(OpCodes.Ldc_I4_0),
-				new CodeInstruction(OpCodes.Ceq),
-				new CodeInstruction(OpCodes.Brfalse, label)
-			});
-
-			index = newInstructions.FindIndex(index, searchPredicate);
-			label = newInstructions[newInstructions.FindIndex(index, i => i.opcode == OpCodes.Br_S || i.opcode == OpCodes.Br)].operand;
-
-			var notNullLabel = generator.DefineLabel();
-			newInstructions[index].WithLabels(notNullLabel);
-			newInstructions.InsertRange(index, new[]
-			{
-				new CodeInstruction(OpCodes.Ldloc_1),
-				new CodeInstruction(OpCodes.Brtrue, notNullLabel),
-				new CodeInstruction(OpCodes.Ldc_I4_0),
-				new CodeInstruction(OpCodes.Br, label)
-			});
-
-			for (var z = 0; z < newInstructions.Count; z++)
-				yield return newInstructions[z];
-
-			ListPool<CodeInstruction>.Shared.Return(newInstructions);
+			Harmony.UnpatchAll(Harmony.Id);
 		}
 	}
 }

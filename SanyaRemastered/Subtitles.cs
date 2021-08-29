@@ -165,13 +165,23 @@
 
 		internal static readonly string GeneratorFinish = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《{0} générateur{s} sur 5 activé{s}.》\n",
+			"《{0} générateur{s} sur 3 activé{s}.》\n",
 			"</size></color>"
 		);
 
 		internal static readonly string GeneratorComplete = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《5 sur 5 générateurs sont activés.\nTous les générateurs ont été engagés avec succès. Finalisation de la séquence de confinement. La Heavy Containment sera surchargée dans t-moins 1 minute.》\n",
+			"《3 sur 3 générateurs sont activés. Tous les générateurs ont été engagés avec succès.》\n",
+			"</size></color>"
+		);
+		internal static readonly string OverchargeStart = string.Concat(
+			"<color=#bbee00><size=25>",
+			"《Surcharge du site dans 3 2 1.》\n",
+			"</size></color>"
+		); 
+		internal static readonly string OverchargeFinish = string.Concat(
+			"<color=#bbee00><size=25>",
+			"《L'installation est de nouveau opérationnelle.》\n",
 			"</size></color>"
 		);
 

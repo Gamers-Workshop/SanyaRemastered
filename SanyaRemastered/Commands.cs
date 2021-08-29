@@ -15,6 +15,9 @@ using System.IO;
 using MapGeneration;
 using System.Linq;
 using Interactables.Interobjects.DoorUtils;
+using MapGeneration.Distributors;
+using Exiled.API.Extensions;
+using Extensions = SanyaRemastered.Functions.Extensions;
 
 namespace SanyaRemastered.Commands
 {
@@ -47,7 +50,7 @@ namespace SanyaRemastered.Commands
 			{
 				case "test":
 					{
-						response = "test ok.";
+						response = $"test ok.";
 						return true;
 					}
 				case "spawnobject":
@@ -68,7 +71,7 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						Methods.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/049_Ringo_Ringo_Roses.raw", 9997, 1, true, player.Position);
+						//Methods.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/049_Ringo_Ringo_Roses.raw", 9997, 1, true, player.Position);
 
 						response = "test ok.";
 						return true;
@@ -81,7 +84,7 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 						response = "ok.";
-						if (Physics.Raycast(player.Position + player.CameraTransform.forward, player.CameraTransform.forward, out var casy))
+						if (Physics.Raycast(player.Position + player.CameraTransform.forward, player.CameraTransform.forward, out var casy,25f))
 						{
 							Log.Warn($"{casy.transform.name} (layer{casy.transform.gameObject.layer})");
 							Log.Warn($"HasComponents:");
@@ -101,6 +104,44 @@ namespace SanyaRemastered.Commands
 							}
 						}
 						return true;
+					}
+				case "checkobjdel":
+					{
+						if (player != null && !player.CheckPermission("sanya.dev"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						response = "ok.";
+						if (Physics.Raycast(player.Position + player.CameraTransform.forward, player.CameraTransform.forward, out var casy, 25f))
+						{
+							Log.Warn($"{casy.transform.name} (layer{casy.transform.gameObject.layer})");
+							Log.Warn($"HasComponents:");
+							foreach (var i in casy.transform.gameObject.GetComponents<Component>())
+							{
+								if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+								{
+									Log.Warn($"    {i.name}:{i.GetType()}");
+								}
+							}
+							Log.Warn($"HasComponentsInChildren:");
+							foreach (var i in casy.transform.gameObject.GetComponentsInChildren<Component>())
+							{
+								if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+								{
+									Log.Warn($"    {i.name}:{i.GetType()}");
+								}
+							}
+                            Log.Warn($"HasComponentsInParent:");
+                            foreach (var i in casy.transform.gameObject.GetComponentsInParent<Component>())
+                            {
+								if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+								{
+									Log.Warn($"    {i.name}:{i.GetType()}");
+								}
+                            }
+						}
+                        return true;
 					}
 				case "box":
 					{
@@ -161,16 +202,32 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						var target = Player.Get(int.Parse(arguments.At(1)));
+						if (arguments.At(1) == null)
+                        {
+							response = "[Scale] <player> <x> <y> <z>.";
+							return false;
+						}
+						Player target = Player.Get(arguments.At(1));
+						if (target != null)
+						{
+							if (float.TryParse(arguments.At(2), out float x)
+								&& float.TryParse(arguments.At(3), out float y)
+								&& float.TryParse(arguments.At(4), out float z))
+							{
+								Vector3 pos = new Vector3(x, y, z);
+								target.Scale = pos;
+								response = $"{target.Nickname} as been scale to {pos} ok.";
+								return true;
+							}
+							else
+							{
+								response = "[Scale] il manque la taille <x> <y> <z>.";
+								return false;
+							}
+						}
 
-						target.Scale = new UnityEngine.Vector3(
-							float.Parse(arguments.At(2)),
-							float.Parse(arguments.At(3)),
-							float.Parse(arguments.At(4))
-						);
-
-						response = $"{target.Nickname} ok.";
-						return true;
+						response = "[Scale] Il manque le joueur <player> <x> <y> <z>.";
+						return false;
 					}
 				case "args":
 					{
@@ -199,9 +256,12 @@ namespace SanyaRemastered.Commands
 							}
 							else if (ulong.TryParse(arguments.At(2), out ulong duration))
 							{
-								foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
+								foreach (Player ply in Player.List)
 								{
-									ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+									if (ply.ReferenceHub.TryGetComponent<SanyaRemasteredComponent>(out var Component))
+										Component.AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+									else
+										Log.Debug($"{ply.Nickname} don't have SanyaRemasteredComponent");
 								}
 								response = $"Le Hint {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
 								return true;
@@ -229,8 +289,13 @@ namespace SanyaRemastered.Commands
 									response = $"Votre message a bien été envoyé à :\n";
 									foreach (Player ply in PlyList)
 									{
-										ply.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
-										response += $" - {ply.Nickname}\n";
+										if (ply.ReferenceHub.TryGetComponent<SanyaRemasteredComponent>(out var Component))
+                                        {
+											Component.AddHudCenterDownText(Extensions.FormatArguments(arguments, 3), duration);
+											response += $" - {ply.Nickname}\n";
+										}
+										else
+											Log.Debug($"{ply.Nickname} don't have SanyaRemasteredComponent"); 
 									}
 									return true;
 								}
@@ -259,7 +324,7 @@ namespace SanyaRemastered.Commands
 							var comp = player.GameObject.GetComponent<SanyaRemasteredComponent>();
 							foreach (Player p in Player.List)
 								p.GameObject.GetComponent<SanyaRemasteredComponent>().DisableHud = bool.Parse(arguments.At(2).ToLower());
-							response = $"all hud is = {bool.Parse(arguments.At(2).ToLower())}";
+							response = $"all hud is = {bool.Parse(arguments.At(1).ToLower())}";
 						} catch (Exception) 
 						{
 							response = "hud true/false";
@@ -298,28 +363,29 @@ namespace SanyaRemastered.Commands
 
 						if (!isActwatchEnabled)
 						{
-							player.SendCustomSyncObject(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
+							MirrorExtensions.SendFakeSyncObject(player, player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
 							{
-								writer.WritePackedUInt64(1ul);
-								writer.WritePackedUInt32((uint)1);
+								writer.WriteUInt64(1ul);
+								writer.WriteUInt32((uint)1);
 								writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
-								writer.WritePackedUInt32((uint)3);
+								writer.WriteUInt32((uint)19);
 								writer.WriteByte((byte)1);
 							});
 							isActwatchEnabled = true;
 						}
 						else
 						{
-							player.SendCustomSyncObject(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
+							MirrorExtensions.SendFakeSyncObject(player, player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) =>
 							{
-								writer.WritePackedUInt64(1ul);
-								writer.WritePackedUInt32((uint)1);
+								writer.WriteUInt64(1ul);
+								writer.WriteUInt32(1);
 								writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);
-								writer.WritePackedUInt32((uint)3);
-								writer.WriteByte((byte)0);
+								writer.WriteUInt32(19);
+								writer.WriteByte(0);
 							});
 							isActwatchEnabled = false;
 						}
+
 
 						response = $"ok. [{isActwatchEnabled}]";
 						return true;
@@ -349,7 +415,7 @@ namespace SanyaRemastered.Commands
 						response = "ok.";
 						return true;
 					}
-				case "914":
+				/*case "914":
 					{
 						if (player != null && !player.CheckPermission("sanya.914"))
 						{
@@ -360,7 +426,7 @@ namespace SanyaRemastered.Commands
 						{
 							if(arguments.At(1).ToLower() == "use")
 							{
-								if(!Scp914.Scp914Machine.singleton.working)
+								if(!Scp914.singleton.working)
 								{
 									Scp914.Scp914Machine.singleton.RpcActivate(NetworkTime.time);
 									response = "ok.";
@@ -398,7 +464,7 @@ namespace SanyaRemastered.Commands
 							response = "invalid parameters. (need params)";
 							return false;
 						}
-					}
+					}*/
 				case "nukecap":
 					{
 						if (player != null && !player.CheckPermission("sanya.nukecap"))
@@ -445,14 +511,31 @@ namespace SanyaRemastered.Commands
 						if (arguments.Count > 1 && arguments.At(1).ToLower() == "hcz")
 						{
 							if (float.TryParse(arguments.At(2), out float duration))
-								Generator079.mainGenerator.ServerOvercharge(duration, true);
+								foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
+								{
+									MapGeneration.RoomIdentifier roomIdentifier2;
+									Scp079Interactable scp079Interactable;
+									if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+									{
+										flickerableLightController.ServerFlickerLights(duration);
+									}
+								}
+
 							response = "HCZ blackout!";
 							return true;
 						}
 						if (arguments.Count > 1 && arguments.At(1).ToLower() == "all")
 						{
 							if (float.TryParse(arguments.At(2), out float duration))
-								Generator079.mainGenerator.ServerOvercharge(duration, false);
+								foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
+								{
+									MapGeneration.RoomIdentifier roomIdentifier2;
+									Scp079Interactable scp079Interactable;
+									if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out roomIdentifier2) && flickerableLightController.TryGetComponent(out scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+									{
+										flickerableLightController.ServerFlickerLights(duration);
+									}
+								}
 							response = "ALL blackout!";
 							return true;
 						}
@@ -472,7 +555,56 @@ namespace SanyaRemastered.Commands
 						response += $"[{RoundSummary.singleton.classlistStart.scps_except_zombies}]";
 						return true;
 					}
-				case "ammo":
+				case "infammo":
+				case "infiniteammo":
+					{
+						if (player != null && !player.CheckPermission("sanya.ammo"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						if (arguments.At(1).ToLower() == "all")
+                        {
+							foreach (Player p in Player.List.Where(x=>!x.SessionVariables.ContainsKey("InfAmmo")))
+									p.SessionVariables.Add("InfAmmo", null);
+							response = "Tous les joueurs on l'infinite ammo";
+							return true;
+						}
+						else if (arguments.At(1).ToLower() == "clear")
+						{
+							foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
+								p.SessionVariables.Remove("InfAmmo");
+							response = "Plus aucun joueurs n'as le infinite ammo";
+							return true;
+						}
+						else if (arguments.At(1).ToLower() == "list")
+						{
+							response = "Liste des joueurs avec infinite ammo";
+							foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
+								response += "\n  - " + p.Nickname;
+							return true;
+						}
+						Player target = Player.Get(arguments.At(1));
+						if (target != null)
+						{
+							if (target.SessionVariables.ContainsKey("InfAmmo"))
+								target.SessionVariables.Remove("InfAmmo");
+							else
+								target.SessionVariables.Add("InfAmmo", null);
+							response = $"Inf Ammo: {target.SessionVariables.ContainsKey("InfAmmo")}.";
+							return true;
+						}
+						else
+						{
+							if (player.SessionVariables.ContainsKey("InfAmmo"))
+								player.SessionVariables.Remove("InfAmmo");
+							else
+								player.SessionVariables.Add("InfAmmo", null);
+							response = $"Inf Ammo: {player.SessionVariables.ContainsKey("InfAmmo")}.";
+							return true;
+						}
+                    }
+				/*case "ammo":
 					{
 						if (player != null && !player.CheckPermission("sanya.ammo"))
 						{
@@ -486,16 +618,6 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.Count > 1)
 						{
-							if (arguments.At(1).ToLower() == "inf")
-							{
-								if (player.SessionVariables.ContainsKey("InfAmmo"))
-									player.SessionVariables.Remove("InfAmmo");
-								else
-									player.SessionVariables.Add("InfAmmo", null);
-								response = $"Inf Ammo: {player.SessionVariables.ContainsKey("InfAmmo")}.";
-
-								return true;
-							}
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
@@ -503,9 +625,9 @@ namespace SanyaRemastered.Commands
 									uint.TryParse(arguments.At(3), out uint Nato762) &&
 									uint.TryParse(arguments.At(4), out uint Nato9))
 								{
-									target.Ammo[(int)AmmoType.Nato556] = Nato556;
-									target.Ammo[(int)AmmoType.Nato762] = Nato762;
-									target.Ammo[(int)AmmoType.Nato9] = Nato9;
+									target.Ammo[AmmoType.Nato556] = Nato556;
+									target.Ammo[AmmoType.Nato762] = Nato762;
+									target.Ammo[AmmoType.Nato9] = Nato9;
 									response = $"{target.Nickname}  {Nato556}:{Nato762}:{Nato9}";
 									return true;
 								}
@@ -552,7 +674,7 @@ namespace SanyaRemastered.Commands
 							response = "Failed to set. (cant use from SERVER)";
 							return false;
 						}
-					}
+					}*/
 				case "forceend":
 					{
 						if (player != null && !player.CheckPermission("sanya.forceend"))
@@ -624,24 +746,6 @@ namespace SanyaRemastered.Commands
 						response = $"Ambien sound \n";
 						return true;
 					}
-				case "listdoor":
-					{
-						if (player != null && !player.CheckPermission("sanya.dev"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						response = $"DoorList\n";
-						foreach (var doors in Map.Doors)
-						{
-							response += $"{doors.name} : {doors.name} \n";
-						}
-						foreach (var doors2 in UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>())
-						{
-							response += doors2.TargetPrefab.name;
-						}
-						return true;
-					}
 				case "reload":
 					{
 						if (player != null && !player.CheckPermission("sanya.reload"))
@@ -663,7 +767,7 @@ namespace SanyaRemastered.Commands
 						response = $"Players List ({PlayerManager.players.Count})\n";
 						foreach (var i in Player.List.Where((p) => p.Role != RoleType.None))
 						{
-							response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i.Position}\n";
+							response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i?.CurrentRoom}\n";
 						}
 						response.Trim();
 						return true;
@@ -725,7 +829,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position, false, 0.1f, target.ReferenceHub);
+								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, 0f, target);
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
@@ -738,7 +842,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(ply.Position, false, 0.1f, ply.ReferenceHub);
+									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0f, ply);
 								}
 								response = "success spawn grenade on all player";
 								return true;
@@ -753,7 +857,7 @@ namespace SanyaRemastered.Commands
 						{
 							if (player != null)
 							{
-								Methods.SpawnGrenade(player.ReferenceHub.transform.position, false, 0.1f, player.ReferenceHub);
+								Methods.SpawnGrenade(player.Position, ItemType.GrenadeHE, 0f, player);
 								response = $"success. target:{Player.Get(player.ReferenceHub.gameObject).Nickname}";
 								return true;
 							}
@@ -776,7 +880,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.Spawn018(target.ReferenceHub);
+								Methods.SpawnGrenade(target.Position,ItemType.SCP018,-1, target);
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
@@ -789,7 +893,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.Spawn018(ply.ReferenceHub);
+									Methods.SpawnGrenade(target.Position, ItemType.SCP018, -1, target);
 								}
 								response = "success spawn ball on all player";
 								return true;
@@ -804,7 +908,7 @@ namespace SanyaRemastered.Commands
 						{
 							if (player != null)
 							{
-								Methods.Spawn018(player.ReferenceHub);
+								Methods.SpawnGrenade(player.Position, ItemType.SCP018, -1, player);
 								response = $"success. target:{Player.Get(player.ReferenceHub.gameObject).Nickname}";
 								return true;
 							}
@@ -827,7 +931,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position, false, -1f, target.ReferenceHub);
+								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, -1f, target);
 								response = $"success. target:{target.Nickname}";
 								return false;
 							}
@@ -840,7 +944,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(ply.Position, false, -1f, ply.ReferenceHub);
+									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, -1f, ply);
 								}
 								response = "success spawn grenade on all player";
 								return true;
@@ -855,13 +959,13 @@ namespace SanyaRemastered.Commands
 						{
 							if (player != null)
 							{
-								Methods.SpawnGrenade(player.ReferenceHub.transform.position, false, -1f, player.ReferenceHub);
+								Methods.SpawnGrenade(player.Position, ItemType.GrenadeHE, 0f, player);
 								response = $"success. target:{Player.Get(player.ReferenceHub.gameObject).Nickname}";
 								return true;
 							}
 							else
 							{
-								response = "[ball] missing target.";
+								response = "[grenade] missing target.";
 								return false;
 							}
 						}
@@ -913,7 +1017,7 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						ReferenceHub target = Player.Get(arguments.At(1)).ReferenceHub;
+						Player target = Player.Get(arguments.At(1));
 						if (target != null)
 						{
 							if (float.TryParse(arguments.At(2), out float x)
@@ -921,7 +1025,7 @@ namespace SanyaRemastered.Commands
 								&& float.TryParse(arguments.At(4), out float z))
 							{
 								Vector3 pos = new Vector3(x, y, z);
-								target.playerMovementSync.OverridePosition(pos, 0f, true);
+								target.Position = pos;
 								response = $"TP to {pos}.";
 								return true;
 							}
@@ -944,9 +1048,7 @@ namespace SanyaRemastered.Commands
 							{
 								Vector3 pos = new Vector3(x, y, z);
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
-								{
-									ply.ReferenceHub.playerMovementSync.OverridePosition(pos, 0f, true);
-								}
+									ply.Position = pos;
 								response = $"TP to {pos}.";
 								return true;
 							}
@@ -973,40 +1075,32 @@ namespace SanyaRemastered.Commands
 						{
 							if (arguments.At(1).ToLower() == "unlock")
 							{
-								foreach (var generator in Generator079.Generators)
+								foreach (var generator in Recontainer079.AllGenerators)
 								{
-									generator.NetworkisDoorUnlocked = true;
-									generator.NetworkisDoorOpen = true;
-									generator._doorAnimationCooldown = 0.5f;
+									generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, true);
 								}
 								response = "gen unlocked.";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "door")
 							{
-								foreach (var generator in Generator079.Generators)
+								foreach (var generator in Recontainer079.AllGenerators)
 								{
-									if (!generator.prevFinish)
-									{
-										bool now = !generator.isDoorOpen;
-										generator.NetworkisDoorOpen = now;
-										generator.CallRpcDoSound(now);
-									}
+									generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, !generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Open));
+									generator._targetCooldown = generator._doorToggleCooldownTime;
 								}
 								response = $"gen doors interacted.";
 								return true;
 							}
 							else if (arguments.At(1).ToLower() == "set")
 							{
-								float cur = 10f;
-								foreach (var generator in Generator079.Generators)
+								foreach (var generator in Recontainer079.AllGenerators.Where(x => !x.Engaged))
 								{
-									if (!generator.prevFinish)
+									if (generator != null)
 									{
-										generator.NetworkisDoorOpen = true;
-										generator.NetworkisTabletConnected = true;
-										generator.NetworkremainingPowerup = cur;
-										cur += 10f;
+										generator.Engaged = true;
+										generator.Network_flags = (byte)Scp079Generator.GeneratorFlags.Engaged;
+										response = "set once.";
 									}
 								}
 								response = "gen set.";
@@ -1014,24 +1108,25 @@ namespace SanyaRemastered.Commands
 							}
 							else if (arguments.At(1).ToLower() == "once")
 							{
-								Generator079 gen = Generator079.Generators.FindAll(x => !x.prevFinish).GetRandomOne();
+								var gen = Recontainer079.AllGenerators.FirstOrDefault(x => !x.Engaged);
 
 								if (gen != null)
 								{
-									gen.NetworkisDoorUnlocked = true;
-									gen.NetworkisTabletConnected = true;
-									gen.NetworkisDoorOpen = true;
+									gen.Engaged = true;
+									gen.Network_flags = (byte)Scp079Generator.GeneratorFlags.Engaged;
+									response = "set once.";
+									return true;
 								}
-								response = "set once.";
-								return true;
+								response = "All generator ";
+								return false;
 							}
 							else if (arguments.At(1).ToLower() == "eject")
 							{
-								foreach (var generator in Generator079.Generators)
+								foreach (var generator in Recontainer079.AllGenerators)
 								{
-									if (generator.isTabletConnected)
+									if (generator.Activating)
 									{
-										generator.EjectTablet();
+										generator.Activating = false;
 									}
 								}
 								response = "gen ejected.";

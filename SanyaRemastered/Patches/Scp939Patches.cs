@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(Scp939_VisionController), nameof(Scp939_VisionController.AddVision))]
+	/*[HarmonyPatch(typeof(Scp939_VisionController), nameof(Scp939_VisionController.AddVision))]
 	public static class Scp939VisionShieldPatch
 	{
 		public static void Prefix(Scp939_VisionController __instance, Scp939PlayerScript scp939)
@@ -54,5 +54,5 @@ namespace SanyaRemastered.Patches
 			}
 			return false;
 		}
-	}
+	}*/
 }

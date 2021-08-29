@@ -41,7 +41,7 @@ namespace SanyaRemastered.Patches
 				scp106PlayerScript._hub.playerMovementSync.OverridePosition(scp106PlayerScript.portalPrefab.transform.position + Vector3.up * 1.5f, 0f, false);
 				yield return Timing.WaitForSeconds(3.5f);
 				if (AlphaWarheadController.Host.detonated && scp106PlayerScript.transform.position.y < 800f)
-					scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0), scp106PlayerScript.gameObject, true);
+					scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0, true), scp106PlayerScript.gameObject, true);
 				scp106PlayerScript.goingViaThePortal = false;
 			}
 		}

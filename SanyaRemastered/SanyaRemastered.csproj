@@ -33,19 +33,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="Contain.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\AnimationControllerPatches.cs" />
     <Compile Include="Patches\FallDamagePatch.cs" />
+    <Compile Include="Patches\HandCuffsPatches.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\AntiCheatPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\InfAmmoPatches.cs" />
+    <Compile Include="Patches\InteractPatches.cs" />
     <Compile Include="Patches\ItemCleanupPatch.cs" />
     <Compile Include="Patches\JumpAttackPatches.cs" />
-    <Compile Include="Patches\PlayerInteractPatch.cs" />
+    <Compile Include="Patches\DoorInteractPatch.cs" />
+    <Compile Include="Patches\LiftMovingSinkholePatch.cs" />
+    <Compile Include="Patches\OverchargePatches.cs" />
     <Compile Include="Patches\Scp018Patches.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
@@ -54,93 +59,82 @@
     <Compile Include="Patches\Scp106Patches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
+    <Compile Include="Patches\ScpTargetPatches.cs" />
     <Compile Include="Patches\VoicePacketPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SanyaConfig.cs" />
-    <Compile Include="SanyaPluginComponent.cs" />
+    <Compile Include="SanyaRemasteredComponent.cs" />
     <Compile Include="Subtitles.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CommsHack">
-      <HintPath>C:\Users\louismonneyronpc\Downloads\CommsHack.dll</HintPath>
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\CommandSystem.Core.dll</HintPath>
     </Reference>
     <Reference Include="DiscordLog">
       <HintPath>..\..\DiscordLog\DiscordLog\bin\Debug\DiscordLog.dll</HintPath>
     </Reference>
-    <Reference Include="DissonanceVoip_publicized">
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\6390275\SCPSL_Data\Managed\publicized_assemblies\DissonanceVoip_publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.API, Version=2.1.18.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Exiled.API">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events, Version=2.1.18.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Exiled.CreditTags">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.CreditTags.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.CustomItems">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.CustomItems.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Events">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Loader, Version=2.1.18.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Exiled.Loader">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Exiled.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Permissions, Version=2.1.18.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Exiled.Permissions">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Permissions.dll</HintPath>
     </Reference>
-    <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\Mirror.dll</HintPath>
+    <Reference Include="Exiled.Updater">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Updater.dll</HintPath>
     </Reference>
-    <Reference Include="NorthwoodLib, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
+    <Reference Include="Mirror">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\Mirror.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NorthwoodLib">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\NorthwoodLib.dll</HintPath>
+    </Reference>
+    <Reference Include="SemVer">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\SemVer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\Desktop\SCPSL SERVEUR\depots\996561\5855280\SCPSL_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="YamlDotNet">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

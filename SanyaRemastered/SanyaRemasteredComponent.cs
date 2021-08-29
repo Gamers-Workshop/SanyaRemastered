@@ -17,7 +17,7 @@ using HarmonyLib;
 using Assets._Scripts.Dissonance;
 using Dissonance;
 using Dissonance.Integrations.MirrorIgnorance;
-using Dissonance.Audio.Playback;
+using MapGeneration.Distributors;
 
 namespace SanyaRemastered
 {
@@ -26,14 +26,13 @@ namespace SanyaRemastered
 
 		public static readonly HashSet<Player> _scplists = new HashSet<Player>();
 		private static Vector3 _espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
-		private static GameObject _portalPrefab;
 
 		public bool DisableHud = false;
 
 		private SanyaRemastered _plugin;
 		private Player _player;
 		private string CustomText = string.Empty;
-		private string _hudTemplate = "<align=left><voffset=38em><size=50%><alpha=#44>([STATS])\n<alpha=#ff></size></align><align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]</align></voffset>";
+		private string _hudTemplate = "<line-height=95%><voffset=8.5em><align=left><size=50%><alpha=#44>([STATS])<alpha=#ff></size></align>\n<align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
 		private string _hudText = string.Empty;
@@ -48,7 +47,6 @@ namespace SanyaRemastered
 
 		private void Start()
 		{
-			if (_portalPrefab == null) _portalPrefab = GameObject.Find("SCP106_PORTAL");
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
 			_espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
@@ -129,10 +127,10 @@ namespace SanyaRemastered
 				switch (_player.Team)
 				{
 					case Team.MTF:
-						_player.SetRole(RoleType.ChaosInsurgency);
+						_player.SetRole(RoleType.ChaosConscript);
 						break;
 					case Team.CHI:
-						_player.SetRole(RoleType.NtfCadet);
+						_player.SetRole(RoleType.NtfPrivate);
 						break;
 				}
 			}
@@ -150,17 +148,7 @@ namespace SanyaRemastered
 					_player.ReferenceHub.playerEffectsController.EnableEffect<Corroding>(1f);
 				}
 		}
-		private void CheckOnPortal()
-		{
-			if (_portalPrefab == null || !SanyaRemastered.Instance.Config.Scp106PortalEffect || _player.Role == RoleType.Scp106 || !(_timer > 1f)) return;
 
-			if (Vector3.Distance(_portalPrefab.transform.position + Vector3.up * 1.5f, _player.Position) < 1.5f)
-			{
-				if (_player.IsHuman())
-					_player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(4f, "Corroding", DamageTypes.Scp106, 0), _player.GameObject);
-				_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
-			}
-		}
 		private void SoundVolume()
 		{
 			if (!(_timer > 1f) || !_player.IsAlive) return;
@@ -168,9 +156,11 @@ namespace SanyaRemastered
 
 		private void UpdateRespawnCounter()
 		{
-			if (!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator || !(_timer > 1f)) return;
-
-			_respawnCounter = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
+			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator) return;
+			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown || RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.PlayingEntryAnimations)
+				_respawnCounter = (int)Math.Truncate(RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds);
+			else
+				_respawnCounter = 0;
 		}
 
 		private void UpdateScpLists()
@@ -195,7 +185,7 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = null;
-			if (_player.IsMuted && _player.GameObject.TryGetComponent(out Radio radio) && (radio.isVoiceChatting || radio.isTransmitting))
+			if (_player.IsMuted && _player.IsVoiceChatting)
 				info += $"<b>Vous avez été mute</b> ";
 			if (_player.IsInvisible)
 				info += $"<b>vous êtes invisible</b> ";
@@ -203,6 +193,7 @@ namespace SanyaRemastered
             {
 				curText = curText.Replace("([STATS])", info);
 			}
+
 			//[LIST]
 			if (_player.Team == Team.SCP)
 			{
@@ -212,7 +203,7 @@ namespace SanyaRemastered
 					list += "SCP\n";
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
-							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.curLvl + 1}\n";
+							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n";
 						else
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
 					list.TrimEnd('\n');
@@ -226,25 +217,23 @@ namespace SanyaRemastered
 						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
 					list.TrimEnd('\n');
 				}
-				curText = curText.Replace("[LIST]", FormatStringForHud(list, 6));
+				curText = curText.Replace("[LIST]", FormatStringForHud(list, 7));
 			}
 			else
-				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 6));
+				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 7));
 
 			//[CENTER_UP]
-			if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
-				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(_player.ReferenceHub.animationController.curAnim == 1 ? "Extend:Enabled" : "Extend:Disabled", 6));
-			else
-				curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
+			curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
 			if (_player.Role == RoleType.Scp079 && _player.Zone == Exiled.API.Enums.ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
             {
 				string InfoGen = null;
-				foreach (Generator079 gen in Generator079.Generators.Where(x=>x.isTabletConnected).OrderBy(x => x.remainingPowerup))
+				foreach (Scp079Generator gen in Recontainer079.AllGenerators.Where(x=>x.Activating).OrderBy(x => x.Network_syncTime))
                 {
-					InfoGen += $"<color=#ffff00>({Map.FindParentRoom(Methods.NameOfGeneratorRoom(gen).gameObject).Type}){Mathf.FloorToInt(gen.remainingPowerup) / 60:00} : {Mathf.FloorToInt(gen.remainingPowerup) % 60:00}</color>\n";
+					InfoGen += $"<color=#ffff00>({Map.FindParentRoom(gen.gameObject).Type}){Mathf.FloorToInt(gen.Network_syncTime) / 60:00} : {Mathf.FloorToInt(gen.Network_syncTime) % 60:00}</color>\n";
 				}
+				curText = curText.Replace("[CENTER]", FormatStringForHud(InfoGen, 6));
 			}
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
@@ -276,16 +265,15 @@ namespace SanyaRemastered
 
 			//[BOTTOM]
 			if (!string.IsNullOrEmpty(_hudBottomString))
-				curText = curText.Replace("[BOTTOM]", FormatStringForHud(_hudBottomString, 6));
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(_hudBottomString, 2));
 
 			else if (!string.IsNullOrWhiteSpace(SanyaRemastered.Instance.Config.IsBeta))
-				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 6));
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 2));
 			else
-				curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 6));
-			
-			
+				curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
+
 			_hudText = curText;
-			_player.ShowHint(_hudText, 2);
+			_player.SendTextHintNotEffect(_hudText, 2);
 		}
 
 		private string FormatStringForHud(string text, int needNewLine)

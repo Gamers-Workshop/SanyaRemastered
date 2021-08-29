@@ -51,14 +51,8 @@ namespace SanyaRemastered
 		public bool Nukecapclose { get; set; } = false;
 		[Description("Tesla Config")]
 		public float TeslaRange { get; set; } = 5.5f;
-		public List<string> TeslaTriggerableTeams { get; set; } = new List<string>();
-		public List<Team> TeslaTriggerableTeamsParsed = new List<Team>();
 		public bool TeslaNoTriggerableDisarmed { get; set; } = false;
 
-		[Description("ItemCleanup Config")]
-		public int ItemCleanup { get; set; } = -1;
-		public List<string> ItemCleanupIgnore { get; set; } = new List<string>();
-		public List<ItemType> ItemCleanupIgnoreParsed = new List<ItemType>();
 		[Description("Ajout de porte sur la map")]
 		public bool AddDoorsOnSurface { get; set; } = false;
 		[Description("Game config")]
@@ -91,7 +85,6 @@ namespace SanyaRemastered
 		[Description("Stamina Add \n  # Stamina effect ajoute un leger ralentissement quand la personne n'as pas de stamina")]
 		public bool StaminaEffect { get; set; } = false;
 		public float StaminaLostJump { get; set; } = 0.05f;
-		public float StaminaLostLogicer { get; set; } = 0.001f;
 		
 		[Description("Traitre")]
 		public int TraitorLimit { get; set; } = -1;
@@ -172,10 +165,6 @@ namespace SanyaRemastered
 		public float Scp106DamageMultiplicator { get; set; } = 1f;
 		public float Scp106GrenadeMultiplicator { get; set; } = 1f;
 
-		[Description("Capacité de parler avec la touche V au SCP (sauf 939 qui l'as déjà)")]
-		public List<string> AltvoicechatScps { get; set; } = new List<string>();
-		public List<RoleType> AltvoicechatScpsParsed = new List<RoleType>();
-
 		[Description("SCP Activé les mode étendue")]
 		public bool Scp079ExtendEnabled { get; set; } = false;
 		[Description("SCP-106 Config \n  # Quand vous marcher sur le portail de 106 vous tomber dans la dimmenssion de poche")]
@@ -186,6 +175,8 @@ namespace SanyaRemastered
 		public float Scp079ExtendCostFindscp { get; set; } = 10f;
 		public int Scp079ExtendLevelDoorbeep { get; set; } = 1;
 		public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
+		public int Scp079ExtendBlackoutIntercom { get; set; } = 1;
+		public float Scp079ExtendCostBlackoutIntercom { get; set; } = 5f;
 
 		[Description("SCP-079 Radar Humain")]
 		public bool Scp079spot { get; set; } = false;
@@ -197,7 +188,7 @@ namespace SanyaRemastered
 		public List<string> GazBlacklistRooms { get; set; } = new List<string>();
 		public int GasDuration  { get; set; } = 60;
 		public int TimerWaitGas { get; set; } = 60;
-		public int GasExpGain { get; set; } = 2;
+		public int GasExpGain { get; set; } = 10;
 		public float Scp079ExCostGaz { get; set; } = 150;
 		public int Scp079ExLevelGaz { get; set; } = 4;
 
@@ -225,7 +216,23 @@ namespace SanyaRemastered
 			{"Speaker Start",                  10f },
 			{"Speaker Update",                0.8f }
 		};
+		[Description("SCP Can't interact Now")]
+		public bool ScpCantInteract { get; set; } = false;
+		public Dictionary<string, List<RoleType>> ScpCantInteractList { get; set; } = new Dictionary<string, List<RoleType>>()
+		{
+			{"Change914Knob",            new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"Use914",                   new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"Contain106",               new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"DetonateWarhead",          new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"AlphaWarheadButton",       new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"UseElevator",              new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"UseGenerator",             new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"UseLocker",                new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"UseAlphaWarheadPanel",     new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"DoorInteractOpen",		 new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
+			{"DoorInteractClose",		 new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989} },
 
+		};
 
 		public string GetConfigs()
 		{
@@ -320,30 +327,6 @@ namespace SanyaRemastered
 
 			return returned;
 		}
-		public void ParseConfig()
-		{
-			try
-			{
-				ItemCleanupIgnore.Clear();
-				TeslaTriggerableTeams.Clear();
-				AltvoicechatScpsParsed.Clear();
 
-				foreach (var item in ItemCleanupIgnore)
-					if (Enum.TryParse(item, out ItemType type))
-						ItemCleanupIgnoreParsed.Add(type);
-
-				foreach (var item in TeslaTriggerableTeams)
-					if (Enum.TryParse(item, out Team team))
-						TeslaTriggerableTeamsParsed.Add(team);
-
-				foreach (var item in AltvoicechatScps)
-					if (Enum.TryParse(item, out RoleType role))
-						AltvoicechatScpsParsed.Add(role);
-			}
-			catch (Exception ex)
-			{
-				Log.Error($"[ParseConfig] Error : {ex}");
-			}
-		}
 	}
 }

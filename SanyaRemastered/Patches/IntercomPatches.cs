@@ -13,8 +13,6 @@ namespace SanyaRemastered.Patches
 
 	class IntercomUpdateTextPatches
 	{
-		public static float time = 67.50499f;
-		public static bool draw = true;
 		public static void Prefix(Intercom __instance)
 		{	
 		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
@@ -27,23 +25,18 @@ namespace SanyaRemastered.Patches
 				int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
 				int TimeWarhead = (int)Math.Truncate(AlphaWarheadOutsitePanel._host.timeToDetonation);
 				bool isContain = PlayerManager.localPlayer.GetComponent<CharacterClassManager>()._lureSpj.NetworkallowContain;
-				float TimeContained = 0f;
 
 				leftdecont = Mathf.Clamp(leftdecont, 0, leftdecont);
 
 				float totalvoltagefloat = 0f;
-				foreach (var i in Generator079.Generators)
+				foreach (var i in Recontainer079.AllGenerators.ToList())
 				{
-					totalvoltagefloat += i.localVoltage;
+					totalvoltagefloat += i._currentTime;
 				}
-				totalvoltagefloat *= 1000f;
 				
-				foreach (Generator079 gen in Generator079.Generators)
-				{
-					TimeContained += gen.NetworkremainingPowerup;
-				}
+				totalvoltagefloat = (int)(totalvoltagefloat * 26.666f);
 
-				string contentfix = string.Concat(
+					string contentfix = string.Concat(
 								$"<color=#fffffff>──── Centre d'information FIM Epsilon-11 ────</color>\n",
 								$"Durée de la brèche : {RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}\n",
 								$"SCP restants : {RoundSummary.singleton.CountTeam(Team.SCP) - RoundSummary.singleton.CountRole(RoleType.Scp0492):00}/{RoundSummary.singleton.classlistStart.scps_except_zombies:00}\n",
@@ -97,26 +90,12 @@ namespace SanyaRemastered.Patches
 
 				//Générateur 079
 
-				if (TimeContained == 0 && draw == false)
-				{ 
-					if (time > 0.1f)
-					{ 
-						time -= Time.deltaTime;
-						contentfix += string.Concat($"<color=#ff0000>Surcharge du site : {(int)time / 60}:{(int)time % 60:00}</color>\n");
-					}
-					else
+
+				if (Map.ActivatedGenerators == 3)
+				{
 						contentfix += string.Concat("Tous les générateurs du site sont activés\n");
 				}
 				else
-				{
-					time = 69.50499f;
-				}
-
-				if (totalvoltagefloat == 5000 && draw == true)
-				{
-					draw = false;
-				}
-				else if (totalvoltagefloat != 5000)
 				{
 					contentfix += string.Concat($"Puissance des générateurs : {totalvoltagefloat:0000}KVA\n");
 				}

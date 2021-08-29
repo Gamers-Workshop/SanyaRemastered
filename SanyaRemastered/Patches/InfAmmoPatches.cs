@@ -10,7 +10,7 @@ namespace SanyaRemastered.Patches
 {
     public static class InfAmmoPatches
     {
-		[HarmonyPatch(typeof(WeaponManager), "CallCmdShoot")]
+		/*[HarmonyPatch(typeof(WeaponManager), "CallCmdShoot")]
 		public static class InfAmmoGun
 		{
 			public static void Postfix(WeaponManager __instance)
@@ -21,16 +21,15 @@ namespace SanyaRemastered.Patches
 					__instance._hub.inventory.items.ModifyDuration(itemIndex, __instance._hub.inventory.items[itemIndex].durability + 1f);
 				}
 			}
-		}
-		[HarmonyPatch(typeof(MicroHID), nameof(MicroHID.UpdateServerside))]
+		}*/
+		[HarmonyPatch(typeof(InventorySystem.Items.MicroHID.MicroHIDItem), nameof(InventorySystem.Items.MicroHID.MicroHIDItem.ExecuteServerside))]
 		public static class InfAmmoHid
 		{
-			public static void Postfix(MicroHID __instance)
+			public static void Postfix(InventorySystem.Items.MicroHID.MicroHIDItem __instance)
 			{
-				if (Player.Get(__instance.refHub).SessionVariables.ContainsKey("InfAmmo"))
+				if (Player.Get(__instance.gameObject).SessionVariables.ContainsKey("InfAmmo"))
 				{
-					__instance.ChangeEnergy(1);
-					__instance.NetworkEnergy = 1;
+					__instance.RemainingEnergy = 1;
 				}
 			}
 		}

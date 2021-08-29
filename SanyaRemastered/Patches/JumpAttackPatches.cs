@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.CallCmdChangeSpeedState))]
+	/*[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.CallCmdChangeSpeedState))]
 	public static class JumpAttackPatch
 	{
 		public static void Prefix(AnimationController __instance, byte newState)
@@ -38,5 +38,5 @@ namespace SanyaRemastered.Patches
 				}
 			}
 		}
-	}
+	}*/
 }

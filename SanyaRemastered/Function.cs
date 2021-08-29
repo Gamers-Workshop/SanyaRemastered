@@ -1,7 +1,13 @@
 ﻿using Dissonance.Integrations.MirrorIgnorance;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
+using Hints;
 using Interactables.Interobjects.DoorUtils;
+using InventorySystem;
+using InventorySystem.Items;
+using InventorySystem.Items.ThrowableProjectiles;
+using MapGeneration.Distributors;
 using MEC;
 using Mirror;
 using NorthwoodLib;
@@ -15,10 +21,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -247,7 +251,7 @@ namespace SanyaRemastered.Functions
                     List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
                     foreach (var pos in randampos)
                     {
-                        Methods.SpawnGrenade(pos, false, 0.1f);
+                        Methods.SpawnGrenade(pos, ItemType.GrenadeHE, 0f);
                         yield return Timing.WaitForSeconds(0.1f);
                     }
                     if (TimeEnd != -1)
@@ -274,7 +278,7 @@ namespace SanyaRemastered.Functions
         {
             while (isActuallyBombGoing)
             {
-                CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
+                //CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
                 yield return Timing.WaitForSeconds(11);
             }
         }
@@ -295,17 +299,17 @@ namespace SanyaRemastered.Functions
                 scp106PlayerScript._hub.playerMovementSync.OverridePosition(position, 0f, false);
                 yield return Timing.WaitForSeconds(3.5f);
                 if (AlphaWarheadController.Host.detonated && scp106PlayerScript.transform.position.y < 800f)
-                    scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0), scp106PlayerScript.gameObject, true);
+                    scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0,false), scp106PlayerScript.gameObject, true);
                 scp106PlayerScript.goingViaThePortal = false;
             }
         }
     }
     internal static class Methods
     {
-        public static HttpClient httpClient = new HttpClient();
-        public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
+        //public static HttpClient httpClient = new HttpClient();
+        //public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
 
-        public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
+        //public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
         public static bool IsStuck(Vector3 pos)
         {
             bool result = false;
@@ -320,46 +324,21 @@ namespace SanyaRemastered.Functions
             }
             return result;
         }
-        public static void SpawnGrenade(Vector3 position, bool isFlash = false, float fusedur = -1, ReferenceHub player = null)
+        public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, Player player = null)
         {
-            if (player == null) player = ReferenceHub.GetHub(PlayerManager.localPlayer);
-            var gm = player.GetComponent<Grenades.GrenadeManager>();
-            Grenades.Grenade component = UnityEngine.Object.Instantiate(gm.availableGrenades[isFlash ? (int)GRENADE_ID.FLASH_NADE : (int)GRENADE_ID.FRAG_NADE].grenadeInstance).GetComponent<Grenades.Grenade>();
-            if (fusedur != -1) component.fuseDuration = fusedur;
-            component.FullInitData(gm, position, Quaternion.Euler(component.throwStartAngle), Vector3.zero, component.throwAngularVelocity, player == null ? Team.TUT : player.characterClassManager.CurRole.team);
-            NetworkServer.Spawn(component.gameObject);
-        }
-        public static Transform NameOfGeneratorRoom(this Generator079 gen)
-        {
-            Transform transform = gen.transform;
-            Physics.Raycast(new Ray(transform.position - transform.forward, Vector3.up), out RaycastHit raycastHit, 5f, global::Interface079.singleton.roomDetectionMask);
-            Transform transform2 = raycastHit.transform;
-            if (!transform2)
+            try
             {
-                RaycastHit raycastHit2;
-                Physics.Raycast(new Ray(transform.position - transform.forward, Vector3.down), out raycastHit2, 5f, global::Interface079.singleton.roomDetectionMask);
-                transform2 = raycastHit2.transform;
+                if (fusedur != -1)
+                    new ExplosiveGrenade(Grenade, player) { FuseTime = fusedur }.SpawnActive(position, player);
+                else
+                    new ExplosiveGrenade(Grenade, player).SpawnActive(position, player);
             }
-            if (transform2)
+            catch (Exception ex)
             {
-                while (transform2 != null && !transform2.transform.name.Contains("ROOT", StringComparison.OrdinalIgnoreCase) && !transform2.gameObject.CompareTag("Room"))
-                {
-                    transform2 = transform2.transform.parent;
-                }
+                Log.Error($"[SpawnGrenade] Error: {ex}");
             }
-            return transform2;
 
         }
-        public static void Spawn018(ReferenceHub player)
-        {
-            var gm = player.GetComponent<Grenades.GrenadeManager>();
-            var component = UnityEngine.Object.Instantiate(gm.availableGrenades[(int)GRENADE_ID.SCP018_NADE].grenadeInstance).GetComponent<Grenades.Scp018Grenade>();
-            component.InitData(gm,
-                new Vector3(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f)),
-                new Vector3(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f)));
-            NetworkServer.Spawn(component.gameObject);
-        }
-
         public static int GetRandomIndexFromWeight(int[] list)
         {
             int sum = 0;
@@ -383,6 +362,10 @@ namespace SanyaRemastered.Functions
             }
             return -1;
         }
+		public static void SendTextHintNotEffect(this Player player, string text, float time)
+		{
+			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
+		}
 
         public static void SendSubtitle(string text, ushort time, ReferenceHub target = null)
         {
@@ -404,13 +387,6 @@ namespace SanyaRemastered.Functions
             PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
         }
 
-        public static void TargetShake(this ReferenceHub target, bool achieve)
-        {
-            NetworkWriter writer = NetworkWriterPool.GetWriter();
-            writer.WriteBoolean(achieve);
-            target.TargetSendRpc(AlphaWarheadController.Host, nameof(AlphaWarheadController.RpcShake), writer);
-            NetworkWriterPool.Recycle(writer);
-        }
         public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
         {
             var msg = new RpcMessage
@@ -422,73 +398,7 @@ namespace SanyaRemastered.Functions
             };
             sendto?.characterClassManager.connectionToClient.Send(msg, 0);
         }
-        public static void SendCustomSync(this Player player, NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncObject, Action<NetworkWriter> customSyncVar)
-        {
-            /* 
-			
-			Example(SyncVar) [TargetOnlyBadge]:
-			player.SendCustomSync(player.networkIdentity, typeof(ServerRoles), null, (targetwriter) =>
-			{
-				targetwriter.WritePackedUInt64(2UL);
-				targetwriter.WriteString("test");
-			});
-
-			Example(SyncList) [EffectOnlySCP207]:
-			player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
-				writer.WritePackedUInt64(1ul);								// DirtyObjectsBit
-				writer.WritePackedUInt32((uint)1);							// DirtyIndexCount
-				writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);	// Operations
-				writer.WritePackedUInt32((uint)0);							// EditIndex
-				writer.WriteByte((byte)1);									// Item
-			}, null);
-
-			*/
-            NetworkWriter writer = NetworkWriterPool.GetWriter();
-            NetworkWriter writer2 = NetworkWriterPool.GetWriter();
-            MakeCustomSyncWriter(behaviorOwner, targetType, customSyncObject, customSyncVar, writer, writer2);
-            NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new UpdateVarsMessage() { netId = behaviorOwner.netId, payload = writer.ToArraySegment() });
-            NetworkWriterPool.Recycle(writer);
-            NetworkWriterPool.Recycle(writer2);
-        }
-        public static void MakeCustomSyncWriter(NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncObject, Action<NetworkWriter> customSyncVar, NetworkWriter owner, NetworkWriter observer)
-        {
-            ulong dirty = 0ul;
-            ulong dirty_o = 0ul;
-            NetworkBehaviour behaviour = null;
-            for (int i = 0; i < behaviorOwner.NetworkBehaviours.Length; i++)
-            {
-                behaviour = behaviorOwner.NetworkBehaviours[i];
-                if (behaviour.GetType() == targetType)
-                {
-                    dirty |= 1UL << i;
-                    if (behaviour.syncMode == SyncMode.Observers) dirty_o |= 1UL << i;
-                }
-            }
-            owner.WritePackedUInt64(dirty);
-            observer.WritePackedUInt64(dirty & dirty_o);
-
-            int position = owner.Position;
-            owner.WriteInt32(0);
-            int position2 = owner.Position;
-
-            if (customSyncObject != null)
-                customSyncObject.Invoke(owner);
-            else
-                behaviour.SerializeObjectsDelta(owner);
-
-            customSyncVar?.Invoke(owner);
-
-            int position3 = owner.Position;
-            owner.Position = position;
-            owner.WriteInt32(position3 - position2);
-            owner.Position = position3;
-
-            if (dirty_o != 0ul)
-            {
-                ArraySegment<byte> arraySegment = owner.ToArraySegment();
-                observer.WriteBytes(arraySegment.Array, position, owner.Position - position);
-            }
-        }
+        
         public static void AddDeathTimeForScp049(ReferenceHub target)
         {
             PlayerManager.localPlayer.GetComponent<RagdollManager>().SpawnRagdoll(
@@ -496,7 +406,7 @@ namespace SanyaRemastered.Functions
                             target.transform.rotation,
                             Vector3.zero,
                             (int)RoleType.ClassD,
-                            new PlayerStats.HitInfo(-1, "Scp049Reviver", DamageTypes.Scp049, -1),
+                            new PlayerStats.HitInfo(-1, "Scp049Reviver", DamageTypes.Scp049, -1,true),
                             true,
                             target.GetComponent<MirrorIgnorancePlayer>().PlayerId,
                             target.nicknameSync.DisplayName,
@@ -518,13 +428,6 @@ namespace SanyaRemastered.Functions
                 && raycastHit.transform.name == player.name;
         }
 
-        public static void Blink()
-        {
-            foreach (var scp173 in UnityEngine.Object.FindObjectsOfType<Scp173PlayerScript>())
-            {
-                scp173.RpcBlinkTime();
-            }
-        }
         public static int GetMTFTickets()
         {
             if (CustomLiteNetLib4MirrorTransport.DelayConnections) return -1;
@@ -537,26 +440,7 @@ namespace SanyaRemastered.Functions
             return RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
         }
 
-        public static void SendCustomSyncObject(this Player target, NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customAction)
-        {
-            /* 
-			Cant be use if you dont understand(ill make more use easily soonTM)
-			Example(SyncList) [EffectOnlySCP207]:
-			player.SendCustomSync(player.ReferenceHub.networkIdentity, typeof(PlayerEffectsController), (writer) => {
-				writer.WritePackedUInt64(1ul);								// DirtyObjectsBit
-				writer.WritePackedUInt32((uint)1);							// DirtyIndexCount
-				writer.WriteByte((byte)SyncList<byte>.Operation.OP_SET);	// Operations
-				writer.WritePackedUInt32((uint)0);							// EditIndex
-				writer.WriteByte((byte)1);									// Item
-			});
-			*/
-            NetworkWriter writer = NetworkWriterPool.GetWriter();
-            NetworkWriter writer2 = NetworkWriterPool.GetWriter();
-            MakeCustomSyncWriter(behaviorOwner, targetType, customAction, null, writer, writer2);
-            NetworkServer.SendToClientOfPlayer(target.ReferenceHub.networkIdentity, new UpdateVarsMessage() { netId = behaviorOwner.netId, payload = writer.ToArraySegment() });
-            NetworkWriterPool.Recycle(writer);
-            NetworkWriterPool.Recycle(writer2);
-        }
+   
 
         // API, dont change
         public static int GetComponentIndex(NetworkIdentity identity, Type type)
@@ -571,97 +455,7 @@ namespace SanyaRemastered.Functions
             return bytecodes[Array.FindLastIndex(bytecodes, x => x == System.Reflection.Emit.OpCodes.Ldc_I8.Value) + 1];
         }
 
-        // API, dont change
-        public static System.Reflection.MethodInfo GetWriteExtension(object value)
-        {
-            Type type = value.GetType();
-            switch (Type.GetTypeCode(type))
-            {
-                case TypeCode.String:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteString));
-                case TypeCode.Boolean:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteBoolean));
-                case TypeCode.Int16:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteInt16));
-                case TypeCode.Int32:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WritePackedInt32));
-                case TypeCode.UInt16:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteUInt16));
-                case TypeCode.Byte:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteByte));
-                case TypeCode.SByte:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteSByte));
-                case TypeCode.Single:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteSingle));
-                case TypeCode.Double:
-                    return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteDouble));
-                default:
-                    if (type == typeof(Vector3))
-                        return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteVector3));
-                    if (type == typeof(Vector2))
-                        return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteVector2));
-                    if (type == typeof(GameObject))
-                        return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteGameObject));
-                    if (type == typeof(Quaternion))
-                        return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WriteQuaternion));
-                    if (type == typeof(BreakableWindow.BreakableWindowStatus))
-                        return typeof(BreakableWindowStatusSerializer).GetMethod(nameof(BreakableWindowStatusSerializer.WriteBreakableWindowStatus));
-                    if (type == typeof(Grenades.RigidbodyVelocityPair))
-                        return typeof(Grenades.RigidbodyVelocityPairSerializer).GetMethod(nameof(Grenades.RigidbodyVelocityPairSerializer.WriteRigidbodyVelocityPair));
-                    if (type == typeof(ItemType))
-                        return typeof(NetworkWriterExtensions).GetMethod(nameof(NetworkWriterExtensions.WritePackedInt32));
-                    if (type == typeof(PlayerMovementSync.RotationVector))
-                        return typeof(RotationVectorSerializer).GetMethod(nameof(RotationVectorSerializer.WriteRotationVector));
-                    if (type == typeof(Pickup.WeaponModifiers))
-                        return typeof(WeaponModifiersSerializer).GetMethod(nameof(WeaponModifiersSerializer.WriteWeaponModifiers));
-                    if (type == typeof(Offset))
-                        return typeof(OffsetSerializer).GetMethod(nameof(OffsetSerializer.WriteOffset));
-                    return null;
-            }
-        }
-        public static void MakeCustomSyncVarWriter(NetworkIdentity behaviorOwner, Type targetType, Action<NetworkWriter> customSyncVar, NetworkWriter owner, NetworkWriter observer)
-        {
-            ulong dirty = 0ul;
-            ulong dirty_o = 0ul;
-            NetworkBehaviour behaviour = null;
-            for (int i = 0; i < behaviorOwner.NetworkBehaviours.Length; i++)
-            {
-                behaviour = behaviorOwner.NetworkBehaviours[i];
-                if (behaviour.GetType() == targetType)
-                {
-                    dirty |= 1UL << i;
-                    if (behaviour.syncMode == SyncMode.Observers) dirty_o |= 1UL << i;
-                }
-            }
-            owner.WritePackedUInt64(dirty);
-            observer.WritePackedUInt64(dirty & dirty_o);
-
-            int position = owner.Position;
-            owner.WriteInt32(0);
-            int position2 = owner.Position;
-
-            behaviour.SerializeObjectsDelta(owner);
-            customSyncVar(owner);
-            int position3 = owner.Position;
-            owner.Position = position;
-            owner.WriteInt32(position3 - position2);
-            owner.Position = position3;
-
-            if (dirty_o != 0ul)
-            {
-                ArraySegment<byte> arraySegment = owner.ToArraySegment();
-                observer.WriteBytes(arraySegment.Array, position, owner.Position - position);
-            }
-        }
-        public static void RpcCassieAnnouncement(RespawnEffectsController resp, NetworkConnection conn, string words, bool makeHold, bool makeNoise)
-        {
-            NetworkWriter writer = NetworkWriterPool.GetWriter();
-            writer.WriteString(words);
-            writer.WriteBoolean(makeHold);
-            writer.WriteBoolean(makeNoise);
-            SendTargetRPCInternal(conn, typeof(RespawnEffectsController), "RpcCassieAnnouncement", writer, 0, resp.netId, resp.ComponentIndex);
-            NetworkWriterPool.Recycle(writer);
-        }
+       
         public static void SendTargetRPCInternal(NetworkConnection conn, Type invokeClass, string rpcName, NetworkWriter writer, int channelId, uint netid, int componentindex)
         {
             if (!NetworkServer.active)
@@ -697,73 +491,52 @@ namespace SanyaRemastered.Functions
             return gameObject;
         }
     }
-    public static class Keycard
-    {
-        [Flags]
-        public enum Permissions
-        {
-            None = 0x0,
-            Checkpoints = 0x1,
-            ExitGates = 0x2,
-            Intercom = 0x4,
-            AlphaWarhead = 0x8,
-            ContainmentLevelOne = 0x10,
-            ContainmentLevelTwo = 0x20,
-            ContainmentLevelThree = 0x40,
-            ArmoryLevelOne = 0x80,
-            ArmoryLevelTwo = 0x100,
-            ArmoryLevelThree = 0x200,
-            ScpOverride = 0x400,
-
-            Pedestal = 0x800
-        }
-
-        public static readonly ReadOnlyDictionary<string, Permissions> BackwardsCompatibility = new ReadOnlyDictionary<string, Permissions>(new Dictionary<string, Permissions>
-        {
-            ["CONT_LVL_1"] = Permissions.ContainmentLevelOne,
-            ["CONT_LVL_2"] = Permissions.ContainmentLevelTwo,
-            ["CONT_LVL_3"] = Permissions.ContainmentLevelThree,
-
-            ["ARMORY_LVL_1"] = Permissions.ArmoryLevelOne,
-            ["ARMORY_LVL_2"] = Permissions.ArmoryLevelTwo,
-            ["ARMORY_LVL_3"] = Permissions.ArmoryLevelThree,
-
-            ["INCOM_ACC"] = Permissions.Intercom,
-            ["CHCKPOINT_ACC"] = Permissions.Checkpoints,
-            ["EXIT_ACC"] = Permissions.ExitGates,
-
-            ["PEDESTAL_ACC"] = Permissions.Pedestal,
-        });
-
-        public static Permissions ToTruthyPermissions(this KeycardPermissions keycardPermissions) => (Permissions)keycardPermissions;
-
-        public static Permissions ToTruthyPermissions(string permission)
-        {
-            if (string.IsNullOrEmpty(permission))
-                return Permissions.None;
-
-            BackwardsCompatibility.TryGetValue(permission, out var p);
-            return p;
-        }
-
-        public static Permissions ToTruthyPermissions(string[] permissions)
-        {
-            var p = Permissions.None;
-            for (var z = 0; z < permissions.Length; z++)
-                p |= ToTruthyPermissions(permissions[z]);
-
-            return p;
-        }
-
-        public static bool HasFlagFast(this Permissions permissions, Permissions flag, bool requireAll) => requireAll ? (permissions & flag) == flag : (permissions & flag) != 0;
-    }
     internal static class Extensions
     {
         public static bool IsHuman(this Player player)
         {
             return player.Team != Team.SCP && player.Team != Team.RIP;
         }
+        public static bool IsInTheBox(Vector3 posroom,float x1,float x2,float z1, float z2,float y1, float y2,float rotation)
+        {
+            Vector3 end;
+            Vector3 end2;
+            if (rotation == 0f)
+            {
+                end = new Vector3(x1, y1, z1);
+                end2 = new Vector3(x2, y2, z2);
+            }
+            else if (rotation == 90f)
+            {
+                end = new Vector3(z1, y1, -x2);
+                end2 = new Vector3(z2, y2, -x1);
+            }
+            else if (rotation == 180f)
+            {
+                end = new Vector3(-x2, y1, -z2);
+                end2 = new Vector3(-x1, y2, -z1);
+            }
+            else
+            {
+                end = new Vector3(-z2, y1, x1);
+                end2 = new Vector3(-z1, y2, x2);
+            }
+            if (SanyaRemastered.Instance.Config.IsDebugged)
+            {
 
+                Log.Info(end2.x < posroom.x);
+                Log.Info(posroom.x < end.x);
+                Log.Info(end2.y < posroom.y);
+                Log.Info(posroom.y < end.y);
+                Log.Info(end2.z < posroom.z);
+                Log.Info(posroom.z < end.z);
+            }
+            if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
+            {
+                return true;
+            }
+            return false;
+        }
         public static bool IsEnemy(this Player player, Team target)
         {
             if (player.Role == RoleType.Spectator || player.Role == RoleType.None || player.Team == target)

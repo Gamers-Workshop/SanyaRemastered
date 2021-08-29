@@ -36,7 +36,7 @@ namespace SanyaRemastered.Patches
 						Vector3 position = __instance._ccm.transform.position;
 						__instance.RpcDoSound();
 						__instance._ccm.RpcPlaceBlood(position, 0, Mathf.Clamp(num / 30f, 0.8f, 2f));
-						__instance._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(Mathf.Abs(num), "WORLD", DamageTypes.Falldown, 0), __instance._ccm.gameObject, true, true);
+						__instance._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(Mathf.Abs(num), "WORLD", DamageTypes.Falldown, 0,false), __instance._ccm.gameObject, true, true);
 					}
 				}
 			}

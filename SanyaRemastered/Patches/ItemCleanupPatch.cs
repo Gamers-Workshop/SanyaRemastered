@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(Inventory), nameof(Inventory.SetPickup))]
+	/*[HarmonyPatch(typeof(Inventory), nameof(Inventory.SetPickup))]
 	public static class ItemCleanupPatch
 	{
 		public static Dictionary<GameObject, float> items = new Dictionary<GameObject, float>();
@@ -43,8 +43,8 @@ namespace SanyaRemastered.Patches
 				},
 				ownerPlayer = __instance.gameObject
 			}, pos, rot);
-			__result = gameObject.GetComponent<Pickup>();*/
+			__result = gameObject.GetComponent<Pickup>();*//*
 			return false;
 		}
-	}
+	}*/
 }

@@ -1,5 +1,4 @@
 ﻿using Exiled.API.Features;
-using Grenades;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using Mirror;
@@ -7,7 +6,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-    [HarmonyPatch(typeof(Grenade), nameof(Grenade.NetworkthrowerTeam), MethodType.Setter)]
+    /*[HarmonyPatch(typeof(Grenade), nameof(Grenade.NetworkthrowerTeam), MethodType.Setter)]
     public static class GrenadeThrowerPatch
     {
         public static void Prefix(Grenade __instance, ref Team value)
@@ -81,7 +80,7 @@ namespace SanyaRemastered.Patches
                             num3 *= __instance.damageScpMultiplier;
                         }
 
-                        componentInParent2.playerStats.HurtPlayer(new PlayerStats.HitInfo(num3, __instance.logName, DamageTypes.Grenade, Player.Get(__instance.throwerGameObject).Id), componentInParent2.playerStats.gameObject);
+                        componentInParent2.playerStats.HurtPlayer(new PlayerStats.HitInfo(num3, __instance.logName, DamageTypes.Grenade, Player.Get(__instance.throwerGameObject).Id,false), componentInParent2.playerStats.gameObject);
                     }
                 }
 
@@ -93,5 +92,5 @@ namespace SanyaRemastered.Patches
             }
             return false;
         }
-    }
+    }*/
 }
