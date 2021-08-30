@@ -210,7 +210,8 @@ namespace SanyaRemastered.Commands
 						Player target = Player.Get(arguments.At(1));
 						if (target != null)
 						{
-							if (float.TryParse(arguments.At(2), out float x)
+							if (arguments.Count > 4
+								&& float.TryParse(arguments.At(2), out float x)
 								&& float.TryParse(arguments.At(3), out float y)
 								&& float.TryParse(arguments.At(4), out float z))
 							{
@@ -254,7 +255,7 @@ namespace SanyaRemastered.Commands
 								response = "Permission denied.";
 								return false;
 							}
-							else if (ulong.TryParse(arguments.At(2), out ulong duration))
+							else if (arguments.Count > 2 && ulong.TryParse(arguments.At(2), out ulong duration))
 							{
 								foreach (Player ply in Player.List)
 								{
@@ -272,7 +273,7 @@ namespace SanyaRemastered.Commands
 								return false;
 							}
 						}
-						else if (ulong.TryParse(arguments.At(2), out ulong duration))
+						else if (arguments.Count > 2 && ulong.TryParse(arguments.At(2), out ulong duration))
 						{
                             {
 								string[] Users = arguments.At(1).Split('.');
@@ -526,7 +527,8 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.Count > 1 && arguments.At(1).ToLower() == "all")
 						{
-							if (float.TryParse(arguments.At(2), out float duration))
+							if (arguments.Count > 2 && float.TryParse(arguments.At(2), out float duration))
+                            {
 								foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
 								{
 									MapGeneration.RoomIdentifier roomIdentifier2;
@@ -536,8 +538,10 @@ namespace SanyaRemastered.Commands
 										flickerableLightController.ServerFlickerLights(duration);
 									}
 								}
-							response = "ALL blackout!";
-							return true;
+								response = "ALL blackout!";
+								return true;
+							}
+							response = "need an duration";
 						}
 						else
 							response = "all ou hcz";
@@ -739,7 +743,7 @@ namespace SanyaRemastered.Commands
 							response = "Permission denied.";
 							return false;
 						}
-						if (int.TryParse(arguments.At(1), out int sound))
+						if (arguments.Count > 1 && int.TryParse(arguments.At(1), out int sound))
 						{
 							Methods.PlayAmbientSound(sound);
 						}
@@ -781,12 +785,12 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.At(1).ToLower() == "start")
 						{
-							if (int.TryParse(arguments.At(2), out int duration))
+							if (arguments.Count() > 2 && int.TryParse(arguments.At(2), out int duration))
 							{
-								if (float.TryParse(arguments.At(3), out float duration2))
+								if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float duration2))
 								{
 									SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2), Segment.FixedUpdate));
-									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {duration2 / 60}:{duration2 % 60:00}";
+									response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {(int)duration2 / 60}:{(int)duration2 % 60:00}";
 									return true;
 								}
 								else
@@ -815,6 +819,78 @@ namespace SanyaRemastered.Commands
 							response = $"sanya air start/stop";
 							return false;
 						}
+					}
+				case "color":
+					{
+						if (player != null && !player.CheckPermission("sanya.color"))
+						{
+							response = "Permission denied.";
+							return false;
+						}
+						if (arguments.Count == 1)
+						{
+							response = "Usage: lightcolor r g b or lightcolor reset";
+							return false;
+						}
+						if (arguments.At(1).ToLower() == "all")
+                        {
+							if (arguments.Count == 3 && arguments.At(2).ToLower() == "reset")
+							{
+								foreach (var i in FlickerableLightController.Instances)
+								{
+									i.WarheadLightColor = FlickerableLightController.DefaultWarheadColor;
+									i.WarheadLightOverride = false;
+								}
+								response = "reset ok.";
+								return true;
+							}
+
+							if (arguments.Count == 5
+								&& float.TryParse(arguments.At(2), out var r)
+								&& float.TryParse(arguments.At(3), out var g)
+								&& float.TryParse(arguments.At(4), out var b))
+							{
+								foreach (var i in FlickerableLightController.Instances)
+								{
+									i.WarheadLightColor = new Color(r / 255f, g / 255f, b / 255f);
+									i.WarheadLightOverride = true;
+								}
+								response = $"color set:{r},{g},{b}";
+								return true;
+							}
+							response = $"lightcolor: invalid params.";
+							return false;
+						}
+						else if (arguments.At(1).ToLower() == "set")
+						{
+							foreach (Room room in Map.Rooms)
+							{
+								if (room.Type.ToString().Contains(arguments.At(2)))
+								{
+									if (arguments.Count == 6
+									&& float.TryParse(arguments.At(3), out var r)
+									&& float.TryParse(arguments.At(4), out var g)
+									&& float.TryParse(arguments.At(5), out var b))
+									{
+										room.Color = new Color(r / 255f, g / 255f, b / 255f);
+									}
+								}
+							}
+						}
+						else if (arguments.At(1) == "reset")
+						{
+							foreach (Room room in Map.Rooms)
+							{
+								if (room.Type.ToString().ToLower().Contains(arguments.At(2).ToLower()))
+								{
+									room.ResetColor();
+								}
+							}
+						}
+
+
+						response = $"lightcolor: invalid params.";
+						return false;
 					}
 				case "expl":
 				case "explode":
@@ -1020,7 +1096,8 @@ namespace SanyaRemastered.Commands
 						Player target = Player.Get(arguments.At(1));
 						if (target != null)
 						{
-							if (float.TryParse(arguments.At(2), out float x)
+							if (arguments.Count > 4
+								&& float.TryParse(arguments.At(2), out float x)
 								&& float.TryParse(arguments.At(3), out float y)
 								&& float.TryParse(arguments.At(4), out float z))
 							{
@@ -1042,7 +1119,8 @@ namespace SanyaRemastered.Commands
 								response = "Permission denied.";
 								return false;
 							}
-							if (float.TryParse(arguments.At(2), out float x)
+							if (arguments.Count > 4
+								&& float.TryParse(arguments.At(2), out float x)
 								&& float.TryParse(arguments.At(3), out float y)
 								&& float.TryParse(arguments.At(4), out float z))
 							{

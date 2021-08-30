@@ -28,123 +28,6 @@ using UnityEngine.Networking;
 
 namespace SanyaRemastered.Functions
 {
-    internal static class ShitChecker
-    {
-        private static readonly string whitelist_path = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, "VPN-Whitelist.txt");
-        public static HashSet<IPAddress> whitelist = new HashSet<IPAddress>();
-        private static readonly string blacklist_path = Path.Combine(SanyaRemastered.Instance.Config.DataDirectory, "VPN-Blacklist.txt");
-        public static HashSet<IPAddress> blacklist = new HashSet<IPAddress>();
-
-        /*public static IEnumerator<float> CheckVPN(PreAuthenticatingEventArgs ev)
-		{
-			IPAddress address = ev.Request.RemoteEndPoint.Address;
-
-			if (IsWhiteListed(address) || IsBlacklisted(address))
-			{
-				Log.Debug($"[VPNChecker] Already Checked:{address}", SanyaRemastered.Instance.Config.IsDebugged);
-				yield break;
-			}
-
-			using (UnityWebRequest unityWebRequest = UnityWebRequest.Get($"https://v2.api.iphub.info/ip/{address}"))
-			{
-				unityWebRequest.SetRequestHeader("X-Key", SanyaRemastered.Instance.Config.KickVpnApikey);
-				yield return Timing.WaitUntilDone(unityWebRequest.SendWebRequest());
-				if (!unityWebRequest.isNetworkError)
-				{
-					var data = JsonSerializer.Deserialize<VPNData>(unityWebRequest.downloadHandler.text);
-
-					Log.Info($"[VPNChecker] Checking:{address}:{ev.UserId} ({data.CountryCode}/{data.Isp})");
-
-					if (data.Block == 0 || data.Block == 2)
-					{
-						Log.Info($"[VPNChecker] Passed:{address} UserId:{ev.UserId}");
-						AddWhitelist(address);
-						yield break;
-					}
-					else if (data.Block == 1)
-					{
-						Log.Info($"[VPNChecker] VPN Detected:{address} UserId:{ev.UserId}");
-						AddBlacklist(address);
-
-						var player = Player.Get(ev.UserId);
-						if (player != null)
-						{
-							ServerConsole.Disconnect(player.Connection, Subtitles.VPNKickMessage);
-						}
-						if (!EventHandlers.kickedbyChecker.ContainsKey(ev.UserId))
-							EventHandlers.kickedbyChecker.Add(ev.UserId, "vpn");
-						yield break;
-					}
-					else
-					{
-						Log.Error($"[VPNChecker] Error({unityWebRequest.responseCode}):block == {data.Block}");
-					}
-				}
-				else
-				{
-					Log.Error($"[VPNChecker] Error({unityWebRequest.responseCode}):{unityWebRequest.error}");
-					yield break;
-				}
-			}
-		}
-		*/
-        
-        public static void LoadLists()
-        {
-            whitelist.Clear();
-            blacklist.Clear();
-
-            if (!File.Exists(whitelist_path))
-                File.WriteAllText(whitelist_path, null);
-            if (!File.Exists(blacklist_path))
-                File.WriteAllText(blacklist_path, null);
-
-            foreach (var line in File.ReadAllLines(whitelist_path))
-            {
-                if (IPAddress.TryParse(line, out var address))
-                {
-                    whitelist.Add(address);
-                }
-            }
-
-            foreach (var line2 in File.ReadAllLines(blacklist_path))
-            {
-                if (IPAddress.TryParse(line2, out var address2))
-                {
-                    blacklist.Add(address2);
-                }
-            }
-        }
-
-        public static void AddWhitelist(IPAddress address)
-        {
-            whitelist.Add(address);
-            using (StreamWriter writer = File.AppendText(whitelist_path))
-            {
-                writer.WriteLine(address);
-            }
-        }
-
-        public static bool IsWhiteListed(IPAddress address)
-        {
-            return whitelist.Contains(address);
-        }
-
-        public static void AddBlacklist(IPAddress address)
-        {
-            blacklist.Add(address);
-            using (StreamWriter writer = File.AppendText(blacklist_path))
-            {
-                writer.WriteLine(address);
-            }
-        }
-
-        public static bool IsBlacklisted(IPAddress address)
-        {
-            return blacklist.Contains(address);
-        }
-    }
-
     internal static class Coroutines
     {
         public static bool isAirBombGoing = false;
@@ -537,18 +420,7 @@ namespace SanyaRemastered.Functions
             }
             return false;
         }
-        public static bool IsEnemy(this Player player, Team target)
-        {
-            if (player.Role == RoleType.Spectator || player.Role == RoleType.None || player.Team == target)
-                return false;
-            if (player.Team == Team.SCP && target == Team.TUT || player.Team == Team.TUT && target == Team.SCP) return false;
-            return target == Team.SCP
-                || target == Team.TUT
-                || ((player.Team != Team.MTF && player.Team != Team.RSC) || (target != Team.MTF && target != Team.RSC))
-                &&
-                ((player.Team != Team.CDP && player.Team != Team.CHI) || (target != Team.CDP && target != Team.CHI))
-            ;
-        }
+        
         public static int GetHealthAmountPercent(this Player player)
         {
             return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));

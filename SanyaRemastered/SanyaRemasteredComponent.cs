@@ -157,7 +157,7 @@ namespace SanyaRemastered
 		private void UpdateRespawnCounter()
 		{
 			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator) return;
-			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown || RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.PlayingEntryAnimations)
+			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown)
 				_respawnCounter = (int)Math.Truncate(RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds);
 			else
 				_respawnCounter = 0;
@@ -201,11 +201,16 @@ namespace SanyaRemastered
 				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
 					list += "SCP\n";
+					int Scp0492 = 0;
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n";
+						else if (scp.Role == RoleType.Scp0492)
+							Scp0492++;
 						else
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
+					if (Scp0492 > 0)
+						list += $"Scp049-2:{Scp0492}\n";
 					list.TrimEnd('\n');
 				}
 				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
