@@ -62,6 +62,12 @@
 			"《Vous avez pas le niveau requis.》\n",
 			"</size></color>"
 			);
+		internal static readonly string Extend079SuccessBlackoutIntercom = string.Concat(
+			"<color=#bbee00><size=25>",
+			"《Succée du blackout.》\n",
+			"</size></color>"
+			);
+
 		internal static readonly string Extend079GazCooldown = string.Concat(
 			"<color=#bbee00><size=25>",
 			"《Vous devez attendre {0}》\n",
