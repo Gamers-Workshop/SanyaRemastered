@@ -46,22 +46,19 @@
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\InfAmmoPatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />
-    <Compile Include="Patches\ItemCleanupPatch.cs" />
     <Compile Include="Patches\JumpAttackPatches.cs" />
     <Compile Include="Patches\DoorInteractPatch.cs" />
-    <Compile Include="Patches\LiftMovingSinkholePatch.cs" />
     <Compile Include="Patches\OverchargePatches.cs" />
-    <Compile Include="Patches\Scp018Patches.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\Scp096Patches.cs" />
-    <Compile Include="Patches\Scp106Patches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ScpTargetPatches.cs" />
     <Compile Include="Patches\VoicePacketPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ram.cs" />
     <Compile Include="SanyaConfig.cs" />
     <Compile Include="SanyaRemasteredComponent.cs" />
     <Compile Include="Subtitles.cs" />
@@ -85,6 +82,9 @@
     </Reference>
     <Reference Include="DiscordLog">
       <HintPath>..\..\DiscordLog\DiscordLog\bin\Debug\DiscordLog.dll</HintPath>
+    </Reference>
+    <Reference Include="DissonanceVoip_publicized">
+      <HintPath>..\..\..\SCPSL\SCPSL SERVEUR\depots\996561\ReferenceFille\publicized_assemblies\DissonanceVoip_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.API">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>

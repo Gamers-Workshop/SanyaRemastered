@@ -514,13 +514,11 @@ namespace SanyaRemastered.Commands
 							if (float.TryParse(arguments.At(2), out float duration))
 								foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
 								{
-									MapGeneration.RoomIdentifier roomIdentifier2;
-									Scp079Interactable scp079Interactable;
-									if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
-									{
-										flickerableLightController.ServerFlickerLights(duration);
-									}
-								}
+                                    if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+                                    {
+                                        flickerableLightController.ServerFlickerLights(duration);
+                                    }
+                                }
 
 							response = "HCZ blackout!";
 							return true;
@@ -531,13 +529,11 @@ namespace SanyaRemastered.Commands
                             {
 								foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
 								{
-									MapGeneration.RoomIdentifier roomIdentifier2;
-									Scp079Interactable scp079Interactable;
-									if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out roomIdentifier2) && flickerableLightController.TryGetComponent(out scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
-									{
-										flickerableLightController.ServerFlickerLights(duration);
-									}
-								}
+                                    if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+                                    {
+                                        flickerableLightController.ServerFlickerLights(duration);
+                                    }
+                                }
 								response = "ALL blackout!";
 								return true;
 							}
@@ -588,15 +584,20 @@ namespace SanyaRemastered.Commands
 								response += "\n  - " + p.Nickname;
 							return true;
 						}
-						Player target = Player.Get(arguments.At(1));
-						if (target != null)
+						if (arguments.Count > 0)
 						{
-							if (target.SessionVariables.ContainsKey("InfAmmo"))
-								target.SessionVariables.Remove("InfAmmo");
-							else
-								target.SessionVariables.Add("InfAmmo", null);
-							response = $"Inf Ammo: {target.SessionVariables.ContainsKey("InfAmmo")}.";
-							return true;
+							Player target = Player.Get(arguments.At(1));
+							if (target != null)
+                            {
+								if (target.SessionVariables.ContainsKey("InfAmmo"))
+									target.SessionVariables.Remove("InfAmmo");
+								else
+									target.SessionVariables.Add("InfAmmo", null);
+								response = $"Inf Ammo: {target.SessionVariables.ContainsKey("InfAmmo")}.";
+								return true;
+							}
+							response = $"Inf Ammo: Can't Find the player";
+							return false;
 						}
 						else
 						{
@@ -834,7 +835,7 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.At(1).ToLower() == "all")
                         {
-							if (arguments.Count == 3 && arguments.At(2).ToLower() == "reset")
+							if (arguments.Count > 2 && arguments.At(2).ToLower() == "reset")
 							{
 								foreach (var i in FlickerableLightController.Instances)
 								{
@@ -844,8 +845,18 @@ namespace SanyaRemastered.Commands
 								response = "reset ok.";
 								return true;
 							}
-
-							if (arguments.Count == 5
+							if (arguments.Count > 2 && arguments.At(2).ToLower() == "rand")
+							{
+								System.Random rng = new System.Random();
+								foreach (var i in FlickerableLightController.Instances)
+								{
+									i.WarheadLightColor = new Color((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
+									i.WarheadLightOverride = true;
+								}
+								response = "random color ok.";
+								return true;
+							}
+							if (arguments.Count > 4
 								&& float.TryParse(arguments.At(2), out var r)
 								&& float.TryParse(arguments.At(3), out var g)
 								&& float.TryParse(arguments.At(4), out var b))
@@ -867,7 +878,7 @@ namespace SanyaRemastered.Commands
 							{
 								if (room.Type.ToString().Contains(arguments.At(2)))
 								{
-									if (arguments.Count == 6
+									if (arguments.Count > 5
 									&& float.TryParse(arguments.At(3), out var r)
 									&& float.TryParse(arguments.At(4), out var g)
 									&& float.TryParse(arguments.At(5), out var b))

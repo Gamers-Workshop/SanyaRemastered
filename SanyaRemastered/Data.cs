@@ -12,7 +12,12 @@ namespace SanyaRemastered.Data
 		FLASH_NADE = 1,
 		SCP018_NADE = 2
 	}
-
+	public struct MemoryMetrics
+	{
+		public double Total { get; set; }
+		public double Used { get; set; }
+		public double Free { get; set; }
+	}
 	public static class OutsideRandomAirbombPos
 	{
 		public static List<Vector3> Load()

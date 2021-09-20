@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	/*[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.CallCmdChangeSpeedState))]
+	[HarmonyPatch(typeof(AnimationController), nameof(AnimationController.UserCode_CmdChangeSpeedState))]
 	public static class JumpAttackPatch
 	{
 		public static void Prefix(AnimationController __instance, byte newState)
@@ -22,12 +22,12 @@ namespace SanyaRemastered.Patches
 				var target = Player.Get(hits.transform.gameObject);
 				if (target?.Id == player?.Id) continue;
 
-				if (player.ReferenceHub.weaponManager.GetShootPermission(target.Team) || ServerConsole.FriendlyFire && !target.IsGodModeEnabled)
+				if (HitboxIdentity.CheckFriendlyFire(player.Team,target.Team) || ServerConsole.FriendlyFire && !target.IsGodModeEnabled)
 				{
 					Log.Debug($"Attack:{player.Nickname} -> {target.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
 					target.ReferenceHub.falldamage.RpcDoSound();
 					target.Hurt(3f, player, DamageTypes.Scp0492);
-					player.ReferenceHub.GetComponent<Scp173PlayerScript>().TargetHitMarker(player.Connection);
+					player.SendHitmarker();
 					Vector3 vec = __instance.ccm._hub.PlayerCameraReference.forward * 0.5f;
 					Vector3 targetpos = new Vector3(target.Position.x + vec.x, target.Position.y, target.Position.z + vec.z);
 					if (!Methods.IsStuck(targetpos))
@@ -38,5 +38,5 @@ namespace SanyaRemastered.Patches
 				}
 			}
 		}
-	}*/
+	}
 }

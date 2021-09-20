@@ -185,8 +185,6 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = null;
-			if (_player.IsMuted && _player.IsVoiceChatting)
-				info += $"<b>Vous avez été mute</b> ";
 			if (_player.IsInvisible)
 				info += $"<b>vous êtes invisible</b> ";
 

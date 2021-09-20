@@ -345,7 +345,7 @@ namespace SanyaRemastered
                                         response = "Tu doit étre dans ton confinement";
                                         return false;
                                     }
-                                    var door = player.CurrentRoom.Doors.First(x => x is PryableDoor);
+                                    var door = player.CurrentRoom.Doors.First(x => x.Base is PryableDoor);
                                     {
                                         if (door.Base.GetExactState() == 0f)
                                         {

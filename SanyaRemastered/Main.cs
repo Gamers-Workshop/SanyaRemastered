@@ -20,6 +20,7 @@ using NorthwoodLib.Pools;
 using System.Reflection.Emit;
 using Mirror;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace SanyaRemastered
 {
@@ -39,10 +40,19 @@ namespace SanyaRemastered
 		private readonly MethodInfo _methodToPatch = AccessTools.Method("PlayerInteract:CallCmdSwitchAWButton");
 
 		public SanyaRemastered() => Instance = this;
+		private Ram.MemoryService _memoryService;
 
 		public override void OnEnabled()
 		{
 			if (!Config.IsEnabled) return;
+			
+			int processId = Process.GetCurrentProcess().Id;
+			_memoryService = new Ram.MemoryService(processId);
+			//Only run if memory is going to be asked for
+			if (Config.RamInfo)
+			{
+				_memoryService.BackgroundWorker.RunWorkerAsync();
+			}
 
 			base.OnEnabled();
 
@@ -87,8 +97,7 @@ namespace SanyaRemastered
 
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
-			
-			PlayerEvents.InteractingElevator += Handlers.OnInteractingElevator;
+
 			PlayerEvents.PreAuthenticating += Handlers.OnPreAuth;
 			PlayerEvents.Verified += Handlers.OnPlayerVerified;
 			PlayerEvents.Destroying += Handlers.OnPlayerDestroying;
@@ -102,21 +111,22 @@ namespace SanyaRemastered
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
-			PlayerEvents.SyncingData += Handlers.OnSyncingData;
+			PlayerEvents.InteractingElevator += Handlers.OnInteractingElevator;
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
 			PlayerEvents.Shooting += Handlers.OnShoot;
+			PlayerEvents.SyncingData += Handlers.OnSyncingData;
+			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
-			//PlayerEvents.StoppingGenerator += Handlers.OnStoppingGenerator;
+			PlayerEvents.StoppingGenerator += Handlers.OnStoppingGenerator;
 			PlayerEvents.OpeningGenerator  += Handlers.OnGeneratorOpen;
 			PlayerEvents.ClosingGenerator += Handlers.OnGeneratorClose;
-			//PlayerEvents.ActivatingGenerator += Handlers.OnActivatingGenerator;
-			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
+			PlayerEvents.ActivatingGenerator += Handlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing += Handlers.OnHandcuffing;
 
+			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp106Events.CreatingPortal += Handlers.On106MakePortal;
 			Scp106Events.Teleporting += Handlers.On106Teleport;
-			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp914Events.UpgradingPlayer += Handlers.On914UpgradingPlayer;
 
 			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
@@ -143,8 +153,7 @@ namespace SanyaRemastered
 
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
-			
-			PlayerEvents.InteractingElevator -= Handlers.OnInteractingElevator;
+
 			PlayerEvents.PreAuthenticating -= Handlers.OnPreAuth;
 			PlayerEvents.Verified -= Handlers.OnPlayerVerified;
 			PlayerEvents.Destroying -= Handlers.OnPlayerDestroying;
@@ -158,21 +167,22 @@ namespace SanyaRemastered
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
+			PlayerEvents.InteractingElevator -= Handlers.OnInteractingElevator;
 			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
 
 			PlayerEvents.Shooting -= Handlers.OnShoot;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
-			//PlayerEvents.StoppingGenerator -= Handlers.OnStoppingGenerator;
+			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;
+			PlayerEvents.StoppingGenerator -= Handlers.OnStoppingGenerator;
 			PlayerEvents.OpeningGenerator -= Handlers.OnGeneratorOpen;
 			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
-			//PlayerEvents.ActivatingGenerator -= Handlers.OnActivatingGenerator;
-			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
+			PlayerEvents.ActivatingGenerator -= Handlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing -= Handlers.OnHandcuffing;
 
+			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;
 			Scp106Events.Teleporting -= Handlers.On106Teleport;
-			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp914Events.UpgradingPlayer -= Handlers.On914UpgradingPlayer;
 
 			Scp096Events.AddingTarget -= Handlers.On096AddingTarget;

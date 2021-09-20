@@ -6,6 +6,7 @@ using Hints;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem;
 using InventorySystem.Items;
+using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.ThrowableProjectiles;
 using MapGeneration.Distributors;
 using MEC;
@@ -40,7 +41,28 @@ namespace SanyaRemastered.Functions
             outsite.NetworkkeycardEntered = false;
             yield break;
         }
-
+        public static IEnumerator<float> RestartServer()
+        {
+            yield return Timing.WaitForSeconds(30f);
+            if (Player.List.Count() == 0)
+            {
+                ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
+                PlayerStats.StaticChangeLevel(true);
+            }
+            else
+            {
+                if (ServerStatic.StopNextRound == ServerStatic.NextRoundAction.Restart)
+                {
+                    ServerStatic.StopNextRound = ServerStatic.NextRoundAction.DoNothing;
+                    ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionResetEntry));
+                }
+                else
+                {
+                    ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
+                    ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
+                }
+            }
+        }
         public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
         {
             AirBombWait = timewait;
@@ -420,14 +442,11 @@ namespace SanyaRemastered.Functions
             }
             return false;
         }
-        
+        public static void SendHitmarker(this Player player) => player.Connection.Send(new RequestMessage(0, RequestType.Hitmarker));
+
         public static int GetHealthAmountPercent(this Player player)
         {
             return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));
-        }
-        public static void SendToTargetSound(this Player player)
-        {
-            NetworkServer.SendToClientOfPlayer(player.ReferenceHub.networkIdentity, new PlayableScps.Messages.Scp096ToTargetMessage(player.ReferenceHub));
         }
         public static void OpenReportWindow(this Player player, string text)
         {

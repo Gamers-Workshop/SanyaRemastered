@@ -242,3 +242,4 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.WindModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.ARModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.XRModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.InputModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\DissonanceVoip_publicized.dll

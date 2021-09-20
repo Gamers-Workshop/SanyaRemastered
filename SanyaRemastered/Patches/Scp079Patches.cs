@@ -27,7 +27,7 @@ namespace SanyaRemastered.Patches
 	}
 
 	//SCP-079 
-	//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdSwitchCamera))]
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdSwitchCamera))]
 	public static class Scp079CameraPatch
 	{
 		public static bool Prefix(Scp079PlayerScript __instance, ref ushort cameraId, bool lookatRotation)
@@ -75,123 +75,131 @@ namespace SanyaRemastered.Patches
 	}
 
 	//SCP-079Extend Sprint 
-	//[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.CallCmdInteract))]
+	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
 	public static class Scp079InteractPatch
 	{
-		public static bool Prefix(Scp079PlayerScript __instance, ref string command, ref GameObject target)
+		public static bool Prefix(Scp079PlayerScript __instance, Command079 command ,string args,GameObject target)
 		{
-			if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
-
-			var player = Player.Dictionary[__instance.gameObject];
-			Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command}");
-
-			if (player.ReferenceHub.animationController.curAnim != 1) return true;
-
-			if (command.Contains("LOCKDOWN:"))
+			try
 			{
-				if (player.ReferenceHub.scp079PlayerScript.Network_curLvl + 1 < SanyaRemastered.Instance.Config.Scp079ExLevelGaz)
-				{
-					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
-					return false;
-				}
-				else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExCostGaz)
-				{
-					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
-					return false;
-				}
-				else if (player.ReferenceHub.scp079PlayerScript.Mana >= SanyaRemastered.Instance.Config.Scp079ExCostGaz)
-				{
-					//no break
-				}
-				else
-				{
-					Log.Error("ERROR");
-					return false;
-				}
-				Room room = player.CurrentRoom;
+				if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
 
-				bool locked = false;
-				foreach (Door door in room.Doors)
+				var player = Player.Dictionary[__instance.gameObject];
+				Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command} args {args}");
+
+				if (player.ReferenceHub.animationController.curAnim != 1) return true;
+
+				if (command == Command079.Lockdown)
 				{
-					DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.Base.ActiveLocks);
-					if (!locked &&
-						(((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
-						|| (door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
-						|| (!door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
-						|| lockMode == DoorLockMode.FullLock))
-						locked = true;
-				}
-				if (room == null || locked)
-				{
-					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
-					return false;
-				}
-				foreach (var blackroom in SanyaRemastered.Instance.Config.GazBlacklistRooms)
-				{
-					if (room.Type.ToString().ToLower().Contains(blackroom.ToLower()))
+					if (player.ReferenceHub.scp079PlayerScript.Network_curLvl + 1 < SanyaRemastered.Instance.Config.Scp079ExLevelGaz)
+					{
+						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+						return false;
+					}
+					else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExCostGaz)
+					{
+						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+						return false;
+					}
+					else if (player.ReferenceHub.scp079PlayerScript.Mana >= SanyaRemastered.Instance.Config.Scp079ExCostGaz)
+					{
+						//no break
+					}
+					else
+					{
+						Log.Error("ERROR");
+						return false;
+					}
+					Room room = player.CurrentRoom;
+
+					bool locked = false;
+					foreach (Door door in room.Doors)
+					{
+						DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.Base.ActiveLocks);
+						if (!locked &&
+							(((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
+							|| (door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
+							|| (!door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
+							|| lockMode == DoorLockMode.FullLock))
+							locked = true;
+					}
+					if (room == null || locked)
 					{
 						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
 						return false;
 					}
-				}
-				player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
-				if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.Mana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
-				Timing.RunCoroutine(GasRoom(room, player.ReferenceHub), Segment.FixedUpdate);
-				return false;
-			}
-			else if (command.Contains("DOOR:"))
-			{
-				__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep, __instance.Mana);
-				{
+					foreach (var blackroom in SanyaRemastered.Instance.Config.GazBlacklistRooms)
 					{
-						if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendLevelDoorbeep)
+						if (room.Type.ToString().ToLower().Contains(blackroom.ToLower()))
 						{
-							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
-							return false;
-						}
-						else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
-						{
-							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
-							return false;
-						}
-						else if (player.ReferenceHub.scp079PlayerScript.Mana >= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
-						{
-							//no break
-						}
-						else
-						{
-							Log.Error("ERROR");
+							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
 							return false;
 						}
 					}
-					var door = target.GetComponent<DoorVariant>();
-					if (door != null && door.syncInterval <= 0f)
+					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
+					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.Mana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
+					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub), Segment.FixedUpdate);
+					return false;
+				}
+				else if (command == Command079.Door)
+				{
+					__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep, __instance.Mana);
 					{
+						{
+							if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendLevelDoorbeep)
+							{
+								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+								return false;
+							}
+							else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
+							{
+								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+								return false;
+							}
+							else if (player.ReferenceHub.scp079PlayerScript.Mana >= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
+							{
+								//no break
+							}
+							else
+							{
+								Log.Error("ERROR");
+								return false;
+							}
+						}
+						var door = target.GetComponent<DoorVariant>();
+						if (door != null && door.syncInterval <= 0f)
+						{
 
-						door.syncInterval = 0.5f;
-						if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep;
+							door.syncInterval = 0.5f;
+							if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep;
+						}
+						return false;
 					}
+				}
+				else if (command == Command079.Speaker && args == "EZ_Intercom")
+				{
+					if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendBlackoutIntercom)
+					{
+						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+						return false;
+					}
+					else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom)
+					{
+						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+						return false;
+					}
+					player.CurrentRoom.TurnOffLights(30f);
+					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom;
+					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessBlackoutIntercom, 10);
 					return false;
 				}
+				return true;
 			}
-			else if (command.Contains("SPEAKER:EZ_Intercom"))
+			catch (System.Exception ex)
             {
-				if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendBlackoutIntercom)
-				{
-					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
-					return false;
-				}
-				else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom)
-				{
-					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
-					return false;
-				}
-				player.CurrentRoom.TurnOffLights(30f);
-				if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom;
-				player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessBlackoutIntercom, 10);
-				return false;
+				Log.Error("[Scp079PlayerScript.UserCode_CmdInteract]" + ex);
+				return true;
 			}
-			return true;
 		}
 		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
 		{
@@ -202,7 +210,7 @@ namespace SanyaRemastered.Patches
 				door.Base.NetworkTargetState = true;
 				door.Base.ServerChangeLock(DoorLockReason.Isolation,true);
 			}
-			for (int i = SanyaRemastered.Instance.Config.GasDuration * 2; i > 0f; i--)
+			for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i--)
 			{
 				foreach (var player in Player.List)
 				{
@@ -212,9 +220,11 @@ namespace SanyaRemastered.Patches
 						{
 							player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"),2);
 						}
-						Methods.PlayAmbientSound(7);
+						room.Color = FlickerableLightController.DefaultWarheadColor;
 					}
 				}
+				yield return Timing.WaitForSeconds(0.5f);
+				room.ResetColor();
 				yield return Timing.WaitForSeconds(0.5f);
 			}
 			foreach (var door in doors)
