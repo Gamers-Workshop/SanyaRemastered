@@ -71,6 +71,7 @@ namespace SanyaRemastered
 			//SoundVolume();
 			UpdateRespawnCounter();
 			UpdateScpLists();
+			UpdateHint();
 			UpdateExHud();
 
 			if (_timer > 1f)
@@ -178,7 +179,23 @@ namespace SanyaRemastered
 			}
 
 		}
-
+		public void UpdateHint()
+		{
+			if (_player.TryGetSessionVariable("hint_centerdown", out Tuple<string, ushort> Hintcenterdown))
+			{
+				_hudBottomString = Hintcenterdown.Item1;
+				_hudBottomTime = Hintcenterdown.Item2;
+				_hudBottomTimer = 0f;
+				_player.SessionVariables.Remove("hint_centerdown");
+			}
+			if (_player.TryGetSessionVariable("hint_bottom", out Tuple<string, ushort> Hintbottom))
+            {
+				_hudBottomString = Hintbottom.Item1;
+				_hudBottomTime = Hintbottom.Item2;
+				_hudBottomTimer = 0f;
+				_player.SessionVariables.Remove("hint_bottom");
+			}
+		}
 		private void UpdateExHud()
 		{
 			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
