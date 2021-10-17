@@ -15,7 +15,8 @@ namespace SanyaRemastered.Patches
 	{
 		public static bool Prefix(TimedGrenadePickup __instance,Footprinting.Footprint attacker, Vector3 source, float range)
 		{
-			if (!SanyaRemastered.Instance.Config.GrenadeChainSametiming) return true;
+			if (!SanyaRemastered.Instance.Config.GrenadeChainSametiming || __instance.Info.ItemId == ItemType.SCP018) return true;
+
 			if (Vector3.Distance(__instance.transform.position, source) / range > 0.4f)
 			{
 				return false;
@@ -32,7 +33,7 @@ namespace SanyaRemastered.Patches
 			}
 			__instance.Info.Locked = true;
 			__instance._attacker = attacker;
-			Methods.SpawnGrenade(__instance.Rb.position, __instance.Info.ItemId,0.1f,Player.Get(attacker.NetId));
+			Methods.SpawnGrenade(__instance.Rb.position, throwableItem.ItemTypeId,0f ,Player.Get(attacker.NetId));
 			__instance.DestroySelf();
 			return false;
 		}

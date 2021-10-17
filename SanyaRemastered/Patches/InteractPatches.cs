@@ -96,28 +96,6 @@ namespace SanyaRemastered.Patches
 				}
 			}
 		}
-		[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUseElevator))]
-		public static class PlayerInteractUseElevator
-		{
-			public static bool Prefix(PlayerInteract __instance,Mirror.NetworkBehaviour obj)
-			{
-				try
-				{
-					__instance = (PlayerInteract)obj;
-					if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleType> roles))
-					{
-						if (roles.Contains(__instance._ccm.CurRole.roleId))
-							return false;
-					}
-					return true;
-				}
-				catch (System.Exception ex)
-				{
-					Log.Error(ex);
-					return true;
-				}
-			}
-		}
 		[HarmonyPatch(typeof(Scp079Generator), nameof(Scp079Generator.ServerInteract))]
 		public static class PlayerInteractScp079Generator
 		{
@@ -142,7 +120,7 @@ namespace SanyaRemastered.Patches
 		[HarmonyPatch(typeof(Locker), nameof(Locker.ServerInteract))]
 		public static class PlayerInteractUseLocker
 		{
-			public static bool Prefix(Locker __instance,ReferenceHub ply,byte collider)
+			public static bool Prefix(Locker __instance,ReferenceHub ply,byte colliderId)
 			{
 				try
 				{
@@ -168,27 +146,6 @@ namespace SanyaRemastered.Patches
 				try
 				{
 					if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseAlphaWarheadPanel", out List<RoleType> roles))
-					{
-						if (roles.Contains(__instance._ccm.CurRole.roleId))
-							return false;
-					}
-					return true;
-				}
-				catch (System.Exception ex)
-				{
-					Log.Error(ex);
-					return true;
-				}
-			}
-		}
-		//[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUseElevator))]
-		public static class ElevatorInteractingPatch
-		{
-			public static bool Prefix(PlayerInteract __instance, GameObject elevator)
-			{
-				try
-				{
-					if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleType> roles))
 					{
 						if (roles.Contains(__instance._ccm.CurRole.roleId))
 							return false;

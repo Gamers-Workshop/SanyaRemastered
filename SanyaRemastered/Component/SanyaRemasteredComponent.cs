@@ -198,7 +198,7 @@ namespace SanyaRemastered
 				string list = string.Empty;
 				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
-					list += "SCP\n";
+					list += "<color=red>SCP\n";
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
@@ -220,6 +220,7 @@ namespace SanyaRemastered
 						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
 					list.TrimEnd('\n');
 				}
+				list += "</color>";
 				curText = curText.Replace("[LIST]", FormatStringForHud(list, 7));
 			}
 			else
@@ -231,35 +232,37 @@ namespace SanyaRemastered
 			//[CENTER]
 			if (_player.Role == RoleType.Scp079 && _player.Zone == Exiled.API.Enums.ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
             {
-				string InfoGen = null;
-				foreach (Scp079Generator gen in Recontainer079.AllGenerators.Where(x=>x.Activating).OrderBy(x => x.Network_syncTime))
+				string InfoGen = string.Empty;
+				foreach (Scp079Generator gen in Recontainer079.AllGenerators)
                 {
-					InfoGen += $"<color=#ffff00>({Map.FindParentRoom(gen.gameObject).Type}){Mathf.FloorToInt(gen.Network_syncTime) / 60:00} : {Mathf.FloorToInt(gen.Network_syncTime) % 60:00}</color>\n";
+					if (gen.Activating)
+						InfoGen += $"<color=#ffff00>({Map.FindParentRoom(gen?.gameObject)?.Type}){Mathf.FloorToInt(gen.Network_syncTime) / 60:00} : {Mathf.FloorToInt(gen.Network_syncTime) % 60:00}</color>\n";
 				}
 				curText = curText.Replace("[CENTER]", FormatStringForHud(InfoGen, 6));
 			}
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
+			
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
 			else if (_player.Role == RoleType.Spectator)
 			{
 				if (Coroutines.isActuallyBombGoing)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn tant que le bombardement est activé.", 5));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn tant que le bombardement est activé.", 5));
 				else if (Coroutines.AirBombWait != 0 && Coroutines.AirBombWait < 60)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 5));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 5));
 				else if (Warhead.IsDetonated && SanyaRemastered.Instance.Config.StopRespawnAfterDetonated)
 					if (Coroutines.AirBombWait != 0)
-						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
 					else
-						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn après l'explosion du site.", 5));
+						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site.", 5));
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun Respawn. Il n'y a plus de tickets disponibles.", 5));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Il n'y a plus de tickets disponibles.", 5));
 				else if (_respawnCounter == 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 5));
 				else if (_respawnCounter != -1)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain Respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}.", 5));
+					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}.", 5));
 				else
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 5));
 			}

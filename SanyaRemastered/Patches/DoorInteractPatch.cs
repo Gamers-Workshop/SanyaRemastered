@@ -7,38 +7,99 @@ using System.Collections.Generic;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(AirlockController), nameof(AirlockController.OnDoorAction))]
 	public static class DoorInteractPatch
 	{
-		public static bool Prefix(AirlockController __instance, DoorVariant door, DoorAction action, ReferenceHub ply)
+		[HarmonyPatch(typeof(BreakableDoor), nameof(BreakableDoor.AllowInteracting))]
+		public static bool Prefix(BreakableDoor __instance, ReferenceHub ply)
 		{
 			try
 			{
 				if (SanyaRemastered.Instance.Config.ScpCantInteract)
-                {
-                    {
-						if (SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out List<RoleType> roles) && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleType> roles2))
-						{
-							if (action == DoorAction.Opened || action == DoorAction.Closed && !door.TargetState)
-							{
-								if (roles.Contains(ply.characterClassManager.CurRole.roleId))
-								{
-									return false;
-								}
-							}
-						}
+				{
+					Door door = Door.Get(__instance);
+					Log.Debug($"[OnDoorAction] is ___instance = null {__instance == null} is DoorVariant null {door == null} player is {ply.nicknameSync._firstNickname}");
+					if (!door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
 					}
-                    {
-						if (SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out List<RoleType> roles) && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleType> roles2))
-						{
-							if (action == DoorAction.Opened || action == DoorAction.Closed && door.TargetState)
-							{
-								if (roles.Contains(ply.characterClassManager.CurRole.roleId))
-								{
-									return false;
-								}
-							}
-						}
+					if (door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out var role2) && role2.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Log.Error(ex);
+				return true;
+			}
+		}
+		[HarmonyPatch(typeof(BasicDoor), nameof(BasicDoor.AllowInteracting))]
+		public static bool Prefix(BasicDoor __instance, ReferenceHub ply)
+		{
+			try
+			{
+				if (SanyaRemastered.Instance.Config.ScpCantInteract)
+				{
+					Door door = Door.Get(__instance);
+					if (!door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+					if (door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out var role2) && role2.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Log.Error(ex);
+				return true;
+			}
+		}
+		[HarmonyPatch(typeof(CheckpointDoor), nameof(CheckpointDoor.AllowInteracting))]
+		public static bool Prefix(CheckpointDoor __instance, ReferenceHub ply)
+		{
+			try
+			{
+				if (SanyaRemastered.Instance.Config.ScpCantInteract)
+				{
+					Door door = Door.Get(__instance);
+					if (!door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+					if (door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out var role2) && role2.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			catch (System.Exception ex)
+			{
+				Log.Error(ex);
+				return true;
+			}
+		}
+		[HarmonyPatch(typeof(PryableDoor), nameof(PryableDoor.AllowInteracting))]
+		public static bool Prefix(PryableDoor __instance, ReferenceHub ply)
+		{
+			try
+			{
+				if (SanyaRemastered.Instance.Config.ScpCantInteract)
+				{
+					Door door = Door.Get(__instance);
+					if (!door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
+					}
+					if (door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out var role2) && role2.Contains(ply.characterClassManager.CurRole.roleId))
+					{
+						return false;
 					}
 				}
 				return true;
@@ -50,5 +111,4 @@ namespace SanyaRemastered.Patches
 			}
 		}
 	}
-
 }

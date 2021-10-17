@@ -36,13 +36,13 @@ namespace SanyaRemastered
                                 if (Player.List.Any(x => x.Role == RoleType.Scp079))
                                 {
                                     foreach (var ply in Player.List.Where(x => x.Role == RoleType.Scp079))
-                                        ply.ReferenceHub.BroadcastMessage($"SCP-173 a fait la commande .contain dans la salle {player .CurrentRoom.Name}");
+                                        ply.ReferenceHub.BroadcastMessage($"SCP-173 a fait la commande .contain dans la salle {player.CurrentRoom.Name}");
 
                                     response = "SCP-079 est toujours présent";
                                     return false;
                                 }
 
-                                switch (player .CurrentRoom.Type)
+                                switch (player.CurrentRoom.Type)
                                 {
                                     case RoomType.Lcz914:
                                         {
@@ -120,25 +120,6 @@ namespace SanyaRemastered
                                                 player.SetRole(RoleType.Spectator);
                                                 RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Light Containment Zone", true, true);
                                                 response = "Scp 173 a bien été reconfiné dans la LczArmory";
-                                                return true;
-                                            }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
-                                        }
-                                    case RoomType.HczNuke:
-                                        {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 7.5f, 0f, -15.4f, -20.4f, -400, -420f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                            {
-                                                response = "Tu doit étre confiné";
-                                                return false;
-                                            }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "NUKE_ARMORY");
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                player.SetRole(RoleType.Spectator);
-                                                RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of NATO_A Warhead", true, true);
-                                                response = "Scp 173 a bien été reconfiné dans la HczNuke";
                                                 return true;
                                             }
                                             response = "La porte n'est pas fermer";
@@ -285,7 +266,7 @@ namespace SanyaRemastered
                             }
                         case RoleType.Scp096:
                             {
-                                if (SanyaRemastered.Instance.Config.IsDebugged) Log.Info($"096 state : {(player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}");
+                                Log.Debug($"096 state : {(player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}", SanyaRemastered.Instance.Config.IsDebugged);
                                 if (Scp096PlayerState.Docile != (player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState
                                     && Scp096PlayerState.TryNotToCry != (player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
                                 {
@@ -306,25 +287,6 @@ namespace SanyaRemastered
                                         player.SetRole(RoleType.Spectator);
                                         RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
                                         response = "096 room 096";
-                                        return true;
-                                    }
-                                    response = "La gate n'est pas fermer";
-                                    return false;
-                                }
-                                else if (player.CurrentRoom.Type == RoomType.HczArmory)
-                                {
-                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 7.5f, 0f, -15.4f, -20.4f, -400, -420f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                    {
-                                        response = "Tu doit étre confiné";
-                                        return false;
-                                    }
-                                    var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HCZ_ARMORY");
-                                    if (door.Base.GetExactState() == 0f)
-                                    {
-                                        door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                        player.SetRole(RoleType.Spectator);
-                                        RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in the Armory of Heavy Containment Zone", true, true);
-                                        response = "096 room nuke";
                                         return true;
                                     }
                                     response = "La gate n'est pas fermer";
@@ -372,7 +334,7 @@ namespace SanyaRemastered
                         case RoleType.Scp93953:
                         case RoleType.Scp93989:
                             {
-                                if (player .CurrentRoom.Type == RoomType.Hcz106)
+                                if (player.CurrentRoom.Type == RoomType.Hcz106)
                                 {
                                     if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.4f, 30.8f, -1.9f, 20f, 13f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                     {

@@ -115,6 +115,7 @@ namespace SanyaRemastered
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
 			PlayerEvents.Shooting += Handlers.OnShoot;
+			PlayerEvents.UsingMicroHIDEnergy += Handlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
 			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
@@ -132,8 +133,8 @@ namespace SanyaRemastered
 			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
 			Scp096Events.Enraging += Handlers.On096Enraging;
 			Scp096Events.CalmingDown += Handlers.On096CalmingDown;
+
 			Scp049Events.FinishingRecall += Handlers.On049FinishingRecall;
-			Scp049Events.StartingRecall += Handlers.On049StartingRecall;
 		}
 
 		private void UnRegistEvents()
@@ -171,6 +172,7 @@ namespace SanyaRemastered
 			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
 
 			PlayerEvents.Shooting -= Handlers.OnShoot;
+			PlayerEvents.UsingMicroHIDEnergy -= Handlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
 			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;
@@ -189,7 +191,6 @@ namespace SanyaRemastered
 			Scp096Events.Enraging -= Handlers.On096Enraging;
 			Scp096Events.CalmingDown -= Handlers.On096CalmingDown;
 			Scp049Events.FinishingRecall -= Handlers.On049FinishingRecall;
-			Scp049Events.StartingRecall -= Handlers.On049StartingRecall;
 			Handlers = null;
 		}
 

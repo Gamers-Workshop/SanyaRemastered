@@ -18,6 +18,7 @@ using Interactables.Interobjects.DoorUtils;
 using MapGeneration.Distributors;
 using Exiled.API.Extensions;
 using Extensions = SanyaRemastered.Functions.Extensions;
+using Scp914;
 
 namespace SanyaRemastered.Commands
 {
@@ -326,7 +327,8 @@ namespace SanyaRemastered.Commands
 							foreach (Player p in Player.List)
 								p.GameObject.GetComponent<SanyaRemasteredComponent>().DisableHud = bool.Parse(arguments.At(2).ToLower());
 							response = $"all hud is = {bool.Parse(arguments.At(1).ToLower())}";
-						} catch (Exception) 
+						} 
+						catch (Exception) 
 						{
 							response = "hud true/false";
 							return false;
@@ -416,7 +418,7 @@ namespace SanyaRemastered.Commands
 						response = "ok.";
 						return true;
 					}
-				/*case "914":
+				case "914":
 					{
 						if (player != null && !player.CheckPermission("sanya.914"))
 						{
@@ -425,11 +427,15 @@ namespace SanyaRemastered.Commands
 						}
 						if (arguments.Count > 1)
 						{
-							if(arguments.At(1).ToLower() == "use")
+							Scp914Controller Scp914 = UnityEngine.Object.FindObjectOfType<Scp914Controller>();
+							if (arguments.At(1).ToLower() == "use")
 							{
-								if(!Scp914.singleton.working)
+								if(!Scp914._isUpgrading)
 								{
-									Scp914.Scp914Machine.singleton.RpcActivate(NetworkTime.time);
+									Scp914._remainingCooldown = Scp914._totalSequenceTime;
+									Scp914._isUpgrading = true;
+									Scp914._itemsAlreadyUpgraded = false;
+									Scp914.RpcPlaySound(1);
 									response = "ok.";
 									return true;
 								}
@@ -442,21 +448,30 @@ namespace SanyaRemastered.Commands
 							}
 							else if(arguments.At(1).ToLower() == "knob")
 							{
-								response = $"ok. [{Scp914.Scp914Machine.singleton.knobState}] -> ";
-								Scp914.Scp914Machine.singleton.ChangeKnobStatus();
-								response += $"[{Scp914.Scp914Machine.singleton.knobState}]";
+								response = $"ok. [{Scp914._knobSetting}] -> ";
+								Scp914._remainingCooldown = Scp914._knobChangeCooldown;
+								Type typeFromHandle = typeof(Scp914KnobSetting);
+								Scp914KnobSetting scp914KnobSetting = Scp914._knobSetting + 1;
+								Scp914.Network_knobSetting = scp914KnobSetting;
+								if (!Enum.IsDefined(typeFromHandle, scp914KnobSetting))
+								{
+									Scp914.Network_knobSetting = Scp914KnobSetting.Rough;
+								}
+								Scp914.RpcPlaySound(0);
+
+								response += $"[{Scp914._knobSetting}]";
 								return true;
 							}
-							else if (Enum.TryParse(arguments.At(1),out Scp914.Scp914Knob knob))
+							else if (Enum.TryParse(arguments.At(1),out Scp914KnobSetting knob))
                             {
-								response = $"ok. [{Scp914.Scp914Machine.singleton.knobState}] -> ";
-								Scp914.Scp914Machine.singleton.knobState = knob;
-								response += $"[{Scp914.Scp914Machine.singleton.knobState}]";
+								response = $"ok. [{Scp914.Network_knobSetting}] -> ";
+								Scp914.Network_knobSetting = knob;
+								response += $"[{Scp914.Network_knobSetting}]";
 								return true;
 							}
 							else
 							{
-								response = "invalid parameters. (use/knob) or (Coarse/OneToOne/Fine/VeryFine)";
+								response = "invalid parameters. (use/knob) or (Rough/Coarse/OneToOne/Fine/VeryFine)";
 								return false;
 							}
 						}
@@ -465,7 +480,7 @@ namespace SanyaRemastered.Commands
 							response = "invalid parameters. (need params)";
 							return false;
 						}
-					}*/
+					}
 				case "nukecap":
 					{
 						if (player != null && !player.CheckPermission("sanya.nukecap"))
@@ -609,77 +624,6 @@ namespace SanyaRemastered.Commands
 							return true;
 						}
                     }
-				/*case "ammo":
-					{
-						if (player != null && !player.CheckPermission("sanya.ammo"))
-						{
-							response = "Permission denied.";
-							return false;
-						}
-						if (player == null)
-						{
-							response = "Only can use with RemoteAdmin.";
-							return false;
-						}
-						if (arguments.Count > 1)
-						{
-							Player target = Player.Get(arguments.At(1));
-							if (target != null && target.Role != RoleType.Spectator)
-							{
-								if (uint.TryParse(arguments.At(2), out uint Nato556) &&
-									uint.TryParse(arguments.At(3), out uint Nato762) &&
-									uint.TryParse(arguments.At(4), out uint Nato9))
-								{
-									target.Ammo[AmmoType.Nato556] = Nato556;
-									target.Ammo[AmmoType.Nato762] = Nato762;
-									target.Ammo[AmmoType.Nato9] = Nato9;
-									response = $"{target.Nickname}  {Nato556}:{Nato762}:{Nato9}";
-									return true;
-								}
-								else
-								{
-									response = "sanya ammo {player} (5.56) (7.62) (9mm).";
-									return false;
-								}
-							}
-							if (arguments.At(1) == "all")
-							{
-								if (player != null && !player.CheckPermission("sanya.allammo"))
-								{
-									response = "Permission denied.";
-									return false;
-								}
-								if (uint.TryParse(arguments.At(2), out uint Nato556) &&
-									uint.TryParse(arguments.At(3), out uint Nato762) &&
-									uint.TryParse(arguments.At(4), out uint Nato9))
-								{
-									foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
-									{
-										ply.Ammo[(int)AmmoType.Nato556] = Nato556;
-										ply.Ammo[(int)AmmoType.Nato762] = Nato762;
-										ply.Ammo[(int)AmmoType.Nato9] = Nato9;
-									}
-									response = $"ammo set {Nato556}:{Nato762}:{Nato9}";
-									return true;
-								}
-								else
-								{
-									response = "sanya ammo all (5.56) (7.62) (9mm)";
-									return false;
-								}
-							}
-							else
-							{
-								response = "sanya (player id ou all) ";
-								return false;
-							}
-						}
-						else
-						{
-							response = "Failed to set. (cant use from SERVER)";
-							return false;
-						}
-					}*/
 				case "forceend":
 					{
 						if (player != null && !player.CheckPermission("sanya.forceend"))
@@ -916,7 +860,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, 0f, target);
+								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, 0f, player);
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
@@ -929,7 +873,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0f, ply);
+									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0f, player);
 								}
 								response = "success spawn grenade on all player";
 								return true;
@@ -967,7 +911,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position,ItemType.SCP018,-1, target);
+								Methods.SpawnGrenade(target.Position,ItemType.SCP018,-1, player);
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
@@ -980,7 +924,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(target.Position, ItemType.SCP018, -1, target);
+									Methods.SpawnGrenade(target.Position, ItemType.SCP018, -1, player);
 								}
 								response = "success spawn ball on all player";
 								return true;
@@ -1018,7 +962,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, -1f, target);
+								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, -1f, player);
 								response = $"success. target:{target.Nickname}";
 								return false;
 							}
@@ -1031,7 +975,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, -1f, ply);
+									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, -1f, player);
 								}
 								response = "success spawn grenade on all player";
 								return true;
@@ -1188,6 +1132,7 @@ namespace SanyaRemastered.Commands
 									if (generator != null)
 									{
 										generator.Engaged = true;
+										generator._currentTime = 1000;
 										generator.Network_flags = (byte)Scp079Generator.GeneratorFlags.Engaged;
 										response = "set once.";
 									}
@@ -1202,6 +1147,7 @@ namespace SanyaRemastered.Commands
 								if (gen != null)
 								{
 									gen.Engaged = true;
+									gen._currentTime = 1000;
 									gen.Network_flags = (byte)Scp079Generator.GeneratorFlags.Engaged;
 									response = "set once.";
 									return true;

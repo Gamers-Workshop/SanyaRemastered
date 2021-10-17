@@ -36,7 +36,7 @@ namespace SanyaRemastered.Patches
 
 			Log.Debug($"[Scp079CameraPatch] {cameraId}:{lookatRotation}");
 
-			if (__instance.GetComponent<AnimationController>().curAnim != 1) return true;
+			if (/*__instance.GetComponent<AnimationController>().curAnim != 1*/ true) return true;
 
 			if (__instance.Network_curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
 			{
@@ -85,9 +85,9 @@ namespace SanyaRemastered.Patches
 				if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
 
 				var player = Player.Dictionary[__instance.gameObject];
-				Log.Debug($"[Scp079InteractPatch] {player.ReferenceHub.animationController.curAnim} -> {command} args {args}");
+				Log.Debug($"[Scp079InteractPatch] {/*player.ReferenceHub.animationController.curAnim*/null} -> {command} args {args}");
 
-				if (player.ReferenceHub.animationController.curAnim != 1) return true;
+				if (/*player.ReferenceHub.animationController.curAnim != 1*/ true) return true;
 
 				if (command == Command079.Lockdown)
 				{

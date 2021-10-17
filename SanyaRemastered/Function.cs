@@ -187,13 +187,7 @@ namespace SanyaRemastered.Functions
                 yield return Timing.WaitForSeconds(11);
             }
         }
-        /*public static IEnumerator<float> Scp914()
-        {
-            while ()
-            {
 
-            }
-        }*/
         public static IEnumerator<float> Scp106CustomTeleport(Scp106PlayerScript scp106PlayerScript, Vector3 position)
         {
             if (!scp106PlayerScript.goingViaThePortal)
@@ -211,6 +205,7 @@ namespace SanyaRemastered.Functions
     }
     internal static class Methods
     {
+        
         //public static HttpClient httpClient = new HttpClient();
         //public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
 
@@ -233,7 +228,14 @@ namespace SanyaRemastered.Functions
         {
             try
             {
-                if (fusedur != -1)
+                if (Grenade == ItemType.GrenadeFlash)
+                {
+                    if (fusedur != -1)
+                        new FlashGrenade(ItemType.GrenadeFlash, player) { FuseTime = fusedur }.SpawnActive(position, player);
+                    else
+                        new FlashGrenade(ItemType.GrenadeFlash, player).SpawnActive(position, player);
+                }
+                else if (fusedur != -1)
                     new ExplosiveGrenade(Grenade, player) { FuseTime = fusedur }.SpawnActive(position, player);
                 else
                     new ExplosiveGrenade(Grenade, player).SpawnActive(position, player);
@@ -318,7 +320,17 @@ namespace SanyaRemastered.Functions
                             target.queryProcessor.PlayerId
                         );
         }
-
+        public static void MoveNetworkIdentityObject(NetworkIdentity identity, Vector3 pos)
+        {
+            identity.gameObject.transform.position = pos;
+            ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage();
+            objectDestroyMessage.netId = identity.netId;
+            foreach (var ply in Player.List)
+            {
+                ply.Connection.Send(objectDestroyMessage, 0);
+                typeof(NetworkServer).GetMethod("SendSpawnMessage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { identity, ply.Connection });
+            }
+        }
         public static bool CanLookToPlayer(this Camera079 camera, ReferenceHub player)
         {
             Player EPlayer = Player.Dictionary[player.gameObject];
@@ -402,6 +414,7 @@ namespace SanyaRemastered.Functions
         {
             return player.Team != Team.SCP && player.Team != Team.RIP;
         }
+        
         public static bool IsInTheBox(Vector3 posroom,float x1,float x2,float z1, float z2,float y1, float y2,float rotation)
         {
             Vector3 end;
@@ -429,12 +442,12 @@ namespace SanyaRemastered.Functions
             if (SanyaRemastered.Instance.Config.IsDebugged)
             {
 
-                Log.Info(end2.x < posroom.x);
-                Log.Info(posroom.x < end.x);
-                Log.Info(end2.y < posroom.y);
-                Log.Info(posroom.y < end.y);
-                Log.Info(end2.z < posroom.z);
-                Log.Info(posroom.z < end.z);
+                Log.Debug(end2.x < posroom.x);
+                Log.Debug(posroom.x < end.x);
+                Log.Debug(end2.y < posroom.y);
+                Log.Debug(posroom.y < end.y);
+                Log.Debug(end2.z < posroom.z);
+                Log.Debug(posroom.z < end.z);
             }
             if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
             {
@@ -442,7 +455,7 @@ namespace SanyaRemastered.Functions
             }
             return false;
         }
-        public static void SendHitmarker(this Player player) => player.Connection.Send(new RequestMessage(0, RequestType.Hitmarker));
+        public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
 
         public static int GetHealthAmountPercent(this Player player)
         {
@@ -464,7 +477,7 @@ namespace SanyaRemastered.Functions
                 }
             }
         }
-        public static bool IsExmode(this Player player) => player.ReferenceHub.animationController.curAnim == 1;
+        public static bool IsExmode(this Player player) => /*player.ReferenceHub.animationController.curAnim == 1*/ false;
 
         public static bool IsList(this Type type)
         {

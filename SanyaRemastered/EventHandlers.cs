@@ -201,6 +201,7 @@ namespace SanyaRemastered
             }
             if (plugin.Config.AddDoorsOnSurface)
             {
+                
                 Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
                 var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
                 var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
@@ -212,22 +213,15 @@ namespace SanyaRemastered
                 // Exit
                 var door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
                 var door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
-
+                //Scale
                 door1.transform.localScale = DoorScale;
                 door2.transform.localScale = DoorScale;
-
                 door3.transform.localScale = DoorScale;
                 door4.transform.localScale = DoorScale;
-
-                /*//Spawn Main du serpent 
-                var door5 = UnityEngine.Object.Instantiate(HCZprefab.TargetPrefab, new UnityEngine.Vector3(1.15f, 1000f, 4.8f), Quaternion.Euler(Vector3.up * 0f));
-                (door5 as BreakableDoor)._ignoredDamageSources |= DoorDamageType.Grenade;
-                var door6 = UnityEngine.Object.Instantiate(HCZprefab.TargetPrefab, new UnityEngine.Vector3(-1.27f, 1000f, 4.8f), Quaternion.Euler(Vector3.up * 360f));
-                (door6 as BreakableDoor)._ignoredDamageSources |= DoorDamageType.Grenade;
-
-                door5.gameObject.AddComponent<DoorNametagExtension>().UpdateName("GATE_EX_R");
-                door6.gameObject.AddComponent<DoorNametagExtension>().UpdateName("GATE_EX_L");*/
-
+                //name
+                door3.gameObject.AddComponent<DoorNametagExtension>().UpdateName("EXIT_1");
+                door4.gameObject.AddComponent<DoorNametagExtension>().UpdateName("EXIT_2");
+                //spawn
                 NetworkServer.Spawn(door1.gameObject);
                 NetworkServer.Spawn(door2.gameObject);
                 NetworkServer.Spawn(door3.gameObject);
@@ -305,7 +299,7 @@ namespace SanyaRemastered
         }
         public void OnTeamRespawn(RespawningTeamEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count} IsCI:{ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency} MaxAmount:{ev.MaximumRespawnAmount}");
+            Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count} IsCI:{ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency} MaxAmount:{ev.MaximumRespawnAmount}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated)
                 ev.Players.Clear();
@@ -318,7 +312,7 @@ namespace SanyaRemastered
         }
         public void OnWarheadStart(StartingEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}");
+            Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}",SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
             {
@@ -350,7 +344,6 @@ namespace SanyaRemastered
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
-                if (plugin.Config.CloseDoorsOnNukecancel)
                     foreach (var door in Map.Doors)
                         if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
                             door.Base.NetworkTargetState = false;
@@ -359,7 +352,7 @@ namespace SanyaRemastered
 
         public void OnDetonated()
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}");
+            Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.OutsidezoneTerminationTimeAfterNuke >= 0)
             {
@@ -368,7 +361,7 @@ namespace SanyaRemastered
         }
         public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}");
+            Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 switch (ev.Id)
@@ -470,7 +463,7 @@ namespace SanyaRemastered
         }
         public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}");
+            Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
             //if (SanyaRemastered.Instance.Config.GeneratorFinishLock) ev.Generator.Network_flags = (byte)Scp079Generator.GeneratorFlags.Unlocked;
 
             int curgen = Map.ActivatedGenerators + 1;
@@ -485,10 +478,13 @@ namespace SanyaRemastered
                     Methods.SendSubtitle(Subtitles.GeneratorComplete, 20);
                 }
             }
+            if (SanyaRemastered.Instance.Config.GeneratorFinishLock) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
+
+
         }
         public void OnPreAuth(PreAuthenticatingEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}");
+            Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void OnPlayerVerified(VerifiedEventArgs ev)
@@ -516,13 +512,13 @@ namespace SanyaRemastered
         public void OnPlayerDestroying(DestroyingEventArgs ev)
         {
             if (ev.Player.IsHost) return;
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
+            Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void OnPlayerSetClass(ChangingRoleEventArgs ev)
         {
             if (ev.Player.IsHost) return;
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}");
+            Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
             {
@@ -552,7 +548,7 @@ namespace SanyaRemastered
         public void OnPlayerSpawn(SpawningEventArgs ev)
         {
             if (ev.Player.IsHost) return;
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}");
+            Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}", SanyaRemastered.Instance.Config.IsDebugged);
             ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
             if (ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
                 ev.Player.Scale = new Vector3(SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size);
@@ -573,7 +569,7 @@ namespace SanyaRemastered
         public void OnPlayerHurt(HurtingEventArgs ev)
         {
             if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+            Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
             
             if (ev.Target == null) return;
 
@@ -627,13 +623,13 @@ namespace SanyaRemastered
                 }
             }
 
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+            Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void OnDied(DiedEventArgs ev)
         {
             if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.Tool.Name}-> {ev.Target?.Nickname}[{ev.Target?.Role}]");
+            Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.Tool.Name}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
             if (SanyaRemastered.Instance.Config.Scp939Size != 1)
             {
                 ev.Target.Scale = Vector3.one;
@@ -650,7 +646,7 @@ namespace SanyaRemastered
                 && !string.IsNullOrEmpty(ev.Killer.UserId)
                 && ev.Killer.UserId != ev.Target.UserId)
             {
-                ev.Killer.GameObject.GetComponent<Hitmarker>().Trigger(3);
+                ev.Killer.SendHitmarker(3);
             }
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle
@@ -762,7 +758,7 @@ namespace SanyaRemastered
         }
         public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}");
+            Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
             /*if (PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
                 PlayerHasEnrage096InPocket.Remove(ev.Player.GameObject);*/
             List<Player> Scp106 = Player.List.Where(x => x.Role == RoleType.Scp106).ToList();
@@ -781,7 +777,7 @@ namespace SanyaRemastered
 
         public void OnPlayerItemUsed(UsedItemEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item}");
+            Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item.Type}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Item.Base.ItemTypeId == ItemType.Medkit)
             {
@@ -810,43 +806,22 @@ namespace SanyaRemastered
         public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
         {
             Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer && ev.Player.HasItem(ItemType.Radio)) ev.IsTriggerable = false;
         }
 
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}");
-
-            if (plugin.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled)
+            Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (plugin.Config.ScpCantInteract)
             {
-                ev.IsAllowed = false;
-
-                DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)ev.Door.Base.ActiveLocks);
-                if (ev.IsAllowed
-                || ((ev.Door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
-                || (ev.Door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
-                || (!ev.Door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
-                || lockMode == DoorLockMode.FullLock) return;
-
-                if (ev.Door.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None)
-                    ev.IsAllowed = true;
-
-                /*foreach (var item in ev.Player.Inventory.UserInventory.Items.Where(x => x.Value.ItemTypeId.ToString().Contains("Keycard")))
+                if (!ev.Door.IsOpen && plugin.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen" , out var role) && role.Contains(ev.Player.Role))
                 {
-                    Item[] itemlist = UnityEngine.Object.FindObjectOfType<InventorySystem.Inventory>().item;
-
-                    Item gameItem = Array.Find(itemlist, i => i.id == item.id);
-
-                    // Relevant for items whose type was not found
-                    if (gameItem == null)
-                        continue;
-
-                    Keycard.Permissions itemPerms = Keycard.ToTruthyPermissions(gameItem.permissions);
-
-                    if (itemPerms.HasFlagFast(ev.Door.RequiredPermissions, ev.Door.RequiredPermissions.RequireAll))
-                    {
-                        ev.IsAllowed = true;
-                    }
-                }*/
+                    ev.IsAllowed = false;
+                }
+                if (ev.Door.IsOpen && plugin.Config.ScpCantInteractList.TryGetValue("DoorInteractClose", out var role2) && role2.Contains(ev.Player.Role))
+                {
+                    ev.IsAllowed = false;
+                }
             }
             if (plugin.Config.AddDoorsOnSurface && ev.Door.Base.TryGetComponent<DoorNametagExtension>(out var nametag))
             {
@@ -867,21 +842,11 @@ namespace SanyaRemastered
 
         public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}");
-            if (SanyaRemastered.Instance.Config.InventoryKeycardActivation && ev.Player.Team != Team.SCP && !ev.Player.IsBypassModeEnabled)
-            {
-                /*foreach (var item in ev.Player.Inventory.UserInventory.Items)
-                {
-                    if (ev.Player.Inventory.GetItemByID(item.Value).permissions.Contains("PEDESTAL_ACC"))
-                    {
-                        ev.IsAllowed = true;
-                    }
-                }*/
-            }
+            Log.Debug($"[OnPlayerLockerInteract] {ev.Player.Nickname}:{ev.Locker.name}", SanyaRemastered.Instance.Config.IsDebugged);
         }
         public void OnInteractingElevator(InteractingElevatorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Name : {ev.Elevator.GetType().Name}");
+            Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Name : {ev.Elevator.GetType().Name}", SanyaRemastered.Instance.Config.IsDebugged);
             if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleType> roles))
             {
                 if (roles.Contains(ev.Player.Role))
@@ -900,7 +865,7 @@ namespace SanyaRemastered
         }
         public void OnShoot(ShootingEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}");
+            Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
 
 
             if (ev.ShotPosition != Vector3.zero
@@ -909,10 +874,10 @@ namespace SanyaRemastered
                 if (SanyaRemastered.Instance.Config.Item_shoot_move)
                 {
                     var pickup = raycastHit.transform.GetComponentInParent<ItemPickupBase>();
-                    Log.Info($"pickup is null ? {pickup != null} : pickup.Rb is null ?{pickup.Rb != null}");
+                    Log.Debug($"pickup is null ? {pickup != null} : pickup.Rb is null ?{pickup.Rb != null}", SanyaRemastered.Instance.Config.IsDebugged);
                     if (pickup != null && pickup.Rb != null)
                     {
-                        Log.Info($"Force ? {Vector3.Distance(ev.ShotPosition, ev.Shooter.Position) * 2} : Weight ?{pickup.Info.Weight}");
+                        Log.Debug($"Force ? {Vector3.Distance(ev.ShotPosition, ev.Shooter.Position) * 2} : Weight ?{pickup.Info.Weight}", SanyaRemastered.Instance.Config.IsDebugged);
                         pickup.Rb.AddExplosionForce((Vector3.Distance(ev.ShotPosition, ev.Shooter.Position) * 2) / pickup.Info.Weight, ev.Shooter.Position, 500f, 3f, ForceMode.Impulse);
                     }
                 }
@@ -960,14 +925,25 @@ namespace SanyaRemastered
                 }
                 if (ev.Shooter.SessionVariables.ContainsKey("InfAmmo"))
                 {
-                    FirearmStatus firearm = ev.Shooter.CurrentItem.Base.GetComponent<Firearm>().Status;
-                    ev.Shooter.CurrentItem.Base.GetComponent<Firearm>().Status = new FirearmStatus((byte)(firearm.Ammo + 1), firearm.Flags, firearm.Attachments);
+                    if (ev.Shooter.CurrentItem.Base is Firearm fa && fa != null)
+                        fa.Status = new FirearmStatus((byte)(fa.Status.Ammo + 1), fa.Status.Flags, fa.Status.Attachments);
                 }
+            }
+        }
+        public void OnUsingMicroHIDEnergy(UsingMicroHIDEnergyEventArgs ev)
+        {
+            if (ev.Player.SessionVariables.ContainsKey("InfAmmo"))
+            {
+                ev.Drain = 0;
+            }
+            if (SanyaRemastered.Instance.Config.MicroHidNotActive.Contains(ev.Player.Role))
+            {
+                ev.IsAllowed = false;
             }
         }
         public void OnSyncingData(SyncingDataEventArgs ev)
         {
-            if (ev.Player == null || ev.Player.IsHost || !ev.Player.ReferenceHub.Ready || ev.Player.ReferenceHub.animationController.curAnim == ev.CurrentAnimation) return;
+            if (ev.Player == null || ev.Player.IsHost || !ev.Player.ReferenceHub.Ready || /*ev.Player.ReferenceHub.animationController.curAnim == ev.CurrentAnimation*/ true) return;
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
             {
@@ -975,17 +951,6 @@ namespace SanyaRemastered
                     ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendEnabled, 3);
                 else
                     ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendDisabled, 3);
-            }
-
-            if (SanyaRemastered.Instance.Config.StaminaLostJump > 0f
-                && ev.CurrentAnimation == 2
-                && ev.Player.ReferenceHub.characterClassManager.IsHuman()
-                && !ev.Player.ReferenceHub.fpc.staminaController._invigorated.IsEnabled
-                && !ev.Player.ReferenceHub.fpc.staminaController._scp207.IsEnabled
-                )
-            {
-                ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina -= SanyaRemastered.Instance.Config.StaminaLostJump;
-                ev.Player.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
             }
             if (SanyaRemastered.Instance.Config.StaminaEffect)
             {
@@ -1004,29 +969,8 @@ namespace SanyaRemastered
 
         public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}");
+            Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}", SanyaRemastered.Instance.Config.IsDebugged);         
 
-
-            if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled && ev.Player.Team != Team.SCP)
-            {
-                /*foreach (var item in ev.Player.Inventory.UserInventory.Items.Where(x => x.Value.ItemTypeId.ToString().Contains("Keycard")))
-                {
-                    Item[] itemlist = UnityEngine.Object.FindObjectOfType<Inventory>().availableItems;
-
-                    Item gameItem = Array.Find(itemlist, i => i.id == item.Value);
-
-                    // Relevant for items whose type was not found
-                    if (gameItem == null)
-                        continue;
-
-                    Keycard.Permissions itemPerms = Keycard.ToTruthyPermissions(gameItem.permissions);
-
-                    if (itemPerms.HasFlagFast(Keycard.Permissions.ContainmentLevelThree, false))
-                    {
-                        ev.IsAllowed = true;
-                    }
-                }*/
-            }
             var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
             if (SanyaRemastered.Instance.Config.Nukecapclose && outsite.keycardEntered)
             {
@@ -1040,30 +984,18 @@ namespace SanyaRemastered
         
         public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
         {
-            /*if (plugin.Config.InventoryKeycardActivation && !ev.Player.IsBypassModeEnabled && ev.Player.Team != Team.SCP)
-            {
-                foreach (var item in ev.Player.Inventory.UserInventory.Items)
-                {
-                    if (ev.Player.Inventory.GetItemByID(item.Value.ItemTypeId).permissions.Contains("ARMORY_LVL_2"))
-                    {
-                        ev.IsAllowed = true;
-                    }
-                }
-            }*/
-
             if (ev.IsAllowed && SanyaRemastered.Instance.Config.GeneratorUnlockOpen)
             {
-                ev.Generator._doorToggleCooldownTime = 2f;
-                ev.Generator.Network_flags = (byte)Scp079Generator.GeneratorFlags.Open;
+                ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, true);
             }
         }
         public void OnStoppingGenerator(StoppingGeneratorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnEjectingGeneratorTablet] {ev.Player.Nickname} -> UnkNow Beceause EXILED Connard");
+            Log.Debug($"[OnStoppingGenerator] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
         }
         public void OnGeneratorOpen(OpeningGeneratorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}");
+            Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged) ;
             if (ev.Generator.Engaged && SanyaRemastered.Instance.Config.GeneratorFinishLock)
             {
                 ev.IsAllowed = false;
@@ -1072,19 +1004,19 @@ namespace SanyaRemastered
 
         public void OnGeneratorClose(ClosingGeneratorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorClose] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}");
+            Log.Debug($"[OnGeneratorClose] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void OnActivatingGenerator(ActivatingGeneratorEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[OnGeneratorInsert] {ev.Player.Nickname} -> Unknow Exiled Connard");
+            Log.Debug($"[OnActivatingGenerator] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (SanyaRemastered.Instance.Config.GeneratorActivatingClose) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
         }
-
-
-
 
         public void OnHandcuffing(HandcuffingEventArgs ev)
         {
+            Log.Debug($"[OnHandcuffing] {ev.Cuffer.Nickname} -> {ev.Target.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (ev.Target.IsGodModeEnabled) ev.IsAllowed = false;
             /*if (SanyaRemastered.Instance.Config.Scp049Real)
             {
                 ReferenceHub.GetHub(ev.Target.GameObject)..NetworkCufferId = ev.Cuffer.ReferenceHub.queryProcessor.PlayerId;
@@ -1092,7 +1024,7 @@ namespace SanyaRemastered
         }
         public void On079LevelGain(GainingLevelEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}");
+            Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}",SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
             {
@@ -1115,12 +1047,12 @@ namespace SanyaRemastered
         }
         public void On106MakePortal(CreatingPortalEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On106MakePortal] {ev.Player.Nickname}:{ev.Position}");
+            Log.Debug($"[On106MakePortal] {ev.Player.Nickname}:{ev.Position}", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void On106Teleport(TeleportingEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.IsDebugged) Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}");
+            Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}", SanyaRemastered.Instance.Config.IsDebugged);
         }
         public void On914UpgradingPlayer(UpgradingPlayerEventArgs ev)
         {
@@ -1159,15 +1091,13 @@ namespace SanyaRemastered
                             if (ev.Player.Role == RoleType.Scp93953)
                             {
                                 var Health = ev.Player.Health;
-                                ev.Player.SetRole(RoleType.Scp93989);
-                                ev.Player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(ev.Player.MaxHealth - Health, "Scp914", DamageTypes.RagdollLess, 0, true), ev.Player.ReferenceHub.gameObject);
+                                ev.Player.SetRole(RoleType.Scp93989,lite: true);
                                 break;
                             }
                             else if (ev.Player.Role == RoleType.Scp93989)
                             {
                                 var Health = ev.Player.Health;
-                                ev.Player.SetRole(RoleType.Scp93953);
-                                ev.Player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(ev.Player.MaxHealth - Health, "Scp914", DamageTypes.RagdollLess, 0, true), ev.Player.ReferenceHub.gameObject);
+                                ev.Player.SetRole(RoleType.Scp93953,lite: true);
                                 break;
                             }
                             else if (ev.Player.Role != RoleType.Scp106)
@@ -1235,8 +1165,7 @@ namespace SanyaRemastered
             }*/
             if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
             {
-                 ev.IsAllowed = false;
-                ev.Scp096.PlayerState = Scp096PlayerState.Docile;
+                ev.IsAllowed = false;
             }
         }
         public void On049FinishingRecall(FinishingRecallEventArgs ev)
@@ -1249,14 +1178,6 @@ namespace SanyaRemastered
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Amnesia>(5f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.2f);
             }
-        }
-        public void On049StartingRecall(StartingRecallEventArgs ev)
-        {
-            /*if (ev.Target.GameObject.GetComponent<PlayerStats>().lastHitInfo.GetDamageType() == DamageTypes.Scp049 && SanyaRemastered.Instance.Config.Scp049Real)
-            {
-                ev.Scp049.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous ne pouvez pas soigné se corps",5);
-                ev.IsAllowed = false;
-            }*/
         }
     }
 }

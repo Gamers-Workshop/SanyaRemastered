@@ -17,7 +17,7 @@ namespace SanyaRemastered.Patches
 		{	
 		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
 			{
-				Room Hcz106 = Map.Rooms.Where(x => x.Type == RoomType.Hcz106).Single();
+				Room RoomHcz106 = Map.Rooms.Where(x => x.Type == RoomType.Hcz106).Single();
 				Room RoomIntercom = Map.Rooms.Where(x => x.Type == RoomType.EzIntercom).Single();
 				if (!RoomIntercom.LightsOff && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
 				{
@@ -45,7 +45,7 @@ namespace SanyaRemastered.Patches
 								$"Nine-Tailed Fox restants : {RoundSummary.singleton.CountTeam(Team.MTF):00}\n"
 								);
 					//SCP-106 Femur
-					if (!Hcz106.LightsOff)
+					if (!RoomHcz106.LightsOff)
 						if (isContain)
 						{
 							if (OneOhSixContainer.used)

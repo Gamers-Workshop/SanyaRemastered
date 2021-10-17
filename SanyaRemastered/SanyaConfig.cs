@@ -25,7 +25,7 @@ namespace SanyaRemastered
         public bool Coroding106 { get; set; } = false;
         public bool ExplodingGrenadeTesla { get; set; } = false;
         public bool TeslaDestroyName { get; set; } = false;
-        public bool ScpTakeFallDamage { get; set; } = false;
+        public bool TeslaNoTriggerRadioPlayer { get; set; } = false;
         public string BoxMessageOnJoin { get; set; } = string.Empty;
         [Description("Jump attaque")]
         public bool JumpingKickAttack { get; set; } = false;
@@ -68,6 +68,8 @@ namespace SanyaRemastered
         public bool CloseDoorsOnNukecancel { get; set; } = false;
         public bool Scp049_add_time_res_success { get; set; } = false;
         public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
+        [Description("Désactivé la microhid pour les rôle")]
+        public List<RoleType> MicroHidNotActive { get; set; } = new List<RoleType>{RoleType.ClassD, RoleType.Scientist };
 
         [Description("Generator Config")]
         public bool GeneratorUnlockOpen { get; set; } = false;
@@ -81,7 +83,6 @@ namespace SanyaRemastered
         public bool OpenDoorOnShoot { get; set; } = false;
         public bool GrenadeChainSametiming { get; set; } = false;
         public bool GodmodeAfterEndround { get; set; } = false;
-        public bool InventoryKeycardActivation { get; set; } = false;
         public float PainEffectStart { get; set; } = -1;
 
         [Description("Donne un effect d'assourdissement quand on est proche de l'explosion d'une grenade")]
@@ -90,6 +91,8 @@ namespace SanyaRemastered
         [Description("Stamina Add \n  # Stamina effect ajoute un leger ralentissement quand la personne n'as pas de stamina")]
         public bool StaminaEffect { get; set; } = false;
         public float StaminaLostJump { get; set; } = 0.05f;
+        [Description("Ascenceur Attente")]
+        public float WaitForUseLift { get; set; } = 0;
 
         [Description("Traitre")]
         public int TraitorLimit { get; set; } = -1;
@@ -130,6 +133,7 @@ namespace SanyaRemastered
         [Description("RP")]
         public bool Scp096Real { get; set; } = false;
         public bool Scp049Real { get; set; } = false;
+        public bool ScpTakeFallDamage { get; set; } = false;
         public List<string> ScpFallDamage { get; set; } = new List<string>
         {
             "Scp049",
@@ -231,7 +235,6 @@ namespace SanyaRemastered
             {"UseAlphaWarheadPanel",     new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
             {"DoorInteractOpen",         new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
             {"DoorInteractClose",        new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-
         };
 
         public string GetConfigs()
