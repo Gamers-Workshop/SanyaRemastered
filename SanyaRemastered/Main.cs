@@ -97,6 +97,7 @@ namespace SanyaRemastered
 
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
+			MapEvents.PlacingBulletHole += Handlers.OnPlacingBulletHole;
 
 			PlayerEvents.PreAuthenticating += Handlers.OnPreAuth;
 			PlayerEvents.Verified += Handlers.OnPlayerVerified;
@@ -114,7 +115,7 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingElevator += Handlers.OnInteractingElevator;
 			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting += Handlers.OnShoot;
+			PlayerEvents.Shooting += Handlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy += Handlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.SyncingData += Handlers.OnSyncingData;
 			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
@@ -154,6 +155,7 @@ namespace SanyaRemastered
 
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
+			MapEvents.PlacingBulletHole -= Handlers.OnPlacingBulletHole;
 
 			PlayerEvents.PreAuthenticating -= Handlers.OnPreAuth;
 			PlayerEvents.Verified -= Handlers.OnPlayerVerified;
@@ -171,7 +173,7 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingElevator -= Handlers.OnInteractingElevator;
 			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting -= Handlers.OnShoot;
+			PlayerEvents.Shooting -= Handlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy -= Handlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
 			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;

@@ -5,12 +5,9 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
-using InventorySystem.Items;
-using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
 using LightContainmentZoneDecontamination;
-using LiteNetLib.Utils;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
@@ -18,13 +15,10 @@ using PlayableScps;
 using Respawning;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
-using SanyaRemastered.Patches;
 using Scp914;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SanyaRemastered
@@ -201,7 +195,7 @@ namespace SanyaRemastered
             }
             if (plugin.Config.AddDoorsOnSurface)
             {
-                
+
                 Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
                 var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
                 var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
@@ -312,7 +306,7 @@ namespace SanyaRemastered
         }
         public void OnWarheadStart(StartingEventArgs ev)
         {
-            Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}",SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
             {
@@ -344,9 +338,9 @@ namespace SanyaRemastered
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
-                    foreach (var door in Map.Doors)
-                        if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
-                            door.Base.NetworkTargetState = false;
+                foreach (var door in Map.Doors)
+                    if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
+                        door.Base.NetworkTargetState = false;
             }
         }
 
@@ -482,6 +476,59 @@ namespace SanyaRemastered
 
 
         }
+        public void OnPlacingBulletHole(PlacingBulletHole ev)
+        {
+            //Log.Debug($"[OnPlacingBulletHole] {ev.Owner.Nickname} -{ev.Position}-> ", SanyaRemastered.Instance.Config.IsDebugged);
+
+            if (ev.Position != Vector3.zero && Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, grenade_pickup_mask))
+            {
+                if (raycastHit.transform.TryGetComponent<ItemPickupBase>(out var pickup))
+                {
+                    //Log.Debug($"[ItemPickupBase]", SanyaRemastered.Instance.Config.IsDebugged);
+                    if (SanyaRemastered.Instance.Config.Item_shoot_move)
+                    {
+                        //Log.Debug($"Item {pickup.Info.ItemId} : Force = {2.5f / pickup.Info.Weight} : Weight = {pickup.Info.Weight}", SanyaRemastered.Instance.Config.IsDebugged);
+                        pickup.Rb.AddExplosionForce(2.5f / (pickup.Info.Weight + 1), ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                    }
+                    if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
+                    {
+                        //Log.Debug("Grenade", SanyaRemastered.Instance.Config.IsDebugged);
+                        var collisionDetectionPickup = pickup.transform.GetComponentInParent<CollisionDetectionPickup>();
+                        //Log.Debug("collisionDetectionPickup is null: " + collisionDetectionPickup == null, SanyaRemastered.Instance.Config.IsDebugged);
+
+                        var thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
+                        //Log.Debug("ThrownProjectile is null: " + thrownProjectile == null, SanyaRemastered.Instance.Config.IsDebugged);
+                        if (thrownProjectile != null && thrownProjectile.Info.ItemId != ItemType.SCP018)
+                        {
+                            //Log.Debug("NoSCP018", SanyaRemastered.Instance.Config.IsDebugged);
+                            var timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
+                            //Log.Debug("timeGrenade is null: " + timeGrenade == null, SanyaRemastered.Instance.Config.IsDebugged);
+                            if (timeGrenade != null)
+                            {
+                                timeGrenade.TargetTime = 0.1f;
+                            }
+                        }
+                    }
+                }
+                
+                if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
+                {
+                    var basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
+                    //Log.Debug($"[basicDoor] {basicDoor != null}", SanyaRemastered.Instance.Config.IsDebugged);
+                    if (basicDoor != null)
+                    {
+                        if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed) goto finish;
+                        if (basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f) goto finish;
+                        if (basicDoor.NetworkActiveLocks != 0) goto finish;
+                        if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(basicDoor is PryableDoor))
+                        {
+                            basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
+                        }
+                    }
+                }
+            finish:;
+            }
+        }
         public void OnPreAuth(PreAuthenticatingEventArgs ev)
         {
             Log.Debug($"[OnPreAuth] {ev.Request.RemoteEndPoint.Address}:{ev.UserId}", SanyaRemastered.Instance.Config.IsDebugged);
@@ -533,7 +580,7 @@ namespace SanyaRemastered
             if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
             {
                 bool IsAnTarget = false;
-                foreach (Player scp096 in Player.List.Where(x=> x.Role == RoleType.Scp096))
+                foreach (Player scp096 in Player.List.Where(x => x.Role == RoleType.Scp096))
                     if (scp096.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096.HasTarget(ev.Player.ReferenceHub))
                         IsAnTarget = true;
                 if (IsAnTarget)
@@ -570,7 +617,7 @@ namespace SanyaRemastered
         {
             if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
-            
+
             if (ev.Target == null) return;
 
             if (ev.DamageType != DamageTypes.Nuke
@@ -722,7 +769,7 @@ namespace SanyaRemastered
                     if (i.Role == RoleType.Scp079) isFound079 = true;
                 }
 
-                Log.Debug($"[Check079] SCPs:{count} isFound079:{isFound079} totalvol:{Map.ActivatedGenerators}",SanyaRemastered.Instance.Config.IsDebugged);
+                Log.Debug($"[Check079] SCPs:{count} isFound079:{isFound079} totalvol:{Map.ActivatedGenerators}", SanyaRemastered.Instance.Config.IsDebugged);
                 if (count == 1
                     && isFound079
                     && Map.ActivatedGenerators < 2
@@ -766,7 +813,7 @@ namespace SanyaRemastered
             {
                 player.SendHitmarker();
             }
-            if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue("Scp106" , out int heal) && heal > 0)
+            if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue("Scp106", out int heal) && heal > 0)
             {
                 foreach (Player player in Scp106)
                 {
@@ -814,7 +861,7 @@ namespace SanyaRemastered
             Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}", SanyaRemastered.Instance.Config.IsDebugged);
             if (plugin.Config.ScpCantInteract)
             {
-                if (!ev.Door.IsOpen && plugin.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen" , out var role) && role.Contains(ev.Player.Role))
+                if (!ev.Door.IsOpen && plugin.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ev.Player.Role))
                 {
                     ev.IsAllowed = false;
                 }
@@ -863,70 +910,16 @@ namespace SanyaRemastered
                 ev.IsAllowed = false;
             }
         }
-        public void OnShoot(ShootingEventArgs ev)
+        public void OnShooting(ShootingEventArgs ev)
         {
-            Log.Debug($"[OnShoot] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnShooting] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
 
-
-            if (ev.ShotPosition != Vector3.zero
-                && Physics.Linecast(ev.Shooter.Position, ev.ShotPosition, out RaycastHit raycastHit, grenade_pickup_mask))
+            if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                if (SanyaRemastered.Instance.Config.Item_shoot_move)
+                Player target = Player.Get(ev.TargetNetId);
+                if (target != null && target.Role == RoleType.Scp096)
                 {
-                    var pickup = raycastHit.transform.GetComponentInParent<ItemPickupBase>();
-                    Log.Debug($"pickup is null ? {pickup != null} : pickup.Rb is null ?{pickup.Rb != null}", SanyaRemastered.Instance.Config.IsDebugged);
-                    if (pickup != null && pickup.Rb != null)
-                    {
-                        Log.Debug($"Force ? {Vector3.Distance(ev.ShotPosition, ev.Shooter.Position) * 2} : Weight ?{pickup.Info.Weight}", SanyaRemastered.Instance.Config.IsDebugged);
-                        pickup.Rb.AddExplosionForce((Vector3.Distance(ev.ShotPosition, ev.Shooter.Position) * 2) / pickup.Info.Weight, ev.Shooter.Position, 500f, 3f, ForceMode.Impulse);
-                    }
-                }
-
-                if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
-                {
-                    var fraggrenade = raycastHit.transform.GetComponentInParent<ExplosionGrenade>();
-                    if (fraggrenade != null)
-                    {
-                        fraggrenade._fuseTime = 0.1f;
-                    }
-                    var Flashgrenade = raycastHit.transform.GetComponentInParent<FlashbangGrenade>();
-                    if (Flashgrenade != null)
-                    {
-                        Flashgrenade._fuseTime = 0.1f;
-                    }
-                }
-                if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
-                {
-                    var door = raycastHit.transform.GetComponentInParent<DoorVariant>();
-                    if (door != null)
-                    {
-                        DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.ActiveLocks);
-
-                        if (((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
-                        || (door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
-                        || (!door.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
-                        || lockMode == DoorLockMode.FullLock
-                        || door.NetworkTargetState && door.GetExactState() != 1f || !door.NetworkTargetState && door.GetExactState() != 0f
-                        ) return;
-
-                        if (door.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(door is PryableDoor))
-                        {
-                            door.NetworkTargetState = !door.NetworkTargetState;
-                        }
-                    }
-                }
-                if (SanyaRemastered.Instance.Config.Scp096Real)
-                {
-                    Player target = Player.Get(ev.TargetNetId);
-                    if (target != null && target.Role == RoleType.Scp096)
-                    {
-                        ev.IsAllowed = false;
-                    }
-                }
-                if (ev.Shooter.SessionVariables.ContainsKey("InfAmmo"))
-                {
-                    if (ev.Shooter.CurrentItem.Base is Firearm fa && fa != null)
-                        fa.Status = new FirearmStatus((byte)(fa.Status.Ammo + 1), fa.Status.Flags, fa.Status.Attachments);
+                    ev.IsAllowed = false;
                 }
             }
         }
@@ -969,7 +962,7 @@ namespace SanyaRemastered
 
         public void OnActivatingWarheadPanel(ActivatingWarheadPanelEventArgs ev)
         {
-            Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}", SanyaRemastered.Instance.Config.IsDebugged);         
+            Log.Debug($"[OnActivatingWarheadPanel] Nickname : {ev.Player.Nickname}  Allowed : {ev.IsAllowed}", SanyaRemastered.Instance.Config.IsDebugged);
 
             var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
             if (SanyaRemastered.Instance.Config.Nukecapclose && outsite.keycardEntered)
@@ -981,7 +974,7 @@ namespace SanyaRemastered
                 ev.IsAllowed = false;
             }
         }
-        
+
         public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
         {
             if (ev.IsAllowed && SanyaRemastered.Instance.Config.GeneratorUnlockOpen)
@@ -995,7 +988,7 @@ namespace SanyaRemastered
         }
         public void OnGeneratorOpen(OpeningGeneratorEventArgs ev)
         {
-            Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged) ;
+            Log.Debug($"[OnGeneratorOpen] {ev.Player.Nickname} -> {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
             if (ev.Generator.Engaged && SanyaRemastered.Instance.Config.GeneratorFinishLock)
             {
                 ev.IsAllowed = false;
@@ -1024,7 +1017,7 @@ namespace SanyaRemastered
         }
         public void On079LevelGain(GainingLevelEventArgs ev)
         {
-            Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}",SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
             {
@@ -1091,13 +1084,13 @@ namespace SanyaRemastered
                             if (ev.Player.Role == RoleType.Scp93953)
                             {
                                 var Health = ev.Player.Health;
-                                ev.Player.SetRole(RoleType.Scp93989,lite: true);
+                                ev.Player.SetRole(RoleType.Scp93989, lite: true);
                                 break;
                             }
                             else if (ev.Player.Role == RoleType.Scp93989)
                             {
                                 var Health = ev.Player.Health;
-                                ev.Player.SetRole(RoleType.Scp93953,lite: true);
+                                ev.Player.SetRole(RoleType.Scp93953, lite: true);
                                 break;
                             }
                             else if (ev.Player.Role != RoleType.Scp106)
@@ -1133,7 +1126,8 @@ namespace SanyaRemastered
                         {
                             ev.Player.EnableEffect<Scp207>();
                             ev.Player.ChangeEffectIntensity<Scp207>(4);
-                            Timing.CallDelayed(5, () => {
+                            Timing.CallDelayed(5, () =>
+                            {
                                 ev.Player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "Scp914", DamageTypes.Scp096, 0, true), ev.Player.ReferenceHub.gameObject);
                                 ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("L'analyse chimique de la substance a l'intérieur de SCP-914 reste non concluante.", 30);
                             });
