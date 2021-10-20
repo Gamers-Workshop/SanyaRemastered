@@ -860,7 +860,7 @@ namespace SanyaRemastered.Commands
 							Player target = Player.Get(arguments.At(1));
 							if (target != null && target.Role != RoleType.Spectator)
 							{
-								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, 0f, player);
+								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, 0.1f, player);
 								response = $"success. target:{target.Nickname}";
 								return true;
 							}
@@ -873,7 +873,7 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0f, player);
+									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0.1f, player);
 								}
 								response = "success spawn grenade on all player";
 								return true;
@@ -888,7 +888,7 @@ namespace SanyaRemastered.Commands
 						{
 							if (player != null)
 							{
-								Methods.SpawnGrenade(player.Position, ItemType.GrenadeHE, 0f, player);
+								Methods.SpawnGrenade(player.Position, ItemType.GrenadeHE, 0.1f, player);
 								response = $"success. target:{Player.Get(player.ReferenceHub.gameObject).Nickname}";
 								return true;
 							}

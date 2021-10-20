@@ -51,17 +51,21 @@ namespace SanyaRemastered
                                                 response = "Tu n'est pas confiné";
                                                 return false;
                                             }
-                                            var door = player .CurrentRoom.Doors.First(x => x.Nametag == "914");
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "914");
                                             if (door.Base.GetExactState() == 0f)
                                             {
-                                                door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                player .SetRole(RoleType.Spectator);
-                                                RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4", true, true);
                                                 response = "173 room 049";
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4";
+                                                }
                                                 return true;
                                             }
                                             response = "La gate n'est pas fermer";
                                             return false;
+                                            
                                         }
                                     case RoomType.Lcz012:
                                         {
@@ -75,9 +79,12 @@ namespace SanyaRemastered
                                             {
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                    player.SetRole(RoleType.Spectator);
-                                                    RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2", true, true);
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2";
+                                                    }
                                                     response = "Scp 173 a bien été reconfiné dans la salle de Scp012";
                                                     return true;
                                                 }
@@ -96,9 +103,12 @@ namespace SanyaRemastered
                                             {
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                    player.SetRole(RoleType.Spectator);
-                                                    RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Heavy containment Zone", true, true);
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Heavy containment Zone";
+                                                    }
                                                     response = "Scp 173 a bien été reconfiné dans la HczArmory";
                                                     return true;
                                                 }
@@ -116,9 +126,12 @@ namespace SanyaRemastered
                                             var door = player.CurrentRoom.Doors.First(x => x.Nametag == "LCZ_ARMORY");
                                             if (door.Base.GetExactState() == 0f)
                                             {
-                                                door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                player.SetRole(RoleType.Spectator);
-                                                RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of Light Containment Zone", true, true);
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Light Containment Zone";
+                                                }
                                                 response = "Scp 173 a bien été reconfiné dans la LczArmory";
                                                 return true;
                                             }
@@ -135,9 +148,12 @@ namespace SanyaRemastered
                                             var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HID");
                                             if (door.Base.GetExactState() == 0f)
                                             {
-                                                door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                player.SetRole(RoleType.Spectator);
-                                                RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Storage of Micro H I D", true, true);
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Storage of Micro H I D";
+                                                }
                                                 response = "Scp 173 a bien été reconfiné dans la Hid";
                                             }
                                             response = "La porte n'est pas fermer";
@@ -153,9 +169,12 @@ namespace SanyaRemastered
                                             var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
                                             if (door.Base.GetExactState() == 0f)
                                             {
-                                                door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                player.SetRole(RoleType.Spectator);
-                                                RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Armory of SCP 0 4 9", true, true);
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of SCP 0 4 9";
+                                                }
                                                 response = "Scp 173 a bien été reconfiné dans l'armurerie de Scp 049";
                                                 return true;
                                             }
@@ -170,9 +189,12 @@ namespace SanyaRemastered
                                                 {
                                                     if (door.Base.GetExactState() == 0f)
                                                     {
-                                                        door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                        player.SetRole(RoleType.Spectator);
-                                                        RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in Containment chamber of SCP 1 0 6", true, true);
+                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        {
+                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                            containScpComponent.doors.Add(door);
+                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
+                                                        }
                                                         response = "Scp 173 a bien été reconfiné dans la salle de Scp 106";
                                                         return true;
                                                     }
@@ -194,10 +216,13 @@ namespace SanyaRemastered
                                                 var door2 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_SECOND");
                                                 if (door1.Base.GetExactState() == 0f && door2.Base.GetExactState() == 0f)
                                                 {
-                                                    door1.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                    door2.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                    player.SetRole(RoleType.Spectator);
-                                                    RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in Containment chamber of SCP 1 0 6", true, true);
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door1);
+                                                        containScpComponent.doors.Add(door2);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
+                                                    }
                                                     response = "Scp 173 a bien été reconfiné dans le confinement de Scp 106";
                                                     return true;
                                                 }
@@ -229,9 +254,12 @@ namespace SanyaRemastered
                                                 var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_SECOND");
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                    player.SetRole(RoleType.Spectator);
-                                                    RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
+                                                    }
                                                     response = "Scp 173 a bien été reconfiné dans le confinement de Scp 079";
                                                     return true;
                                                 }
@@ -244,9 +272,12 @@ namespace SanyaRemastered
                                                 {
                                                     if (door.Base.GetExactState() == 0f)
                                                     {
-                                                        door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                                        player.SetRole(RoleType.Spectator);
-                                                        RespawnEffectsController.PlayCassieAnnouncement("SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9", true, true);
+                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        {
+                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                            containScpComponent.doors.Add(door);
+                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
+                                                        }
                                                         response = "Scp 173 a bien été reconfiné dans le confinement de Scp 079";
                                                         return true;
                                                     }
@@ -283,9 +314,12 @@ namespace SanyaRemastered
                                     var door = player.CurrentRoom.Doors.First(x => x.Nametag == "096");
                                     if (door.Base.GetExactState() == 0f)
                                     {
-                                        door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                        player.SetRole(RoleType.Spectator);
-                                        RespawnEffectsController.PlayCassieAnnouncement("SCP 0 9 6 as been contained in there containment chamber", true, true);
+                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                        {
+                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                            containScpComponent.doors.Add(door);
+                                            containScpComponent.CassieAnnounceContain = "SCP 0 9 6 as been contained in there containment chamber";
+                                        }
                                         response = "096 room 096";
                                         return true;
                                     }
@@ -311,10 +345,12 @@ namespace SanyaRemastered
                                     {
                                         if (door.Base.GetExactState() == 0f)
                                         {
-                                            door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-
-                                            player.SetRole(RoleType.Spectator);
-                                            RespawnEffectsController.PlayCassieAnnouncement("SCP 0 4 9 as been contained in there containment chamber", true, true);
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
+                                            }
                                             response = "Le confinement a été effectué";
                                             return true;
                                         }
@@ -345,9 +381,12 @@ namespace SanyaRemastered
                                     {
                                         if (door.Base.GetExactState() == 0f)
                                         {
-                                            door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-                                            player.SetRole(RoleType.Spectator);
-                                            RespawnEffectsController.PlayCassieAnnouncement("SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6", true, true);
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
+                                            }
                                             response = "939 confiné";
                                             return true;
 

@@ -33,7 +33,7 @@ namespace SanyaRemastered.Patches
 			}
 			__instance.Info.Locked = true;
 			__instance._attacker = attacker;
-			Methods.SpawnGrenade(__instance.Rb.position, throwableItem.ItemTypeId,0f ,Player.Get(attacker.NetId));
+			Methods.SpawnGrenade(__instance.Rb.position, throwableItem.ItemTypeId,0.1f ,Player.Get(attacker.NetId));
 			__instance.DestroySelf();
 			return false;
 		}

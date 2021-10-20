@@ -283,6 +283,12 @@ namespace SanyaRemastered
             foreach (var player in Player.List)
                 if (player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out var comp))
                     UnityEngine.Object.Destroy(comp);
+            foreach (var player in Player.List)
+                if (player.GameObject.TryGetComponent<Scp914Effect>(out var comp))
+                    UnityEngine.Object.Destroy(comp);
+            foreach (var player in Player.List)
+                if (player.GameObject.TryGetComponent<ContainScpComponent>(out var comp))
+                    UnityEngine.Object.Destroy(comp);
             SanyaRemasteredComponent._scplists.Clear();
 
             foreach (var cor in RoundCoroutines)
@@ -484,18 +490,8 @@ namespace SanyaRemastered
             {
                 if (raycastHit.transform.TryGetComponent<ItemPickupBase>(out var pickup))
                 {
-                    //Log.Debug($"[ItemPickupBase]", SanyaRemastered.Instance.Config.IsDebugged);
-                    if (SanyaRemastered.Instance.Config.Item_shoot_move)
-                    {
-                        //Log.Debug($"Item {pickup.Info.ItemId} : Force = {2.5f / pickup.Info.Weight} : Weight = {pickup.Info.Weight}", SanyaRemastered.Instance.Config.IsDebugged);
-                        pickup.Rb.AddExplosionForce(2.5f / (pickup.Info.Weight + 1), ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
-                    }
                     if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
                     {
-                        //Log.Debug("Grenade", SanyaRemastered.Instance.Config.IsDebugged);
-                        var collisionDetectionPickup = pickup.transform.GetComponentInParent<CollisionDetectionPickup>();
-                        //Log.Debug("collisionDetectionPickup is null: " + collisionDetectionPickup == null, SanyaRemastered.Instance.Config.IsDebugged);
-
                         var thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
                         //Log.Debug("ThrownProjectile is null: " + thrownProjectile == null, SanyaRemastered.Instance.Config.IsDebugged);
                         if (thrownProjectile != null && thrownProjectile.Info.ItemId != ItemType.SCP018)
@@ -506,8 +502,16 @@ namespace SanyaRemastered
                             if (timeGrenade != null)
                             {
                                 timeGrenade.TargetTime = 0.1f;
+                                goto finish;
                             }
                         }
+                    }
+                    //Log.Debug($"[ItemPickupBase]", SanyaRemastered.Instance.Config.IsDebugged);
+                    if (SanyaRemastered.Instance.Config.Item_shoot_move)
+                    {
+                        //Log.Debug($"Item {pickup.Info.ItemId} : Force = {2.5f / pickup.Info.Weight} : Weight = {pickup.Info.Weight}", SanyaRemastered.Instance.Config.IsDebugged);
+                        pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1))+2, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                        goto finish;
                     }
                 }
                 
@@ -566,7 +570,10 @@ namespace SanyaRemastered
         {
             if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
-
+            if (ev.Player.GameObject.TryGetComponent<ContainScpComponent>(out var comp1))
+                UnityEngine.Object.Destroy(comp1);
+            if (ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var comp2))
+                UnityEngine.Object.Destroy(comp2);
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
             {
                 RoundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 10)));
@@ -610,7 +617,8 @@ namespace SanyaRemastered
             if (SanyaRemastered.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106
                 || SanyaRemastered.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
             {
-                ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>();
+                ev.Player.ChangeRunningSpeed(0.8f);
+                ev.Player.ChangeWalkingSpeed(0.8f);
             }
         }
         public void OnPlayerHurt(HurtingEventArgs ev)
@@ -619,7 +627,10 @@ namespace SanyaRemastered
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Target == null) return;
-
+            if (ev.DamageType == DamageTypes.Scp207 && ev.Target.GameObject.TryGetComponent<Scp914Effect>(out var comp) && ev.HitInformation.Attacker != "SCP-914")
+            {
+                ev.Amount = 0;
+            }
             if (ev.DamageType != DamageTypes.Nuke
                 && ev.DamageType != DamageTypes.Decont
                 && ev.DamageType != DamageTypes.Wall
@@ -677,6 +688,7 @@ namespace SanyaRemastered
         {
             if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
             Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.HitInformations.Tool.Name}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
+
             if (SanyaRemastered.Instance.Config.Scp939Size != 1)
             {
                 ev.Target.Scale = Vector3.one;
@@ -847,6 +859,8 @@ namespace SanyaRemastered
                 ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Poisoned>();
                 ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Amnesia>();
                 ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Deafened>();
+                if (ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var comp))
+                    UnityEngine.Object.Destroy(comp);
             }
         }
 
@@ -859,6 +873,10 @@ namespace SanyaRemastered
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
             Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (plugin.Config.ContainCommand && ev.Player.Team == Team.SCP)
+            {
+                Methods.IsCanBeContain(ev.Player);
+            }
             if (plugin.Config.ScpCantInteract)
             {
                 if (!ev.Door.IsOpen && plugin.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ev.Player.Role))
@@ -977,10 +995,7 @@ namespace SanyaRemastered
 
         public void OnGeneratorUnlock(UnlockingGeneratorEventArgs ev)
         {
-            if (ev.IsAllowed && SanyaRemastered.Instance.Config.GeneratorUnlockOpen)
-            {
-                ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, true);
-            }
+            if (ev.IsAllowed && SanyaRemastered.Instance.Config.GeneratorUnlockOpen) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, true);
         }
         public void OnStoppingGenerator(StoppingGeneratorEventArgs ev)
         {
@@ -1112,25 +1127,24 @@ namespace SanyaRemastered
                         break;
                     case Scp914KnobSetting.Fine:
                         {
-                            ev.Player.EnableEffect<Scp207>();
-                            ev.Player.ChangeEffectIntensity<Scp207>(4);
-
-                            Timing.CallDelayed(60, () =>
+                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var Death))
                             {
-                                ev.Player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "Scp914", DamageTypes.Scp207, 0, true), ev.Player.ReferenceHub.gameObject);
-                                ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous étes mort d'un arret cardiaque", 30);
-                            });
+                                var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
+                                comp.TimerBeforeDeath = 60;
+                            }
+                            else
+                            {
+                                Death.TimerBeforeDeath = 5;
+                            }
                         }
                         break;
                     case Scp914KnobSetting.VeryFine:
                         {
-                            ev.Player.EnableEffect<Scp207>();
-                            ev.Player.ChangeEffectIntensity<Scp207>(4);
-                            Timing.CallDelayed(5, () =>
+                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out _))
                             {
-                                ev.Player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "Scp914", DamageTypes.Scp096, 0, true), ev.Player.ReferenceHub.gameObject);
-                                ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("L'analyse chimique de la substance a l'intérieur de SCP-914 reste non concluante.", 30);
-                            });
+                                var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
+                                comp.TimerBeforeDeath = 5;
+                            }
                         }
                         break;
                 }

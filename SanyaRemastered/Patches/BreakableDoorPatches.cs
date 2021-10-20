@@ -13,7 +13,11 @@ namespace SanyaRemastered.Patches
     {
         public static bool Prefix(Interactables.Interobjects.BreakableDoor __instance)
         {
-            if (SanyaRemastered.Instance.Config.Scp096Real && __instance.TryGetComponent<DoorNametagExtension>(out var doorNametagExtension) && doorNametagExtension._nametag == "096") return false;
+            if (SanyaRemastered.Instance.Config.Scp096Real && __instance.TryGetComponent<DoorNametagExtension>(out var doorNametagExtension) && doorNametagExtension._nametag == "096")
+            {
+                __instance.TargetState = true;
+                return false;
+            }
             return true;
         }
     }
