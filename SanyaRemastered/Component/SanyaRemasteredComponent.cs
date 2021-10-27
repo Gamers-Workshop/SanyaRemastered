@@ -227,17 +227,19 @@ namespace SanyaRemastered
 					if (Scp0492 > 0)
 						list += $"Scp049-2:{Scp0492}\n";
 					list.TrimEnd('\n');
+					list += "</color>";
 				}
 				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
 				{
+					list += "<color=red>SCP\n";
 					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
 					list += $"Target : {TargetList.Count()}\n";
 					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n";
 					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => TargetList.Contains(p.ReferenceHub)).Count() != 0))
 						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
 					list.TrimEnd('\n');
+					list += "</color>";
 				}
-				list += "</color>";
 				curText = curText.Replace("[LIST]", FormatStringForHud(list, 7));
 			}
 			else

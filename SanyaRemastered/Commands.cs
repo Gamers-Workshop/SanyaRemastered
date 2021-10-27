@@ -19,6 +19,7 @@ using MapGeneration.Distributors;
 using Exiled.API.Extensions;
 using Extensions = SanyaRemastered.Functions.Extensions;
 using Scp914;
+using Utils.Networking;
 
 namespace SanyaRemastered.Commands
 {
@@ -53,6 +54,23 @@ namespace SanyaRemastered.Commands
 					{
 						response = $"test ok.";
 						return true;
+					}
+				case "rainbow":
+                    {
+						try
+                        {
+							new InventorySystem.Items.Usables.Scp330.CandyRainbow.ExplosionMessage
+							{
+								ExplosionPosition = player.Position
+							}.SendToAuthenticated(0);
+							response = "Is work ?? i think";
+							return true;
+						}
+						catch (Exception ex)
+                        {
+							response = "Is not work Spaghetti bolognaise\n" + ex;
+							return false;
+						}
 					}
 				case "spawnobject":
                     {

@@ -1,5 +1,6 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using SanyaRemastered.Functions;
 using System;
@@ -44,15 +45,26 @@ namespace SanyaRemastered
 			if (!(_timer > 1f)) return;
 			_player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText($"Vous allez être reconfiné dans {TimeBeforeContain} seconde{(TimeBeforeContain <= 1 ? "" : "s")}", 2);
 
-			if (doors.Count == doors.Where(x=>x.Base.GetExactState() == 0f).Count())
+			if (doors.Count == doors.Where(x=>x.Base.GetExactState() == 0f && (!x.Base.TryGetComponent(out BreakableDoor breakableDoor) || !breakableDoor.IsDestroyed)).Count())
             {
 				if (TimeBeforeContain <= 0)
                 {
 					foreach (Door door in doors)
+                    {
 						door.Base.ServerChangeLock(DoorLockReason.SpecialDoorFeature, true);
-					try { Methods.SpawnDummyModel(_player.Position, default, _player.Role, _player.Scale); } catch (Exception) { Log.Error("Cant spawn dummy"); }
+						if (door.Base is BreakableDoor dr)
+						{
+							dr._ignoredDamageSources &= DoorDamageType.Scp096;
+							dr._ignoredDamageSources &= DoorDamageType.ServerCommand;
+							dr._ignoredDamageSources &= DoorDamageType.Grenade;
+							dr._ignoredDamageSources &= DoorDamageType.Weapon;
+							dr._ignoredDamageSources &= DoorDamageType.None;
+						}
+					}
+					try { Methods.SpawnDummyModel(_player.Position, _player.GameObject.transform.rotation, _player.Role, _player.Scale); } catch (Exception ex) { Log.Error("Cant spawn dummy" +ex); }
 					Cassie.GlitchyMessage(CassieAnnounceContain, 0.05f, 0.05f);
 					_player.SetRole(RoleType.Spectator);
+					Destroy(this);
 				}
 			}
 			else
