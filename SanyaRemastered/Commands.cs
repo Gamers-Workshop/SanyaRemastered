@@ -783,6 +783,144 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 					}
+				case "speed":
+					if (player != null && !player.CheckPermission("sanya.speed"))
+					{
+						response = "Permission denied.";
+						return false;
+					}
+					{
+						if (arguments.Count > 2)
+						{
+							Player target = Player.Get(arguments.At(1));
+							if (target != null && target.Role != RoleType.Spectator)
+							{
+								if (arguments.At(2).ToLower() == "walk")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										target.ChangeWalkingSpeed(speed);
+										response = $"Change the walk speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "sprint")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										target.ChangeRunningSpeed(speed);
+										response = $"Change the sprint speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "all")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										target.ChangeWalkingSpeed(speed);
+										target.ChangeRunningSpeed(speed);
+										response = $"Change the speed to {speed}";
+										return true;
+									}
+								}
+								response = "[speed] missing args <all/Player> <walk/sprint/all> <speed>";
+								return false;
+							}
+							else if (arguments.At(1).ToLower() == "all")
+							{
+								if (player != null && !player.CheckPermission("sanya.allspeed"))
+								{
+									response = "Permission denied.";
+									return false;
+								}
+								if (arguments.At(2).ToLower() == "walk")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
+										{
+											target.ChangeWalkingSpeed(speed);
+										}
+										response = $"Change the walk speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "sprint")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
+										{
+											target.ChangeRunningSpeed(speed);
+										}
+										response = $"Change the sprint speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "all")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
+										{
+											target.ChangeWalkingSpeed(speed);
+											target.ChangeRunningSpeed(speed);
+										}
+										response = $"Change the speed to {speed}";
+										return true;
+									}
+								}
+								response = "fail to change the speed <all/Player> <walk/sprint/all> <speed>";
+								return false;
+							}
+							else
+							{
+								response = "[speed] missing target.";
+								return false;
+							}
+						}
+						else
+						{
+							if (player != null)
+							{
+								if (arguments.At(1).ToLower() == "walk")
+								{
+									if (arguments.Count() > 2 && float.TryParse(arguments.At(2), out float speed))
+									{
+										player.ChangeWalkingSpeed(speed);
+										response = $"Change the walk speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "sprint")
+								{
+									if (arguments.Count() > 2 && float.TryParse(arguments.At(2), out float speed))
+									{
+										player.ChangeRunningSpeed(speed);
+										response = $"Change the sprint speed to {speed}";
+										return true;
+									}
+								}
+								else if (arguments.At(2).ToLower() == "all")
+								{
+									if (arguments.Count() > 3 && float.TryParse(arguments.At(3), out float speed))
+									{
+										player.ChangeWalkingSpeed(speed);
+										player.ChangeRunningSpeed(speed);
+										response = $"Change the speed to {speed}";
+										return true;
+									}
+								}
+								response = $"please take <walk/sprint/all> <speed>";
+								return false;
+							}
+							else
+							{
+								response = "[speed] missing target.";
+								return false;
+							}
+						}
+					}
 				case "color":
 					{
 						if (player != null && !player.CheckPermission("sanya.color"))
@@ -889,7 +1027,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
+								foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
 								{
 									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, 0.1f, player);
 								}
@@ -927,7 +1065,7 @@ namespace SanyaRemastered.Commands
 						if (arguments.Count > 1)
 						{
 							Player target = Player.Get(arguments.At(1));
-							if (target != null && target.Role != RoleType.Spectator)
+							if (target != null && target.Team != Team.RIP)
 							{
 								Methods.SpawnGrenade(target.Position,ItemType.SCP018,-1, player);
 								response = $"success. target:{target.Nickname}";
@@ -940,7 +1078,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
+								foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
 								{
 									Methods.SpawnGrenade(target.Position, ItemType.SCP018, -1, player);
 								}
@@ -978,7 +1116,7 @@ namespace SanyaRemastered.Commands
 						if (arguments.Count > 1)
 						{
 							Player target = Player.Get(arguments.At(1));
-							if (target != null && target.Role != RoleType.Spectator)
+							if (target != null && target.Team != Team.RIP)
 							{
 								Methods.SpawnGrenade(target.Position, ItemType.GrenadeHE, -1f, player);
 								response = $"success. target:{target.Nickname}";
@@ -991,7 +1129,7 @@ namespace SanyaRemastered.Commands
 									response = "Permission denied.";
 									return false;
 								}
-								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
+								foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
 								{
 									Methods.SpawnGrenade(ply.Position, ItemType.GrenadeHE, -1f, player);
 								}
@@ -1027,7 +1165,7 @@ namespace SanyaRemastered.Commands
 							return false;
 						}
 						Player target = Player.UserIdsCache[arguments.At(1)];
-						if (target != null && target.Role != RoleType.Spectator)
+						if (target != null && target.Team != Team.RIP)
 						{
 							target.ClearInventory();
 							response = $"Clear Inventory : {target.Nickname}";
@@ -1040,7 +1178,7 @@ namespace SanyaRemastered.Commands
 								response = "Permission denied.";
 								return false;
 							}
-							foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
+							foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
 							{
 								ply.ClearInventory();
 							}
@@ -1098,7 +1236,7 @@ namespace SanyaRemastered.Commands
 								&& float.TryParse(arguments.At(4), out float z))
 							{
 								Vector3 pos = new Vector3(x, y, z);
-								foreach (var ply in Player.List.Where((p) => p.Role != RoleType.None))
+								foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
 									ply.Position = pos;
 								response = $"TP to {pos}.";
 								return true;

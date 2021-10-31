@@ -1134,7 +1134,7 @@ namespace SanyaRemastered
                             }
                             else
                             {
-                                Death.TimerBeforeDeath = 5;
+                                Death.TimerBeforeDeath /= 2;
                             }
                         }
                         break;

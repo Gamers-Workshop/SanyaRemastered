@@ -23,10 +23,13 @@ namespace SanyaRemastered.Patches
             }
             GameObject gameObject = Object.Instantiate(role.model_ragdoll, pos + role.ragdoll_offset.position, Quaternion.Euler(rot.eulerAngles + role.ragdoll_offset.rotation));
             
-            gameObject.transform.localScale = Player.Get(playerId).Scale;
+            gameObject.transform.localScale = new Vector3(Player.Get(playerId).Scale.x * gameObject.transform.localScale.x, 
+                                                          Player.Get(playerId).Scale.y * gameObject.transform.localScale.y, 
+                                                          Player.Get(playerId).Scale.z * gameObject.transform.localScale.z);
+
             Mirror.NetworkServer.Spawn(gameObject);
             Ragdoll component = gameObject.GetComponent<Ragdoll>();
-            component.Networkowner = new global::Ragdoll.Info(ownerID, ownerNick, ragdollInfo, role, playerId);
+            component.Networkowner = new Ragdoll.Info(ownerID, ownerNick, ragdollInfo, role, playerId);
             component.NetworkallowRecall = allowRecall;
             component.NetworkPlayerVelo = velocity;
             component.NetworkSCP096Death = _096Death;
