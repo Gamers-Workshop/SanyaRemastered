@@ -24,8 +24,6 @@ namespace SanyaRemastered
 			_player = Player.Get(gameObject);
 			_player.EnableEffect<Scp207>();
 			_player.ChangeEffectIntensity<Scp207>(4);
-			_player.ChangeRunningSpeed(100);
-			_player.ChangeWalkingSpeed(100);
 
 		}
 		private void OnDestroy()

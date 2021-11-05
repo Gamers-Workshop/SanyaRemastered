@@ -135,7 +135,7 @@ namespace SanyaRemastered.Patches
 					}
 					else if (__instance.remainingCooldown > 0f)
 					{
-						contentfix += "Temps avent redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + $" seconde{(__instance.remainingCooldown <= 1 ? "" : "s")} ";
+						contentfix += "Temps avant redémarrage : " + Mathf.CeilToInt(__instance.remainingCooldown) + $" seconde{(__instance.remainingCooldown <= 1 ? "" : "s")} ";
 					}
 					else if (__instance.speechRemainingTime == -77f)
 					{

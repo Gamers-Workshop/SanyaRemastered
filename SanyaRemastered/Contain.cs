@@ -238,13 +238,13 @@ namespace SanyaRemastered
                                     case RoomType.Hcz079:
                                         {
                                             byte TEST = 0;
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.3f, -8.2f, 22.5f, 5.2f, 10f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.3f, -8.2f, 22.5f, 5.2f, 10f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                             {
                                                 TEST = 1;
                                             }
                                             if (TEST != 1)
                                             {
-                                                if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -12.3f, -20.8f, 18.7f, -2.5f, 7f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                                if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -12.3f, -20.8f, 18.7f, -2.5f, 7f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                                 {
                                                     TEST = 2;
                                                 }

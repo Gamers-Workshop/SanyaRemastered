@@ -45,6 +45,7 @@ namespace SanyaRemastered
 		private float _hudBottomTime = -1f;
 		private float _hudBottomTimer = 0f;
 
+		//public float soundvolume = -1f;
 		private void Start()
 		{
 			_plugin = SanyaRemastered.Instance;
@@ -64,8 +65,6 @@ namespace SanyaRemastered
 			_timer += Time.deltaTime;
 
 			UpdateTimers();
-
-			CheckTraitor();
 			//CheckOnDecal();
 
 			//SoundVolume();
@@ -84,7 +83,7 @@ namespace SanyaRemastered
 			_hudCenterDownTime = timer;
 			_hudCenterDownTimer = 0f;
 		}
-
+		
 		public void ClearHudCenterDownText()
 		{
 			_hudCenterDownTime = -1f;
@@ -115,29 +114,6 @@ namespace SanyaRemastered
 				_hudBottomString = string.Empty;
 		}
 
-		private void CheckTraitor()
-		{
-			if (_plugin.Config.TraitorChancePercent <= 0) return;
-
-			if (_player.Team != Team.MTF && _player.Team != Team.CHI) return;
-			if (!_player.IsCuffed) return;
-			if (Vector3.Distance(_player.Position, _espaceArea) > Escape.radius) return;
-
-			if (UnityEngine.Random.Range(0, 100) >= _plugin.Config.TraitorChancePercent)
-			{
-				switch (_player.Team)
-				{
-					case Team.MTF:
-						_player.SetRole(RoleType.ChaosConscript);
-						break;
-					case Team.CHI:
-						_player.SetRole(RoleType.NtfPrivate);
-						break;
-				}
-			}
-			else
-				_player.SetRole(RoleType.Spectator);
-		}
 		private void CheckOnDecal()
 		{
 			if (_plugin.Handlers.DecalList.Count != 0 || !_plugin.Config.Coroding106 || _player.Team == (Team.SCP | Team.RIP) ) return;
@@ -150,10 +126,24 @@ namespace SanyaRemastered
 				}
 		}
 
-		private void SoundVolume()
+		/*private void SoundVolume()
 		{
-			if (!(_timer > 1f) || !_player.IsAlive) return;
-		}
+			if (!(_timer > 1f)) return;
+			string log = "Get DissonanceComms";
+			try
+			{
+				var comms = FindObjectOfType<DissonanceComms>();
+				log = $"IsNull : {comms == null} Get PlayerId";
+				Exiled.API.Features.Log.Info($"comms is null ? {comms == null}");
+				var player = comms?.FindPlayer(_player.ReferenceHub.GetComponent<MirrorIgnorancePlayer>()?.PlayerId);
+				log = $"IsNull{player == null} Get Amplitude";
+				soundvolume = player.Amplitude;
+			}
+			catch (Exception ex)
+            {
+                Exiled.API.Features.Log.Error($"Error Sound Volume at log !" + ex);
+            }
+		}*/
 
 		private void UpdateRespawnCounter()
 		{
@@ -181,14 +171,16 @@ namespace SanyaRemastered
 		}
 		public void UpdateHint()
 		{
-			if (_player.TryGetSessionVariable("hint_centerdown", out Tuple<string, ushort> Hintcenterdown))
+			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
+
+			if (_player.TryGetSessionVariable("hint_centerdown", out Tuple<string, float> Hintcenterdown))
 			{
-				_hudBottomString = Hintcenterdown.Item1;
-				_hudBottomTime = Hintcenterdown.Item2;
-				_hudBottomTimer = 0f;
+				_hudCenterDownString = Hintcenterdown.Item1;
+				_hudCenterDownTime = Hintcenterdown.Item2;
+				_hudCenterDownTimer = 0f;
 				_player.SessionVariables.Remove("hint_centerdown");
 			}
-			if (_player.TryGetSessionVariable("hint_bottom", out Tuple<string, ushort> Hintbottom))
+			if (_player.TryGetSessionVariable("hint_bottom", out Tuple<string, float> Hintbottom))
             {
 				_hudBottomString = Hintbottom.Item1;
 				_hudBottomTime = Hintbottom.Item2;
@@ -201,11 +193,10 @@ namespace SanyaRemastered
 			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
 			string curText = _hudTemplate;
 			//[LEFT_UP]
-			string info = null;
+			string info = string.Empty;
 			if (_player.IsInvisible)
 				info += $"<b>vous êtes invisible</b> ";
-
-            {
+			{
 				curText = curText.Replace("([STATS])", info);
 			}
 
@@ -291,7 +282,23 @@ namespace SanyaRemastered
 			//[BOTTOM]
 			if (!string.IsNullOrEmpty(_hudBottomString))
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(_hudBottomString, 2));
-
+			else if (_player.Role == RoleType.Spectator) 
+			{
+				try
+				{
+					Player Spectate = Player.Get(_player.ReferenceHub.spectatorManager.CurrentSpectatedPlayer.gameObject);
+					if (Spectate != null && Spectate.TryGetSessionVariable("NewRole", out Tuple<string, string> newrole))
+					{
+						curText = curText.Replace("[BOTTOM]", FormatStringForHud($"\n<b><color={Spectate.RoleColor.ToHex()}>{newrole.Item2}</color></b>", 2));
+					}
+					else
+						curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
+				}
+				finally 
+				{
+					curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
+				}
+			}
 			else if (!string.IsNullOrWhiteSpace(SanyaRemastered.Instance.Config.IsBeta))
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 2));
 			else

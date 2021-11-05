@@ -185,9 +185,9 @@ namespace SanyaRemastered
                             if (door is BreakableDoor dr)
                             {
                                 dr._remainingHealth = 750f;
-                                dr._ignoredDamageSources |= DoorDamageType.Scp096;
-                                dr._ignoredDamageSources |= DoorDamageType.ServerCommand;
-                                dr._ignoredDamageSources |= DoorDamageType.Grenade;
+                                dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
+                                dr._ignoredDamageSources &= ~DoorDamageType.ServerCommand;
+                                dr._ignoredDamageSources &= ~DoorDamageType.Grenade;
                             }
                         }
                     }
@@ -195,7 +195,6 @@ namespace SanyaRemastered
             }
             if (plugin.Config.AddDoorsOnSurface)
             {
-
                 Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
                 var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
                 var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
@@ -569,7 +568,7 @@ namespace SanyaRemastered
         public void OnPlayerSetClass(ChangingRoleEventArgs ev)
         {
             if (ev.Player.IsHost) return;
-            Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -{ev.Reason}> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
             if (ev.Player.GameObject.TryGetComponent<ContainScpComponent>(out var comp1))
                 UnityEngine.Object.Destroy(comp1);
             if (ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var comp2))
@@ -593,7 +592,7 @@ namespace SanyaRemastered
                 if (IsAnTarget)
                 {
                     ev.NewRole = RoleType.Spectator;
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudBottomText("Vous avez été abatue a la sortie car vous avez vue le visage de SCP-096", 10);
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous avez été abatue a la sortie car vous avez vue le visage de SCP-096", 10);
                 }
             }
         }
@@ -954,7 +953,7 @@ namespace SanyaRemastered
         }
         public void OnSyncingData(SyncingDataEventArgs ev)
         {
-            if (ev.Player == null || ev.Player.IsHost || !ev.Player.ReferenceHub.Ready || /*ev.Player.ReferenceHub.animationController.curAnim == ev.CurrentAnimation*/ true) return;
+            if (ev.Player == null || ev.Player.IsHost || !ev.Player.ReferenceHub.Ready) return;
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
             {

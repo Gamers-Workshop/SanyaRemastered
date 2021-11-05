@@ -44,7 +44,6 @@
     <Compile Include="Patches\BreakableDoorPatches.cs" />
     <Compile Include="Patches\FallDamagePatch.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
-    <Compile Include="Patches\AntiCheatPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />
     <Compile Include="Patches\JumpAttackPatches.cs" />
@@ -102,7 +101,8 @@
     <Reference Include="Exiled.CustomItems">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.CustomItems.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events">
+    <Reference Include="Exiled.Events, Version=3.3.1.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Events.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Loader">
