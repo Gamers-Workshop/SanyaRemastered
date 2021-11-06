@@ -58,6 +58,7 @@
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ScpTargetPatches.cs" />
+    <Compile Include="Patches\ServerDropEverythingPatches.cs" />
     <Compile Include="Patches\TeslaPatches.cs" />
     <Compile Include="Patches\VoicePacketPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
