@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerDropEverything))]
+	[HarmonyPatch(typeof(InventoryExtensions), nameof(InventoryExtensions.ServerCreatePickup))]
 	public static class ServerDropEverythingPatches
 	{
 		public static bool Prefix(this Inventory inv, ItemPickupBase __result, InventorySystem.Items.ItemBase item, PickupSyncInfo psi, bool spawn = true)
@@ -29,7 +29,7 @@ namespace SanyaRemastered.Patches
 				{
 					NetworkServer.Spawn(itemPickupBase.gameObject);
 				}
-				itemPickupBase.InfoReceived(default(InventorySystem.Items.Pickups.PickupSyncInfo), psi);
+				itemPickupBase.InfoReceived(default(PickupSyncInfo), psi);
 				__result = itemPickupBase;
 				itemPickupBase.TryGetComponent(out Rigidbody rigidbody);
 				rigidbody.velocity = inv._hub.playerMovementSync.PlayerVelocity;
