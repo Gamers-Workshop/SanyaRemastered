@@ -186,8 +186,6 @@ namespace SanyaRemastered
                             {
                                 dr._remainingHealth = 750f;
                                 dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
-                                dr._ignoredDamageSources &= ~DoorDamageType.ServerCommand;
-                                dr._ignoredDamageSources &= ~DoorDamageType.Grenade;
                             }
                         }
                     }
@@ -258,6 +256,20 @@ namespace SanyaRemastered
 
         public void OnRoundStart()
         {
+            Timing.CallDelayed(1f, () =>
+            {
+                if (Player.Get(RoleType.Scp049).Count() > 0 && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                {
+                    Door.Get(door.TargetDoor).IsOpen = true;
+                }
+            });
+            Timing.CallDelayed(5f, () =>
+            {
+                if (Player.Get(RoleType.Scp049).Count() > 0 && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                {
+                    Door.Get(door.TargetDoor).IsOpen = true;
+                }
+            });
             Log.Info($"[OnRoundStart] Round Start!");
         }
 
@@ -575,7 +587,11 @@ namespace SanyaRemastered
                 UnityEngine.Object.Destroy(comp2);
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
             {
-                RoundCoroutines.Add(Timing.CallDelayed(5f, () => ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 10)));
+                RoundCoroutines.Add(Timing.CallDelayed(5f, () => 
+                { 
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 20);
+                    ev.Player.ResetInventory(new List<ItemType> {ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun,ItemType.Medkit,ItemType.GrenadeFlash});
+                }));
             }
             if (SanyaRemastered.Instance.Config.Scp049_add_time_res_success && ev.NewRole == RoleType.Scp0492)
             {
@@ -832,11 +848,19 @@ namespace SanyaRemastered
                 }
             }
         }
-
+        public void OnThrowingItem(ThrowingItemEventArgs ev)
+        {
+            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+                ev.IsAllowed = false;
+        }
+        public void OnPlayerUsingItem(UsingItemEventArgs ev)
+        {
+            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+                ev.IsAllowed = false;
+        }
         public void OnPlayerItemUsed(UsedItemEventArgs ev)
         {
             Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item.Type}", SanyaRemastered.Instance.Config.IsDebugged);
-
             if (ev.Item.Base.ItemTypeId == ItemType.Medkit)
             {
                 ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
@@ -930,7 +954,8 @@ namespace SanyaRemastered
         public void OnShooting(ShootingEventArgs ev)
         {
             Log.Debug($"[OnShooting] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-
+            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Shooter.Role == RoleType.Scp079) 
+                ev.IsAllowed = false;
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
                 Player target = Player.Get(ev.TargetNetId);
@@ -1028,6 +1053,69 @@ namespace SanyaRemastered
             {
                 ReferenceHub.GetHub(ev.Target.GameObject)..NetworkCufferId = ev.Cuffer.ReferenceHub.queryProcessor.PlayerId;
             }*/
+        }
+        public void OnProcessingHotkey(ProcessingHotkeyEventArgs ev)
+        {
+            Log.Debug($"[OnProcessingHotkey] {ev.Player.Nickname} -> {ev.Hotkey}", SanyaRemastered.Instance.Config.IsDebugged);
+
+            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+            {
+                Scp079PlayerScript scp079 = ev.Player.ReferenceHub.scp079PlayerScript;
+                switch (ev.Hotkey)
+                {
+                    case HotkeyButton.Keycard:
+                        {
+                            if (scp079.Network_curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
+                            {
+                                List<Camera079> cams = new List<Camera079>();
+                                foreach (var ply in Player.List)
+                                {
+                                    if (ply.Team == Team.SCP && ply.Role != RoleType.Scp079)
+                                    {
+                                        cams.AddRange(ply.ReferenceHub.GetNearCams());
+                                    }
+                                }
+
+                                Camera079 target;
+                                if (cams.Count > 0)
+                                {
+                                    target = cams.GetRandomOne();
+                                }
+                                else break;
+
+                                if (target != null)
+                                {
+                                    if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Mana)
+                                    {
+                                        scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Mana);
+                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 5);
+                                        break;
+                                    }
+
+                                    scp079.RpcSwitchCamera(target.cameraId, false);
+                                    scp079.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
+                                    scp079.currentCamera = target;
+                                    break;
+                                }
+                            }
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 5);
+                            break;
+                        }
+                    case HotkeyButton.PrimaryFirearm:
+                        {
+
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendEnabled, 5);
+                            ev.Player.SessionVariables.Add("scp079_advanced_mode", null);
+                            break;
+                        }
+                    case HotkeyButton.SecondaryFirearm:
+                        {
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendDisabled, 5);
+                            ev.Player.SessionVariables.Remove("scp079_advanced_mode");
+                            break;
+                        }
+                }
+            }
         }
         public void On079LevelGain(GainingLevelEventArgs ev)
         {
@@ -1142,6 +1230,8 @@ namespace SanyaRemastered
                             if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out _))
                             {
                                 var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
+                                ev.Player.ChangeRunningSpeed(100, false);
+                                ev.Player.ChangeWalkingSpeed(100, false);
                                 comp.TimerBeforeDeath = 5;
                             }
                         }
@@ -1153,7 +1243,7 @@ namespace SanyaRemastered
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                ev.EnrageTimeToAdd = 0;
+                ev.EnrageTimeToAdd = -18;
             }
         }
         public void On096Enraging(EnragingEventArgs ev)
@@ -1173,6 +1263,10 @@ namespace SanyaRemastered
             if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
             {
                 ev.IsAllowed = false;
+            }
+            else if (SanyaRemastered.Instance.Config.Scp096Real)
+            {
+                ev.Scp096.EnrageTimeLeft = 0.3f;
             }
         }
         public void On049FinishingRecall(FinishingRecallEventArgs ev)

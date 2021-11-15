@@ -206,15 +206,15 @@ namespace SanyaRemastered
 				string list = string.Empty;
 				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
-					list += "<color=red>SCP\n";
+					list += "<color=red><u>SCP</u>\n";
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
 							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n";
-						else if (scp.Role == RoleType.Scp0492)
-							Scp0492++;
+						else if (scp.Role != RoleType.Scp0492)
+							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.CurrentRoom.Type}\n";
 						else
-							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.GetHealthAmountPercent()}%\n";
+							Scp0492++;
 					if (Scp0492 > 0)
 						list += $"Scp049-2:{Scp0492}\n";
 					list.TrimEnd('\n');
@@ -222,7 +222,7 @@ namespace SanyaRemastered
 				}
 				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
 				{
-					list += "<color=red>SCP\n";
+					list += "<color=red><u>SCP</u>\n";
 					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
 					list += $"Target : {TargetList.Count()}\n";
 					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n";

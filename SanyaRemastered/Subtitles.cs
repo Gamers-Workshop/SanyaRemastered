@@ -13,19 +13,19 @@
 
 		internal static readonly string ExtendEnabled = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Mode d'extension activé. Vous pouvez basculer par les touches de sprint.》\n",
+			"《Mode d'extension activé.》\n",
 			"</size></color>"
 			);
 
 		internal static readonly string ExtendDisabled = string.Concat(
 			"<size=25>",
-			"《Mode d'extension désactivé. Vous pouvez basculer par les touches de sprint.》\n",
+			"《Mode d'extension désactivé.》\n",
 			"</size>"
 			);
 
 		internal static readonly string Extend079First = string.Concat(
-			 "<color=#bbee00><size=25>",
-			"《Vous pouvez utiliser le mode d'extension. Vous pouvez basculer par les touches de sprint.》\n",
+			"<color=#bbee00><size=25>",
+			"《Vous pouvez utiliser vos raccourcis pour vous téléporter à un SCP ou activer un mode étendue de SCP-079.》\n",
 			"</size></color>"
 			);
 

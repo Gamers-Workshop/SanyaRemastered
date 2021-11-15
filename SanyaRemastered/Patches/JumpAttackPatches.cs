@@ -11,7 +11,7 @@ namespace SanyaRemastered.Patches
 	{
 		public static void Prefix(AnimationController __instance, byte newState)
 		{
-			if (!SanyaRemastered.Instance.Config.JumpingKickAttack || __instance.curAnim != 2 || __instance._curMoveState == newState || newState != 1 || !__instance.ccm.IsHuman())
+			if (!SanyaRemastered.Instance.Config.JumpingKickAttack ||  || __instance._curMoveState == newState || newState != 1 || !__instance.ccm.IsHuman())
 				return;
 
 			Log.Debug($"Attack:{__instance.ccm._hub.nicknameSync.MyNick}", SanyaRemastered.Instance.Config.IsDebugged);

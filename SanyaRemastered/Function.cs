@@ -838,7 +838,7 @@ namespace SanyaRemastered.Functions
                 }
             }
         }
-        public static bool IsExmode(this Player player) => /*player.ReferenceHub.animationController.curAnim == 1*/ false;
+        public static bool IsExmode(this Player player) => player.SessionVariables.ContainsKey("scp079_advanced_mode");
 
         public static bool IsList(this Type type)
         {

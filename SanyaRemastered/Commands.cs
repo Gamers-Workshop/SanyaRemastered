@@ -55,7 +55,7 @@ namespace SanyaRemastered.Commands
 						response = $"test ok.";
 						return true;
 					}
-				case "rainbow":
+				/*case "rainbow"://SCP330 Command
                     {
 						try
                         {
@@ -71,7 +71,7 @@ namespace SanyaRemastered.Commands
 							response = "Is not work Spaghetti bolognaise\n" + ex;
 							return false;
 						}
-					}
+					}*/
 				case "spawnobject":
                     {
 						if (player != null && !player.CheckPermission("sanya.dev"))
@@ -158,9 +158,10 @@ namespace SanyaRemastered.Commands
 								{
 									Log.Warn($"    {i.name}:{i.GetType()}");
 								}
-                            }
+							}
+							GameObject.DestroyImmediate(casy.transform.gameObject);
 						}
-                        return true;
+						return true;
 					}
 				case "box":
 					{
@@ -180,9 +181,9 @@ namespace SanyaRemastered.Commands
 								}
 								foreach (Player ply in Player.List.Where((p) => p.Role != RoleType.None))
 								{
-									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 1));
+									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 2));
 								}
-								response = $"La box avec : {Extensions.FormatArguments(arguments, 1)} a bien été envoyé a tout le monde ";
+								response = $"La box avec : {Extensions.FormatArguments(arguments, 2)} a bien été envoyé a tout le monde ";
 								return true;
 							}
 							
@@ -200,7 +201,7 @@ namespace SanyaRemastered.Commands
 								response = $"Votre message a bien été envoyé à :\n";
 								foreach (Player ply in PlyList)
 								{
-									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 2));
+									ply.OpenReportWindow(Extensions.FormatArguments(arguments, 3));
 									response += $" - {ply.Nickname}\n";
 								}
 								return true;
@@ -210,8 +211,6 @@ namespace SanyaRemastered.Commands
 								response = $"Sanya box <player/all> <message> // Sanya box <id.id.id> <message>";
 								return false;
 							}
-							
-							
 						}
 					}
 				case "scale":

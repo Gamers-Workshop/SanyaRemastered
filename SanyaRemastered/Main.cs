@@ -108,6 +108,8 @@ namespace SanyaRemastered
 			PlayerEvents.Died += Handlers.OnDied;
 			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
+			PlayerEvents.ThrowingItem -= Handlers.OnThrowingItem;
+			PlayerEvents.UsingItem += Handlers.OnPlayerUsingItem;
 			PlayerEvents.ItemUsed += Handlers.OnPlayerItemUsed;
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
@@ -125,6 +127,7 @@ namespace SanyaRemastered
 			PlayerEvents.ClosingGenerator += Handlers.OnGeneratorClose;
 			PlayerEvents.ActivatingGenerator += Handlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing += Handlers.OnHandcuffing;
+			PlayerEvents.ProcessingHotkey += Handlers.OnProcessingHotkey;
 
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
 			Scp106Events.CreatingPortal += Handlers.On106MakePortal;
@@ -166,6 +169,8 @@ namespace SanyaRemastered
 			PlayerEvents.Died -= Handlers.OnDied;
 			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
+			PlayerEvents.ThrowingItem -= Handlers.OnThrowingItem;
+			PlayerEvents.UsingItem -= Handlers.OnPlayerUsingItem;
 			PlayerEvents.ItemUsed -= Handlers.OnPlayerItemUsed;
 			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
@@ -183,6 +188,7 @@ namespace SanyaRemastered
 			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
 			PlayerEvents.ActivatingGenerator -= Handlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing -= Handlers.OnHandcuffing;
+			PlayerEvents.ProcessingHotkey -= Handlers.OnProcessingHotkey;
 
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
 			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;

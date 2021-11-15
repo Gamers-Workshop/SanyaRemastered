@@ -26,54 +26,6 @@ namespace SanyaRemastered.Patches
 		}
 	}
 
-	//SCP-079 
-	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdSwitchCamera))]
-	public static class Scp079CameraPatch
-	{
-		public static bool Prefix(Scp079PlayerScript __instance, ref ushort cameraId, bool lookatRotation)
-		{
-			if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
-
-			Log.Debug($"[Scp079CameraPatch] {cameraId}:{lookatRotation}");
-
-			if (/*__instance.GetComponent<AnimationController>().curAnim != 1*/ true) return true;
-
-			if (__instance.Network_curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
-			{
-				List<Camera079> cams = new List<Camera079>();
-				foreach (var ply in Player.List)
-				{
-					if (ply.Team == Team.SCP && ply.Role != RoleType.Scp079)
-					{
-						cams.AddRange(ply.ReferenceHub.GetNearCams());
-					}
-				}
-
-				Camera079 target;
-				if (cams.Count > 0)
-				{
-					target = cams.GetRandomOne();
-				}
-				else return true;
-
-				if (target != null)
-				{
-					if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > __instance.Mana)
-					{
-						__instance.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, __instance.Mana);
-						return false;
-					}
-
-					__instance.RpcSwitchCamera(target.cameraId, lookatRotation);
-					__instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
-					__instance.currentCamera = target;
-					return false;
-				}
-			}
-			return true;
-		}
-	}
-
 	//SCP-079Extend Sprint 
 	[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
 	public static class Scp079InteractPatch
@@ -85,9 +37,9 @@ namespace SanyaRemastered.Patches
 				if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
 
 				var player = Player.Dictionary[__instance.gameObject];
-				Log.Debug($"[Scp079InteractPatch] {/*player.ReferenceHub.animationController.curAnim*/null} -> {command} args {args}");
+				Log.Debug($"[Scp079InteractPatch] {player.IsExmode()} -> {command} args {args}");
 
-				if (/*player.ReferenceHub.animationController.curAnim != 1*/ true) return true;
+				if (!player.IsExmode()) return true;
 
 				if (command == Command079.Lockdown)
 				{
@@ -111,19 +63,35 @@ namespace SanyaRemastered.Patches
 						return false;
 					}
 					Room room = player.CurrentRoom;
+					List<Door> doors = new List<Door>();
+					HashSet<Scp079Interactable> scp079Interactables = Scp079Interactable.InteractablesByRoomId[player.ReferenceHub.scp079PlayerScript.CurrentRoom.UniqueId];
 
-					bool locked = false;
-					foreach (Door door in room.Doors)
+					foreach (Scp079Interactable scp079Interactable in scp079Interactables)
 					{
-						DoorLockMode lockMode = DoorLockUtils.GetMode((DoorLockReason)door.Base.ActiveLocks);
-						if (!locked &&
-							(((door is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed)
-							|| (door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanClose))
-							|| (!door.Base.NetworkTargetState && !lockMode.HasFlagFast(DoorLockMode.CanOpen))
-							|| lockMode == DoorLockMode.FullLock))
-							locked = true;
+						if (!(scp079Interactable == null))
+						{
+							Scp079Interactable.InteractableType type = scp079Interactable.type;
+							IDamageableDoor damageableDoor;
+							if (type != Scp079Interactable.InteractableType.Door)
+							{
+								if (type == Scp079Interactable.InteractableType.Lockdown)
+								{
+									continue;
+								}
+							}
+							else if (scp079Interactable.TryGetComponent(out DoorVariant doorVariant2) && (damageableDoor = (doorVariant2 as IDamageableDoor)) != null && damageableDoor.IsDestroyed)
+							{
+								player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+								return false;
+							}
+						}
 					}
-					if (room == null || locked)
+					foreach (Scp079Interactable scp079Interactable in scp079Interactables)
+					{
+						scp079Interactable.TryGetComponent(out DoorVariant doorVariant);
+						doors.Add(Door.Get(doorVariant));
+					}
+					if (room == null)
 					{
 						player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
 						return false;
@@ -138,7 +106,7 @@ namespace SanyaRemastered.Patches
 					}
 					player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
 					if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.Mana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
-					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub), Segment.FixedUpdate);
+					Timing.RunCoroutine(GasRoom(room, player.ReferenceHub, doors), Segment.FixedUpdate);
 					return false;
 				}
 				else if (command == Command079.Door)
@@ -201,10 +169,10 @@ namespace SanyaRemastered.Patches
 				return true;
 			}
 		}
-		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp)
+		private static IEnumerator<float> GasRoom(Room room, ReferenceHub scp,List<Door> doors)
 		{
 			DiscordLog.DiscordLog.Instance.LOG += $":biohazard: Gazage de la salle : {room.Type}";
-			List<Door> doors = room.Doors.ToList();
+
 			foreach (var door in doors)
 			{
 				door.Base.NetworkTargetState = true;
