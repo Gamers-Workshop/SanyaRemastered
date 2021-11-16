@@ -28,8 +28,8 @@ namespace SanyaRemastered
 		}
 		private void OnDestroy()
 		{
-			_player.ChangeRunningSpeed(default);
-			_player.ChangeWalkingSpeed(default);
+			_player.ChangeRunningSpeed(ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier);
+			_player.ChangeWalkingSpeed(ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier);
 		}
 
 		private void FixedUpdate()

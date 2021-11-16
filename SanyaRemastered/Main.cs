@@ -106,9 +106,9 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
 			PlayerEvents.Died += Handlers.OnDied;
-			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
+			PlayerEvents.EscapingPocketDimension += Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem -= Handlers.OnThrowingItem;
+			PlayerEvents.ThrowingItem += Handlers.OnThrowingItem;
 			PlayerEvents.UsingItem += Handlers.OnPlayerUsingItem;
 			PlayerEvents.ItemUsed += Handlers.OnPlayerItemUsed;
 			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
