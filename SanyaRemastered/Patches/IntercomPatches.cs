@@ -9,6 +9,21 @@ using Exiled.API.Enums;
 
 namespace SanyaRemastered.Patches
 {
+
+	[HarmonyPatch(typeof(Intercom), nameof(Intercom.ServerAllowToSpeak))]
+	class IntercomUpdateSpeaker
+	{
+		public static void Prefix(Intercom __instance)
+        {
+			if (SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
+            {
+				Room RoomIntercom = Map.Rooms.Where(x => x.Type == RoomType.EzIntercom).Single();
+				if (RoomIntercom.LightsOff)
+					Intercom.host.speaker = null;
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(Intercom), nameof(Intercom.UpdateText))]
 
 	class IntercomUpdateTextPatches

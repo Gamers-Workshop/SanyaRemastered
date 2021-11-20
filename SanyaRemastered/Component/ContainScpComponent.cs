@@ -61,7 +61,6 @@ namespace SanyaRemastered
 							dr._ignoredDamageSources &= DoorDamageType.None;
 						}
 					}
-					try { Methods.SpawnDummyModel(_player.Position, _player.GameObject.transform.rotation, _player.Role, _player.Scale); } catch (Exception ex) { Log.Error("Cant spawn dummy" +ex); }
 					Cassie.GlitchyMessage(CassieAnnounceContain, 0.05f, 0.05f);
 					_player.SetRole(RoleType.Spectator);
 					Destroy(this);

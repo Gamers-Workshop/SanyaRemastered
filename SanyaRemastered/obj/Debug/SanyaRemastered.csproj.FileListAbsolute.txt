@@ -243,3 +243,5 @@ D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.CoreModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.PhysicsModule.dll
 D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\UnityEngine.AnimationModule.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\CommsHack.dll
+D:\1-Plugin\SanyaRemastered\SanyaRemastered\bin\Debug\CommsHack.pdb

@@ -70,7 +70,7 @@
 
 		internal static readonly string Extend079GazCooldown = string.Concat(
 			"<color=#bbee00><size=25>",
-			"《Vous devez attendre {0}》\n",
+			"《Vous devez attendre {0} seconde{s}》\n",
 			"</size></color>"
 			);
 		internal static readonly string Extend079GazFail = string.Concat(

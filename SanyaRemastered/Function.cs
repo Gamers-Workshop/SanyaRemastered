@@ -24,6 +24,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -49,7 +50,7 @@ namespace SanyaRemastered.Functions
             if (Player.List.Count() == 0)
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
-                PlayerStats.StaticChangeLevel(true);
+                ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
             }
             else
             {
@@ -78,12 +79,10 @@ namespace SanyaRemastered.Functions
                     Methods.SendSubtitle(Subtitles.AirbombStop, 10);
                 }
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
-                Log.Info("[AirSupportBomb] The AirBomb as stop");
                 yield break;
             }
             else if (isAirBombGoing && !stop)
             {
-                Log.Info("[AirSupportBomb] The AirBomb as already true");
                 yield break;
             }
             DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n";
@@ -185,7 +184,7 @@ namespace SanyaRemastered.Functions
         {
             while (isActuallyBombGoing)
             {
-                //CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
+                CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
                 yield return Timing.WaitForSeconds(11);
             }
         }
@@ -208,10 +207,10 @@ namespace SanyaRemastered.Functions
     internal static class Methods
     {
         
-        //public static HttpClient httpClient = new HttpClient();
-        //public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
+        public static HttpClient httpClient = new HttpClient();
+        public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
 
-        //public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
+        public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
         public static void IsCanBeContain(Player player)
         {
             try 
@@ -249,7 +248,26 @@ namespace SanyaRemastered.Functions
                                         return;
 
                                     }
-                                case RoomType.Lcz012:
+                                    case RoomType.Lcz173:
+                                    {
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -16.4f, -30.2f, -5.2f, -16.7f, -16.8f, -22.3f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "173_GATE");
+                                            if (door.Base.GetExactState() == 0f && !door.Base.GetComponent<Timed173PryableDoor>()._stopwatch.IsRunning)
+                                            {
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in there containment chamber";
+                                                }
+                                                return;
+                                            }
+                                            return;
+                                    }
+                                    case RoomType.Lcz012:
                                     {
                                         if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, player.CurrentRoom.Transform.rotation.eulerAngles.y)
                                             && !Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
@@ -667,20 +685,6 @@ namespace SanyaRemastered.Functions
             sendto?.characterClassManager.connectionToClient.Send(msg, 0);
         }
         
-        public static void AddDeathTimeForScp049(ReferenceHub target)
-        {
-            PlayerManager.localPlayer.GetComponent<RagdollManager>().SpawnRagdoll(
-                            Vector3.zero,
-                            target.transform.rotation,
-                            Vector3.zero,
-                            (int)RoleType.ClassD,
-                            new PlayerStats.HitInfo(-1, "Scp049Reviver", DamageTypes.Scp049, -1,true),
-                            true,
-                            target.GetComponent<MirrorIgnorancePlayer>().PlayerId,
-                            target.nicknameSync.DisplayName,
-                            target.queryProcessor.PlayerId
-                        );
-        }
         public static void MoveNetworkIdentityObject(NetworkIdentity identity, Vector3 pos)
         {
             identity.gameObject.transform.position = pos;
@@ -826,12 +830,11 @@ namespace SanyaRemastered.Functions
         {
             player.ReferenceHub.GetComponent<GameConsoleTransmission>().SendToClient(player.Connection, "[REPORTING] " + text, "white");
         }
-        public static IEnumerable<Camera079> GetNearCams(this ReferenceHub player)
+        public static IEnumerable<Camera079> GetNearCams(this Vector3 position)
         {
-            Player EPlayer = Player.Dictionary[player.gameObject];
             foreach (var cam in Scp079PlayerScript.allCameras)
             {
-                var dis = Vector3.Distance(EPlayer.Position, cam.transform.position);
+                var dis = Vector3.Distance(position, cam.transform.position);
                 if (dis <= 15f)
                 {
                     yield return cam;

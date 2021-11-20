@@ -25,7 +25,6 @@ namespace SanyaRemastered
         public bool Coroding106 { get; set; } = false;
         public bool ExplodingGrenadeTesla { get; set; } = false;
         public bool TeslaDestroyName { get; set; } = false;
-        public bool TeslaNoTriggerRadioPlayer { get; set; } = false;
         public string BoxMessageOnJoin { get; set; } = string.Empty;
         [Description("Jump attaque")]
         public bool JumpingKickAttack { get; set; } = false;
@@ -56,7 +55,8 @@ namespace SanyaRemastered
         public bool Nukecapclose { get; set; } = false;
         [Description("Tesla Config")]
         public float TeslaRange { get; set; } = 5.5f;
-        public bool TeslaNoTriggerableDisarmed { get; set; } = false;
+        public bool TeslaNoTriggerRadioPlayer { get; set; } = false;
+        public bool NoIdlingTeslaGodmodAndBlackout { get; set; } = false;
 
         [Description("Ajout de porte sur la map")]
         public bool AddDoorsOnSurface { get; set; } = false;
@@ -66,7 +66,6 @@ namespace SanyaRemastered
         public bool IntercomInformation { get; set; } = false;
         public bool IntercomBrokenOnBlackout { get; set; } = false;
         public bool CloseDoorsOnNukecancel { get; set; } = false;
-        public bool Scp049_add_time_res_success { get; set; } = false;
         public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
         [Description("Désactivé la microhid pour les rôle")]
         public List<RoleType> MicroHidNotActive { get; set; } = new List<RoleType>{RoleType.ClassD, RoleType.Scientist };
@@ -172,30 +171,31 @@ namespace SanyaRemastered
 
         [Description("SCP Activé les mode étendue")]
         public bool Scp079ExtendEnabled { get; set; } = false;
-        [Description("SCP-106 Config \n  # Quand vous marcher sur le portail de 106 vous tomber dans la dimmenssion de poche")]
-        public bool Scp106PortalEffect { get; set; } = false;
 
-        [Description("SCP-079 Config Plugin \n  # Pour désactivé une capacité Scp079ExtendLevel = 6")]
+        [Description("SCP-079 Config Plugin \n" +
+            "# Pour désactivé une capacité Scp079ExtendLevel = 6\n" +
+            "# Tp a la caméra du générateur activé le plus proche")]
+        public int Scp079ExtendLevelFindGeneratorActive { get; set; } = 1;
+        public float Scp079ExtendCostFindGeneratorActive { get; set; } = 10f;
+        [Description("DoorBeep")]
+
         public int Scp079ExtendLevelFindscp { get; set; } = 1;
         public float Scp079ExtendCostFindscp { get; set; } = 10f;
+        [Description("DoorBeep")]
         public int Scp079ExtendLevelDoorbeep { get; set; } = 1;
         public float Scp079ExtendCostDoorbeep { get; set; } = 5f;
+        [Description("Blackout Intercom")]
         public int Scp079ExtendBlackoutIntercom { get; set; } = 1;
         public float Scp079ExtendCostBlackoutIntercom { get; set; } = 5f;
-
-        [Description("SCP-079 Radar Humain")]
-        public bool Scp079spot { get; set; } = false;
-
-        [Description("SCP-079 Niveau requis pour le spot")]
-        public int Scp079ExtendLevelSpot { get; set; } = 1;
 
         [Description("SCP-079 GAS Config")]
         public List<string> GazBlacklistRooms { get; set; } = new List<string>();
         public int GasDuration { get; set; } = 60;
-        public int TimerWaitGas { get; set; } = 60;
+        public int GasTimerWait { get; set; } = 60;
         public int GasExpGain { get; set; } = 10;
         public float Scp079ExCostGaz { get; set; } = 150;
         public int Scp079ExLevelGaz { get; set; } = 4;
+        public int GasWaitingTime { get; set; } = 60;
 
         [Description("SCP-079 Config")]
         public Dictionary<string, float> Scp079ManaCost { get; set; } = new Dictionary<string, float>()

@@ -37,8 +37,6 @@ namespace SanyaRemastered
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
-		private readonly MethodInfo _methodToPatch = AccessTools.Method("PlayerInteract:CallCmdSwitchAWButton");
-
 		public SanyaRemastered() => Instance = this;
 		private Ram.MemoryService _memoryService;
 
@@ -62,8 +60,27 @@ namespace SanyaRemastered
 
 			Log.Info($"[OnEnabled] SanyaRemastered({Version}) Enabled Complete.");
 		}
+        public override void OnReloaded()
+        {
+			if (!Config.IsEnabled) return;
 
-		public override void OnDisabled()
+			int processId = Process.GetCurrentProcess().Id;
+			_memoryService = new Ram.MemoryService(processId);
+			//Only run if memory is going to be asked for
+			if (Config.RamInfo)
+			{
+				_memoryService.BackgroundWorker.RunWorkerAsync();
+			}
+			RegistEvents();
+			RegistPatch();
+
+			foreach (Player p in Player.List)
+				if (!p.GameObject.TryGetComponent<SanyaRemasteredComponent>(out _))
+					p.GameObject.AddComponent<SanyaRemasteredComponent>();
+
+			base.OnReloaded();
+        }
+        public override void OnDisabled()
 		{
 			base.OnDisabled();
 
@@ -98,6 +115,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += Handlers.OnPlacingBulletHole;
+			MapEvents.DamagingWindow += Handlers.OnDamagingWindow;
 
 			PlayerEvents.PreAuthenticating += Handlers.OnPreAuth;
 			PlayerEvents.Verified += Handlers.OnPlayerVerified;
@@ -105,6 +123,7 @@ namespace SanyaRemastered
 			PlayerEvents.ChangingRole += Handlers.OnPlayerSetClass;
 			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
+
 			PlayerEvents.Died += Handlers.OnDied;
 			PlayerEvents.EscapingPocketDimension += Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
@@ -159,6 +178,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= Handlers.OnPlacingBulletHole;
+			MapEvents.DamagingWindow += Handlers.OnDamagingWindow;
 
 			PlayerEvents.PreAuthenticating -= Handlers.OnPreAuth;
 			PlayerEvents.Verified -= Handlers.OnPlayerVerified;
