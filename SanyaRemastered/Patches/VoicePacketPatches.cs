@@ -89,4 +89,29 @@ namespace SanyaRemastered.Patches
 
 		}
 	}
+	//[HarmonyPatch(typeof(PlayerCollection), nameof(PlayerCollection.TryGet))]
+	public static class PatchingThisForMArtin
+	{
+		public static bool Prefix(PlayerCollection __instance,ref bool __result, string playerId,out VoicePlayerState state)
+		{
+			if (playerId == null)
+				throw new ArgumentNullException("playerId");
+
+			var found = __instance._playersLookup.TryGetValue(playerId, out state);
+
+			if (!found)
+			{
+				var log = $"PLAYER NOT FOUND: {playerId}\nKnown Players:";
+				foreach (var item in __instance._playersLookup)
+					log += $"\n - {item.Key} => {item.Value}";
+				log += "\nKnown States:";
+		
+				foreach (var item in __instance._players)
+					log += $"\n - {item.Name}";
+				Exiled.API.Features.Log.Error(log);
+			}
+			__result = found;
+			return false;
+		}
+	}
 }

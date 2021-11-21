@@ -555,6 +555,13 @@ namespace SanyaRemastered
                 { 
                     ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 20);
                     ev.Player.ResetInventory(new List<ItemType> {ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun,ItemType.Medkit,ItemType.GrenadeFlash});
+                    foreach (var item in ev.Player.Inventory.UserInventory.Items)
+                    {
+                        if (item.Value.ItemTypeId == ItemType.GunShotgun && item.Value.TryGetComponent(out Firearm firearm))
+                        {
+                            firearm.ItemSerial = 37;
+                        }
+                    }
                 }));
             }
             if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
