@@ -213,43 +213,43 @@ namespace SanyaRemastered.Functions
         public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
         public static void IsCanBeContain(Player player)
         {
-            try 
+            try
             {
-            if (SanyaRemastered.Instance.Config.ContainCommand && player.Team == Team.SCP)
-            {
-                switch (player.Role)
+                if (SanyaRemastered.Instance.Config.ContainCommand && player.Team == Team.SCP)
                 {
-                    case RoleType.Scp173:
-                        {
-                            if (Player.List.Any(x => x.Role == RoleType.Scp079))
+                    switch (player.Role)
+                    {
+                        case RoleType.Scp173:
                             {
-                                return;
-                            }
+                                if (Player.List.Any(x => x.Role == RoleType.Scp079))
+                                {
+                                    return;
+                                }
 
-                            switch (player.CurrentRoom.Type)
-                            {
-                                case RoomType.Lcz914:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 2.9f, -10.2f, 10.1f, -10.2f, 0, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                switch (player.CurrentRoom.Type)
+                                {
+                                    case RoomType.Lcz914:
                                         {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "914");
-                                        if (door.Base.GetExactState() == 0f)
-                                        {
-                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 2.9f, -10.2f, 10.1f, -10.2f, 0, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                containScpComponent.doors.Add(door);
-                                                containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4";
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "914");
+                                            if (door.Base.GetExactState() == 0f)
+                                            {
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4";
+                                                }
+                                                return;
                                             }
                                             return;
-                                        }
-                                        return;
 
-                                    }
+                                        }
                                     case RoomType.Lcz173:
-                                    {
+                                        {
                                             if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -16.4f, -30.2f, -5.2f, -16.7f, -16.8f, -22.3f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                             {
                                                 return;
@@ -266,111 +266,15 @@ namespace SanyaRemastered.Functions
                                                 return;
                                             }
                                             return;
-                                    }
+                                        }
                                     case RoomType.Lcz012:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, player.CurrentRoom.Transform.rotation.eulerAngles.y)
-                                            && !Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                         {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "012");
-                                        {
-                                            if (door.Base.GetExactState() == 0f)
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, player.CurrentRoom.Transform.rotation.eulerAngles.y)
+                                                && !Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2";
-                                                }
                                                 return;
                                             }
-                                        }
-                                        return;
-                                    }
-                                case RoomType.HczArmory:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 0.1f, -5.6f, 2.9f, -2.8f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HCZ_ARMORY");
-                                        {
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Heavy containment Zone";
-                                                }
-                                                return;
-                                            }
-                                        }
-                                        return;
-                                    }
-                                case RoomType.LczArmory:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 1.2f, -9.5f, 6f, -7f, -1f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "LCZ_ARMORY");
-                                        if (door.Base.GetExactState() == 0f)
-                                        {
-                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                            {
-                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                containScpComponent.doors.Add(door);
-                                                containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Light Containment Zone";
-                                            }
-                                            return;
-                                        }
-                                        return;
-                                    }
-                                case RoomType.HczHid:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 3.7f, -4.0f, 9.8f, 7.4f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HID");
-                                        if (door.Base.GetExactState() == 0f)
-                                        {
-                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                            {
-                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                containScpComponent.doors.Add(door);
-                                                containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Storage of Micro H I D";
-                                            }
-                                        }
-                                        return;
-                                    }
-                                case RoomType.Hcz049:
-                                    {
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            return;
-                                        }
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
-                                        if (door.Base.GetExactState() == 0f)
-                                        {
-                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                            {
-                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                containScpComponent.doors.Add(door);
-                                                containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of SCP 0 4 9";
-                                            }
-                                            return;
-                                        }
-                                        return;
-                                    }
-                                case RoomType.Hcz106:
-                                    {
-                                        if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.5f, 30.8f, -1.9f, 20f, 10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "012");
                                             {
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
@@ -378,6 +282,127 @@ namespace SanyaRemastered.Functions
                                                     {
                                                         var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                         containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2";
+                                                    }
+                                                    return;
+                                                }
+                                            }
+                                            return;
+                                        }
+                                    case RoomType.HczArmory:
+                                        {
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 0.1f, -5.6f, 2.9f, -2.8f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HCZ_ARMORY");
+                                            {
+                                                if (door.Base.GetExactState() == 0f)
+                                                {
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Heavy containment Zone";
+                                                    }
+                                                    return;
+                                                }
+                                            }
+                                            return;
+                                        }
+                                    case RoomType.LczArmory:
+                                        {
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 1.2f, -9.5f, 6f, -7f, -1f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "LCZ_ARMORY");
+                                            if (door.Base.GetExactState() == 0f)
+                                            {
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Light Containment Zone";
+                                                }
+                                                return;
+                                            }
+                                            return;
+                                        }
+                                    case RoomType.HczHid:
+                                        {
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 3.7f, -4.0f, 9.8f, 7.4f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HID");
+                                            if (door.Base.GetExactState() == 0f)
+                                            {
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Storage of Micro H I D";
+                                                }
+                                            }
+                                            return;
+                                        }
+                                    case RoomType.Hcz049:
+                                        {
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                            if (door.Base.GetExactState() == 0f)
+                                            {
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of SCP 0 4 9";
+                                                }
+                                                return;
+                                            }
+                                            return;
+                                        }
+                                    case RoomType.Hcz106:
+                                        {
+                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.5f, 30.8f, -1.9f, 20f, 10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                                                {
+                                                    if (door.Base.GetExactState() == 0f)
+                                                    {
+                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        {
+                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                            containScpComponent.doors.Add(door);
+                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
+                                                        }
+                                                        return;
+                                                    }
+                                                    else
+                                                    {
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -25.6f, -33.7f, 32f, -4.6f, 20f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                if (Player.List.Any((p) => p.Role == RoleType.Scp106))
+                                                {
+                                                    return;
+                                                }
+                                                var door1 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_PRIMARY");
+                                                var door2 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_SECOND");
+                                                if (door1.Base.GetExactState() == 0f && door2.Base.GetExactState() == 0f)
+                                                {
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door1);
+                                                        containScpComponent.doors.Add(door2);
                                                         containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
                                                     }
                                                     return;
@@ -387,66 +412,25 @@ namespace SanyaRemastered.Functions
                                                     return;
                                                 }
                                             }
-                                        }
-                                        if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -25.6f, -33.7f, 32f, -4.6f, 20f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            if (Player.List.Any((p) => p.Role == RoleType.Scp106))
-                                            {
-                                                return;
-                                            }
-                                            var door1 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_PRIMARY");
-                                            var door2 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_SECOND");
-                                            if (door1.Base.GetExactState() == 0f && door2.Base.GetExactState() == 0f)
-                                            {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door1);
-                                                    containScpComponent.doors.Add(door2);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
-                                                }
-                                                return;
-                                            }
-                                            else
-                                            {
-                                                return;
-                                            }
-                                        }
-                                        return;
-                                    }
-                                case RoomType.Hcz079:
-                                    {
-                                        byte TEST = 0;
-                                        if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.3f, -8.2f, 22.5f, 5.2f, 10f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                        {
-                                            TEST = 1;
-                                        }
-                                        if (TEST != 1)
-                                        {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -12.3f, -20.8f, 18.7f, -2.5f, 7f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                            {
-                                                TEST = 2;
-                                            }
-                                        }
-                                        if (TEST == 1)
-                                        {
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_SECOND");
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
-                                                }
-                                                return;
-                                            }
                                             return;
                                         }
-                                        if (TEST == 2)
+                                    case RoomType.Hcz079:
                                         {
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_FIRST");
+                                            byte TEST = 0;
+                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.3f, -8.2f, 22.5f, 5.2f, 10f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                             {
+                                                TEST = 1;
+                                            }
+                                            if (TEST != 1)
+                                            {
+                                                if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -12.3f, -20.8f, 18.7f, -2.5f, 7f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                                {
+                                                    TEST = 2;
+                                                }
+                                            }
+                                            if (TEST == 1)
+                                            {
+                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_SECOND");
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
                                                     if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
@@ -459,112 +443,144 @@ namespace SanyaRemastered.Functions
                                                 }
                                                 return;
                                             }
+                                            if (TEST == 2)
+                                            {
+                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_FIRST");
+                                                {
+                                                    if (door.Base.GetExactState() == 0f)
+                                                    {
+                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        {
+                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                            containScpComponent.doors.Add(door);
+                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
+                                                        }
+                                                        return;
+                                                    }
+                                                    return;
+                                                }
+                                            }
+                                            return;
                                         }
-                                        return;
-                                    }
-                                default:
+                                    default:
+                                        {
+                                            return;
+                                        }
+                                }
+                            }
+                        case RoleType.Scp096:
+                            {
+                                Log.Debug($"096 state : {(player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}", SanyaRemastered.Instance.Config.IsDebugged);
+                                if (Scp096PlayerState.Docile != (player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState
+                                    && Scp096PlayerState.TryNotToCry != (player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
+                                {
+                                    return;
+                                }
+                                if (player.CurrentRoom.Type == RoomType.Hcz096)
+                                {
+                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 4.4f, 0.5f, 1.9f, -1.9f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                     {
                                         return;
                                     }
-                            }
-                        }
-                    case RoleType.Scp096:
-                        {
-                            Log.Debug($"096 state : {(player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}", SanyaRemastered.Instance.Config.IsDebugged);
-                            if (Scp096PlayerState.Docile != (player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState
-                                && Scp096PlayerState.TryNotToCry != (player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
-                            {
-                                return;
-                            }
-                            if (player.CurrentRoom.Type == RoomType.Hcz096)
-                            {
-                                if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 4.4f, 0.5f, 1.9f, -1.9f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                {
-                                    return;
-                                }
-                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "096");
-                                if (door.Base.GetExactState() == 0f)
-                                {
-                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                    {
-                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                        containScpComponent.doors.Add(door);
-                                        containScpComponent.CassieAnnounceContain = "SCP 0 9 6 as been contained in there containment chamber";
-                                    }
-                                    return;
-                                }
-                                return;
-                            }
-                            else
-                            {
-                                return;
-                            }
-                        }
-                    case RoleType.Scp049:
-                        {
-                            if (player.CurrentRoom.Type == RoomType.Hcz049)
-                            {
-                                if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                {
-                                    return;
-                                }
-                                var door = player.CurrentRoom.Doors.First(x => x.Base is PryableDoor);
-                                {
+                                    var door = player.CurrentRoom.Doors.First(x => x.Nametag == "096");
                                     if (door.Base.GetExactState() == 0f)
                                     {
                                         if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                         {
                                             var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                             containScpComponent.doors.Add(door);
-                                            containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
+                                            containScpComponent.CassieAnnounceContain = "SCP 0 9 6 as been contained in there containment chamber";
                                         }
                                         return;
                                     }
-                                    else
-                                    {
-                                        return;
-                                    }
+                                    return;
                                 }
-                            }
-                            else
-                            {
-                                return;
-                            }
-                        }
-                    case RoleType.Scp93953:
-                    case RoleType.Scp93989:
-                        {
-                            if (player.CurrentRoom.Type == RoomType.Hcz106)
-                            {
-                                if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.4f, 30.8f, -1.9f, 20f, 13f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                else
                                 {
                                     return;
                                 }
-                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                            }
+                        case RoleType.Scp049:
+                            {
+                                if (player.CurrentRoom.Type == RoomType.Hcz049)
                                 {
-                                    if (door.Base.GetExactState() == 0f)
+                                    if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                        if (door.Base.GetExactState() == 0f)
                                         {
-                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                            containScpComponent.doors.Add(door);
-                                            containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
+                                            }
+                                            return;
                                         }
+                                        else
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    else if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.3f, -9.6f, -11, -16.8f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    {
+                                        var door = player.CurrentRoom.Doors.First(x => x.Base is PryableDoor);
+                                        if (door.Base.GetExactState() == 0f)
+                                        {
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
+                                            }
+                                            return;
+                                        }
+                                        else
+                                        {
+                                            return;
+                                        }
+                                    }
+                                    return;
+                                }
+                                else
+                                {
+                                    return;
+                                }
+                            }
+                        case RoleType.Scp93953:
+                        case RoleType.Scp93989:
+                            {
+                                if (player.CurrentRoom.Type == RoomType.Hcz106)
+                                {
+                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.4f, 30.8f, -1.9f, 20f, 13f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    {
                                         return;
+                                    }
+                                    var door = player.CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                                    {
+                                        if (door.Base.GetExactState() == 0f)
+                                        {
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
+                                            }
+                                            return;
 
-                                    }
-                                    else
-                                    {
-                                        return;
+                                        }
+                                        else
+                                        {
+                                            return;
+                                        }
                                     }
                                 }
+                                return;
                             }
-                            return;
-                        }
+                    }
+                    return;
                 }
                 return;
-            }
-            return;
             }
             catch (Exception ex)
             {
@@ -574,20 +590,25 @@ namespace SanyaRemastered.Functions
 
         public static void SpawnDummyModel(Vector3 position, Quaternion rotation, RoleType role, Vector3 scale)
         {
-            GameObject obj = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-            CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-            if (ccm == null)
-                Log.Error("CCM is null, this can cause problems!");
-            ccm.CurClass = role;
-            ccm.GodMode = true;
-            ccm.RefreshPlyModel(role);
-            obj.GetComponent<NicknameSync>().Network_myNickSync = "Dummy";
-            obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-            obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-            obj.transform.localScale = scale;
-            obj.transform.position = position;
-            obj.transform.rotation = rotation;
-            NetworkServer.Spawn(obj);
+            try
+            {
+                GameObject obj = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
+                CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
+                if (ccm == null)
+                    Log.Error("CCM is null, this can cause problems!");
+                ccm.CurClass = role;
+                ccm.GodMode = true;
+                ccm.RefreshPlyModel(role);
+                obj.GetComponent<NicknameSync>().Network_myNickSync = "Dummy";
+                obj.GetComponent<QueryProcessor>().PlayerId = 9999;
+                obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
+                obj.transform.localScale = scale;
+                obj.transform.position = position;
+                obj.transform.rotation = rotation;
+                NetworkServer.Spawn(obj);
+            }
+            catch (Exception ex)
+            { Log.Error("Error In create Dummy " + ex); }
         }
         public static bool IsStuck(Vector3 pos)
         {
@@ -668,9 +689,17 @@ namespace SanyaRemastered.Functions
             }
         }
 
-        public static void PlayAmbientSound(int id)
+        public static void PlayAmbientSound(int id,Player player = null)
         {
+            if (player == null)
             PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
+            else
+            {
+                PooledNetworkWriter writer = NetworkWriterPool.GetWriter();
+                writer.WriteInt32(id);
+                var networkIdentity = player.ReferenceHub.networkIdentity.NetworkBehaviours.First(x => x.netId == player.NetworkIdentity.netId);
+                player.ReferenceHub.TargetSendRpc(player.ReferenceHub.GetComponent<AmbientSoundPlayer>(),"RpcPlaySound", writer);
+            }
         }
 
         public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour

@@ -178,17 +178,15 @@ namespace SanyaRemastered.Patches
             }
             for (int i = SanyaRemastered.Instance.Config.GasDuration; i > 0f; i--)
             {
-                foreach (var player in Player.List)
+                foreach (var player in room.Players)
                 {
-                    if (player.CurrentRoom != null && player.CurrentRoom == room)
+                    Methods.PlayAmbientSound(7,player);
+                    if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
-                        if (SanyaRemastered.Instance.Config.CassieSubtitle)
-                        {
-                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"), 2);
-                        }
-                        room.Color = FlickerableLightController.DefaultWarheadColor;
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"), 2);
                     }
                 }
+                room.Color = FlickerableLightController.DefaultWarheadColor;
                 yield return Timing.WaitForSeconds(0.5f);
                 room.ResetColor();
                 yield return Timing.WaitForSeconds(0.5f);

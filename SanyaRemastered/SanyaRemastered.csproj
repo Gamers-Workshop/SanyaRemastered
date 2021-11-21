@@ -55,6 +55,7 @@
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\Scp096Patches.cs" />
+    <Compile Include="Patches\Scp173Patches.cs" />
     <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ScpTargetPatches.cs" />

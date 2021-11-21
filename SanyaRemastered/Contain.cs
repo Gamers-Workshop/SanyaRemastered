@@ -336,13 +336,9 @@ namespace SanyaRemastered
                             {
                                 if (player.CurrentRoom.Type == RoomType.Hcz049)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        response = "Tu doit étre dans ton confinement";
-                                        return false;
-                                    }
-                                    var door = player.CurrentRoom.Doors.First(x => x.Base is PryableDoor);
-                                    {
+                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
                                         if (door.Base.GetExactState() == 0f)
                                         {
                                             if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
@@ -360,6 +356,28 @@ namespace SanyaRemastered
                                             return false;
                                         }
                                     }
+                                    else if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.3f, -9.6f, -11, -16.8f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    {
+                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                        if (door.Base.GetExactState() == 0f)
+                                        {
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
+                                            }
+                                            response = "Le confinement a été effectué";
+                                            return true;
+                                        }
+                                        else
+                                        {
+                                            response = "Vous devez avoir la porte de votre confinement fermer";
+                                            return false;
+                                        }
+                                    }
+                                    response = "Tu doit étre dans ton confinement";
+                                    return false;
                                 }
                                 else
                                 {

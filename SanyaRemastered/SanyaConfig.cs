@@ -132,6 +132,7 @@ namespace SanyaRemastered
         [Description("RP")]
         public bool Scp096Real { get; set; } = false;
         public bool Scp049Real { get; set; } = false;
+        public bool Scp173Real { get; set; } = false;
         public bool ScpTakeFallDamage { get; set; } = false;
         public List<string> ScpFallDamage { get; set; } = new List<string>
         {

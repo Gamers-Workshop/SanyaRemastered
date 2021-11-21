@@ -840,6 +840,8 @@ namespace SanyaRemastered
         public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
         {
             Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer && ev.Player.ReferenceHub.characterClassManager.IsHuman() && ev.Player.ReferenceHub.inventory.UserInventory.Items.Any(x => x.Value.ItemTypeId == ItemType.Radio && x.Value.GetComponent<RadioItem>().IsUsable))
+                ev.IsTriggerable = false;
         }
 
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
