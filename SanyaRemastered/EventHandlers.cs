@@ -5,6 +5,7 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
+using InventorySystem.Items.Armor;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
@@ -564,6 +565,10 @@ namespace SanyaRemastered
                     }
                 }));
             }
+            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+            {
+                ev.Player.ClearInventory();
+            }
             if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
             {
                 bool IsAnTarget = false;
@@ -606,6 +611,10 @@ namespace SanyaRemastered
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.HitInformation.Attacker}({ev.HitInformation.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Target == null) return;
+            if (SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
+            {
+                ev.Amount = BodyArmorUtils.ProcessDamage(bodyArmor.VestEfficacy, ev.Amount, SanyaRemastered.Instance.Config.Scp939EffectiveArmor);
+            }
             if (ev.DamageType == DamageTypes.Scp207 && ev.Target.GameObject.TryGetComponent<Scp914Effect>(out var comp) && ev.HitInformation.Attacker != "SCP-914")
             {
                 ev.Amount = 0;
@@ -841,6 +850,8 @@ namespace SanyaRemastered
                 ev.Player.DisableAllEffects();
                 if (ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var comp))
                     UnityEngine.Object.Destroy(comp);
+                if (ev.Player.IsInPocketDimension)
+                    ev.Player.EnableEffect(EffectType.Corroding);
             }
         }
 
@@ -857,6 +868,10 @@ namespace SanyaRemastered
             if (plugin.Config.ContainCommand && ev.Player.Team == Team.SCP)
             {
                 Methods.IsCanBeContain(ev.Player);
+            }
+            if (ev.Door.DoorLockType == DoorLockType.Isolation)
+            {
+                ev.IsAllowed = false;
             }
             if (plugin.Config.ScpCantInteract)
             {

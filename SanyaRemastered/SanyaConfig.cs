@@ -145,6 +145,9 @@ namespace SanyaRemastered
         [Description("Dégats Usp")]
         public float UspDamageMultiplierHuman { get; set; } = 1f;
         public float UspDamageMultiplierScp { get; set; } = 1f;
+        [Description("Armor Protect on SCP-939")]
+        public int Scp939EffectiveArmor { get; set; } = -1;
+
 
         [Description("Recovery Amount")]
         public Dictionary<string, int> ScpRecoveryAmount { get; set; } = new Dictionary<string, int>()

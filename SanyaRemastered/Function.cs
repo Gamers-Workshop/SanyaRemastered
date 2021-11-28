@@ -50,7 +50,7 @@ namespace SanyaRemastered.Functions
             if (Player.List.Count() == 0)
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
-                ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
+                PlayerStats.StaticChangeLevel(true);
             }
             else
             {
