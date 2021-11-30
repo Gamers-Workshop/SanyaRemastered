@@ -158,6 +158,13 @@ namespace SanyaRemastered
                     }
                 }
             }
+            if (plugin.Config.GateClosingAuto)
+            {
+                DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out var GateA);
+                var CheckpointA = GateA.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
+                DoorNametagExtension.NamedDoors.TryGetValue("GATE_B", out var GateB);
+                var CheckpointB = GateB.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
+            }
             if (plugin.Config.AddDoorsOnSurface)
             {
                 Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
@@ -338,7 +345,8 @@ namespace SanyaRemastered
         }
         public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
         {
-            Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}", SanyaRemastered.Instance.Config.IsDebugged);
+            if (ev.Id != 6)
+                Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 switch (ev.Id)
@@ -347,8 +355,8 @@ namespace SanyaRemastered
                         {
                             foreach (Player player in Player.List)
                             {
-                                if (player.CurrentRoom.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationInit);
+                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
+                                    player.Broadcast(20, Subtitles.DecontaminationInit, shouldClearPrevious: true);
                             }
                             break;
                         }
@@ -356,8 +364,8 @@ namespace SanyaRemastered
                         {
                             foreach (Player player in Player.List)
                             {
-                                if (player.CurrentRoom.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"));
+                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
+                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), shouldClearPrevious: true);
                             }
                             break;
                         }
@@ -365,42 +373,41 @@ namespace SanyaRemastered
                         {
                             foreach (Player player in Player.List)
                             {
-                                if (player.CurrentRoom.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"));
+                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
+                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), shouldClearPrevious: true);
                             }
                             break;
                         }
                     case 3:
                         {
-                            foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
-                            {
-                                player.ClearBroadcasts();
-                                player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"));
-                            }
+                            foreach (Player player in Player.List)
+                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
+                                {
+                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), shouldClearPrevious: true);
+                                }
                             break;
                         }
                     case 4:
                         {
-                            foreach (Player player in Player.List.Where((p) => p.CurrentRoom.Zone == ZoneType.LightContainment))
-                            {
-                                player.ClearBroadcasts();
-                                player.Broadcast(45, Subtitles.Decontamination30s.Replace("{0}", "10"));
-                            }
+                            foreach (Player player in Player.List)
+                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
+                                {
+                                    player.Broadcast(45, Subtitles.Decontamination30s.Replace("{0}", "10"),shouldClearPrevious: true);
+                                }
                             break;
                         }
-                    case 5:
-                        {
-                            //no announce
-                            break;
-                        }
-                    case 6:
-                        {
-                            Methods.SendSubtitle(Subtitles.DecontaminationLockdown, 15);
-                            break;
-                        }
+                    default:
+                        break;
+
                 }
         }
+        public void OnDecontaminating(DecontaminatingEventArgs ev)
+        {
+            Log.Debug($"[OnDecontaminating]", SanyaRemastered.Instance.Config.IsDebugged);
 
+            if (plugin.Config.CassieSubtitle)
+                Methods.SendSubtitle(Subtitles.DecontaminationLockdown, 15);
+        }
         public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
@@ -479,7 +486,7 @@ namespace SanyaRemastered
                     }
                     if (SanyaRemastered.Instance.Config.Item_shoot_move)
                     {
-                        pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1))+2, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                        pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1))+4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
                         goto finish;
                     }
                 }
@@ -899,6 +906,10 @@ namespace SanyaRemastered
                         ev.IsAllowed = false;
                 }
             }
+            if (ev.Door.Base.TryGetComponent<GateTimerClose>(out var Gate))
+            {
+                Gate._timeBeforeClosing = -1;
+            }
         }
 
         public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)
@@ -1093,7 +1104,7 @@ namespace SanyaRemastered
                         }
                     case HotkeyButton.Medical:
                         {
-                            if (scp079.Network_curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
+                            if (scp079.Network_curLvl + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindGeneratorActive)
                             {
                                 List<Camera079> cams = new List<Camera079>();
                                 foreach (var gen in Recontainer079.AllGenerators)
@@ -1121,7 +1132,7 @@ namespace SanyaRemastered
                                     }
 
                                     scp079.RpcSwitchCamera(target.cameraId, false);
-                                    scp079.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
+                                    scp079.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindGeneratorActive;
                                     scp079.currentCamera = target;
                                     break;
                                 }

@@ -111,6 +111,7 @@ namespace SanyaRemastered
 			WarheadEvents.Detonated += Handlers.OnDetonated;
 			
 			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
+			MapEvents.Decontaminating += Handlers.OnDecontaminating;
 			MapEvents.AnnouncingNtfEntrance += Handlers.OnAnnounceNtf;
 
 			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;

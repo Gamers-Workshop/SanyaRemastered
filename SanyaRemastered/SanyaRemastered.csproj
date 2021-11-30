@@ -34,6 +34,7 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Component\ContainScpComponent.cs" />
+    <Compile Include="Component\GateTimerClose.cs" />
     <Compile Include="Component\Scp914Effect.cs" />
     <Compile Include="Contain.cs" />
     <Compile Include="EventHandlers.cs" />

@@ -24,7 +24,8 @@ namespace SanyaRemastered
         public bool IsDebugged { get; set; } = false;
         public bool Coroding106 { get; set; } = false;
         public bool ExplodingGrenadeTesla { get; set; } = false;
-        public bool TeslaDestroyName { get; set; } = false;
+        public bool GateClosingAuto { get; set; } = false;
+
         public string BoxMessageOnJoin { get; set; } = string.Empty;
         [Description("Jump attaque")]
         public bool JumpingKickAttack { get; set; } = false;
@@ -55,6 +56,7 @@ namespace SanyaRemastered
         public bool Nukecapclose { get; set; } = false;
         [Description("Tesla Config")]
         public float TeslaRange { get; set; } = 5.5f;
+        public bool TeslaDestroyName { get; set; } = false;
         public bool TeslaNoTriggerRadioPlayer { get; set; } = false;
         public bool NoIdlingTeslaGodmodAndBlackout { get; set; } = false;
 
@@ -93,14 +95,8 @@ namespace SanyaRemastered
         [Description("Ascenceur Attente")]
         public float WaitForUseLift { get; set; } = 0;
 
-        [Description("Traitre")]
-        public int TraitorLimit { get; set; } = -1;
-        public int TraitorChancePercent { get; set; } = 50;
-
-        [Description("\n  # SCP Balanced")]
-        public float Scp939CanSeeVoiceChatting { get; set; } = 0f;
-
-        [Description("Permet au SCP de .contain")]
+        [Description("\n  # SCP Balanced " +
+            "Permet au SCP de .contain")]
         public bool ContainCommand { get; set; } = false;
 
         [Description("Le cadavre n'apparait pas quand on se fait tuer par")]
@@ -120,13 +116,7 @@ namespace SanyaRemastered
         public bool HitmarkGrenade { get; set; } = false;
         public bool HitmarkKilled { get; set; } = false;
 
-        [Description("Config de SCP-018")]
-        public float Scp018DamageMultiplier { get; set; } = 1f;
-        public bool Scp018FriendlyFire { get; set; } = false;
-        public bool Scp018CantDestroyObject { get; set; } = false;
-
         [Description("SCP-939 Patches")]
-        public int Scp939SeeingAhpAmount { get; set; } = -1;
 
         public float Scp939Size { get; set; } = 1f;
         [Description("RP")]

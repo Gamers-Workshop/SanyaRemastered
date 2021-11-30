@@ -25,7 +25,6 @@ namespace SanyaRemastered
 	{
 
 		public static readonly HashSet<Player> _scplists = new HashSet<Player>();
-		private static Vector3 _espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 
 		public bool DisableHud = false;
 
@@ -50,7 +49,6 @@ namespace SanyaRemastered
 		{
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
-			_espaceArea = new Vector3(177.5f, 985.0f, 29.0f);
 		}
 		private void OnDestroy()
 		{
