@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using MEC;
+using PlayerStatsSystem;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
 using System;
@@ -215,7 +216,7 @@ namespace SanyaRemastered.Patches
                         player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>(10);
-                        player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(5, "GAS", DamageTypes.Poison, 0, true), player.GameObject);
+                        player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("GAS.", 10));
                         if (player.Role == RoleType.Spectator)
                         {
                             scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);

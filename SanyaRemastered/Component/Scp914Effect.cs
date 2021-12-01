@@ -1,6 +1,7 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using PlayerStatsSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace SanyaRemastered
 			TimerBeforeDeath--;
 			if (TimerBeforeDeath < 0)
             {
-				_player.ReferenceHub.playerStats.HurtPlayer(new PlayerStats.HitInfo(914914, "SCP-914", DamageTypes.Scp207, 0, true), _player.ReferenceHub.gameObject);
+				_player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914.", 914914));
 				_player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous êtes mort d'un arret cardiaque", 20);
 			}
 		}

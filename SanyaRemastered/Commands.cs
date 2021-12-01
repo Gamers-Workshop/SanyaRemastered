@@ -141,6 +141,7 @@ namespace SanyaRemastered.Commands
 								if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
 								{
 									Log.Warn($"    {i.name}:{i.GetType()}");
+									GameObject.Destroy(i.gameObject);
 								}
 							}
 							Log.Warn($"HasComponentsInChildren:");
@@ -149,6 +150,7 @@ namespace SanyaRemastered.Commands
 								if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
 								{
 									Log.Warn($"    {i.name}:{i.GetType()}");
+									GameObject.Destroy(i.gameObject);
 								}
 							}
                             Log.Warn($"HasComponentsInParent:");
@@ -159,7 +161,7 @@ namespace SanyaRemastered.Commands
 									Log.Warn($"    {i.name}:{i.GetType()}");
 								}
 							}
-							GameObject.DestroyImmediate(casy.transform.gameObject);
+							GameObject.Destroy(casy.transform.gameObject);
 						}
 						return true;
 					}

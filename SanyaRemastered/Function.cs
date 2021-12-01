@@ -15,8 +15,10 @@ using Mirror;
 using NorthwoodLib;
 using NorthwoodLib.Pools;
 using PlayableScps;
+using PlayerStatsSystem;
 using RemoteAdmin;
 using Respawning;
+using RoundRestarting;
 using SanyaRemastered.Data;
 using System;
 using System.Collections.Generic;
@@ -50,7 +52,7 @@ namespace SanyaRemastered.Functions
             if (Player.List.Count() == 0)
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
-                PlayerStats.StaticChangeLevel(true);
+                RoundRestart.ChangeLevel(true);
             }
             else
             {
@@ -186,21 +188,6 @@ namespace SanyaRemastered.Functions
             {
                 CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
                 yield return Timing.WaitForSeconds(11);
-            }
-        }
-
-        public static IEnumerator<float> Scp106CustomTeleport(Scp106PlayerScript scp106PlayerScript, Vector3 position)
-        {
-            if (!scp106PlayerScript.goingViaThePortal)
-            {
-                scp106PlayerScript.RpcTeleportAnimation();
-                scp106PlayerScript.goingViaThePortal = true;
-                yield return Timing.WaitForSeconds(3.5f);
-                scp106PlayerScript._hub.playerMovementSync.OverridePosition(position, 0f, false);
-                yield return Timing.WaitForSeconds(3.5f);
-                if (AlphaWarheadController.Host.detonated && scp106PlayerScript.transform.position.y < 800f)
-                    scp106PlayerScript._hub.playerStats.HurtPlayer(new PlayerStats.HitInfo(9000f, "WORLD", DamageTypes.Nuke, 0,false), scp106PlayerScript.gameObject, true);
-                scp106PlayerScript.goingViaThePortal = false;
             }
         }
     }
@@ -851,9 +838,9 @@ namespace SanyaRemastered.Functions
         }
         public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
 
-        public static int GetHealthAmountPercent(this Player player)
+        public static float GetHealthAmountPercent(this Player player)
         {
-            return (int)(100f - (player.ReferenceHub.playerStats.GetHealthPercent() * 100f));
+            return (100f - player.Health / player.MaxHealth * 100f);
         }
         public static void OpenReportWindow(this Player player, string text)
         {
