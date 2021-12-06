@@ -47,19 +47,19 @@
     <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />
-    <Compile Include="Patches\JumpAttackPatches.cs" />
     <Compile Include="Patches\DoorInteractPatch.cs" />
     <Compile Include="Patches\JumpingStaminaPatch.cs" />
-    <Compile Include="Patches\LiftPatches.cs" />
+    <Compile Include="Patches\KillCommandPatches.cs" />
     <Compile Include="Patches\OverchargePatches.cs" />
+    <Compile Include="Patches\PocketDimensionFix.cs" />
     <Compile Include="Patches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\Scp096Patches.cs" />
     <Compile Include="Patches\Scp173Patches.cs" />
-    <Compile Include="Patches\Scp939Patches.cs" />
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ScpTargetPatches.cs" />
+    <Compile Include="Patches\ServerDisconnectPatches.cs" />
     <Compile Include="Patches\TeslaPatches.cs" />
     <Compile Include="Patches\VoicePacketPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,6 +75,7 @@
     <Reference Include="0Harmony">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Accessibility" />
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
@@ -90,6 +91,7 @@
     <Reference Include="CommsHack">
       <HintPath>..\..\CommsHack-main\CommsHack\CommsHack\bin\Debug\CommsHack.dll</HintPath>
     </Reference>
+    <Reference Include="CustomMarshalers" />
     <Reference Include="DiscordLog">
       <HintPath>..\..\DiscordLog\DiscordLog\bin\Debug\DiscordLog.dll</HintPath>
     </Reference>
@@ -123,9 +125,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="NorthwoodLib, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
@@ -134,10 +133,18 @@
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\SemVer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

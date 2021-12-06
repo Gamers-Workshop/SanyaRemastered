@@ -47,7 +47,7 @@ namespace SanyaRemastered
                     {
                         foreach (Player player in Player.List)
                         {
-                            if (player.IsHuman() && player.GetHealthAmountPercent()  <= SanyaRemastered.Instance.Config.PainEffectStart)
+                            if (player.IsHuman() && player.GetHealthAmountPercent()  > SanyaRemastered.Instance.Config.PainEffectStart)
                             {
                                 player.EnableEffect<Disabled>(1.2f);
                             }
@@ -564,13 +564,6 @@ namespace SanyaRemastered
                 { 
                     ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 20);
                     ev.Player.ResetInventory(new List<ItemType> {ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun,ItemType.Medkit,ItemType.GrenadeFlash});
-                    foreach (var item in ev.Player.Inventory.UserInventory.Items)
-                    {
-                        if (item.Value.ItemTypeId == ItemType.GunShotgun && item.Value.TryGetComponent(out Firearm firearm))
-                        {
-                            firearm.ItemSerial = 37;
-                        }
-                    }
                 }));
             }
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
@@ -615,22 +608,17 @@ namespace SanyaRemastered
         }
         public void OnPlayerHurt(HurtingEventArgs ev)
         {
-            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.DamageHandler is UniversalDamageHandler damage) || !ev.IsAllowed) return;
-            Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.DamageHandler}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
+            if (ev.Target == null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.Handler.Base is UniversalDamageHandler damage) || !ev.IsAllowed) return;
+            Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (ev.Target == null) return;
-            if (SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
+            if (ev.Handler.Type == DamageType.Scp && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
             {
                 ev.Amount = BodyArmorUtils.ProcessDamage(bodyArmor.VestEfficacy, ev.Amount, SanyaRemastered.Instance.Config.Scp939EffectiveArmor);
             }
             {
-                if (ev.Target.GameObject.TryGetComponent<Scp914Effect>(out var comp) && damage._logsText != "SCP-914." && damage.TranslationId == 10)
-                {
-                    ev.Amount = 0;
-                }
                 if (damage.TranslationId != DeathTranslations.Warhead.Id
                     && damage.TranslationId != DeathTranslations.Decontamination.Id
-                    //&& death.TranslationId != DamageTypes.Wall
+                    && damage.TranslationId != DeathTranslations.Crushed.Id
                     && damage.TranslationId != DeathTranslations.Tesla.Id
                     && damage.TranslationId != DeathTranslations.Scp207.Id)
                 {
@@ -644,7 +632,7 @@ namespace SanyaRemastered
                         }
 
                     //USPMultiplier
-                    if (ev.DamageHandler is FirearmDamageHandler firearmDamageHandler && firearmDamageHandler.WeaponType == ItemType.GunCOM18)
+                    if (ev.Handler.Base is FirearmDamageHandler firearmDamageHandler && firearmDamageHandler.WeaponType == ItemType.GunCOM18)
                     {
                         if (ev.Target.ReferenceHub.characterClassManager.IsAnyScp())
                         {
@@ -676,12 +664,12 @@ namespace SanyaRemastered
                     }
                 }
             }
-            Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.DamageHandler}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnPlayerHurt:After] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Base}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
         public void OnDied(DiedEventArgs ev)
         {
-            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.DamageHandler is UniversalDamageHandler universalDamageHandler)) return;
+            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.Handler.Base is UniversalDamageHandler universalDamageHandler)) return;
             Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{universalDamageHandler._logsText}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.Scp939Size != 1)
@@ -709,7 +697,7 @@ namespace SanyaRemastered
                 string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
                 string str;
                 if (ev.Target.Role != RoleType.Scp0492)
-                    if (ev.DamageHandler is WarheadDamageHandler)
+                    if (ev.Handler.Base is WarheadDamageHandler)
                     {
                         str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
                     }
@@ -772,7 +760,7 @@ namespace SanyaRemastered
                 if (count == 1
                     && isFound079
                     && Map.ActivatedGenerators < 2
-                    && ev.DamageHandler is WarheadDamageHandler)
+                    && ev.Handler.Base is WarheadDamageHandler)
                 {
                     isForced = true;
                     str = str.Replace("{-1}", "\nTout les SCP ont été sécurisé.\nLa séquence de reconfinement de SCP-079 a commencé\nLa Heavy Containement Zone vas surcharger dans t-moins 1 minutes.");
@@ -785,7 +773,7 @@ namespace SanyaRemastered
                     Methods.SendSubtitle(str, (ushort)(isForced ? 30 : 10));
             }
 
-            if (universalDamageHandler.TranslationId == DeathTranslations.Decontamination.Id || ev.DamageHandler is WarheadDamageHandler)
+            if (universalDamageHandler.TranslationId == DeathTranslations.Decontamination.Id || ev.Handler.Base is WarheadDamageHandler)
             {
                 ev.Target.Inventory.UserInventory.Items.Clear();
             }
@@ -1174,7 +1162,7 @@ namespace SanyaRemastered
                 {
                     case Scp914KnobSetting.Rough:
                         {
-                            ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914.", 914914));
+                            ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
                             if (ev.Player.Team != Team.SCP)
                                 ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
                         }
@@ -1183,11 +1171,11 @@ namespace SanyaRemastered
                         {
                             if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
                             {
-                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914.", 914914));
+                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
                             }
                             if (ev.Player.Team != Team.SCP)
                             {
-                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914.", 70));
+                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914", 70));
                                 ev.Player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>();
                                 ev.Player.ReferenceHub.playerEffectsController.GetEffect<Bleeding>();
                                 ev.Player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
@@ -1231,23 +1219,45 @@ namespace SanyaRemastered
                         {
                             if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var Death))
                             {
+                                ev.Player.EnableEffect<MovementBoost>();
+                                ev.Player.ChangeEffectIntensity<MovementBoost>(40);
+                                ev.Player.EnableEffect<Invigorated>();
                                 var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
-                                comp.TimerBeforeDeath = 60;
+                                comp.TimerBeforeDeath = 80;
                             }
                             else
                             {
-                                Death.TimerBeforeDeath /= 2;
+                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                                {
+                                    playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity,0,255);
+                                }
+                                Death.TimerBeforeDeath = (int)(Death.TimerBeforeDeath/1.5);
                             }
                         }
                         break;
                     case Scp914KnobSetting.VeryFine:
                         {
-                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out _))
+                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var Death))
                             {
+                                ev.Player.EnableEffect<MovementBoost>();
+                                ev.Player.ChangeEffectIntensity<MovementBoost>(80);
+                                ev.Player.EnableEffect<Invigorated>();
                                 var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
-                                ev.Player.ChangeRunningSpeed(100, false);
-                                ev.Player.ChangeWalkingSpeed(100, false);
-                                comp.TimerBeforeDeath = 5;
+                                comp.TimerBeforeDeath = 30;
+                            }
+                            else
+                            {
+                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                                {
+                                    playerEffect.Intensity = (byte)Mathf.Clamp((float)2 * playerEffect.Intensity, 0, 255);
+                                }
+                                else
+                                {
+                                    ev.Player.EnableEffect<MovementBoost>();
+                                    ev.Player.ChangeEffectIntensity<MovementBoost>(80);
+                                    ev.Player.EnableEffect<Invigorated>();
+                                }
+                                Death.TimerBeforeDeath = Mathf.Clamp(Death.TimerBeforeDeath / 3, 0, 30);
                             }
                         }
                         break;
@@ -1258,14 +1268,14 @@ namespace SanyaRemastered
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                ev.EnrageTimeToAdd = -18;
+                ev.EnrageTimeToAdd = 0f;
             }
         }
         public void On096Enraging(EnragingEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                ev.Scp096.EnrageTimeLeft = -960;
+                ev.Scp096.EnrageTimeLeft = 0.5f;
             }
         }
         public void On096CalmingDown(CalmingDownEventArgs ev)
@@ -1278,10 +1288,7 @@ namespace SanyaRemastered
             if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
             {
                 ev.IsAllowed = false;
-            }
-            else if (SanyaRemastered.Instance.Config.Scp096Real)
-            {
-                ev.Scp096.EnrageTimeLeft = 0.3f;
+                ev.Scp096.EnrageTimeLeft = 0.5f;
             }
         }
         public void On049FinishingRecall(FinishingRecallEventArgs ev)

@@ -14,17 +14,18 @@ namespace SanyaRemastered.Patches
 	{
 		public static void Postfix(NetworkConnection connection)
 		{
-			if (CustomLiteNetLib4MirrorTransport.DelayConnections) return;
+			if (CustomLiteNetLib4MirrorTransport.DelayConnections || !ReferenceHub.LocalHub.characterClassManager.RoundStarted) return;
 			var player = Player.Get(connection.identity.gameObject);
 
 			//ジャンプ時スタミナ消費
 			if (SanyaRemastered.Instance.Config.StaminaLostJump > 0
 				&& player.ReferenceHub.characterClassManager.IsHuman()
 				&& !player.ReferenceHub.fpc.staminaController._invigorated.IsEnabled
-				&& !player.ReferenceHub.fpc.staminaController._scp207.IsEnabled
-			)
+				&& !player.ReferenceHub.fpc.staminaController._scp207.IsEnabled)
+            {
 				player.ReferenceHub.fpc.staminaController.RemainingStamina -= SanyaRemastered.Instance.Config.StaminaLostJump;
-			player.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
+				player.ReferenceHub.fpc.staminaController._regenerationTimer = 0f;
+			}
 		}
 	}
 }

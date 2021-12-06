@@ -575,24 +575,22 @@ namespace SanyaRemastered.Functions
             }
         }
 
-        public static void SpawnDummyModel(Vector3 position, Quaternion rotation, RoleType role, Vector3 scale)
+        public static void SpawnDummyModel(Vector3 position, RoleType role, string nick, Quaternion rotation, Vector3 scale)
         {
             try
             {
-                GameObject obj = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-                CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-                if (ccm == null)
-                    Log.Error("CCM is null, this can cause problems!");
-                ccm.CurClass = role;
-                ccm.GodMode = true;
-                ccm.RefreshPlyModel(role);
-                obj.GetComponent<NicknameSync>().Network_myNickSync = "Dummy";
-                obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-                obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-                obj.transform.localScale = scale;
-                obj.transform.position = position;
-                obj.transform.rotation = rotation;
-                NetworkServer.Spawn(obj);
+                GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
+                CharacterClassManager characterClassManager = gameObject.GetComponent<CharacterClassManager>();
+                QueryProcessor queryProcessor = gameObject.GetComponent<QueryProcessor>();
+                gameObject.transform.localScale = scale;
+                gameObject.transform.rotation = rotation;
+                gameObject.transform.position = position;
+                characterClassManager.CurClass = role;
+                characterClassManager.GodMode = true;
+                gameObject.GetComponent<NicknameSync>().Network_myNickSync = nick;
+                queryProcessor.PlayerId = 9999;
+                queryProcessor.NetworkPlayerId = 9999;
+                NetworkServer.Spawn(gameObject);
             }
             catch (Exception ex)
             { Log.Error("Error In create Dummy " + ex); }

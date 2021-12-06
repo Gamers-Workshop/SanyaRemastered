@@ -35,7 +35,7 @@ namespace SanyaRemastered.Patches
                 if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
                 __instance.RefreshCurrentRoom();
                 var player = Player.Dictionary[__instance.gameObject];
-                Log.Debug($"[Scp079InteractPatch] {player.IsExmode()} -> {command} Room {__instance.CurrentRoom.Name}");
+                Log.Debug($"[Scp079InteractPatch] {player.IsExmode()} -> {command} Room {__instance.CurrentRoom.Name}", SanyaRemastered.Instance.Config.IsDebugged);
 
                 if (!player.IsExmode()) return true;
 

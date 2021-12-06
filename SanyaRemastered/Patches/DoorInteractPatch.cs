@@ -17,7 +17,6 @@ namespace SanyaRemastered.Patches
 				if (SanyaRemastered.Instance.Config.ScpCantInteract)
 				{
 					Door door = Door.Get(__instance);
-					Log.Debug($"[OnDoorAction] is ___instance = null {__instance == null} is DoorVariant null {door == null} player is {ply.nicknameSync._firstNickname}");
 					if (!door.IsOpen && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DoorInteractOpen", out var role) && role.Contains(ply.characterClassManager.CurRole.roleId))
 					{
 						return false;

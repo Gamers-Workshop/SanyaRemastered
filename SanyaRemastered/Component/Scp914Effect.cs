@@ -23,14 +23,6 @@ namespace SanyaRemastered
 		{
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
-			_player.EnableEffect<Scp207>();
-			_player.ChangeEffectIntensity<Scp207>(4);
-
-		}
-		private void OnDestroy()
-		{
-			_player.ChangeRunningSpeed(ServerConfigSynchronizer.Singleton.HumanSprintSpeedMultiplier);
-			_player.ChangeWalkingSpeed(ServerConfigSynchronizer.Singleton.HumanWalkSpeedMultiplier);
 		}
 
 		private void FixedUpdate()
@@ -51,8 +43,12 @@ namespace SanyaRemastered
 			TimerBeforeDeath--;
 			if (TimerBeforeDeath < 0)
             {
-				_player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914.", 914914));
-				_player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous êtes mort d'un arret cardiaque", 20);
+				_player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
+				if (!_player.IsAlive)
+                {
+					_player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous êtes mort d'un arret cardiaque", 20);
+					Destroy(this);
+				}
 			}
 		}
 	}

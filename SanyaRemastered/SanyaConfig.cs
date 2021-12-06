@@ -27,8 +27,6 @@ namespace SanyaRemastered
         public bool GateClosingAuto { get; set; } = false;
 
         public string BoxMessageOnJoin { get; set; } = string.Empty;
-        [Description("Jump attaque")]
-        public bool JumpingKickAttack { get; set; } = false;
 
         [Description("Ram Testing")]
         public bool RamInfo { get; set; } = false;

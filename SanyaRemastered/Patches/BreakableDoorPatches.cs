@@ -16,7 +16,7 @@ namespace SanyaRemastered.Patches
         {
             if (SanyaRemastered.Instance.Config.Scp096Real && __instance.TryGetComponent<DoorNametagExtension>(out var doorNametagExtension) && doorNametagExtension._nametag == "096")
             {
-                Door.Get(__instance).IsOpen = true;
+                Door.Get(__instance).IsOpen = !Door.Get(doorNametagExtension.TargetDoor).IsLocked;
                 return false;
             }
             return true;

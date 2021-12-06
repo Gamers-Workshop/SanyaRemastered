@@ -20,6 +20,7 @@ namespace SanyaRemastered.Patches
         {
             try
             {
+                if (player != null && __instance != null)
                 if ((SanyaRemastered.Instance.Config.NoIdlingTeslaGodmodAndBlackout && (Map.FindParentRoom(__instance.gameObject).LightsOff || player.characterClassManager.GodMode))
                     ||
                     (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer && player.characterClassManager.IsHuman() && player.inventory.UserInventory.Items.Any(x => x.Value.ItemTypeId == ItemType.Radio && x.Value.GetComponent<RadioItem>().IsUsable)))
@@ -27,7 +28,6 @@ namespace SanyaRemastered.Patches
                     __result = false;
                     return false;
                 }
-
             }
             catch (Exception ex)
             {

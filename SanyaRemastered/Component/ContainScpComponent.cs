@@ -62,6 +62,7 @@ namespace SanyaRemastered
 						}
 					}
 					Cassie.GlitchyMessage(CassieAnnounceContain, 0.05f, 0.05f);
+					/*Methods.SpawnDummyModel(_player.Position, _player.Role,_player.Nickname,_player.GameObject.transform.rotation,_player.Scale);*/
 					_player.SetRole(RoleType.Spectator);
 					Destroy(this);
 				}
