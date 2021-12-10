@@ -167,6 +167,12 @@ namespace SanyaRemastered
 			}
 
 		}
+		public void UpdateContainScp()
+        {
+			if (!SanyaRemastered.Instance.Config.ContainCommand || _player.IsScp || !(_timer > 1f)) return;
+			
+			Contain.IsCanBeContain(_player);
+		}
 		public void UpdateHint()
 		{
 			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;

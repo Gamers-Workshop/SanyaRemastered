@@ -195,30 +195,22 @@ namespace SanyaRemastered
                 /*NetworkServer.Spawn(door5.gameObject);
                 NetworkServer.Spawn(door6.gameObject);*/
                 try
-                {
-                    /*foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
+                {/*
+                    foreach (var Test in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
                     {
-                        if (identity.name == "Gate")
-                        {
-                            identity.gameObject.transform.position = new UnityEngine.Vector3(14.425f, 995.2f, -23.2f);
-                            ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage
-                            {
-                                netId = identity.netId
-                            };
-                            foreach (var ply in Player.List)
-                            {
-                                ply.Connection.Send(objectDestroyMessage, 0);
-                                typeof(NetworkServer).GetMethod("SendSpawnMessage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { identity, ply.Connection });
-                            }
-                        }
+                        Log.Info($"NetworkIdentity Spawned name: {Test.name} | gameobject: {Test.gameObject} AssetId: {Test.assetId}");
                     }
-                    foreach (KeyValuePair<uint,NetworkIdentity> Test in Mirror.NetworkIdentity.spawned)
+                    Log.Info("0");
+                    var networkIdentity = UnityEngine.Object.FindObjectsOfType<NetworkIdentity>().FirstOrDefault(x => x.name == "Tesla Gate");
+                    Log.Info("1" + networkIdentity == null);
+                    Methods.MoveNetworkIdentityObject(networkIdentity,new UnityEngine.Vector3(174.4f, 983.24f, 29.1f));
+                    var Tesla = UnityEngine.Object.Instantiate(networkIdentity, new UnityEngine.Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
+                    Log.Info("2" + Tesla == null);
+                    NetworkServer.Spawn(Tesla.gameObject);
+                    foreach (var ply in Player.List)
                     {
-                        Log.Info($"NetworkIdentity Spawned Key; {Test.Key} {Test.Value.gameObject} AssetId {Test.Value.assetId}");
-                        if (Test.Value.gameObject.ToString().Contains("Door"))
-                            GameObject.Destroy(Test.Value.gameObject);
+                        typeof(NetworkServer).GetMethod("SendSpawnMessage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { Tesla, ply.Connection });
                     }*/
-
                 }
                 catch (Exception e)
                 {
@@ -851,10 +843,7 @@ namespace SanyaRemastered
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
             Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}", SanyaRemastered.Instance.Config.IsDebugged);
-            if (plugin.Config.ContainCommand && ev.Player.Team == Team.SCP)
-            {
-                Methods.IsCanBeContain(ev.Player);
-            }
+
             if (ev.Door.DoorLockType == DoorLockType.Isolation)
             {
                 ev.IsAllowed = false;

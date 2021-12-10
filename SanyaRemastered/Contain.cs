@@ -9,73 +9,83 @@ using RemoteAdmin;
 using Respawning;
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace SanyaRemastered
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-	class Contain : ICommand
-	{
-		public string Command { get; } = "contain";
-
-		public string[] Aliases { get; } = new string[] { "cont" };
-
-		public string Description { get; } = "Contains commands";
-		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+    public class Contain
+    {
+        public static void IsCanBeContain(Player player)
         {
-            Log.Debug($"[Commands] Sender:{sender.LogName} args:{arguments.Count}", SanyaRemastered.Instance.Config.IsDebugged);
-
-            Player player = null;
-            if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
+            try
             {
-                if (SanyaRemastered.Instance.Config.ContainCommand && player.Team == Team.SCP)
+                var PlayeRoom = player.CurrentRoom;
+                if (player.Team == Team.SCP)
                 {
                     switch (player.Role)
                     {
                         case RoleType.Scp173:
                             {
-                                if (Player.List.Any(x => x.Role == RoleType.Scp079))
-                                {
-                                    foreach (var ply in Player.List.Where(x => x.Role == RoleType.Scp079))
-                                        ply.ReferenceHub.BroadcastMessage($"SCP-173 a fait la commande .contain dans la salle {player.CurrentRoom.Name}");
+                                if (Player.Get(RoleType.Scp079).Count() > 0) return;
 
-                                    response = "SCP-079 est toujours présent";
-                                    return false;
-                                }
-
-                                switch (player.CurrentRoom.Type)
+                                switch (PlayeRoom.Type)
                                 {
                                     case RoomType.Lcz914:
                                         {
-                                            if (!Functions.Extensions.IsInTheBox(player .CurrentRoom.Transform.position - player .Position, 2.9f, -10.2f, 10.1f, -10.2f, 0, -5f, player .CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(2.9f, 0, 10.1f), new Vector3(-10.2f, -5f, -10.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                response = "Tu n'est pas confiné";
-                                                return false;
-                                            }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "914");
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                response = "173 room 049";
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "914");
+                                                if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4";
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(2.9f, 0, 10.1f), new Vector3(-10.2f, -5f, -10.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 9 1 4";
+                                                    }
                                                 }
-                                                return true;
                                             }
-                                            response = "La gate n'est pas fermer";
-                                            return false;
-                                            
+                                            return;
                                         }
-                                    case RoomType.Lcz012:
+                                    case RoomType.Lcz173:
                                         {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, player.CurrentRoom.Transform.rotation.eulerAngles.y)
-                                                && !Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-16.4f, -16.8f, -5.2f), new Vector3(-30.2f, -22.3f, -16.7f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                response = "Tu n'est pas confiné";
-                                                return false;
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "173_GATE");
+                                                if (door.Base.GetExactState() == 0f && !door.Base.GetComponent<Timed173PryableDoor>()._stopwatch.IsRunning)
+                                                {
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-16.4f, -16.8f, -5.2f), new Vector3(-30.2f, -22.3f, -16.7f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in there containment chamber";
+                                                    }
+                                                }
                                             }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "012");
+                                            return;
+                                        }
+                                    /*case RoomType.Lcz012:
+                                        {
+                                            if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, PlayeRoom.Transform.rotation.eulerAngles.y)
+                                                && !Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, PlayeRoom.Transform.rotation.eulerAngles.y))
+                                            {
+                                                return;
+                                            }
+                                            var door = PlayeRoom.Doors.First(x => x.Nametag == "012");
                                             {
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
@@ -85,137 +95,151 @@ namespace SanyaRemastered
                                                         containScpComponent.doors.Add(door);
                                                         containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2";
                                                     }
-                                                    response = "Scp 173 a bien été reconfiné dans la salle de Scp012";
-                                                    return true;
+                                                    return;
                                                 }
                                             }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
-                                        }
+                                            return;
+                                        }*/
                                     case RoomType.HczArmory:
                                         {
-                                            if(!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 0.1f, -5.6f, 2.9f, -2.8f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(0.1f, 0f, 2.9f), new Vector3(-5.6f, -5f, -2.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                response = "Tu doit étre dans ton confinement";
-                                                return false; 
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "HCZ_ARMORY");
+                                                {
+                                                    if (door.Base.GetExactState() == 0f)
+                                                    {
+                                                        foreach (Player player1 in PlayeRoom.Players)
+                                                        {
+                                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(0.1f, 0f, 2.9f), new Vector3(-5.6f, -5f, -2.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                            {
+                                                                return;
+                                                            }
+                                                        }
+                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        {
+                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                            containScpComponent.doors.Add(door);
+                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Heavy containment Zone";
+                                                        }
+                                                    }
+                                                }
                                             }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HCZ_ARMORY");
+                                            return;
+                                        }
+                                    case RoomType.LczArmory:
+                                        {
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(1.2f, -1f, 6f), new Vector3(-9.5f, -10f, -7f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "LCZ_ARMORY");
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(1.2f, -1f, 6f), new Vector3(-9.5f, -10f, -7f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
                                                     if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                                     {
                                                         var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                         containScpComponent.doors.Add(door);
-                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Heavy containment Zone";
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Light Containment Zone";
                                                     }
-                                                    response = "Scp 173 a bien été reconfiné dans la HczArmory";
-                                                    return true;
                                                 }
                                             }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
-                                        }
-                                    case RoomType.LczArmory:
-                                        {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 1.2f, -9.5f, 6f, -7f, -1f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                            {
-                                                response = "Tu doit étre confiné";
-                                                return false;
-                                            }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "LCZ_ARMORY");
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of Light Containment Zone";
-                                                }
-                                                response = "Scp 173 a bien été reconfiné dans la LczArmory";
-                                                return true;
-                                            }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
+                                            return;
                                         }
                                     case RoomType.HczHid:
                                         {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 3.7f, -4.0f, 9.8f, 7.4f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(3.7f, 0f, 9.8f), new Vector3(-4.0f, -5f, 7.4f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                response = "Tu doit étre confiné";
-                                                return false;
-                                            }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "HID");
-                                            if (door.Base.GetExactState() == 0f)
-                                            {
-                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "HID");
+                                                if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                    containScpComponent.doors.Add(door);
-                                                    containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Storage of Micro H I D";
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(3.7f, 0f, 9.8f), new Vector3(-4.0f, -5f, 7.4f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Storage of Micro H I D";
+                                                    }
                                                 }
-                                                response = "Scp 173 a bien été reconfiné dans la Hid";
                                             }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
+                                            return;
                                         }
                                     case RoomType.Hcz049:
                                         {
-                                            if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                response = "Tu doit étre confiné";
-                                                return false;
+                                                return;
                                             }
-                                            var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                            var door = PlayeRoom.Doors.First(x => x.Nametag == "049_ARMORY");
                                             if (door.Base.GetExactState() == 0f)
                                             {
+                                                foreach (Player player1 in PlayeRoom.Players)
+                                                {
+                                                    if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                    {
+                                                        return;
+                                                    }
+                                                }
                                                 if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                                 {
                                                     var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                     containScpComponent.doors.Add(door);
                                                     containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Armory of SCP 0 4 9";
                                                 }
-                                                response = "Scp 173 a bien été reconfiné dans l'armurerie de Scp 049";
-                                                return true;
                                             }
-                                            response = "La porte n'est pas fermer";
-                                            return false;
+                                            return;
                                         }
                                     case RoomType.Hcz106:
                                         {
-                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.5f , 30.8f , -1.9f, 20f, 10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
                                                 {
                                                     if (door.Base.GetExactState() == 0f)
                                                     {
+                                                        foreach (Player player1 in PlayeRoom.Players)
+                                                        {
+                                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                            {
+                                                                return;
+                                                            }
+                                                        }
                                                         if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                                         {
                                                             var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                             containScpComponent.doors.Add(door);
                                                             containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
                                                         }
-                                                        response = "Scp 173 a bien été reconfiné dans la salle de Scp 106";
-                                                        return true;
-                                                    }
-                                                    else
-                                                    {
-                                                        response = "les porte sont pas fermer";
-                                                        return false;
                                                     }
                                                 }
                                             }
-                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -25.6f, -33.7f, 32f, -4.6f, 20f, -10f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            else if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-25.6f, 20f, 32f), new Vector3(-33.7f, -10f, -4.6f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                if (Player.List.Any((p) => p.Role == RoleType.Scp106))
+                                                if (Player.Get(RoleType.Scp106).Count() > 0)
                                                 {
-                                                    response = "Tu ne peux pas te faire reconfiner ici car SCP-106 n'est pas confiné";
-                                                    return false;
+                                                    return;
                                                 }
-                                                var door1 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_PRIMARY");
-                                                var door2 = player.CurrentRoom.Doors.First(x => x.Nametag == "106_SECOND");
+                                                var door1 = PlayeRoom.Doors.First(x => x.Nametag == "106_PRIMARY");
+                                                var door2 = PlayeRoom.Doors.First(x => x.Nametag == "106_SECOND");
                                                 if (door1.Base.GetExactState() == 0f && door2.Base.GetExactState() == 0f)
                                                 {
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-25.6f, 20f, 32f), new Vector3(-33.7f, -10f, -4.6f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
                                                     if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                                     {
                                                         var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
@@ -223,208 +247,177 @@ namespace SanyaRemastered
                                                         containScpComponent.doors.Add(door2);
                                                         containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 1 0 6";
                                                     }
-                                                    response = "Scp 173 a bien été reconfiné dans le confinement de Scp 106";
-                                                    return true;
-                                                }
-                                                else
-                                                {
-                                                    response = "les porte sont pas fermer";
-                                                    return false;
                                                 }
                                             }
-                                            response = "Tu doit étre confiné";
-                                            return false;
+                                            return;
                                         }
                                     case RoomType.Hcz079:
                                         {
-                                            byte TEST = 0;
-                                            if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 10.3f, -8.2f, 22.5f, 5.2f, 10f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                            if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(10.3f, 10f, 22.5f), new Vector3(-8.2f, 0f, 5.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                TEST = 1;
-                                            }
-                                            if (TEST != 1)
-                                            {
-                                                if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -12.3f, -20.8f, 18.7f, -2.5f, 7f, 0f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
-                                                {
-                                                    TEST = 2;
-                                                }
-                                            }
-                                            if (TEST == 1)
-                                            {
-                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_SECOND");
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "079_SECOND");
                                                 if (door.Base.GetExactState() == 0f)
                                                 {
+                                                    foreach (Player player1 in PlayeRoom.Players)
+                                                    {
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(10.3f, 10f, 22.5f), new Vector3(-8.2f, 0f, 5.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                        {
+                                                            return;
+                                                        }
+                                                    }
                                                     if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                                     {
                                                         var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                         containScpComponent.doors.Add(door);
                                                         containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
                                                     }
-                                                    response = "Scp 173 a bien été reconfiné dans le confinement de Scp 079";
-                                                    return true;
                                                 }
-                                                response = "la gate n'est pas fermer";
-                                                return false;
                                             }
-                                            if (TEST == 2)
+                                            else if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-12.3f, 7f, 18.7f), new Vector3(-20.8f, 0f, -2.5f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                             {
-                                                var door = player.CurrentRoom.Doors.First(x => x.Nametag == "079_FIRST");
+                                                var door = PlayeRoom.Doors.First(x => x.Nametag == "079_FIRST");
+                                                if (door.Base.GetExactState() == 0f)
                                                 {
-                                                    if (door.Base.GetExactState() == 0f)
+                                                    foreach (Player player1 in PlayeRoom.Players)
                                                     {
-                                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                        if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-12.3f, 7f, 18.7f), new Vector3(-20.8f, 0f, -2.5f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
-                                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                            containScpComponent.doors.Add(door);
-                                                            containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
+                                                            return;
                                                         }
-                                                        response = "Scp 173 a bien été reconfiné dans le confinement de Scp 079";
-                                                        return true;
                                                     }
-                                                    response = "la gate n'est pas fermer";
-                                                    return false;
+                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                    {
+                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                        containScpComponent.doors.Add(door);
+                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 7 9";
+                                                    }
                                                 }
                                             }
-                                            response = "Tu doit étre confiné";
-                                            return false;
+                                            return;
                                         }
                                     default:
                                         {
-                                            response = "Cette commande doit étre utilisé quand tu est bloqué";
-                                            return false;
+                                            return;
                                         }
                                 }
                             }
                         case RoleType.Scp096:
                             {
-                                Log.Debug($"096 state : {(player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState}", SanyaRemastered.Instance.Config.IsDebugged);
-                                if (Scp096PlayerState.Docile != (player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState
-                                    && Scp096PlayerState.TryNotToCry != (player .ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096).PlayerState)
+                                PlayableScps.Scp096 scp096 = (player.ReferenceHub.scpsController.CurrentScp as PlayableScps.Scp096);
+                                if (Scp096StateExtensions.IsOffensive((scp096).PlayerState) || scp096.Enraging)
                                 {
-                                    response = "NON MEC VAS TUER LES GENS IL Doivent pas te reconf si t'es trigger";
-                                    return false;
+                                    return;
                                 }
-                                if (player.CurrentRoom.Type == RoomType.Hcz096)
+                                if (PlayeRoom.Type == RoomType.Hcz096)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 4.4f, 0.5f, 1.9f, -1.9f, 0f, -5f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        response = "Tu doit étre confiné";
-                                        return false;
-                                    }
-                                    var door = player.CurrentRoom.Doors.First(x => x.Nametag == "096");
-                                    if (door.Base.GetExactState() == 0f)
-                                    {
-                                        if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                        var door = PlayeRoom.Doors.First(x => x.Nametag == "096");
+                                        if (door.Base.GetExactState() == 0f)
                                         {
-                                            var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                            containScpComponent.doors.Add(door);
-                                            containScpComponent.CassieAnnounceContain = "SCP 0 9 6 as been contained in there containment chamber";
+                                            foreach (Player player1 in PlayeRoom.Players)
+                                            {
+                                                if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                {
+                                                    return;
+                                                }
+                                            }
+                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                            {
+                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                containScpComponent.doors.Add(door);
+                                                containScpComponent.CassieAnnounceContain = "SCP 0 9 6 as been contained in there containment chamber";
+                                            }
                                         }
-                                        response = "096 room 096";
-                                        return true;
                                     }
-                                    response = "La gate n'est pas fermer";
-                                    return false;
                                 }
-                                else
-                                {
-                                    response = "Tu n'est pas confiné";
-                                    return false;
-                                }
+                                return;
                             }
                         case RoleType.Scp049:
                             {
-                                if (player.CurrentRoom.Type == RoomType.Hcz049)
+                                if (PlayeRoom.Type == RoomType.Hcz049)
                                 {
-                                    if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, -3f, -8.6f, -4.6f, -10.1f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                        var door = PlayeRoom.Doors.First(x => x.Nametag == "049_ARMORY");
                                         if (door.Base.GetExactState() == 0f)
                                         {
+                                            foreach (Player player1 in PlayeRoom.Players)
+                                            {
+                                                if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                {
+                                                    return;
+                                                }
+                                            }
                                             if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                             {
                                                 var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                 containScpComponent.doors.Add(door);
                                                 containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
                                             }
-                                            response = "Le confinement a été effectué";
-                                            return true;
-                                        }
-                                        else
-                                        {
-                                            response = "Vous devez avoir la porte de votre confinement fermer";
-                                            return false;
                                         }
                                     }
-                                    else if (Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.3f, -9.6f, -11, -16.8f, -260f, -270f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    else if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(9.3f, -260f, -11f), new Vector3(-9.6f, -270f, -16.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        var door = player.CurrentRoom.Doors.First(x => x.Nametag == "049_ARMORY");
+                                        var door = PlayeRoom.Doors.First(x => x.Base is PryableDoor);
                                         if (door.Base.GetExactState() == 0f)
                                         {
+                                            foreach (Player player1 in PlayeRoom.Players)
+                                            {
+                                                if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.3f, -260f, -11f), new Vector3(-9.6f, -270f, -16.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                {
+                                                    return;
+                                                }
+                                            }
                                             if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                             {
                                                 var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                 containScpComponent.doors.Add(door);
                                                 containScpComponent.CassieAnnounceContain = "SCP 0 4 9 as been contained in there containment chamber";
                                             }
-                                            response = "Le confinement a été effectué";
-                                            return true;
-                                        }
-                                        else
-                                        {
-                                            response = "Vous devez avoir la porte de votre confinement fermer";
-                                            return false;
                                         }
                                     }
-                                    response = "Tu doit étre dans ton confinement";
-                                    return false;
                                 }
-                                else
-                                {
-                                    response = "Tu n'est pas confiné";
-                                    return false;
-                                }
+                                return;
                             }
                         case RoleType.Scp93953:
                         case RoleType.Scp93989:
                             {
-                                if (player.CurrentRoom.Type == RoomType.Hcz106)
+                                if (PlayeRoom.Type == RoomType.Hcz106)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(player.CurrentRoom.Transform.position - player.Position, 9.6f, -24.4f, 30.8f, -1.9f, 20f, 13f, player.CurrentRoom.Transform.rotation.eulerAngles.y))
+                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        response = "Tu doit étre dans ton confinement";
-                                        return false;
+                                        return;
                                     }
-                                    var door = player .CurrentRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
+                                    var door = PlayeRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
                                     {
                                         if (door.Base.GetExactState() == 0f)
                                         {
+                                            foreach (Player player1 in PlayeRoom.Players)
+                                            {
+                                                if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                {
+                                                    return;
+                                                }
+                                            }
                                             if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
                                             {
                                                 var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
                                                 containScpComponent.doors.Add(door);
                                                 containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
                                             }
-                                            response = "939 confiné";
-                                            return true;
-
-                                        }
-                                        else
-                                        {
-                                            response = "La porte est ouverte";
-                                            return false;
                                         }
                                     }
                                 }
-                                response = "Tu n'est pas confiné";
-                                return false;
+                                return;
                             }
                     }
-                    response = "Tu n'est pas un SCP confinable";
-                    return false;
                 }
-                response = "La commande contain est seulement pour les SCP en RP";
-                return false;
+                return;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in IsCanBeContain" + ex);
             }
         }
     }

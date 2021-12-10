@@ -15,15 +15,12 @@ namespace SanyaRemastered.Patches
             {
                 return false;
             }
+
             GameObject model_ragdoll = hub.characterClassManager.CurRole.model_ragdoll;
             Ragdoll ragdoll;
             if (model_ragdoll == null || !Object.Instantiate(model_ragdoll).TryGetComponent(out ragdoll))
             {
                 return false;
-            }
-            if (handler is ScpDamageHandler scpDamage)
-            {
-                scpDamage.
             }
             ragdoll.NetworkInfo = new RagdollInfo(hub, handler, model_ragdoll.transform.localPosition, model_ragdoll.transform.localRotation);
             //PlayerSizeForTheRagdoll
