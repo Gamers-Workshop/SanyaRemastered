@@ -124,7 +124,7 @@ namespace SanyaRemastered
             Coroutines.isAirBombGoing = false;
             Coroutines.isActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
-
+            Server.Host.ReferenceHub.characterClassManager.NetworkCurClass = RoleType.Tutorial;
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
                 foreach (var tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
@@ -600,7 +600,7 @@ namespace SanyaRemastered
         }
         public void OnPlayerHurt(HurtingEventArgs ev)
         {
-            if (ev.Target == null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.Handler.Base is UniversalDamageHandler damage) || !ev.IsAllowed) return;
+            if (ev.Target == null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Handler.Type == DamageType.Scp && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
@@ -608,23 +608,23 @@ namespace SanyaRemastered
                 ev.Amount = BodyArmorUtils.ProcessDamage(bodyArmor.VestEfficacy, ev.Amount, SanyaRemastered.Instance.Config.Scp939EffectiveArmor);
             }
             {
-                if (damage.TranslationId != DeathTranslations.Warhead.Id
-                    && damage.TranslationId != DeathTranslations.Decontamination.Id
-                    && damage.TranslationId != DeathTranslations.Crushed.Id
-                    && damage.TranslationId != DeathTranslations.Tesla.Id
-                    && damage.TranslationId != DeathTranslations.Scp207.Id)
+                if (ev.Handler.Type != DamageType.Warhead
+                    && ev.Handler.Type != DamageType.Decontamination
+                    && ev.Handler.Type != DamageType.Crushed
+                    && ev.Handler.Type != DamageType.Tesla
+                    && ev.Handler.Type != DamageType.Scp207)
                 {
                     //GrenadeHitmark
                     if (ev.Attacker != null)
                         if (SanyaRemastered.Instance.Config.HitmarkGrenade
-                        && damage.TranslationId == DeathTranslations.Explosion.Id
+                        && ev.Handler.Type != DamageType.Explosion
                         && ev.Target.UserId != ev.Attacker.UserId)
                         {
                             ev.Attacker.SendHitmarker();
                         }
 
                     //USPMultiplier
-                    if (ev.Handler.Base is FirearmDamageHandler firearmDamageHandler && firearmDamageHandler.WeaponType == ItemType.GunCOM18)
+                    if (ev.Handler.Type == DamageType.Com18)
                     {
                         if (ev.Target.ReferenceHub.characterClassManager.IsAnyScp())
                         {
@@ -639,9 +639,8 @@ namespace SanyaRemastered
 
                     //SCPsMultiplicator
                     if (ev.Target.IsScp
-                        && damage.TranslationId != DeathTranslations.Recontained.Id
-                        //&& death.TranslationId != DamageTypes.Flying
-                        && damage.TranslationId != DeathTranslations.Poisoned.Id)
+                        && ev.Handler.Type != DamageType.Recontainment
+                        && ev.Handler.Type != DamageType.Poison)
                     {
                         if (ev.Target.ArtificialHealth < ev.Amount && SanyaRemastered.Instance.Config.ScpDamageMultiplicator.TryGetValue(ev.Target.Role, out float AmmountDamage) && AmmountDamage != 1)
                         {
@@ -649,8 +648,8 @@ namespace SanyaRemastered
                         }
                         if (ev.Target.Role == RoleType.Scp106)
                         {
-                            if (damage.TranslationId == DeathTranslations.Explosion.Id) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
-                            if (damage.TranslationId != DeathTranslations.MicroHID.Id && damage.TranslationId != DeathTranslations.Tesla.Id)
+                            if (ev.Handler.Type != DamageType.Explosion) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
+                            if (ev.Handler.Type != DamageType.MicroHid && ev.Handler.Type != DamageType.Tesla)
                                 ev.Amount *= SanyaRemastered.Instance.Config.Scp106DamageMultiplicator;
                         }
                     }
@@ -661,8 +660,8 @@ namespace SanyaRemastered
 
         public void OnDied(DiedEventArgs ev)
         {
-            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !(ev.Handler.Base is UniversalDamageHandler universalDamageHandler)) return;
-            Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{universalDamageHandler._logsText}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
+            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
+            Log.Debug($"[OnPlayerDeath] {ev.Killer?.Nickname}[{ev.Killer?.Role}] -{ev.Handler.Type}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.Scp939Size != 1)
             {
@@ -670,10 +669,10 @@ namespace SanyaRemastered
             }
             if (ev.Killer == null) return;
 
-            /*if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue(ev.HitInformations.Tool.Name, out int Heal) && Heal > 0)
+            if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue(ev.Handler.Type.ToString(), out int Heal) && Heal > 0)
             {
                 ev.Killer.Heal(Heal);
-            }*/
+            }
 
             if (SanyaRemastered.Instance.Config.HitmarkKilled
                 && ev.Killer.Team != Team.SCP
@@ -689,15 +688,16 @@ namespace SanyaRemastered
                 string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
                 string str;
                 if (ev.Target.Role != RoleType.Scp0492)
-                    if (ev.Handler.Base is WarheadDamageHandler)
+                {
+                    if (ev.Handler.Type == DamageType.Warhead)
                     {
                         str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
                     }
-                    else if (universalDamageHandler.TranslationId == DeathTranslations.Tesla.Id)
+                    else if (ev.Handler.Type == DamageType.Tesla)
                     {
                         str = Subtitles.SCPDeathTesla.Replace("{0}", fullname);
                     }
-                    else if (universalDamageHandler.TranslationId == DeathTranslations.Decontamination.Id)
+                    else if (ev.Handler.Type == DamageType.Decontamination)
                     {
                         str = Subtitles.SCPDeathDecont.Replace("{0}", fullname);
                     }
@@ -734,6 +734,7 @@ namespace SanyaRemastered
                                 }
                         }
                     }
+                }
                 else
                 {
                     str = "{-1}";
@@ -752,7 +753,7 @@ namespace SanyaRemastered
                 if (count == 1
                     && isFound079
                     && Map.ActivatedGenerators < 2
-                    && ev.Handler.Base is WarheadDamageHandler)
+                    && ev.Handler.Type == DamageType.Warhead)
                 {
                     isForced = true;
                     str = str.Replace("{-1}", "\nTout les SCP ont été sécurisé.\nLa séquence de reconfinement de SCP-079 a commencé\nLa Heavy Containement Zone vas surcharger dans t-moins 1 minutes.");
@@ -765,9 +766,10 @@ namespace SanyaRemastered
                     Methods.SendSubtitle(str, (ushort)(isForced ? 30 : 10));
             }
 
-            if (universalDamageHandler.TranslationId == DeathTranslations.Decontamination.Id || ev.Handler.Base is WarheadDamageHandler)
+            if (ev.Handler.Type == DamageType.Decontamination || ev.Handler.Type == DamageType.Warhead || ev.Handler.Type == DamageType.FemurBreaker)
             {
                 ev.Target.Inventory.UserInventory.Items.Clear();
+                ev.Target.Inventory.UserInventory.ReserveAmmo.Clear();
             }
         }
         public void OnEscapingPocketDimension(EscapingPocketDimensionEventArgs ev)

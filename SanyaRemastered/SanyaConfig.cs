@@ -66,6 +66,7 @@ namespace SanyaRemastered
         public bool IntercomInformation { get; set; } = false;
         public bool IntercomBrokenOnBlackout { get; set; } = false;
         public bool CloseDoorsOnNukecancel { get; set; } = false;
+        public bool FemurBreakerCanBeUsedWithNo106 { get; set; } = false;
         public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
         [Description("Désactivé la microhid pour les rôle")]
         public List<RoleType> MicroHidNotActive { get; set; } = new List<RoleType>{RoleType.ClassD, RoleType.Scientist };
