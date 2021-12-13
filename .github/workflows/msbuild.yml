@@ -17,13 +17,22 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: suisei-cn/actions-download-file@v1
-      id: downloadfile  # Remember to give an ID if you need the output filename
+      id: downloadReferences  # Remember to give an ID if you need the output filename
       name: Download the file
       with:
        url: "https://exiled.host/build_deps/References.zip"
-       target: .
-    - name: Extract some files
+       target: References
+    - uses: suisei-cn/actions-download-file@v1
+      id: downloadExiled  # Remember to give an ID if you need the output filename
+      name: Download the file
+      with:
+       url: "https://github.com/Exiled-Team/EXILED/releases/download/4.1.6/Exiled.tar.gz"
+       target: exiledref
+    - name: Extract References
       run: 7z x References.zip
+    - name: Extract Exiled
+      run: 7z x exiledref/Exiled.tar.gz
+        
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
@@ -35,4 +44,4 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}} /p:referencepath="References;exiledref\EXILED\Plugins;;exiledref\EXILED\Plugins\dependencies"
