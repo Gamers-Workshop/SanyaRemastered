@@ -17,12 +17,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: suisei-cn/actions-download-file@v1
-      id: downloadfile  # Remember to give an ID if you need the output
+      id: downloadfile  # Remember to give an ID if you need the output filename
       name: Download the file
       with:
        url: "https://exiled.host/build_deps/References.zip"
        target: .
-       auto-match: true
     - name: Extract some files
       run: 7z x References.zip
     - name: Add MSBuild to PATH
