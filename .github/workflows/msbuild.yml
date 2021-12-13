@@ -29,7 +29,7 @@ jobs:
        url: "https://github.com/Exiled-Team/EXILED/releases/download/4.1.6/Exiled.tar.gz"
        target: exiledref
     - name: Extract References
-      run: 7z x References.zip
+      run: 7z x References/References.zip
     - name: Extract Exiled
       run: 7z x exiledref/Exiled.tar.gz
         
