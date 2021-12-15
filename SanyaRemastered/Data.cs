@@ -6,12 +6,7 @@ using UnityEngine;
 
 namespace SanyaRemastered.Data
 {
-	public enum GRENADE_ID
-	{
-		FRAG_NADE = 0,
-		FLASH_NADE = 1,
-		SCP018_NADE = 2
-	}
+
 	public struct MemoryMetrics
 	{
 		public double Total { get; set; }
