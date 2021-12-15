@@ -25,7 +25,7 @@ namespace SanyaRemastered.Patches
 					}
 					Vector3 position = __instance.transform.position;
 					float num = __instance.damageOverDistance.Evaluate(__instance.PreviousHeight - position.y);
-					if (num <= 5f || __instance._ccm.NoclipEnabled || __instance._ccm.GodMode || __instance._ccm.CurRole.team == Team.SCP || __instance._pms.InSafeTime)
+					if (num <= 5f || __instance._ccm.NoclipEnabled || __instance._ccm.GodMode || __instance._pms.InSafeTime)
 					{
 						return false;
 					}

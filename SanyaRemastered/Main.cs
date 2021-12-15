@@ -127,7 +127,6 @@ namespace SanyaRemastered
 			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
 
 			PlayerEvents.Died += Handlers.OnDied;
-			PlayerEvents.EscapingPocketDimension += Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem += Handlers.OnThrowingItem;
 			PlayerEvents.UsingItem += Handlers.OnPlayerUsingItem;
@@ -151,8 +150,6 @@ namespace SanyaRemastered
 			PlayerEvents.ProcessingHotkey += Handlers.OnProcessingHotkey;
 
 			Scp079Events.GainingLevel += Handlers.On079LevelGain;
-			Scp106Events.CreatingPortal += Handlers.On106MakePortal;
-			Scp106Events.Teleporting += Handlers.On106Teleport;
 			Scp914Events.UpgradingPlayer += Handlers.On914UpgradingPlayer;
 
 			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
@@ -189,7 +186,6 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning -= Handlers.OnPlayerSpawn;
 			PlayerEvents.Hurting -= Handlers.OnPlayerHurt;
 			PlayerEvents.Died -= Handlers.OnDied;
-			PlayerEvents.EscapingPocketDimension -= Handlers.OnEscapingPocketDimension;
 			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem -= Handlers.OnThrowingItem;
 			PlayerEvents.UsingItem -= Handlers.OnPlayerUsingItem;
@@ -213,8 +209,6 @@ namespace SanyaRemastered
 			PlayerEvents.ProcessingHotkey -= Handlers.OnProcessingHotkey;
 
 			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
-			Scp106Events.CreatingPortal -= Handlers.On106MakePortal;
-			Scp106Events.Teleporting -= Handlers.On106Teleport;
 			Scp914Events.UpgradingPlayer -= Handlers.On914UpgradingPlayer;
 
 			Scp096Events.AddingTarget -= Handlers.On096AddingTarget;

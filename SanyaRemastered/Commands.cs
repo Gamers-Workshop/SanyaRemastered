@@ -20,6 +20,9 @@ using Exiled.API.Extensions;
 using Extensions = SanyaRemastered.Functions.Extensions;
 using Scp914;
 using Utils.Networking;
+using AdminToys;
+using InventorySystem.Items.Pickups;
+using InventorySystem;
 
 namespace SanyaRemastered.Commands
 {
@@ -34,6 +37,12 @@ namespace SanyaRemastered.Commands
 		public string Description { get; } = "SanyaRemastered Commands";
 
 		private bool isActwatchEnabled = false;
+		private DoorVariant targetdoor = null;
+		private ItemPickupBase targetitem = null;
+		private GameObject targetstation = null;
+		private GameObject targetTarget = null;
+		private PrimitiveObjectToy targetPrimitive = null;
+		private LightSourceToy targetLight = null;
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -93,6 +102,166 @@ namespace SanyaRemastered.Commands
 						//Methods.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/049_Ringo_Ringo_Roses.raw", 9997, 1, true, player.Position);
 
 						response = "test ok.";
+						return true;
+					}
+				case "identitytree":
+					{
+						response = "ok.";
+						foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
+						{
+							Log.Warn($"{identity.transform.name} (layer{identity.transform.gameObject.layer})");
+							Log.Warn($"HasComponents:");
+							foreach (var i in identity.transform.gameObject.GetComponents<Component>())
+							{
+								Log.Warn($"    {i?.name}:{i?.GetType()}");
+							}
+							Log.Warn($"HasComponentsInChildren:");
+							foreach (var i in identity.transform.gameObject.GetComponentsInChildren<Component>())
+							{
+								Log.Warn($"    {i?.name}:{i?.GetType()}");
+							}
+							Log.Warn($"HasComponentsInParent:");
+							foreach (var i in identity.transform.gameObject.GetComponentsInParent<Component>())
+							{
+								Log.Warn($"    {i?.name}:{i?.GetType()}");
+							}
+						}
+						return true;
+					}
+				case "identitypos":
+					{
+						response = "ok.";
+						foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
+						{
+							Log.Warn($"{identity.transform.name}{identity.transform.position}");
+						}
+						return true;
+					}
+				case "avlcol":
+					{
+						response = "Available colors:\n";
+						foreach (var i in ReferenceHub.HostHub.serverRoles.NamedColors.OrderBy(x => x.Restricted))
+							response += $"[#{i.ColorHex}] {i.Name,-13} {(i.Restricted ? "Restricted" : "Not Restricted")}\n";
+						return true;
+					}
+				case "lighttest":
+					{
+						if (targetLight == null)
+						{
+							var prefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
+							var pobject = UnityEngine.Object.Instantiate(prefab.GetComponent<LightSourceToy>());
+							targetLight = pobject;
+
+							NetworkServer.Spawn(pobject.gameObject, ownerConnection: null);
+						}
+
+						targetLight.transform.position = new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3)));
+						targetLight.NetworkLightIntensity = float.Parse(arguments.At(4));
+						targetLight.NetworkLightRange = float.Parse(arguments.At(5));
+						targetLight.NetworkLightShadows = bool.Parse(arguments.At(6));
+						response = $"lighttest.";
+						return true;
+					}
+				case "walltest":
+					{
+						if (targetPrimitive == null)
+						{
+							var prefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Primitive"));
+							var pobject = UnityEngine.Object.Instantiate(prefab.GetComponent<PrimitiveObjectToy>());
+
+							pobject.NetworkScale = Vector3.one;
+							pobject.NetworkMaterialColor = Color.black;
+							targetPrimitive = pobject;
+
+							NetworkServer.Spawn(pobject.gameObject, ownerConnection: null);
+						}
+
+						targetPrimitive.NetworkPrimitiveType = PrimitiveType.Cube;
+						targetPrimitive.transform.position = new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3)));
+						targetPrimitive.transform.localScale = new UnityEngine.Vector3(float.Parse(arguments.At(4)), float.Parse(arguments.At(5)), float.Parse(arguments.At(6)));
+						response = $"walltest.";
+						return true;
+					}
+				case "targettest":
+					{
+						if (targetTarget == null)
+						{
+							var gameObject = UnityEngine.Object.Instantiate(CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("dboyTarget")),
+								new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3))),
+								Quaternion.Euler(Vector3.up * float.Parse(arguments.At(4))));
+							targetTarget = gameObject;
+							NetworkServer.Spawn(gameObject);
+						}
+						else
+						{
+							NetworkServer.Destroy(targetTarget);
+							targetTarget = null;
+						}
+						response = $"targettest.";
+						return true;
+					}
+				case "itemtest":
+					{
+						if (targetitem == null)
+						{
+							var itemtype = (ItemType)Enum.Parse(typeof(ItemType), arguments.At(1));
+							var itemBase = InventoryItemLoader.AvailableItems[itemtype];
+							var pickup = UnityEngine.Object.Instantiate(itemBase.PickupDropModel,
+								new UnityEngine.Vector3(float.Parse(arguments.At(2)), float.Parse(arguments.At(3)), float.Parse(arguments.At(4))),
+								Quaternion.Euler(Vector3.up * float.Parse(arguments.At(5))));
+							pickup.Info.ItemId = itemtype;
+							pickup.Info.Weight = itemBase.Weight;
+							pickup.Info.Locked = true;
+							pickup.GetComponent<Rigidbody>().useGravity = false;
+							pickup.transform.localScale = new UnityEngine.Vector3(float.Parse(arguments.At(6)), float.Parse(arguments.At(7)), float.Parse(arguments.At(8)));
+
+							targetitem = pickup;
+							ItemDistributor.SpawnPickup(pickup);
+						}
+						else
+						{
+							NetworkServer.Destroy(targetitem.gameObject);
+							targetitem = null;
+						}
+						response = $"itemtest.";
+						return true;
+					}
+				case "worktest":
+					{
+						if (targetstation == null)
+						{
+							var prefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
+							var station = UnityEngine.Object.Instantiate(prefab,
+								new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3))),
+								Quaternion.Euler(Vector3.up * float.Parse(arguments.At(4))));
+							station.transform.localScale = new UnityEngine.Vector3(float.Parse(arguments.At(5)), float.Parse(arguments.At(6)), float.Parse(arguments.At(7)));
+							targetstation = station;
+							NetworkServer.Spawn(station);
+						}
+						else
+						{
+							NetworkServer.Destroy(targetstation);
+							targetstation = null;
+						}
+						response = $"worktest.";
+						return true;
+					}
+				case "doortest":
+					{
+						if (targetdoor == null)
+						{
+							var prefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+							var door = UnityEngine.Object.Instantiate(prefab.TargetPrefab, new UnityEngine.Vector3(float.Parse(arguments.At(1)), float.Parse(arguments.At(2)), float.Parse(arguments.At(3))), Quaternion.Euler(Vector3.up * 180f));
+							door.transform.localScale = new UnityEngine.Vector3(float.Parse(arguments.At(4)), float.Parse(arguments.At(5)), float.Parse(arguments.At(6)));
+							targetdoor = door;
+							NetworkServer.Spawn(door.gameObject);
+						}
+						else
+						{
+							NetworkServer.Destroy(targetdoor.gameObject);
+							targetdoor = null;
+						}
+						response = $"doortest.";
 						return true;
 					}
 				case "checkobj":

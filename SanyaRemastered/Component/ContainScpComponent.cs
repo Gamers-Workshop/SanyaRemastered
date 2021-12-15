@@ -18,6 +18,7 @@ namespace SanyaRemastered
 		private SanyaRemastered _plugin;
 		private Player _player;
 		private float _timer = 0f;
+		private Room _room = null;
 		public int TimeBeforeContain = 25;
 		public string CassieAnnounceContain;
 		public List<Door> doors = new List<Door>();
@@ -26,6 +27,7 @@ namespace SanyaRemastered
 		{
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
+			_room = _player.CurrentRoom;
 		}
 
 		private void FixedUpdate()
@@ -45,7 +47,7 @@ namespace SanyaRemastered
 			if (!(_timer > 1f)) return;
 			_player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText($"Vous allez être reconfiné dans {TimeBeforeContain} seconde{(TimeBeforeContain <= 1 ? "" : "s")}", 2);
 
-			if (doors.Count == doors.Where(x=>x.Base.GetExactState() == 0f && (!x.Base.TryGetComponent(out BreakableDoor breakableDoor) || !breakableDoor.IsDestroyed)).Count())
+			if (doors.Count == doors.Where(x=>x.Base.GetExactState() == 0f && (!x.Base.TryGetComponent(out BreakableDoor breakableDoor) || !breakableDoor.IsDestroyed)).Count() && _room == _player.CurrentRoom)
             {
 				if (TimeBeforeContain <= 0)
                 {
@@ -62,7 +64,7 @@ namespace SanyaRemastered
 						}
 					}
 					Cassie.GlitchyMessage(CassieAnnounceContain, 0.05f, 0.05f);
-					/*Methods.SpawnDummyModel(_player.Position, _player.Role,_player.Nickname,_player.GameObject.transform.rotation,_player.Scale);*/
+
 					_player.SetRole(RoleType.Spectator);
 					Destroy(this);
 				}

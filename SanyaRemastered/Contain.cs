@@ -39,6 +39,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(2.9f, 0, 10.1f), new Vector3(-10.2f, -5f, -10.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -63,6 +64,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-16.4f, -16.8f, -5.2f), new Vector3(-30.2f, -22.3f, -16.7f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -78,28 +80,6 @@ namespace SanyaRemastered
                                             }
                                             return;
                                         }
-                                    /*case RoomType.Lcz012:
-                                        {
-                                            if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, 10.2f, -9.6f, 8.2f, 2.7f, 8f, -3f, PlayeRoom.Transform.rotation.eulerAngles.y)
-                                                && !Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, 9.8f, -8.9f, 7.8f, -10f, 8f, 2.5f, PlayeRoom.Transform.rotation.eulerAngles.y))
-                                            {
-                                                return;
-                                            }
-                                            var door = PlayeRoom.Doors.First(x => x.Nametag == "012");
-                                            {
-                                                if (door.Base.GetExactState() == 0f)
-                                                {
-                                                    if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                                    {
-                                                        var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                        containScpComponent.doors.Add(door);
-                                                        containScpComponent.CassieAnnounceContain = "SCP 1 7 3 as been contained in the Containment chamber of SCP 0 1 2";
-                                                    }
-                                                    return;
-                                                }
-                                            }
-                                            return;
-                                        }*/
                                     case RoomType.HczArmory:
                                         {
                                             if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(0.1f, 0f, 2.9f), new Vector3(-5.6f, -5f, -2.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
@@ -110,6 +90,7 @@ namespace SanyaRemastered
                                                     {
                                                         foreach (Player player1 in PlayeRoom.Players)
                                                         {
+                                                            if (player1.Team == Team.SCP) continue;
                                                             if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(0.1f, 0f, 2.9f), new Vector3(-5.6f, -5f, -2.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                             {
                                                                 return;
@@ -135,6 +116,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(1.2f, -1f, 6f), new Vector3(-9.5f, -10f, -7f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -159,6 +141,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(3.7f, 0f, 9.8f), new Vector3(-4.0f, -5f, 7.4f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -185,6 +168,7 @@ namespace SanyaRemastered
                                             {
                                                 foreach (Player player1 in PlayeRoom.Players)
                                                 {
+                                                    if (player1.Team == Team.SCP) continue;
                                                     if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                     {
                                                         return;
@@ -209,6 +193,7 @@ namespace SanyaRemastered
                                                     {
                                                         foreach (Player player1 in PlayeRoom.Players)
                                                         {
+                                                            if (player1.Team == Team.SCP) continue;
                                                             if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                             {
                                                                 return;
@@ -235,6 +220,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-25.6f, 20f, 32f), new Vector3(-33.7f, -10f, -4.6f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -260,6 +246,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(10.3f, 10f, 22.5f), new Vector3(-8.2f, 0f, 5.2f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -280,6 +267,7 @@ namespace SanyaRemastered
                                                 {
                                                     foreach (Player player1 in PlayeRoom.Players)
                                                     {
+                                                        if (player1.Team == Team.SCP) continue;
                                                         if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-12.3f, 7f, 18.7f), new Vector3(-20.8f, 0f, -2.5f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                         {
                                                             return;
@@ -310,13 +298,14 @@ namespace SanyaRemastered
                                 }
                                 if (PlayeRoom.Type == RoomType.Hcz096)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                    if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
                                         var door = PlayeRoom.Doors.First(x => x.Nametag == "096");
                                         if (door.Base.GetExactState() == 0f)
                                         {
                                             foreach (Player player1 in PlayeRoom.Players)
                                             {
+                                                if (player1.Team == Team.SCP) continue;
                                                 if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                 {
                                                     return;
@@ -337,13 +326,14 @@ namespace SanyaRemastered
                             {
                                 if (PlayeRoom.Type == RoomType.Hcz049)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                    if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
                                         var door = PlayeRoom.Doors.First(x => x.Nametag == "049_ARMORY");
                                         if (door.Base.GetExactState() == 0f)
                                         {
                                             foreach (Player player1 in PlayeRoom.Players)
                                             {
+                                                if (player1.Team == Team.SCP) continue;
                                                 if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                 {
                                                     return;
@@ -364,6 +354,7 @@ namespace SanyaRemastered
                                         {
                                             foreach (Player player1 in PlayeRoom.Players)
                                             {
+                                                if (player1.Team == Team.SCP) continue;
                                                 if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.3f, -260f, -11f), new Vector3(-9.6f, -270f, -16.8f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                                 {
                                                     return;
@@ -385,26 +376,26 @@ namespace SanyaRemastered
                             {
                                 if (PlayeRoom.Type == RoomType.Hcz106)
                                 {
-                                    if (!Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                    if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
                                     {
-                                        return;
-                                    }
-                                    var door = PlayeRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
-                                    {
-                                        if (door.Base.GetExactState() == 0f)
+                                        var door = PlayeRoom.Doors.First(x => x.Nametag == "106_BOTTOM");
                                         {
-                                            foreach (Player player1 in PlayeRoom.Players)
+                                            if (door.Base.GetExactState() == 0f)
                                             {
-                                                if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                foreach (Player player1 in PlayeRoom.Players)
                                                 {
-                                                    return;
+                                                    if (player1.Team == Team.SCP) continue;
+                                                    if (Functions.Extensions.IsInTheBox(PlayeRoom.Transform.position - player1.Position, new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f), PlayeRoom.Transform.rotation.eulerAngles.y))
+                                                    {
+                                                        return;
+                                                    }
                                                 }
-                                            }
-                                            if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
-                                            {
-                                                var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
-                                                containScpComponent.doors.Add(door);
-                                                containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
+                                                if (!player.GameObject.TryGetComponent<ContainScpComponent>(out _))
+                                                {
+                                                    var containScpComponent = player.GameObject.AddComponent<ContainScpComponent>();
+                                                    containScpComponent.doors.Add(door);
+                                                    containScpComponent.CassieAnnounceContain = "SCP 9 3 9 as been contained in the Containment Chamber of SCP 1 0 6";
+                                                }
                                             }
                                         }
                                     }

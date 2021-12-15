@@ -63,9 +63,8 @@ namespace SanyaRemastered
 			_timer += Time.deltaTime;
 
 			UpdateTimers();
-			//CheckOnDecal();
 
-			//SoundVolume();
+			UpdateContainScp();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateHint();
@@ -112,37 +111,6 @@ namespace SanyaRemastered
 				_hudBottomString = string.Empty;
 		}
 
-		private void CheckOnDecal()
-		{
-			if (_plugin.Handlers.DecalList.Count != 0 || !_plugin.Config.Coroding106 || _player.Team == (Team.SCP | Team.RIP) ) return;
-			foreach (Vector3 Decal in _plugin.Handlers.DecalList)
-				if (Vector3.Distance(_player.Position, Decal) < 1)
-				{
-					_player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(1f);
-					_player.ReferenceHub.playerEffectsController.EnableEffect<SinkHole>(1f);
-					_player.ReferenceHub.playerEffectsController.EnableEffect<Corroding>(1f);
-				}
-		}
-
-		/*private void SoundVolume()
-		{
-			if (!(_timer > 1f)) return;
-			string log = "Get DissonanceComms";
-			try
-			{
-				var comms = FindObjectOfType<DissonanceComms>();
-				log = $"IsNull : {comms == null} Get PlayerId";
-				Exiled.API.Features.Log.Info($"comms is null ? {comms == null}");
-				var player = comms?.FindPlayer(_player.ReferenceHub.GetComponent<MirrorIgnorancePlayer>()?.PlayerId);
-				log = $"IsNull{player == null} Get Amplitude";
-				soundvolume = player.Amplitude;
-			}
-			catch (Exception ex)
-            {
-                Exiled.API.Features.Log.Error($"Error Sound Volume at log !" + ex);
-            }
-		}*/
-
 		private void UpdateRespawnCounter()
 		{
 			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator) return;
@@ -169,8 +137,7 @@ namespace SanyaRemastered
 		}
 		public void UpdateContainScp()
         {
-			if (!SanyaRemastered.Instance.Config.ContainCommand || _player.IsScp || !(_timer > 1f)) return;
-			
+			if (!SanyaRemastered.Instance.Config.ContainCommand || !_player.IsScp || !(_timer > 1f) || _player.GameObject.TryGetComponent(out ContainScpComponent _)) return;
 			Contain.IsCanBeContain(_player);
 		}
 		public void UpdateHint()

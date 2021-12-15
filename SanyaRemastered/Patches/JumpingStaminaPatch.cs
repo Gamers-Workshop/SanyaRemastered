@@ -17,7 +17,7 @@ namespace SanyaRemastered.Patches
 			if (CustomLiteNetLib4MirrorTransport.DelayConnections || !ReferenceHub.LocalHub.characterClassManager.RoundStarted) return;
 			var player = Player.Get(connection.identity.gameObject);
 
-			//ジャンプ時スタミナ消費
+			//StaminaLostJump
 			if (SanyaRemastered.Instance.Config.StaminaLostJump > 0
 				&& player.ReferenceHub.characterClassManager.IsHuman()
 				&& !player.ReferenceHub.fpc.staminaController._invigorated.IsEnabled

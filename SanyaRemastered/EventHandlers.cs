@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using AdminToys;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -11,6 +12,7 @@ using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
 using InventorySystem.Items.ThrowableProjectiles;
 using LightContainmentZoneDecontamination;
+using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
@@ -125,6 +127,7 @@ namespace SanyaRemastered
             Coroutines.isActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
             Server.Host.ReferenceHub.characterClassManager.NetworkCurClass = RoleType.Tutorial;
+            Server.Host.Position = new Vector3(54.8f, 3000f, -44.9f);
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
                 foreach (var tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
@@ -169,16 +172,16 @@ namespace SanyaRemastered
             if (plugin.Config.AddDoorsOnSurface)
             {
                 Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
-                var LCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
-                var EZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
-                var HCZprefab = UnityEngine.Object.FindObjectsOfType<MapGeneration.DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+                var LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
+                var EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
+                var HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
 
                 // Couloir spawn Chaos
-                var door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
-                var door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new UnityEngine.Vector3(14.425f, 995.2f, -23.2f), Quaternion.Euler(Vector3.zero));
+                var door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
+                var door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -23.2f), Quaternion.Euler(Vector3.zero));
                 // Exit
-                var door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
-                var door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new UnityEngine.Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
+                var door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
+                var door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
                 //Scale
                 door1.transform.localScale = DoorScale;
                 door2.transform.localScale = DoorScale;
@@ -192,31 +195,73 @@ namespace SanyaRemastered
                 NetworkServer.Spawn(door2.gameObject);
                 NetworkServer.Spawn(door3.gameObject);
                 NetworkServer.Spawn(door4.gameObject);
-                /*NetworkServer.Spawn(door5.gameObject);
-                NetworkServer.Spawn(door6.gameObject);*/
-                try
-                {/*
-                    foreach (var Test in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
-                    {
-                        Log.Info($"NetworkIdentity Spawned name: {Test.name} | gameobject: {Test.gameObject} AssetId: {Test.assetId}");
-                    }
-                    Log.Info("0");
-                    var networkIdentity = UnityEngine.Object.FindObjectsOfType<NetworkIdentity>().FirstOrDefault(x => x.name == "Tesla Gate");
-                    Log.Info("1" + networkIdentity == null);
-                    Methods.MoveNetworkIdentityObject(networkIdentity,new UnityEngine.Vector3(174.4f, 983.24f, 29.1f));
-                    var Tesla = UnityEngine.Object.Instantiate(networkIdentity, new UnityEngine.Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
-                    Log.Info("2" + Tesla == null);
-                    NetworkServer.Spawn(Tesla.gameObject);
-                    foreach (var ply in Player.List)
-                    {
-                        typeof(NetworkServer).GetMethod("SendSpawnMessage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { Tesla, ply.Connection });
-                    }*/
-                }
-                catch (Exception e)
-                {
-                    Log.Error("Sanya Plugin [Spawn Tesla]" + e);
-                }
+            }
+            if (plugin.Config.EditObjectsOnSurface)
+            {
+                //Prefabの確保
+                var primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Primitive"));
+                var lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
+                var stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
 
+                //ElevatorA
+                var station1 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(-0.15f, 1000f, 9.75f), Quaternion.Euler(Vector3.up * 180f));
+                //En face l'ElevatorB
+                var station2 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(86.69f, 987.2f, -70.85f), Quaternion.Euler(Vector3.up));
+                //MTF
+                var station3 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
+                //ElevatorB
+                var station4 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(83f, 992.77f, -46.35f), Quaternion.Euler(Vector3.up * 90f));
+                //CI
+                var station5 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
+                //Surface
+                var station6 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(56.5f, 1000f, -68.5f), Quaternion.Euler(Vector3.up * 270f));
+                var station7 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(56.5f, 1000f, -71.85f), Quaternion.Euler(Vector3.up * 270f));
+
+                //Light Nuke Red
+                var light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_nuke.transform.position = new Vector3(40.75f, 991f, -35.75f);
+                light_nuke.NetworkLightRange = 4.5f;
+                light_nuke.NetworkLightIntensity = 2f;
+                light_nuke.NetworkLightColor = new Color(1f, 0f, 0f);
+
+                //Lumiére dans le couloir de la GateA 
+                var light_GateA1 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_GateA1.transform.position = new Vector3(-1, 1005.2f, -37);
+                light_GateA1.NetworkLightRange = 6f;
+                light_GateA1.NetworkLightIntensity = 1f;
+                light_GateA1.NetworkLightColor = Color.white;
+
+                var light_GateA2 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_GateA2.transform.position = new Vector3(-1, 1005.2f, -29.5f);
+                light_GateA2.NetworkLightRange = 6f;
+                light_GateA2.NetworkLightIntensity = 1f;
+                light_GateA2.NetworkLightColor = Color.white;
+
+                //SCP-106 Do not go on Container Of 106
+                var room106 = Map.Rooms.First(x => x.Type == RoomType.Hcz106);
+
+                var wall_106 = UnityEngine.Object.Instantiate(primitivePrefab.GetComponent<PrimitiveObjectToy>());
+                wall_106.transform.SetParentAndOffset(room106.transform, new Vector3(7.2f, 2.6f, -14.3f)); 
+                wall_106.transform.localScale = new Vector3(20, 5, 14);
+                if (room106.transform.forward == Vector3.left || room106.transform.forward == Vector3.right)
+                    wall_106.transform.rotation = Quaternion.Euler(Vector3.up * 90f);
+                wall_106.UpdatePositionServer();
+                wall_106.NetworkPrimitiveType = PrimitiveType.Cube;
+                wall_106.NetworkMaterialColor = new Color(0, 0, 0, 0);
+
+                NetworkServer.Spawn(station1);
+                NetworkServer.Spawn(station2);
+                NetworkServer.Spawn(station3);
+                NetworkServer.Spawn(station4);
+                NetworkServer.Spawn(station5);
+                NetworkServer.Spawn(station6);
+                NetworkServer.Spawn(station7);
+
+                NetworkServer.Spawn(light_nuke.gameObject);
+                NetworkServer.Spawn(light_GateA1.gameObject);
+                NetworkServer.Spawn(light_GateA2.gameObject);
+
+                NetworkServer.Spawn(wall_106.gameObject);
             }
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
@@ -772,23 +817,10 @@ namespace SanyaRemastered
                 ev.Target.Inventory.UserInventory.ReserveAmmo.Clear();
             }
         }
-        public void OnEscapingPocketDimension(EscapingPocketDimensionEventArgs ev)
-        {
-            /*if (SanyaRemastered.Instance.Config.Scp096Real && PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
-            {
-                foreach (Player player in Player.List.Where(x=>x.Role == RoleType.Scp096))
-                    if (player.CurrentScp is PlayableScps.Scp096 Scp096)
-                    {
-                        Scp096.Enrage();
-                        Scp096.AddTarget(ev.Player.GameObject);
-                    }
-            }*/
-        }
+
         public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
         {
             Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-            /*if (PlayerHasEnrage096InPocket.Contains(ev.Player.GameObject))
-                PlayerHasEnrage096InPocket.Remove(ev.Player.GameObject);*/
             List<Player> Scp106 = Player.List.Where(x => x.Role == RoleType.Scp106).ToList();
             foreach (Player player in Scp106)
             {
@@ -1003,10 +1035,6 @@ namespace SanyaRemastered
         {
             Log.Debug($"[OnHandcuffing] {ev.Cuffer.Nickname} -> {ev.Target.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
             if (ev.Target.IsGodModeEnabled) ev.IsAllowed = false;
-            /*if (SanyaRemastered.Instance.Config.Scp049Real)
-            {
-                ReferenceHub.GetHub(ev.Target.GameObject)..NetworkCufferId = ev.Cuffer.ReferenceHub.queryProcessor.PlayerId;
-            }*/
         }
         public void OnProcessingHotkey(ProcessingHotkeyEventArgs ev)
         {
@@ -1136,15 +1164,6 @@ namespace SanyaRemastered
                 }
             }
         }
-        public void On106MakePortal(CreatingPortalEventArgs ev)
-        {
-            Log.Debug($"[On106MakePortal] {ev.Player.Nickname}:{ev.Position}", SanyaRemastered.Instance.Config.IsDebugged);
-        }
-
-        public void On106Teleport(TeleportingEventArgs ev)
-        {
-            Log.Debug($"[On106Teleport] {ev.Player.Nickname}:{ev.PortalPosition}", SanyaRemastered.Instance.Config.IsDebugged);
-        }
         public void On914UpgradingPlayer(UpgradingPlayerEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp914Effect)
@@ -1271,11 +1290,6 @@ namespace SanyaRemastered
         }
         public void On096CalmingDown(CalmingDownEventArgs ev)
         {
-            /*foreach (ReferenceHub Ref in ev.Scp096._targets.ToList().Where(x => Player.Get(x.playerId).IsInPocketDimension))
-            {
-                PlayerHasEnrage096InPocket.Add(Ref.gameObject);
-                ev.Scp096._targets.Remove(Ref);
-            }*/
             if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
             {
                 ev.IsAllowed = false;

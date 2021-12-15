@@ -255,6 +255,15 @@ namespace SanyaRemastered.Functions
             }
 
         }
+        public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
+        {
+            target.SetParent(parent);
+            target.position = parent.position;
+            target.transform.localPosition = local;
+            var localoffset = parent.transform.TransformVector(target.localPosition);
+            target.localPosition = Vector3.zero;
+            target.position += localoffset;
+        }
         public static int GetRandomIndexFromWeight(int[] list)
         {
             int sum = 0;
@@ -417,47 +426,33 @@ namespace SanyaRemastered.Functions
         {
             return player.Team != Team.SCP && player.Team != Team.RIP;
         }
-        //        public static bool IsInTheBox(Vector3 posroom,float x1,float x2,float z1, float z2,float y1, float y2,float rotation)
-
         public static bool IsInTheBox(Vector3 posroom,Vector3 max, Vector3 min,float rotation)
         {
             Vector3 end;
             Vector3 end2;
             if (rotation == 0f)
             {
-                end = new Vector3(min.x, min.y, min.z);
-                end2 = new Vector3(max.x, max.y, max.z);
+                end = new Vector3(max.x, max.y, max.z);
+                end2 = new Vector3(min.x, min.y, min.z);
             }
             else if (rotation == 90f)
             {
-                end = new Vector3(min.z, min.y, -max.x);
-                end2 = new Vector3(max.z, max.y, -min.x);
+                end = new Vector3(max.z, max.y, -min.x);
+                end2 = new Vector3(min.z, min.y, -max.x);
             }
             else if (rotation == 180f)
             {
-                end = new Vector3(-max.x, min.y, -max.z);
-                end2 = new Vector3(-min.x, max.y, -min.z);
+                end = new Vector3(-min.x, max.y, -min.z);
+                end2 = new Vector3(-max.x, min.y, -max.z);
             }
             else
             {
-                end = new Vector3(-max.z, min.y, min.x);
-                end2 = new Vector3(-min.z, max.y, max.x);
+                end = new Vector3(-min.z, max.y, max.x);
+                end2 = new Vector3(-max.z, min.y, min.x);
             }
-            if (SanyaRemastered.Instance.Config.IsDebugged)
-            {
 
-                Log.Debug(end2.x < posroom.x);
-                Log.Debug(posroom.x < end.x);
-                Log.Debug(end2.y < posroom.y);
-                Log.Debug(posroom.y < end.y);
-                Log.Debug(end2.z < posroom.z);
-                Log.Debug(posroom.z < end.z);
-            }
-            if (end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z)
-            {
-                return true;
-            }
-            return false;
+            return end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z;
+
         }
         public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
 

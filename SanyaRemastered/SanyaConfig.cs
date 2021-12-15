@@ -60,6 +60,7 @@ namespace SanyaRemastered
 
         [Description("Ajout de porte sur la map")]
         public bool AddDoorsOnSurface { get; set; } = false;
+        public bool EditObjectsOnSurface { get; set; } = false;
         [Description("Game config")]
 
         public bool CassieSubtitle { get; set; } = false;
