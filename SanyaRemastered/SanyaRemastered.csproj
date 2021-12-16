@@ -32,7 +32,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs" />
+    <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Commands\DevCommands\Config.cs" />
+    <Compile Include="Commands\DevCommands\Now.cs" />
+    <Compile Include="Commands\FunCommands\AirBomb.cs" />
+    <Compile Include="Commands\FunCommands\ColorRoom.cs" />
+    <Compile Include="Commands\FunCommands\Generator.cs" />
+    <Compile Include="Commands\FunCommands\Heli.cs" />
+    <Compile Include="Commands\FunCommands\PlayAmbiant.cs" />
+    <Compile Include="Commands\DevCommands\Pocket106.cs" />
+    <Compile Include="Commands\DevCommands\Args.cs" />
+    <Compile Include="Commands\DevCommands\AvlCol.cs" />
+    <Compile Include="Commands\DevCommands\CheckObj.cs" />
+    <Compile Include="Commands\DevCommands\CheckObjDel.cs" />
+    <Compile Include="Commands\DevCommands\DoorTest.cs" />
+    <Compile Include="Commands\DevCommands\Hud.cs" />
+    <Compile Include="Commands\DevCommands\IdentityPos.cs" />
+    <Compile Include="Commands\DevCommands\IdentityTree.cs" />
+    <Compile Include="Commands\DevCommands\ItemTest.cs" />
+    <Compile Include="Commands\DevCommands\LightTest.cs" />
+    <Compile Include="Commands\DevCommands\PosRoom.cs" />
+    <Compile Include="Commands\DevCommands\RoomList.cs" />
+    <Compile Include="Commands\DevCommands\SpawnObject.cs" />
+    <Compile Include="Commands\DevCommands\TargetTest.cs" />
+    <Compile Include="Commands\DevCommands\Test.cs" />
+    <Compile Include="Commands\DevCommands\WallTest.cs" />
+    <Compile Include="Commands\DevCommands\WorkTest.cs" />
+    <Compile Include="Commands\FunCommands\Blackout.cs" />
+    <Compile Include="Commands\FunCommands\Femur.cs" />
+    <Compile Include="Commands\FunCommands\InfiniteAmmo.cs" />
+    <Compile Include="Commands\FunCommands\NukeCap.cs" />
+    <Compile Include="Commands\FunCommands\NukeLock.cs" />
+    <Compile Include="Commands\FunCommands\Pocket.cs" />
+    <Compile Include="Commands\FunCommands\Scale.cs" />
+    <Compile Include="Commands\FunCommands\Scp914.cs" />
+    <Compile Include="Commands\FunCommands\Van.cs" />
+    <Compile Include="Commands\StaffCommands\Box.cs" />
+    <Compile Include="Commands\StaffCommands\ForceEnd.cs" />
+    <Compile Include="Commands\StaffCommands\Hint.cs" />
+    <Compile Include="Commands\StaffCommands\List.cs" />
+    <Compile Include="Commands\StaffCommands\Ping.cs" />
     <Compile Include="Component\ContainScpComponent.cs" />
     <Compile Include="Component\GateTimerClose.cs" />
     <Compile Include="Component\Scp914Effect.cs" />
@@ -162,5 +201,6 @@
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
