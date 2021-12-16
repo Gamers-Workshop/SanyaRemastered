@@ -132,7 +132,7 @@ namespace SanyaRemastered.Functions
                 isActuallyBombGoing = true;
                 Log.Info($"[AirSupportBomb] booting...");
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-                SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
+                SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
                 RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 {

@@ -76,8 +76,10 @@
     <Compile Include="Component\GateTimerClose.cs" />
     <Compile Include="Component\Scp914Effect.cs" />
     <Compile Include="Contain.cs" />
-    <Compile Include="EventHandlers.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="EventHandlers\PlayerHandlers.cs" />
+    <Compile Include="EventHandlers\ScpHandlers.cs" />
+    <Compile Include="EventHandlers\ServerHandlers.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\BreakableDoorPatches.cs" />

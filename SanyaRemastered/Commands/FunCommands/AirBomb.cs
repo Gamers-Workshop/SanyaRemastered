@@ -34,20 +34,20 @@ namespace SanyaRemastered.Commands.FunCommands
 				{
 					if (arguments.Count() > 2 && float.TryParse(arguments.At(2), out float duration2))
 					{
-						SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2), Segment.FixedUpdate));
+						SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration, duration2), Segment.FixedUpdate));
 						response = $"The AirBombing start in {duration / 60}:{duration % 60:00} and stop in {(int)duration2 / 60}:{(int)duration2 % 60:00}";
 						return true;
 					}
 					else
 					{
-						SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration), Segment.FixedUpdate));
+						SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, duration), Segment.FixedUpdate));
 						response = $"The AirBombing start in {duration / 60}:{duration % 60:00}!";
 						return true;
 					}
 				}
 				else
 				{
-					SanyaRemastered.Instance.Handlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false), Segment.FixedUpdate));
+					SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false), Segment.FixedUpdate));
 					response = "Started!";
 					return true;
 				}

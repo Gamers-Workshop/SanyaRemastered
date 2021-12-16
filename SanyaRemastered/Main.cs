@@ -33,7 +33,10 @@ namespace SanyaRemastered
 		public override PluginPriority Priority => (PluginPriority) 1;
 
 		public static SanyaRemastered Instance { get; private set; }
-		public EventHandlers Handlers { get; private set; }
+		public EventHandlers.ServerHandlers ServerHandlers { get; private set; }
+		public EventHandlers.PlayerHandlers PlayerHandlers { get; private set; }
+		public EventHandlers.ScpHandlers ScpHandlers { get; private set; }
+
 		private Harmony Harmony = new Harmony("dev.Yamato");
 		public Random Random { get; } = new Random();
 		private int patchCounter;
@@ -85,9 +88,9 @@ namespace SanyaRemastered
 		{
 			base.OnDisabled();
 
-			foreach (var cor in Handlers.RoundCoroutines)
+			foreach (var cor in ServerHandlers.RoundCoroutines)
 				MEC.Timing.KillCoroutines(cor);
-			Handlers.RoundCoroutines.Clear();
+			ServerHandlers.RoundCoroutines.Clear();
 
 			UnRegistEvents();
 
@@ -98,124 +101,129 @@ namespace SanyaRemastered
 
 		private void RegistEvents()
 		{
-			Handlers = new EventHandlers(this);
+			ServerHandlers = new EventHandlers.ServerHandlers(this);
+			PlayerHandlers = new EventHandlers.PlayerHandlers(this);
+			ScpHandlers = new EventHandlers.ScpHandlers(this);
 
-			ServerEvents.WaitingForPlayers += Handlers.OnWaintingForPlayers;
-			ServerEvents.RoundStarted += Handlers.OnRoundStart;
-			ServerEvents.RoundEnded += Handlers.OnRoundEnd;
-			ServerEvents.RestartingRound += Handlers.OnRoundRestart;
-			ServerEvents.RespawningTeam += Handlers.OnTeamRespawn;
+			//
+			ServerEvents.WaitingForPlayers += ServerHandlers.OnWaintingForPlayers;
+			ServerEvents.RoundStarted += ServerHandlers.OnRoundStart;
+			ServerEvents.RoundEnded += ServerHandlers.OnRoundEnd;
+			ServerEvents.RestartingRound += ServerHandlers.OnRoundRestart;
+			ServerEvents.RespawningTeam += ServerHandlers.OnTeamRespawn;
 			
-			WarheadEvents.Starting += Handlers.OnWarheadStart;
-			WarheadEvents.Stopping += Handlers.OnWarheadCancel;
-			WarheadEvents.Detonated += Handlers.OnDetonated;
+			WarheadEvents.Starting += ServerHandlers.OnWarheadStart;
+			WarheadEvents.Stopping += ServerHandlers.OnWarheadCancel;
+			WarheadEvents.Detonated += ServerHandlers.OnDetonated;
 			
-			MapEvents.AnnouncingDecontamination += Handlers.OnAnnounceDecont;
-			MapEvents.Decontaminating += Handlers.OnDecontaminating;
-			MapEvents.AnnouncingNtfEntrance += Handlers.OnAnnounceNtf;
+			MapEvents.AnnouncingDecontamination += ServerHandlers.OnAnnounceDecont;
+			MapEvents.Decontaminating += ServerHandlers.OnDecontaminating;
+			MapEvents.AnnouncingNtfEntrance += ServerHandlers.OnAnnounceNtf;
 
-			MapEvents.ExplodingGrenade += Handlers.OnExplodingGrenade;
-			MapEvents.GeneratorActivated += Handlers.OnGeneratorFinish;
-			MapEvents.PlacingBulletHole += Handlers.OnPlacingBulletHole;
-			MapEvents.DamagingWindow += Handlers.OnDamagingWindow;
+			MapEvents.ExplodingGrenade += ServerHandlers.OnExplodingGrenade;
+			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
+			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
+			MapEvents.DamagingWindow += ServerHandlers.OnDamagingWindow;
 
-			PlayerEvents.PreAuthenticating += Handlers.OnPreAuth;
-			PlayerEvents.Verified += Handlers.OnPlayerVerified;
-			PlayerEvents.Destroying += Handlers.OnPlayerDestroying;
-			PlayerEvents.ChangingRole += Handlers.OnPlayerSetClass;
-			PlayerEvents.Spawning += Handlers.OnPlayerSpawn;
-			PlayerEvents.Hurting += Handlers.OnPlayerHurt;
+			PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
+			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
+			PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
+			PlayerEvents.ChangingRole += PlayerHandlers.OnPlayerSetClass;
+			PlayerEvents.Spawning += PlayerHandlers.OnPlayerSpawn;
+			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurt;
 
-			PlayerEvents.Died += Handlers.OnDied;
-			PlayerEvents.FailingEscapePocketDimension  += Handlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem += Handlers.OnThrowingItem;
-			PlayerEvents.UsingItem += Handlers.OnPlayerUsingItem;
-			PlayerEvents.ItemUsed += Handlers.OnPlayerItemUsed;
-			PlayerEvents.TriggeringTesla += Handlers.OnPlayerTriggerTesla;
-			PlayerEvents.InteractingDoor += Handlers.OnPlayerDoorInteract;
-			PlayerEvents.InteractingLocker += Handlers.OnPlayerLockerInteract;
-			PlayerEvents.InteractingElevator += Handlers.OnInteractingElevator;
-			PlayerEvents.IntercomSpeaking += Handlers.OnIntercomSpeaking;
+			PlayerEvents.Died += PlayerHandlers.OnDied;
+			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
+			PlayerEvents.ThrowingItem += PlayerHandlers.OnThrowingItem;
+			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
+			PlayerEvents.ItemUsed += PlayerHandlers.OnPlayerItemUsed;
+			PlayerEvents.TriggeringTesla += PlayerHandlers.OnPlayerTriggerTesla;
+			PlayerEvents.InteractingDoor += PlayerHandlers.OnPlayerDoorInteract;
+			PlayerEvents.InteractingLocker += PlayerHandlers.OnPlayerLockerInteract;
+			PlayerEvents.InteractingElevator += PlayerHandlers.OnInteractingElevator;
+			PlayerEvents.IntercomSpeaking += PlayerHandlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting += Handlers.OnShooting;
-			PlayerEvents.UsingMicroHIDEnergy += Handlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.SyncingData += Handlers.OnSyncingData;
-			PlayerEvents.ActivatingWarheadPanel += Handlers.OnActivatingWarheadPanel;
-			PlayerEvents.UnlockingGenerator += Handlers.OnGeneratorUnlock;
-			PlayerEvents.StoppingGenerator += Handlers.OnStoppingGenerator;
-			PlayerEvents.OpeningGenerator  += Handlers.OnGeneratorOpen;
-			PlayerEvents.ClosingGenerator += Handlers.OnGeneratorClose;
-			PlayerEvents.ActivatingGenerator += Handlers.OnActivatingGenerator;
-			PlayerEvents.Handcuffing += Handlers.OnHandcuffing;
-			PlayerEvents.ProcessingHotkey += Handlers.OnProcessingHotkey;
+			PlayerEvents.Shooting += PlayerHandlers.OnShooting;
+			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
+			PlayerEvents.SyncingData += PlayerHandlers.OnSyncingData;
+			PlayerEvents.ActivatingWarheadPanel += PlayerHandlers.OnActivatingWarheadPanel;
+			PlayerEvents.UnlockingGenerator += PlayerHandlers.OnGeneratorUnlock;
+			PlayerEvents.StoppingGenerator += PlayerHandlers.OnStoppingGenerator;
+			PlayerEvents.OpeningGenerator  += PlayerHandlers.OnGeneratorOpen;
+			PlayerEvents.ClosingGenerator += PlayerHandlers.OnGeneratorClose;
+			PlayerEvents.ActivatingGenerator += PlayerHandlers.OnActivatingGenerator;
+			PlayerEvents.Handcuffing += PlayerHandlers.OnHandcuffing;
+			PlayerEvents.ProcessingHotkey += PlayerHandlers.OnProcessingHotkey;
 
-			Scp079Events.GainingLevel += Handlers.On079LevelGain;
-			Scp914Events.UpgradingPlayer += Handlers.On914UpgradingPlayer;
+			Scp079Events.GainingLevel += ScpHandlers.On079LevelGain;
+			Scp914Events.UpgradingPlayer += ScpHandlers.On914UpgradingPlayer;
 
-			Scp096Events.AddingTarget += Handlers.On096AddingTarget;
-			Scp096Events.Enraging += Handlers.On096Enraging;
-			Scp096Events.CalmingDown += Handlers.On096CalmingDown;
+			Scp096Events.AddingTarget += ScpHandlers.On096AddingTarget;
+			Scp096Events.Enraging += ScpHandlers.On096Enraging;
+			Scp096Events.CalmingDown += ScpHandlers.On096CalmingDown;
 
-			Scp049Events.FinishingRecall += Handlers.On049FinishingRecall;
+			Scp049Events.FinishingRecall += ScpHandlers.On049FinishingRecall;
 		}
 
 		private void UnRegistEvents()
 		{
-			ServerEvents.WaitingForPlayers -= Handlers.OnWaintingForPlayers;
-			ServerEvents.RoundStarted -= Handlers.OnRoundStart;
-			ServerEvents.RoundEnded -= Handlers.OnRoundEnd;
-			ServerEvents.RestartingRound -= Handlers.OnRoundRestart;
-			ServerEvents.RespawningTeam -= Handlers.OnTeamRespawn;
+			ServerEvents.WaitingForPlayers -= ServerHandlers.OnWaintingForPlayers;
+			ServerEvents.RoundStarted -= ServerHandlers.OnRoundStart;
+			ServerEvents.RoundEnded -= ServerHandlers.OnRoundEnd;
+			ServerEvents.RestartingRound -= ServerHandlers.OnRoundRestart;
+			ServerEvents.RespawningTeam -= ServerHandlers.OnTeamRespawn;
 			
-			WarheadEvents.Starting -= Handlers.OnWarheadStart;
-			WarheadEvents.Stopping -= Handlers.OnWarheadCancel;
-			WarheadEvents.Detonated -= Handlers.OnDetonated;
+			WarheadEvents.Starting -= ServerHandlers.OnWarheadStart;
+			WarheadEvents.Stopping -= ServerHandlers.OnWarheadCancel;
+			WarheadEvents.Detonated -= ServerHandlers.OnDetonated;
 			
-			MapEvents.AnnouncingDecontamination -= Handlers.OnAnnounceDecont;
-			MapEvents.AnnouncingNtfEntrance -= Handlers.OnAnnounceNtf;
+			MapEvents.AnnouncingDecontamination -= ServerHandlers.OnAnnounceDecont;
+			MapEvents.AnnouncingNtfEntrance -= ServerHandlers.OnAnnounceNtf;
 
-			MapEvents.ExplodingGrenade -= Handlers.OnExplodingGrenade;
-			MapEvents.GeneratorActivated -= Handlers.OnGeneratorFinish;
-			MapEvents.PlacingBulletHole -= Handlers.OnPlacingBulletHole;
-			MapEvents.DamagingWindow += Handlers.OnDamagingWindow;
+			MapEvents.ExplodingGrenade -= ServerHandlers.OnExplodingGrenade;
+			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
+			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
+			MapEvents.DamagingWindow += ServerHandlers.OnDamagingWindow;
 
-			PlayerEvents.PreAuthenticating -= Handlers.OnPreAuth;
-			PlayerEvents.Verified -= Handlers.OnPlayerVerified;
-			PlayerEvents.Destroying -= Handlers.OnPlayerDestroying;
-			PlayerEvents.ChangingRole -= Handlers.OnPlayerSetClass;
-			PlayerEvents.Spawning -= Handlers.OnPlayerSpawn;
-			PlayerEvents.Hurting -= Handlers.OnPlayerHurt;
-			PlayerEvents.Died -= Handlers.OnDied;
-			PlayerEvents.FailingEscapePocketDimension -= Handlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem -= Handlers.OnThrowingItem;
-			PlayerEvents.UsingItem -= Handlers.OnPlayerUsingItem;
-			PlayerEvents.ItemUsed -= Handlers.OnPlayerItemUsed;
-			PlayerEvents.TriggeringTesla -= Handlers.OnPlayerTriggerTesla;
-			PlayerEvents.InteractingDoor -= Handlers.OnPlayerDoorInteract;
-			PlayerEvents.InteractingLocker -= Handlers.OnPlayerLockerInteract;
-			PlayerEvents.InteractingElevator -= Handlers.OnInteractingElevator;
-			PlayerEvents.IntercomSpeaking -= Handlers.OnIntercomSpeaking;
+			PlayerEvents.PreAuthenticating -= PlayerHandlers.OnPreAuth;
+			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
+			PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
+			PlayerEvents.ChangingRole -= PlayerHandlers.OnPlayerSetClass;
+			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawn;
+			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurt;
+			PlayerEvents.Died -= PlayerHandlers.OnDied;
+			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
+			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingItem;
+			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
+			PlayerEvents.ItemUsed -= PlayerHandlers.OnPlayerItemUsed;
+			PlayerEvents.TriggeringTesla -= PlayerHandlers.OnPlayerTriggerTesla;
+			PlayerEvents.InteractingDoor -= PlayerHandlers.OnPlayerDoorInteract;
+			PlayerEvents.InteractingLocker -= PlayerHandlers.OnPlayerLockerInteract;
+			PlayerEvents.InteractingElevator -= PlayerHandlers.OnInteractingElevator;
+			PlayerEvents.IntercomSpeaking -= PlayerHandlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting -= Handlers.OnShooting;
-			PlayerEvents.UsingMicroHIDEnergy -= Handlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.SyncingData -= Handlers.OnSyncingData;
-			PlayerEvents.ActivatingWarheadPanel -= Handlers.OnActivatingWarheadPanel;
-			PlayerEvents.UnlockingGenerator -= Handlers.OnGeneratorUnlock;
-			PlayerEvents.StoppingGenerator -= Handlers.OnStoppingGenerator;
-			PlayerEvents.OpeningGenerator -= Handlers.OnGeneratorOpen;
-			PlayerEvents.ClosingGenerator -= Handlers.OnGeneratorClose;
-			PlayerEvents.ActivatingGenerator -= Handlers.OnActivatingGenerator;
-			PlayerEvents.Handcuffing -= Handlers.OnHandcuffing;
-			PlayerEvents.ProcessingHotkey -= Handlers.OnProcessingHotkey;
+			PlayerEvents.Shooting -= PlayerHandlers.OnShooting;
+			PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
+			PlayerEvents.SyncingData -= PlayerHandlers.OnSyncingData;
+			PlayerEvents.ActivatingWarheadPanel -= PlayerHandlers.OnActivatingWarheadPanel;
+			PlayerEvents.UnlockingGenerator -= PlayerHandlers.OnGeneratorUnlock;
+			PlayerEvents.StoppingGenerator -= PlayerHandlers.OnStoppingGenerator;
+			PlayerEvents.OpeningGenerator -= PlayerHandlers.OnGeneratorOpen;
+			PlayerEvents.ClosingGenerator -= PlayerHandlers.OnGeneratorClose;
+			PlayerEvents.ActivatingGenerator -= PlayerHandlers.OnActivatingGenerator;
+			PlayerEvents.Handcuffing -= PlayerHandlers.OnHandcuffing;
+			PlayerEvents.ProcessingHotkey -= PlayerHandlers.OnProcessingHotkey;
 
-			Scp079Events.GainingLevel -= Handlers.On079LevelGain;
-			Scp914Events.UpgradingPlayer -= Handlers.On914UpgradingPlayer;
+			Scp079Events.GainingLevel -= ScpHandlers.On079LevelGain;
+			Scp914Events.UpgradingPlayer -= ScpHandlers.On914UpgradingPlayer;
 
-			Scp096Events.AddingTarget -= Handlers.On096AddingTarget;
-			Scp096Events.Enraging -= Handlers.On096Enraging;
-			Scp096Events.CalmingDown -= Handlers.On096CalmingDown;
-			Scp049Events.FinishingRecall -= Handlers.On049FinishingRecall;
-			Handlers = null;
+			Scp096Events.AddingTarget -= ScpHandlers.On096AddingTarget;
+			Scp096Events.Enraging -= ScpHandlers.On096Enraging;
+			Scp096Events.CalmingDown -= ScpHandlers.On096CalmingDown;
+			Scp049Events.FinishingRecall -= ScpHandlers.On049FinishingRecall;
+			ServerHandlers = null;
+			PlayerHandlers = null;
+			ScpHandlers = null;
 		}
 
 		private void RegistPatch()
