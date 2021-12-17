@@ -74,7 +74,7 @@ namespace SanyaRemastered.Commands
 
             foreach (var command in AllCommands)
             {
-                if (sender.CheckPermission($"sn.{command.Command}"))
+                if (sender.CheckPermission($"sanya.{command.Command}"))
                 {
                     response += $"<color=yellow><b>- {command.Command} ({string.Join(", ", command.Aliases)})</b></color>\n<color=white>{command.Description}</color>\n";
                 }

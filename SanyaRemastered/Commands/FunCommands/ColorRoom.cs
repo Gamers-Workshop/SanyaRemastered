@@ -15,7 +15,7 @@ namespace SanyaRemastered.Commands.FunCommands
 	{
 		public string Command => "ColorRoom";
 
-		public string[] Aliases => new string[] { };
+		public string[] Aliases => new string[] { "color" };
 
 		public string Description => "Change the color of the room";
 

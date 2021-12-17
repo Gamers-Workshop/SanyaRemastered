@@ -52,7 +52,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					return true;
 				}
 			}
-			else if (arguments.At(1).ToLower() == "stop")
+			else if (arguments.At(0).ToLower() == "stop")
 			{
 				Coroutines.AirSupportBomb(true);
 				Coroutines.isAirBombGoing = false;

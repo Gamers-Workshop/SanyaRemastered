@@ -32,7 +32,7 @@ namespace SanyaRemastered.Commands.StaffCommands
 			response = $"Players List ({PlayerManager.players.Count}/{Server.MaxPlayerCount})\n";
 			foreach (var i in Player.List)
 			{
-				response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i?.CurrentRoom}\n";
+				response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i?.CurrentRoom.Type}\n";
 			}
 			return true;
 		}

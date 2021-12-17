@@ -28,7 +28,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				return false;
 			}
 
-			if (arguments.Count > 1 && int.TryParse(arguments.At(1), out int sound))
+			if (arguments.Count > 0 && int.TryParse(arguments.At(0), out int sound))
 			{
 				Methods.PlayAmbientSound(sound);
 			}

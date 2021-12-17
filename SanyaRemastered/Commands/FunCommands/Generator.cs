@@ -30,7 +30,7 @@ namespace SanyaRemastered.Commands.FunCommands
 
 			if (arguments.Count > 1)
 			{
-				if (arguments.At(1).ToLower() == "unlock")
+				if (arguments.At(0).ToLower() == "unlock")
 				{
 					foreach (var generator in Recontainer079.AllGenerators)
 					{
@@ -39,7 +39,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					response = "gen unlocked.";
 					return true;
 				}
-				else if (arguments.At(1).ToLower() == "door")
+				else if (arguments.At(0).ToLower() == "door")
 				{
 					foreach (var generator in Recontainer079.AllGenerators)
 					{
@@ -49,7 +49,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					response = $"gen doors interacted.";
 					return true;
 				}
-				else if (arguments.At(1).ToLower() == "set")
+				else if (arguments.At(0).ToLower() == "set")
 				{
 					foreach (var generator in Recontainer079.AllGenerators.Where(x => !x.Engaged))
 					{
@@ -64,7 +64,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					response = "gen set.";
 					return true;
 				}
-				else if (arguments.At(1).ToLower() == "once")
+				else if (arguments.At(0).ToLower() == "once")
 				{
 					var gen = Recontainer079.AllGenerators.FirstOrDefault(x => !x.Engaged);
 
@@ -79,7 +79,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					response = "All generator ";
 					return false;
 				}
-				else if (arguments.At(1).ToLower() == "eject")
+				else if (arguments.At(0).ToLower() == "eject")
 				{
 					foreach (var generator in Recontainer079.AllGenerators)
 					{
