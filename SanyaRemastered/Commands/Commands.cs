@@ -48,6 +48,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new AirBomb());
             RegisterCommand(new Blackout());
             RegisterCommand(new ColorRoom());
+            RegisterCommand(new Explode());
             RegisterCommand(new Femur());
             RegisterCommand(new Generator());
             RegisterCommand(new Heli());

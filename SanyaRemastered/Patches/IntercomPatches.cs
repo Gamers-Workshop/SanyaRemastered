@@ -29,8 +29,13 @@ namespace SanyaRemastered.Patches
 	class IntercomUpdateTextPatches
 	{
 		public static void Prefix(Intercom __instance)
-		{	
-		if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
+		{
+			if (!string.IsNullOrEmpty(SanyaRemastered.Instance.SpecialTextIntercom))
+			{
+				__instance.CustomContent = SanyaRemastered.Instance.SpecialTextIntercom;
+				return;
+			}
+			if (!SanyaRemastered.Instance.Config.IntercomInformation) return;
 			{
 				Room RoomHcz106 = Map.Rooms.Where(x => x.Type == RoomType.Hcz106).Single();
 				Room RoomIntercom = Map.Rooms.Where(x => x.Type == RoomType.EzIntercom).Single();

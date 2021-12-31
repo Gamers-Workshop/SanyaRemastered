@@ -9,6 +9,7 @@ using InventorySystem;
 using InventorySystem.Items;
 using InventorySystem.Items.Firearms.BasicMessages;
 using InventorySystem.Items.ThrowableProjectiles;
+using InventorySystem.Items.Usables.Scp330;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
@@ -31,6 +32,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using Utils.Networking;
 
 namespace SanyaRemastered.Functions
 {
@@ -159,7 +161,7 @@ namespace SanyaRemastered.Functions
                     List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
                     foreach (var pos in randampos)
                     {
-                        Methods.SpawnGrenade(pos, ItemType.GrenadeHE, 0.1f);
+                        Methods.Explode(pos);
                         yield return Timing.WaitForSeconds(0.1f);
                     }
                     if (TimeEnd != -1)
@@ -253,7 +255,23 @@ namespace SanyaRemastered.Functions
             {
                 Log.Error($"[SpawnGrenade] Error: {ex}");
             }
-
+        }
+        public static void Explode(Vector3 position,ReferenceHub hub = null)
+        {
+            if (hub == null)
+            {
+                hub = Server.Host.ReferenceHub;
+            }
+            ExplosionGrenade settingsReference;
+            if (!CandyPink.TryGetGrenade(out settingsReference))
+            {
+                return;
+            }
+            new CandyPink.CandyExplosionMessage
+            {
+                Origin = position
+            }.SendToAuthenticated(0);
+            ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
         }
         public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
         {

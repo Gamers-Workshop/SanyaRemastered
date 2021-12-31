@@ -44,6 +44,7 @@ namespace SanyaRemastered
 		public SanyaRemastered() => Instance = this;
 		private Ram.MemoryService _memoryService;
 
+		public string SpecialTextIntercom = null;
 		public override void OnEnabled()
 		{
 			if (!Config.IsEnabled) return;

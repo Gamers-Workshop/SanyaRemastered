@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanyaRemastered.Patches
+namespace SanyaRemastered.Patches.CommandPatches
 {
 	[HarmonyPatch(typeof(KillCommand), nameof(KillCommand.Execute))]
 	public static class KillCommandPatches

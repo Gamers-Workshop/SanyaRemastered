@@ -33,7 +33,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				if (float.TryParse(arguments.At(1), out float duration))
 					foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
 					{
-						if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+						if (RoomIdentifier.RoomsByCoordinates.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
 						{
 							flickerableLightController.ServerFlickerLights(duration);
 						}
@@ -48,7 +48,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				{
 					foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
 					{
-						if (RoomIdentifier.RoomsByCoordinatess.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
+						if (RoomIdentifier.RoomsByCoordinates.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
 						{
 							flickerableLightController.ServerFlickerLights(duration);
 						}
