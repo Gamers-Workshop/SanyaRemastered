@@ -66,16 +66,16 @@ namespace SanyaRemastered.Commands.FunCommands
 				response = $"lightcolor: invalid params.";
 				return false;
 			}
-			else if (arguments.At(1).ToLower() == "set")
+			else if (arguments.At(0).ToLower() == "set")
 			{
 				foreach (Room room in Map.Rooms)
 				{
 					if (room.Type.ToString().Contains(arguments.At(2)))
 					{
-						if (arguments.Count > 4
-						&& float.TryParse(arguments.At(2), out var r)
-						&& float.TryParse(arguments.At(3), out var g)
-						&& float.TryParse(arguments.At(4), out var b))
+						if (arguments.Count > 3
+						&& float.TryParse(arguments.At(1), out var r)
+						&& float.TryParse(arguments.At(2), out var g)
+						&& float.TryParse(arguments.At(3), out var b))
 						{
 							room.Color = new Color(r / 255f, g / 255f, b / 255f);
 						}
