@@ -104,7 +104,6 @@
     <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ScpTargetPatches.cs" />
     <Compile Include="Patches\ServerDisconnectPatches.cs" />
-    <Compile Include="Patches\TeslaPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ram.cs" />
     <Compile Include="SanyaConfig.cs" />
