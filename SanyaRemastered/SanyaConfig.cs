@@ -56,7 +56,6 @@ namespace SanyaRemastered
         public float TeslaRange { get; set; } = 5.5f;
         public bool TeslaDestroyName { get; set; } = false;
         public bool TeslaNoTriggerRadioPlayer { get; set; } = false;
-        public bool NoIdlingTeslaGodmodAndBlackout { get; set; } = false;
 
         [Description("Ajout de porte sur la map")]
         public bool AddDoorsOnSurface { get; set; } = false;
