@@ -1,6 +1,8 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Armor;
@@ -334,13 +336,17 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
         {
-            Log.Debug($"[OnPlayerTriggerTesla] {ev.IsInHurtingRange}:{ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-            if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer 
-                && ev.Player.IsHuman() 
-                && ev.Player.ReferenceHub.inventory.UserInventory.Items.Any(x => x.Value.TryGetComponent(out RadioItem comp) && comp.IsUsable))
-            { 
+            if (ev.Tesla.NetworkInactiveTime > 0)
+            {
                 ev.IsTriggerable = false;
                 ev.IsInIdleRange = false;
+            }
+            else if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer 
+                && Map.FindParentRoom(ev.Tesla.gameObject)?.Players.Any(p => p.Items.Any(i => i.Base is RadioItem radio && radio.IsUsable)) == true)
+            {
+                ev.IsTriggerable = false;
+                ev.IsInIdleRange = false;
+                ev.Tesla.NetworkInactiveTime = 1;
             }
         }
 
@@ -363,22 +369,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
-            if (plugin.Config.AddDoorsOnSurface && ev.Door.Base.TryGetComponent<DoorNametagExtension>(out var nametag))
-            {
-                if (nametag._nametag.Contains("GATE_EX_"))
-                {
-                    bool flagL = DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.AllowInteracting(ev.Player.ReferenceHub, 0);
-                    bool flagR = DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.AllowInteracting(ev.Player.ReferenceHub, 0);
-                    if (flagL && flagR)
-                        if (nametag._nametag == "GATE_EX_L")
-                            DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.NetworkTargetState = !DoorNametagExtension.NamedDoors["GATE_EX_R"].TargetDoor.TargetState;
-                        else
-                            DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.NetworkTargetState = !DoorNametagExtension.NamedDoors["GATE_EX_L"].TargetDoor.TargetState;
-                    else
-                        ev.IsAllowed = false;
-                }
-            }
-            if (ev.Door.Base.TryGetComponent<GateTimerClose>(out var Gate))
+            if (ev.Door.Type == (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent<GateTimerClose>(out var Gate))
             {
                 Gate._timeBeforeClosing = -1;
             }
@@ -420,16 +411,16 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
+            if (ev.Shooter.SessionVariables.ContainsKey("InfAmmo") && ev.Shooter?.CurrentItem is Firearm firearm)
+            {
+                firearm.Ammo++;
+            }
         }
         public void OnUsingMicroHIDEnergy(UsingMicroHIDEnergyEventArgs ev)
         {
             if (ev.Player.SessionVariables.ContainsKey("InfAmmo"))
             {
                 ev.Drain = 0;
-            }
-            if (SanyaRemastered.Instance.Config.MicroHidNotActive.Contains(ev.Player.Role))
-            {
-                ev.IsAllowed = false;
             }
         }
         public void OnSyncingData(SyncingDataEventArgs ev)

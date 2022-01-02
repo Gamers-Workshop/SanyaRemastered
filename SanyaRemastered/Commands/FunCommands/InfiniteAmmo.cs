@@ -26,52 +26,48 @@ namespace SanyaRemastered.Commands.FunCommands
 				response = $"You don't have permission to execute this command. Required permission: sanya.{Command}";
 				return false;
 			}
-
-			if (arguments.At(0).ToLower() == "all")
-			{
-				foreach (Player p in Player.List.Where(x => !x.SessionVariables.ContainsKey("InfAmmo")))
-					p.SessionVariables.Add("InfAmmo", null);
-				response = "Tous les joueurs on l'infinite ammo";
-				return true;
-			}
-			else if (arguments.At(0).ToLower() == "clear")
-			{
-				foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
-					p.SessionVariables.Remove("InfAmmo");
-				response = "Plus aucun joueurs n'as le infinite ammo";
-				return true;
-			}
-			else if (arguments.At(0).ToLower() == "list")
-			{
-				response = "Liste des joueurs avec infinite ammo";
-				foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
-					response += "\n  - " + p.Nickname;
-				return true;
-			}
 			if (arguments.Count > 0)
-			{
-				Player target = Player.Get(arguments.At(0));
-				if (target != null)
+            {
+				if (arguments.At(0).ToLower() == "all")
 				{
-					if (target.SessionVariables.ContainsKey("InfAmmo"))
-						target.SessionVariables.Remove("InfAmmo");
-					else
-						target.SessionVariables.Add("InfAmmo", null);
-					response = $"Inf Ammo: {target.SessionVariables.ContainsKey("InfAmmo")}.";
+					foreach (Player p in Player.List.Where(x => !x.SessionVariables.ContainsKey("InfAmmo")))
+						p.SessionVariables.Add("InfAmmo", null);
+					response = "Tous les joueurs on l'infinite ammo";
 					return true;
 				}
-				response = $"Inf Ammo: Can't Find the player";
-				return false;
-			}
-			else
-			{
-				Player player = null;
-				if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
+				else if (arguments.At(0).ToLower() == "clear")
+				{
+					foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
+						p.SessionVariables.Remove("InfAmmo");
+					response = "Plus aucun joueurs n'as le infinite ammo";
+					return true;
+				}
+				else if (arguments.At(0).ToLower() == "list")
+				{
+					response = "Liste des joueurs avec infinite ammo";
+					foreach (Player p in Player.List.Where(x => x.SessionVariables.ContainsKey("InfAmmo")))
+						response += "\n  - " + p.Nickname;
+					return true;
+				}
 				else
 				{
-					response = $"You need to add argument";
+					Player target = Player.Get(arguments.At(0));
+					if (target != null)
+					{
+						if (target.SessionVariables.ContainsKey("InfAmmo"))
+							target.SessionVariables.Remove("InfAmmo");
+						else
+							target.SessionVariables.Add("InfAmmo", null);
+						response = $"Inf Ammo: {target.SessionVariables.ContainsKey("InfAmmo")}.";
+						return true;
+					}
+					response = $"Inf Ammo: Can't Find the player";
 					return false;
 				}
+			}
+			else if (sender is PlayerCommandSender playerCommandSender)
+			{
+				Player player = Player.Get(playerCommandSender.SenderId);
 
 				if (player.SessionVariables.ContainsKey("InfAmmo"))
 					player.SessionVariables.Remove("InfAmmo");
@@ -79,6 +75,11 @@ namespace SanyaRemastered.Commands.FunCommands
 					player.SessionVariables.Add("InfAmmo", null);
 				response = $"Inf Ammo: {player.SessionVariables.ContainsKey("InfAmmo")}.";
 				return true;
+			}
+			else
+			{
+				response = $"You need to add argument";
+				return false;
 			}
 		}
 	}
