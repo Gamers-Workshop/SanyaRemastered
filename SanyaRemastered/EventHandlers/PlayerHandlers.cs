@@ -352,7 +352,7 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
-            Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Nametag}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Type}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Door.DoorLockType == DoorLockType.Isolation)
             {

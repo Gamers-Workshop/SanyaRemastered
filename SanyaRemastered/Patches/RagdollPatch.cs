@@ -1,4 +1,5 @@
-﻿using Exiled.API.Features;
+﻿using Exiled.API.Enums;
+using Exiled.API.Features;
 using HarmonyLib;
 using Mirror;
 using PlayerStatsSystem;
@@ -22,7 +23,21 @@ namespace SanyaRemastered.Patches
             {
                 return false;
             }
-            ragdoll.NetworkInfo = new RagdollInfo(hub, handler, model_ragdoll.transform.localPosition, model_ragdoll.transform.localRotation);
+            Player player = Player.Get(hub);
+            DamageHandler damage = new DamageHandler(player, handler);
+            string nick = hub.nicknameSync.DisplayName;
+            double time = NetworkTime.time;
+            //Disable Ragdoll
+            if (SanyaRemastered.Instance.Config.Scp106RemoveRagdoll && damage.Type == DamageType.Scp106
+                || SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && damage.Type == DamageType.Scp096) return false;
+            //Disable Recall By 079
+            if (SanyaRemastered.Instance.Config.Scp049Real && damage.Type != DamageType.Scp049) time = double.MinValue;
+            //TeslaDestroyTheNameOfThePlayer
+            if (SanyaRemastered.Instance.Config.TeslaDestroyName && damage.Type == DamageType.Tesla) nick = "inconue";
+
+
+            ragdoll.NetworkInfo = new RagdollInfo(hub, handler, player.Role, model_ragdoll.transform.localPosition + hub.transform.position, model_ragdoll.transform.localRotation * hub.transform.rotation, nick, time);
+
             //PlayerSizeForTheRagdoll
             Player Owner = Player.Get(hub);
             ragdoll.transform.localScale = new Vector3(Owner.Scale.x * ragdoll.transform.localScale.x,

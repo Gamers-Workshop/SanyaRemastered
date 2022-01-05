@@ -214,7 +214,7 @@ namespace SanyaRemastered.EventHandlers
                 light_nuke.transform.position = new Vector3(40.75f, 991f, -35.75f);
                 light_nuke.NetworkLightRange = 4.5f;
                 light_nuke.NetworkLightIntensity = 2f;
-                light_nuke.NetworkLightColor = new Color(1f, 0f, 0f);
+                light_nuke.NetworkLightColor = Color.red;
 
                 //Lumiére dans le couloir de la GateA 
                 var light_GateA1 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
@@ -239,7 +239,6 @@ namespace SanyaRemastered.EventHandlers
                     wall_106.transform.rotation = Quaternion.Euler(Vector3.up * 90f);
                 wall_106.UpdatePositionServer();
                 wall_106.NetworkPrimitiveType = PrimitiveType.Cube;
-                wall_106.NetworkMaterialColor = new Color(0, 0, 0, 0);
 
                 NetworkServer.Spawn(station1);
                 NetworkServer.Spawn(station2);
@@ -252,8 +251,6 @@ namespace SanyaRemastered.EventHandlers
                 NetworkServer.Spawn(light_nuke.gameObject);
                 NetworkServer.Spawn(light_GateA1.gameObject);
                 NetworkServer.Spawn(light_GateA2.gameObject);
-
-                NetworkServer.Spawn(wall_106.gameObject);
             }
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
