@@ -13,7 +13,7 @@ namespace SanyaRemastered.Patches
 	[HarmonyPatch(typeof(Intercom), nameof(Intercom.ServerAllowToSpeak))]
 	class IntercomUpdateSpeaker
 	{
-		public static void Prefix(Intercom __instance)
+		public static void Prefix()
         {
 			if (SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
             {

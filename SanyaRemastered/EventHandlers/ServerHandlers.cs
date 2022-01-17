@@ -333,11 +333,11 @@ namespace SanyaRemastered.EventHandlers
 
                 if (!isresumed)
                 {
-                    Methods.SendSubtitle(Subtitles.AlphaWarheadStart.Replace("{0}", count.ToString()), 15);
+                    Methods.SendSubtitle(SubtitlesList.AlphaWarheadStart.Replace("{0}", count.ToString()), 15);
                 }
                 else
                 {
-                    Methods.SendSubtitle(Subtitles.AlphaWarheadResume.Replace("{0}", count.ToString()), 10);
+                    Methods.SendSubtitle(SubtitlesList.AlphaWarheadResume.Replace("{0}", count.ToString()), 10);
                 }
             }
         }
@@ -350,7 +350,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
             {
-                Methods.SendSubtitle(Subtitles.AlphaWarheadCancel, 7);
+                Methods.SendSubtitle(SubtitlesList.AlphaWarheadCancel, 7);
             }
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
@@ -383,7 +383,7 @@ namespace SanyaRemastered.EventHandlers
                             foreach (Player player in Player.List)
                             {
                                 if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationInit, shouldClearPrevious: true);
+                                    player.Broadcast(20, SubtitlesList.DecontaminationInit, shouldClearPrevious: true);
                             }
                             break;
                         }
@@ -392,7 +392,7 @@ namespace SanyaRemastered.EventHandlers
                             foreach (Player player in Player.List)
                             {
                                 if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "10"), shouldClearPrevious: true);
+                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "10"), shouldClearPrevious: true);
                             }
                             break;
                         }
@@ -401,7 +401,7 @@ namespace SanyaRemastered.EventHandlers
                             foreach (Player player in Player.List)
                             {
                                 if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "5"), shouldClearPrevious: true);
+                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "5"), shouldClearPrevious: true);
                             }
                             break;
                         }
@@ -410,7 +410,7 @@ namespace SanyaRemastered.EventHandlers
                             foreach (Player player in Player.List)
                                 if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
                                 {
-                                    player.Broadcast(20, Subtitles.DecontaminationMinutesCount.Replace("{0}", "1"), shouldClearPrevious: true);
+                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "1"), shouldClearPrevious: true);
                                 }
                             break;
                         }
@@ -419,7 +419,7 @@ namespace SanyaRemastered.EventHandlers
                             foreach (Player player in Player.List)
                                 if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
                                 {
-                                    player.Broadcast(45, Subtitles.Decontamination30s.Replace("{0}", "10"), shouldClearPrevious: true);
+                                    player.Broadcast(45, SubtitlesList.Decontamination30s.Replace("{0}", "10"), shouldClearPrevious: true);
                                 }
                             break;
                         }
@@ -428,12 +428,12 @@ namespace SanyaRemastered.EventHandlers
 
                 }
         }
-        public void OnDecontaminating(DecontaminatingEventArgs ev)
+        public void OnDecontaminating(DecontaminatingEventArgs _)
         {
             Log.Debug($"[OnDecontaminating]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (plugin.Config.CassieSubtitle)
-                Methods.SendSubtitle(Subtitles.DecontaminationLockdown, 15);
+                Methods.SendSubtitle(SubtitlesList.DecontaminationLockdown, 15);
         }
         public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
         {
@@ -450,11 +450,11 @@ namespace SanyaRemastered.EventHandlers
 
                 if (SCPCount > 0)
                 {
-                    Methods.SendSubtitle(Subtitles.MTFRespawnSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}").Replace("{1}", SCPCount.ToString()), 30);
+                    Methods.SendSubtitle(SubtitlesList.MTFRespawnSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}").Replace("{1}", SCPCount.ToString()), 30);
                 }
                 else
                 {
-                    Methods.SendSubtitle(Subtitles.MTFRespawnNOSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}"), 30);
+                    Methods.SendSubtitle(SubtitlesList.MTFRespawnNOSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}"), 30);
                 }
             }
         }
@@ -481,11 +481,11 @@ namespace SanyaRemastered.EventHandlers
             {
                 if (curgen < 3)
                 {
-                    Methods.SendSubtitle(Subtitles.GeneratorFinish.Replace("{0}", curgen.ToString()).Replace("{s}", curgen == 1 ? "" : "s"), 10);
+                    Methods.SendSubtitle(SubtitlesList.GeneratorFinish.Replace("{0}", curgen.ToString()).Replace("{s}", curgen == 1 ? "" : "s"), 10);
                 }
                 else
                 {
-                    Methods.SendSubtitle(Subtitles.GeneratorComplete, 20);
+                    Methods.SendSubtitle(SubtitlesList.GeneratorComplete, 20);
                 }
             }
             if (SanyaRemastered.Instance.Config.GeneratorFinishLock) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);

@@ -19,8 +19,6 @@ namespace SanyaRemastered.Commands.DevCommands
 
         public string Description => "Make All exit safe";
 
-        private LightSourceToy targetLight = null;
-
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission($"sanya.dev"))

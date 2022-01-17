@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
@@ -26,7 +25,7 @@ namespace SanyaRemastered.Commands.DevCommands
                 response = $"You don't have permission to execute this command. Required permission: sanya.dev";
                 return false;
             }
-			Player player = null;
+			Player player;
 			if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 			else
             {

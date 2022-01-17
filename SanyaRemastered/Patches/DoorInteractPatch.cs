@@ -28,7 +28,7 @@ namespace SanyaRemastered.Patches
 				}
 				return true;
 			}
-			catch (System.Exception ex)
+			catch
 			{
 				return true;
 			}
@@ -56,7 +56,7 @@ namespace SanyaRemastered.Patches
 				}
 				return true;
 			}
-			catch (System.Exception ex)
+			catch 
 			{
 				return true;
 			}
@@ -84,7 +84,7 @@ namespace SanyaRemastered.Patches
 				}
 				return true;
 			}
-			catch (System.Exception ex)
+			catch
 			{
 				return true;
 			}
@@ -112,7 +112,7 @@ namespace SanyaRemastered.Patches
 				}
 				return true;
 			}
-			catch (System.Exception ex)
+			catch
 			{
 				return true;
 			}
@@ -155,7 +155,7 @@ namespace SanyaRemastered.Patches
 					}
 					return false;
 				}
-				catch (System.Exception ex)
+				catch
 				{
 					return true;
 				}

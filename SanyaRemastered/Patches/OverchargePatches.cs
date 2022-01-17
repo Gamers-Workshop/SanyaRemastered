@@ -12,7 +12,7 @@ namespace SanyaRemastered.Patches
         public static void Postfix()
         {
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
-                Methods.SendSubtitle(Subtitles.OverchargeStart,5);
+                Methods.SendSubtitle(SubtitlesList.OverchargeStart,5);
         }
     }
     [HarmonyPatch(typeof(Recontainer079), nameof(Recontainer079.EndOvercharge))]
@@ -21,7 +21,7 @@ namespace SanyaRemastered.Patches
         public static void Postfix()
         {
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
-                Methods.SendSubtitle(Subtitles.OverchargeFinish,5);
+                Methods.SendSubtitle(SubtitlesList.OverchargeFinish,5);
         }
     }
 }

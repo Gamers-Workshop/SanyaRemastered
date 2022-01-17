@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Exiled;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using UnityEngine;
 
@@ -59,5 +60,56 @@ namespace SanyaRemastered.Data
 				new Vector3(UnityEngine.Random.Range( -1, -13), 1001, UnityEngine.Random.Range(  4,  -3))
 			};
 		}
+	}
+	public class ContainRoom
+    {
+		public enum ContainmentRoom
+        {
+			//LightZone
+			Lcz914Containment,
+			Lcz173Containment,
+			Lcz330Containment,
+			Lcz330Controller,
+			LczArmory,
+			//HeavyZone
+			HczHid,
+			Hcz106Bottom,
+			Hcz106FemurBreaker,
+			Hcz079Hall,
+			Hcz079Containment,
+			Hcz049Containment,
+			Hcz049Armory,
+			Hcz096Containment,
+			HczArmory,
+			HczNuke,
+			//EntranceZone
+			EzIntercom,
+			//SurfaceZone
+			SurfaceNuke,
+        }
+		Dictionary<ContainmentRoom, List<Tuple<Vector3,Vector3>>> c = new Dictionary<ContainmentRoom, List<Tuple<Vector3, Vector3>>>
+		{
+			//LightZone
+			{ContainmentRoom.Lcz914Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(2.9f, 0, 10.1f), new Vector3(-10.2f, -5f, -10.2f)) } },
+			{ContainmentRoom.Lcz173Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(-16.4f, -16.8f, -5.2f), new Vector3(-30.2f, -22.3f, -16.7f)) } },
+			{ContainmentRoom.Lcz330Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(Vector3.one, Vector3.one), Tuple.Create(Vector3.one, Vector3.one), Tuple.Create(Vector3.one, Vector3.one) } },
+			{ContainmentRoom.Lcz330Controller,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(Vector3.one, Vector3.one), Tuple.Create(Vector3.one, Vector3.one), Tuple.Create(Vector3.one, Vector3.one) } },
+			{ContainmentRoom.LczArmory,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(1.2f, -1f, 6f), new Vector3(-9.5f, -10f, -7f)) } },
+			//HeavyZone
+			{ContainmentRoom.HczHid,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(3.7f, 0f, 9.8f), new Vector3(-4.0f, -5f, 7.4f)) } },
+			{ContainmentRoom.Hcz106Bottom,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(9.6f, 20f, 30.8f), new Vector3(-24.4f, 13f, -1.9f)) } },
+			{ContainmentRoom.Hcz106FemurBreaker,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(-25.6f, 20f, 32f), new Vector3(-33.7f, -10f, -4.6f)) } },
+			{ContainmentRoom.Hcz079Hall,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(-12.3f, 7f, 18.7f), new Vector3(-20.8f, 0f, -2.5f)) } },
+			{ContainmentRoom.Hcz079Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(10.3f, 10f, 22.5f), new Vector3(-8.2f, 0f, 5.2f)) } },
+			{ContainmentRoom.Hcz049Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(9.3f, -260f, -11f), new Vector3(-9.6f, -270f, -16.8f)) } },
+			{ContainmentRoom.Hcz049Armory,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(-3f, -260f, -4.6f), new Vector3(-8.6f, -270f, -10.1f)) } },
+			{ContainmentRoom.Hcz096Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(4.4f, 0f, 1.9f), new Vector3(0.5f, -5f, -1.9f)) } },
+			{ContainmentRoom.HczArmory,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(0.1f, 0f, 2.9f), new Vector3(-5.6f, -5f, -2.8f)) } },
+			{ContainmentRoom.HczNuke,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(Vector3.one, Vector3.one) } },
+			//EntranceZone
+			{ContainmentRoom.EzIntercom,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(Vector3.one, Vector3.one), Tuple.Create(Vector3.one, Vector3.one) } },
+			//SurfaceZone
+			{ContainmentRoom.SurfaceNuke,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(Vector3.one, Vector3.one) } },
+		};
 	}
 }

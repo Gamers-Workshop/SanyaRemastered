@@ -1,4 +1,5 @@
 ﻿using System;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using HarmonyLib;
 using InventorySystem;
@@ -21,19 +22,21 @@ namespace SanyaRemastered.Patches
 			{
 				return false;
 			}
-			ItemBase itemBase;
-			if (!InventoryItemLoader.AvailableItems.TryGetValue(__instance.Info.ItemId, out itemBase))
-			{
-				return false;
-			}
-			ThrowableItem throwableItem;
-			if ((throwableItem = (itemBase as ThrowableItem)) == null)
+            if (!InventoryItemLoader.AvailableItems.TryGetValue(__instance.Info.ItemId, out ItemBase itemBase))
+            {
+                return false;
+            }
+
+            if ((itemBase as ThrowableItem) == null)
 			{
 				return false;
 			}
 			__instance.Info.Locked = true;
 			__instance._attacker = attacker;
-			Methods.SpawnGrenade(__instance.Rb.position, throwableItem.ItemTypeId,0.1f ,Player.Get(attacker.NetId));
+			if (__instance.Info.ItemId == ItemType.GrenadeFlash)
+				Methods.SpawnGrenade(__instance.Rb.position, ItemType.GrenadeFlash,0.1f ,Player.Get(attacker.NetId));
+			else if (__instance.Info.ItemId == ItemType.GrenadeHE)
+				Methods.Explode(__instance.Rb.position, attacker.Hub);
 			__instance.DestroySelf();
 			return false;
 		}

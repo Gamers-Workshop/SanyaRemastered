@@ -31,7 +31,7 @@ namespace SanyaRemastered.Patches
 					}
 					__instance.RpcDoSound();
 					__instance._ccm.RpcPlaceBlood(position, 0, Mathf.Clamp(num / 30f, 0.8f, 2f));
-					__instance._hub.playerStats.DealDamage(new UniversalDamageHandler(num, DeathTranslations.Falldown, "SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED"));
+					__instance._hub.playerStats.DealDamage(new UniversalDamageHandler(num, DeathTranslations.Falldown, null));
 				}
 			}
 			catch(Exception ex)

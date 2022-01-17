@@ -240,24 +240,23 @@ namespace SanyaRemastered
             {
                 if (info.PropertyType.IsList())
                 {
-                    var list = info.GetValue(this) as IEnumerable;
                     returned += $"{info.Name}:\n";
-                    if (list != null)
-                        foreach (var i in list) returned += $"{i}\n";
+                    if (info.GetValue(this) is IEnumerable list)
+                        foreach (object i in list) returned += $"{i}\n";
                 }
                 else if (info.PropertyType.IsDictionary())
                 {
                     returned += $"{info.Name}: ";
 
-                    var obj = info.GetValue(this);
+                    object obj = info.GetValue(this);
 
                     IDictionary dict = (IDictionary)obj;
 
-                    var key = obj.GetType().GetProperty("Keys");
-                    var value = obj.GetType().GetProperty("Values");
-                    var keyObj = key.GetValue(obj, null);
-                    var valueObj = value.GetValue(obj, null);
-                    var keyEnum = keyObj as IEnumerable;
+                    PropertyInfo key = obj.GetType().GetProperty("Keys");
+                    PropertyInfo value = obj.GetType().GetProperty("Values");
+                    object keyObj = key.GetValue(obj, null);
+                    object valueObj = value.GetValue(obj, null);
+                    IEnumerable keyEnum = keyObj as IEnumerable;
 
                     foreach (var i in dict.Keys)
                     {
@@ -274,36 +273,34 @@ namespace SanyaRemastered
 
             FieldInfo[] fieldInfos = typeof(Configs).GetFields(BindingFlags.Public | BindingFlags.Instance);
 
-            foreach (var info in fieldInfos)
+            foreach (FieldInfo info in fieldInfos)
             {
                 if (info.FieldType.IsList())
                 {
-                    var list = info.GetValue(this) as IEnumerable;
                     returned += $"{info.Name}:\n";
-                    if (list != null)
-                        foreach (var i in list) returned += $"{i}\n";
+                    if (info.GetValue(this) is IEnumerable list)
+                        foreach (object i in list) returned += $"{i}\n";
                 }
                 else if (info.FieldType.IsDictionary())
                 {
                     returned += $"{info.Name}: ";
 
-                    var obj = info.GetValue(this);
+                    object obj = info.GetValue(this);
 
                     IDictionary dict = (IDictionary)obj;
 
-                    var key = obj.GetType().GetProperty("Keys");
-                    var value = obj.GetType().GetProperty("Values");
-                    var keyObj = key.GetValue(obj, null);
-                    var valueObj = value.GetValue(obj, null);
-                    var keyEnum = keyObj as IEnumerable;
+                    PropertyInfo key = obj.GetType().GetProperty("Keys");
+                    PropertyInfo value = obj.GetType().GetProperty("Values");
+                    object keyObj = key.GetValue(obj, null);
+                    object valueObj = value.GetValue(obj, null);
+                    IEnumerable keyEnum = keyObj as IEnumerable;
 
-                    foreach (var i in dict.Keys)
+                    foreach (object i in dict.Keys)
                     {
                         if (dict[i].GetType().IsList())
                         {
-                            var list = dict[i] as IEnumerable;
                             returned += $"[{i}:";
-                            if (list != null)
+                            if (dict[i] is IEnumerable list)
                                 foreach (var x in list) returned += $"{x},";
                             returned += "]";
                         }

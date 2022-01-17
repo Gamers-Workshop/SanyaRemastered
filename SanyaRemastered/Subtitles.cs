@@ -1,6 +1,6 @@
 ﻿namespace SanyaRemastered.Data
 {
-	internal static class Subtitles
+	internal static class SubtitlesList
 	{
 
 		internal static readonly string NoProfileKickMessage = string.Concat(

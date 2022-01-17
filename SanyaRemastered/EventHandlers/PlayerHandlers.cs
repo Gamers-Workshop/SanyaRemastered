@@ -73,7 +73,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
                 {
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079First, 20);
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079First, 20);
                     ev.Player.ResetInventory(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
                 }));
             }
@@ -203,15 +203,15 @@ namespace SanyaRemastered.EventHandlers
                 {
                     if (ev.Handler.Type == DamageType.Warhead)
                     {
-                        str = Subtitles.SCPDeathWarhead.Replace("{0}", fullname);
+                        str = SubtitlesList.SCPDeathWarhead.Replace("{0}", fullname);
                     }
                     else if (ev.Handler.Type == DamageType.Tesla)
                     {
-                        str = Subtitles.SCPDeathTesla.Replace("{0}", fullname);
+                        str = SubtitlesList.SCPDeathTesla.Replace("{0}", fullname);
                     }
                     else if (ev.Handler.Type == DamageType.Decontamination)
                     {
-                        str = Subtitles.SCPDeathDecont.Replace("{0}", fullname);
+                        str = SubtitlesList.SCPDeathDecont.Replace("{0}", fullname);
                     }
                     else
                     {
@@ -220,28 +220,28 @@ namespace SanyaRemastered.EventHandlers
                         {
                             case Team.CDP:
                                 {
-                                    str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un classe-D");
+                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un classe-D");
                                     break;
                                 }
                             case Team.CHI:
                                 {
-                                    str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "l'insurection du chaos");
+                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "l'insurection du chaos");
                                     break;
                                 }
                             case Team.RSC:
                                 {
-                                    str = Subtitles.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un scientifique");
+                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un scientifique");
                                     break;
                                 }
                             case Team.MTF:
                                 {
                                     string unit = ev.Killer.ReferenceHub.characterClassManager.CurUnitName;
-                                    str = Subtitles.SCPDeathContainedMTF.Replace("{0}", fullname).Replace("{1}", unit);
+                                    str = SubtitlesList.SCPDeathContainedMTF.Replace("{0}", fullname).Replace("{1}", unit);
                                     break;
                                 }
                             default:
                                 {
-                                    str = Subtitles.SCPDeathUnknown.Replace("{0}", fullname);
+                                    str = SubtitlesList.SCPDeathUnknown.Replace("{0}", fullname);
                                     break;
                                 }
                         }
@@ -430,9 +430,9 @@ namespace SanyaRemastered.EventHandlers
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
             {
                 if (ev.CurrentAnimation == 1)
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendEnabled, 3);
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendEnabled, 3);
                 else
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendDisabled, 3);
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendDisabled, 3);
             }
             if (SanyaRemastered.Instance.Config.StaminaEffect)
             {
@@ -532,7 +532,7 @@ namespace SanyaRemastered.EventHandlers
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Mana)
                                     {
                                         scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Mana);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 5);
+                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoEnergy, 5);
                                         break;
                                     }
 
@@ -542,7 +542,7 @@ namespace SanyaRemastered.EventHandlers
                                     break;
                                 }
                             }
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoLevel, 5);
                             break;
                         }
                     case HotkeyButton.PrimaryFirearm:
@@ -550,13 +550,13 @@ namespace SanyaRemastered.EventHandlers
 
                             if (!ev.Player.SessionVariables.ContainsKey("scp079_advanced_mode"))
                                 ev.Player.SessionVariables.Add("scp079_advanced_mode", null);
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendEnabled, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendEnabled, 5);
                             ev.Player.Inventory.ServerSelectItem(4);
                             break;
                         }
                     case HotkeyButton.SecondaryFirearm:
                         {
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendDisabled, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendDisabled, 5);
                             ev.Player.SessionVariables.Remove("scp079_advanced_mode");
                             ev.Player.Inventory.ServerSelectItem(0);
                             break;
@@ -586,7 +586,7 @@ namespace SanyaRemastered.EventHandlers
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Mana)
                                     {
                                         scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Mana);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 5);
+                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoEnergy, 5);
                                         break;
                                     }
 
@@ -596,7 +596,7 @@ namespace SanyaRemastered.EventHandlers
                                     break;
                                 }
                             }
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoLevel, 5);
                             break;
                         }
                 }

@@ -29,7 +29,7 @@ namespace SanyaRemastered.Commands.StaffCommands
 				return false;
 			}
 
-			Player player = null;
+			Player player;
 			if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 			else
 			{

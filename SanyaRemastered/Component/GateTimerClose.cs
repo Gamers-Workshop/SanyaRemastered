@@ -20,7 +20,7 @@ namespace SanyaRemastered
 		private float _timer = 0f;
 		private int _timerBeforeClose = 20;
 		public int _timeBeforeClosing = -1;
-		private void Start()
+		new private void Start()
 		{
 			_plugin = SanyaRemastered.Instance;
 			_door = gameObject.GetComponent<DoorVariant>();

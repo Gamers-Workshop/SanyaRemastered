@@ -28,7 +28,7 @@ namespace SanyaRemastered.Patches
     [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.UserCode_CmdInteract))]
     public static class Scp079InteractPatch
     {
-        public static bool Prefix(Scp079PlayerScript __instance, Command079 command, string args, GameObject target)
+        public static bool Prefix(Scp079PlayerScript __instance, Command079 command, string _, GameObject target)
         {
             try
             {
@@ -44,12 +44,12 @@ namespace SanyaRemastered.Patches
                     DateTime time = DateTime.Now;
                     if (player.ReferenceHub.scp079PlayerScript.Network_curLvl + 1 < SanyaRemastered.Instance.Config.Scp079ExLevelGaz)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoLevel, 10);
                         return false;
                     }
                     else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExCostGaz)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoEnergy, 10);
                         return false;
                     }
                     Room room = player.CurrentRoom;
@@ -66,7 +66,7 @@ namespace SanyaRemastered.Patches
                             }
                             else if (scp079Interactable.TryGetComponent(out DoorVariant doorVariant) && (damageableDoor = (doorVariant as IDamageableDoor)) != null && damageableDoor.IsDestroyed)
                             {
-                                player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+                                player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079GazFail, 10);
                                 return false;
                             }
                             else
@@ -77,21 +77,21 @@ namespace SanyaRemastered.Patches
                     }
                     if (room == null)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079GazFail, 10);
                         return false;
                     }
                     foreach (var blackroom in SanyaRemastered.Instance.Config.GazBlacklistRooms)
                     {
                         if (room.Type.ToString().ToLower().Contains(blackroom.ToLower()))
                         {
-                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazFail, 10);
+                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079GazFail, 10);
                             return false;
                         }
                     }
                     if (player.TryGetSessionVariable("scp079_gas_waiting", out DateTime dateTime) && time < dateTime)
                     {
                         int TimeToWaiting = (int)(dateTime - time).TotalSeconds;
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079GazCooldown.Replace("{0}", TimeToWaiting.ToString()).Replace("{s}", TimeToWaiting > 1 ? "s" : ""), 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079GazCooldown.Replace("{0}", TimeToWaiting.ToString()).Replace("{s}", TimeToWaiting > 1 ? "s" : ""), 10);
                         return false;
                     }
                     else
@@ -99,7 +99,7 @@ namespace SanyaRemastered.Patches
                         player.SessionVariables.Remove("scp079_gas_waiting");
                         player.SessionVariables.Add("scp079_gas_waiting", DateTime.Now.AddSeconds(SanyaRemastered.Instance.Config.GasWaitingTime));
                     }
-                    player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessGaz, 10);
+                    player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079SuccessGaz, 10);
                     if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) player.ReferenceHub.scp079PlayerScript.Mana -= SanyaRemastered.Instance.Config.Scp079ExCostGaz;
                     Timing.RunCoroutine(GasRoom(room, player.ReferenceHub, doors), Segment.FixedUpdate);
                     DiscordLog.DiscordLog.Instance.LOG += $":biohazard: Gazage de la salle : {room.Type}";
@@ -111,12 +111,12 @@ namespace SanyaRemastered.Patches
                     {
                         if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendLevelDoorbeep)
                         {
-                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoLevel, 10);
                             return false;
                         }
                         else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostDoorbeep)
                         {
-                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoEnergy, 10);
                             return false;
                         }
                         var door = target.GetComponent<DoorVariant>();
@@ -135,12 +135,12 @@ namespace SanyaRemastered.Patches
                 {
                     if (player.ReferenceHub.scp079PlayerScript.Lvl + 1 < SanyaRemastered.Instance.Config.Scp079ExtendBlackoutIntercom)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoLevel, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoLevel, 10);
                         return false;
                     }
                     else if (player.ReferenceHub.scp079PlayerScript.Mana < SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079NoEnergy, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079NoEnergy, 10);
                         return false;
                     }
                     if (AlphaWarheadController.Host.inProgress)
@@ -158,7 +158,7 @@ namespace SanyaRemastered.Patches
                             }
                         }
                         if (!player.IsStaffBypassEnabled && !player.IsBypassModeEnabled) __instance.Mana -= SanyaRemastered.Instance.Config.Scp079ExtendCostBlackoutIntercom;
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079SuccessBlackoutIntercom, 10);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079SuccessBlackoutIntercom, 10);
                         return false;
                     }
                 }
@@ -184,7 +184,7 @@ namespace SanyaRemastered.Patches
                     Methods.PlayAmbientSound(7,player);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"), 2);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendGazWarn.Replace("{1}", i.ToString()).Replace("{s}", $"{(i <= 1 ? "" : "s")}"), 2);
                     }
                 }
                 room.Color = FlickerableLightController.DefaultWarheadColor;
@@ -203,7 +203,7 @@ namespace SanyaRemastered.Patches
                 {
                     if (player.IsAlive)
                     {
-                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.ExtendGazActive, 5);
+                        player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.ExtendGazActive, 5);
                     }
                 }
             }

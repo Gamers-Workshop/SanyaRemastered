@@ -20,7 +20,7 @@ namespace SanyaRemastered
             public BackgroundWorker BackgroundWorker { get; private set; }
             public int ProcessId { get; private set; }
 
-            private bool _isUnix;
+            private readonly bool _isUnix;
 
             public MemoryService(int processId)
             {
@@ -37,8 +37,10 @@ namespace SanyaRemastered
             }
             public void SetUpBackgroundWorker()
             {
-                BackgroundWorker = new BackgroundWorker();
-                BackgroundWorker.WorkerSupportsCancellation = true;
+                BackgroundWorker = new BackgroundWorker
+                {
+                    WorkerSupportsCancellation = true
+                };
                 BackgroundWorker.DoWork += BackgroundWorker_DoWork;
                 BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             }

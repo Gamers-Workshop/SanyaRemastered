@@ -18,8 +18,7 @@ namespace SanyaRemastered.Patches
             }
 
             GameObject model_ragdoll = hub.characterClassManager.CurRole.model_ragdoll;
-            Ragdoll ragdoll;
-            if (model_ragdoll == null || !Object.Instantiate(model_ragdoll).TryGetComponent(out ragdoll))
+            if (model_ragdoll == null || !Object.Instantiate(model_ragdoll).TryGetComponent(out Ragdoll ragdoll))
             {
                 return false;
             }

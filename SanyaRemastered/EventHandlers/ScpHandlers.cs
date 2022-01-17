@@ -26,16 +26,16 @@ namespace SanyaRemastered.EventHandlers
                 switch (ev.NewLevel)
                 {
                     case 1:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079Lv2, 10);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079Lv2, 10);
                         break;
                     case 2:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079Lv3, 10);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079Lv3, 10);
                         break;
                     case 3:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079Lv4, 10);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079Lv4, 10);
                         break;
                     case 4:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(Subtitles.Extend079Lv5, 10);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SubtitlesList.Extend079Lv5, 10);
                         break;
                 }
             }
@@ -74,13 +74,11 @@ namespace SanyaRemastered.EventHandlers
                         {
                             if (ev.Player.Role == RoleType.Scp93953)
                             {
-                                var Health = ev.Player.Health;
                                 ev.Player.SetRole(RoleType.Scp93989, lite: true);
                                 break;
                             }
                             else if (ev.Player.Role == RoleType.Scp93989)
                             {
-                                var Health = ev.Player.Health;
                                 ev.Player.SetRole(RoleType.Scp93953, lite: true);
                                 break;
                             }

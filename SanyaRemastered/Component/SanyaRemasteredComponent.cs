@@ -30,7 +30,6 @@ namespace SanyaRemastered
 
 		private SanyaRemastered _plugin;
 		private Player _player;
-		private string CustomText = string.Empty;
 		private string _hudTemplate = "<line-height=95%><voffset=8.5em><align=left><size=50%><alpha=#44>([STATS])<alpha=#ff></size></align>\n<align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;

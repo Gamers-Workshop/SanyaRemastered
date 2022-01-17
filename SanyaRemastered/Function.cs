@@ -33,7 +33,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Utils.Networking;
-
 namespace SanyaRemastered.Functions
 {
     internal static class Coroutines
@@ -80,7 +79,7 @@ namespace SanyaRemastered.Functions
                 RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 {
-                    Methods.SendSubtitle(Subtitles.AirbombStop, 10);
+                    Methods.SendSubtitle(SubtitlesList.AirbombStop, 10);
                 }
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 yield break;
@@ -100,7 +99,7 @@ namespace SanyaRemastered.Functions
                     RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus {AirBombWait / 60} minutes .", false, true);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
-                        Methods.SendSubtitle(Subtitles.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()), 10);
+                        Methods.SendSubtitle(SubtitlesList.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()), 10);
                     }
                 }
                 else if (AirBombWait == 30f)
@@ -108,7 +107,7 @@ namespace SanyaRemastered.Functions
                     RespawnEffectsController.PlayCassieAnnouncement($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", false, true);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
-                        Methods.SendSubtitle(Subtitles.AirbombStartingWait30s, 10);
+                        Methods.SendSubtitle(SubtitlesList.AirbombStartingWait30s, 10);
                     }
                 }
                 else if (AirBombWait == 0)
@@ -120,7 +119,7 @@ namespace SanyaRemastered.Functions
                     RespawnEffectsController.PlayCassieAnnouncement($"The Outside Zone emergency termination sequence as been stop .", false, true);
                     if (SanyaRemastered.Instance.Config.CassieSubtitle)
                     {
-                        Methods.SendSubtitle(Subtitles.AirbombStop, 10);
+                        Methods.SendSubtitle(SubtitlesList.AirbombStop, 10);
                     }
                     DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                     Log.Info($"[AirSupportBomb] The AirBomb as stop");
@@ -138,7 +137,7 @@ namespace SanyaRemastered.Functions
                 RespawnEffectsController.PlayCassieAnnouncement("danger . outside zone emergency termination sequence activated .", false, true);
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
                 {
-                    Methods.SendSubtitle(Subtitles.AirbombStarting, 10);
+                    Methods.SendSubtitle(SubtitlesList.AirbombStarting, 10);
                 }
                 yield return Timing.WaitForSeconds(5f);
                 Log.Info($"[AirSupportBomb] charging...");
@@ -176,7 +175,7 @@ namespace SanyaRemastered.Functions
                     yield return Timing.WaitForSeconds(0.25f);
                 }
                 if (SanyaRemastered.Instance.Config.CassieSubtitle)
-                    Methods.SendSubtitle(Subtitles.AirbombEnded, 10);
+                    Methods.SendSubtitle(SubtitlesList.AirbombEnded, 10);
                 RespawnEffectsController.PlayCassieAnnouncement("outside zone termination completed .", false, true);
                 isActuallyBombGoing = false;
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
@@ -239,17 +238,29 @@ namespace SanyaRemastered.Functions
         {
             try
             {
-                if (Grenade == ItemType.GrenadeFlash)
+                var item = Item.Create(Grenade, player);
                 {
-                    if (fusedur != -1)
-                        new FlashGrenade(ItemType.GrenadeFlash, player) { FuseTime = fusedur }.SpawnActive(position, player);
-                    else
-                        new FlashGrenade(ItemType.GrenadeFlash, player).SpawnActive(position, player);
+                    if (item.Base.TryGetComponent(out FlashGrenade flashGrenade))
+                    {
+                        if (fusedur != -1)
+                            flashGrenade.SpawnActive(position, player);
+                        else
+                        {
+                            flashGrenade.FuseTime = fusedur;
+                            flashGrenade.SpawnActive(position, player);
+                        }
+                    }
+                    else if (item.Base.TryGetComponent(out ExplosiveGrenade explosiveGrenade))
+                    {
+                        if (fusedur != -1)
+                            explosiveGrenade.SpawnActive(position, player);
+                        else
+                        {
+                            explosiveGrenade.FuseTime = fusedur;
+                            explosiveGrenade.SpawnActive(position, player);
+                        }
+                    }
                 }
-                else if (fusedur != -1)
-                    new ExplosiveGrenade(Grenade, player) { FuseTime = fusedur }.SpawnActive(position, player);
-                else
-                    new ExplosiveGrenade(Grenade, player).SpawnActive(position, player);
             }
             catch (Exception ex)
             {
@@ -262,16 +273,14 @@ namespace SanyaRemastered.Functions
             {
                 hub = Server.Host.ReferenceHub;
             }
-            ExplosionGrenade settingsReference;
-            if (!CandyPink.TryGetGrenade(out settingsReference))
+            if (CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))
             {
-                return;
+                new CandyPink.CandyExplosionMessage
+                {
+                    Origin = position
+                }.SendToAuthenticated(0);
+                ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
             }
-            new CandyPink.CandyExplosionMessage
-            {
-                Origin = position
-            }.SendToAuthenticated(0);
-            ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
         }
         public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
         {
@@ -353,8 +362,10 @@ namespace SanyaRemastered.Functions
         public static void MoveNetworkIdentityObject(NetworkIdentity identity, Vector3 pos)
         {
             identity.gameObject.transform.position = pos;
-            ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage();
-            objectDestroyMessage.netId = identity.netId;
+            ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage
+            {
+                netId = identity.netId
+            };
             foreach (var ply in Player.List)
             {
                 ply.Connection.Send(objectDestroyMessage, 0);

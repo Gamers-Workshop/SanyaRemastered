@@ -30,9 +30,8 @@ namespace SanyaRemastered.Patches.CommandPatches
 				__result = false;
 				return false;
 			}
-			string[] array;
-			List<ReferenceHub> list = Utils.RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out array, false);
-			StringBuilder stringBuilder = StringBuilderPool.Shared.Rent();
+            List<ReferenceHub> list = Utils.RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out string[] _, false);
+            StringBuilder stringBuilder = StringBuilderPool.Shared.Rent();
 			int num = 0;
 			if (list != null)
 			{

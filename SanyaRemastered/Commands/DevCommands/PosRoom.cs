@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
@@ -26,7 +25,7 @@ namespace SanyaRemastered.Commands.DevCommands
 				response = "Permission denied.";
 				return false;
 			}
-			Player player = null;
+			Player player;
 			if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
 			else
 			{
