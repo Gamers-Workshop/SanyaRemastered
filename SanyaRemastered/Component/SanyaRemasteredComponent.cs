@@ -18,6 +18,7 @@ using Assets._Scripts.Dissonance;
 using Dissonance;
 using Dissonance.Integrations.MirrorIgnorance;
 using MapGeneration.Distributors;
+using Exiled.API.Enums;
 
 namespace SanyaRemastered
 {
@@ -132,7 +133,6 @@ namespace SanyaRemastered
 				_scplists.Add(_player);
 				return;
 			}
-
 		}
 		public void UpdateContainScp()
         {
@@ -210,14 +210,11 @@ namespace SanyaRemastered
 			curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
-			if (_player.Role == RoleType.Scp079 && _player.Zone == Exiled.API.Enums.ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
+			if (_player.Role == RoleType.Scp079 && _player.Zone == ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
             {
 				string InfoGen = string.Empty;
-				foreach (Scp079Generator gen in Recontainer079.AllGenerators)
-                {
-					if (gen.Activating)
-						InfoGen += $"<color=#ffff00>({Map.FindParentRoom(gen?.gameObject)?.Type}){Mathf.FloorToInt(gen.Network_syncTime) / 60:00} : {Mathf.FloorToInt(gen.Network_syncTime) % 60:00}</color>\n";
-				}
+				foreach (Generator gen in Generator.Get(GeneratorState.Activating))
+					InfoGen += $"<color=#ffff00>({gen.Room.Type}){Mathf.FloorToInt(gen.CurrentTime) / 60:00} : {Mathf.FloorToInt(gen.CurrentTime) % 60:00}</color>\n";
 				curText = curText.Replace("[CENTER]", FormatStringForHud(InfoGen, 6));
 			}
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));

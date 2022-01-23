@@ -49,9 +49,9 @@ namespace SanyaRemastered.Patches
 					leftdecont = Mathf.Clamp(leftdecont, 0, leftdecont);
 
 					float totalvoltagefloat = 0f;
-					foreach (var i in Recontainer079.AllGenerators.ToList())
+					foreach (var i in Generator.Get(GeneratorState.Activating | GeneratorState.Engaged))
 					{
-						totalvoltagefloat += i._currentTime;
+						totalvoltagefloat += i.CurrentTime;
 					}
 
 					totalvoltagefloat = (int)(totalvoltagefloat * 26.666f);
@@ -109,7 +109,7 @@ namespace SanyaRemastered.Patches
 					}
 
 					//Générateur 079
-					if (Map.ActivatedGenerators == 3)
+					if (Generator.Get(GeneratorState.Engaged).Count() == 3)
 					{
 						contentfix += "Tous les générateurs du site sont activés\n";
 					}

@@ -37,7 +37,7 @@ namespace SanyaRemastered.Patches.CommandPatches
 			{
 				foreach (ReferenceHub referenceHub in list)
 				{
-					if (referenceHub != null && referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Kill By Admin", -1, "SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED")))
+					if (referenceHub != null && referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Kill By Admin")))
 
 					{
 						if (num != 0)

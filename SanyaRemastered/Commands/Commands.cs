@@ -50,7 +50,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new ColorRoom());
             RegisterCommand(new Explode());
             RegisterCommand(new Femur());
-            RegisterCommand(new Generator());
+            RegisterCommand(new GeneratorControl());
             RegisterCommand(new Heli());
             RegisterCommand(new InfiniteAmmo());
             RegisterCommand(new NukeCap());
@@ -59,6 +59,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new Pocket());
             RegisterCommand(new Scale());
             RegisterCommand(new Scp914Prefix());
+            RegisterCommand(new Subtitle());
             RegisterCommand(new Van());
 
             //StaffCommand

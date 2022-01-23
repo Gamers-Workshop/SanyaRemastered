@@ -11,14 +11,18 @@ using UnityEngine;
 
 namespace SanyaRemastered
 {
-	public class Scp914Effect : MonoBehaviour
+	public class Scp914Effect : PlayerEffect , IHealablePlayerEffect
 	{
 
 		private SanyaRemastered _plugin;
 		private Player _player;
 		private float _timer = 0f;
 		public int TimerBeforeDeath;
-
+		public byte intensity = 1;
+		public bool IsHealable(ItemType it)
+		{
+			return it == ItemType.SCP500;
+		}
 		private void Start()
 		{
 			_plugin = SanyaRemastered.Instance;
@@ -50,6 +54,8 @@ namespace SanyaRemastered
 					Destroy(this);
 				}
 			}
+			if (intensity == 0)
+				Destroy(this);
 		}
 	}
 }

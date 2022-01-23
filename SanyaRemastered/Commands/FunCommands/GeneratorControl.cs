@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SanyaRemastered.Commands.FunCommands
 {
 
-	public class Generator : ICommand
+	public class GeneratorControl : ICommand
 	{
 		public string Command => "gen";
 
@@ -28,7 +28,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				return false;
 			}
 
-			if (arguments.Count > 1)
+			if (arguments.Count > 0)
 			{
 				if (arguments.At(0).ToLower() == "unlock")
 				{
@@ -51,9 +51,9 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				else if (arguments.At(0).ToLower() == "set")
 				{
-					foreach (var generator in Recontainer079.AllGenerators.Where(x => !x.Engaged))
+					foreach (var generator in Recontainer079.AllGenerators)
 					{
-						if (generator != null)
+						if (generator != null && !generator.Engaged)
 						{
 							generator.Engaged = true;
 							generator._currentTime = 1000;
@@ -81,13 +81,8 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				else if (arguments.At(0).ToLower() == "eject")
 				{
-					foreach (var generator in Recontainer079.AllGenerators)
-					{
-						if (generator.Activating)
-						{
-							generator.Activating = false;
-						}
-					}
+					foreach (var generator in Generator.Get(Exiled.API.Enums.GeneratorState.Activating))
+						generator.IsActivating = false;
 					response = "gen ejected.";
 					return true;
 				}

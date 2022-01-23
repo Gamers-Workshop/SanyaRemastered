@@ -1,8 +1,8 @@
 ﻿namespace SanyaRemastered.Data
 {
-	internal static class SubtitlesList
-	{
 
+	internal static class HintList
+	{
 		internal static readonly string NoProfileKickMessage = string.Concat(
 			"Votre SteamID n'a pas de profil créé. Ce serveur n'autorise pas les utilisateurs sans profil. \n",
 			"Venez sur le serveur discord pour avoir plus de détails."
@@ -87,12 +87,15 @@
 			"<color=#bbee00><size=25>",
 			"《Gazage de la salle dans {1} second{s}》\n",
 			"</size></color>"
-		);
+			);
 		internal static readonly string ExtendGazActive = string.Concat(
 			"<color=#ff0000><size=25>",
 			"《Gazage en cours.》\n",
 			"</size></color>"
-		);
+			);
+	}
+	internal static class SubtitlesList
+	{
 		internal static readonly string MTFRespawnSCPs = string.Concat(
 			"<color=#6c80ff><size=25>",
 			"《L'unité mobile d'intervention, Epsilon-11, désignée,「{0}」, est entrée dans la fondation.\n Tout le personnel restant est conseillé de suivre les protocoles d'évacuation standards jusqu'à ce qu'une équipe MTF atteigne sa destination dans le site : Il reste sur site {1} SCP.》\n",

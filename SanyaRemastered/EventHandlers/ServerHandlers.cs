@@ -295,9 +295,6 @@ namespace SanyaRemastered.EventHandlers
                 if (player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out var comp))
                     UnityEngine.Object.Destroy(comp);
             foreach (var player in Player.List)
-                if (player.GameObject.TryGetComponent<Scp914Effect>(out var comp))
-                    UnityEngine.Object.Destroy(comp);
-            foreach (var player in Player.List)
                 if (player.GameObject.TryGetComponent<ContainScpComponent>(out var comp))
                     UnityEngine.Object.Destroy(comp);
             SanyaRemasteredComponent._scplists.Clear();
@@ -476,7 +473,7 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            int curgen = Map.ActivatedGenerators + 1;
+            int curgen = Generator.List.Count(x=>x.IsEngaged) + 1;
             if (SanyaRemastered.Instance.Config.CassieSubtitle)
             {
                 if (curgen < 3)

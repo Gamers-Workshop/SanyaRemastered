@@ -146,7 +146,7 @@ namespace SanyaRemastered
 
 			PlayerEvents.Shooting += PlayerHandlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.SyncingData += PlayerHandlers.OnSyncingData;
+			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel += PlayerHandlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator += PlayerHandlers.OnGeneratorUnlock;
 			PlayerEvents.StoppingGenerator += PlayerHandlers.OnStoppingGenerator;
@@ -205,7 +205,7 @@ namespace SanyaRemastered
 
 			PlayerEvents.Shooting -= PlayerHandlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.SyncingData -= PlayerHandlers.OnSyncingData;
+			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel -= PlayerHandlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator -= PlayerHandlers.OnGeneratorUnlock;
 			PlayerEvents.StoppingGenerator -= PlayerHandlers.OnStoppingGenerator;
