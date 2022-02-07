@@ -113,14 +113,9 @@ namespace SanyaRemastered
 			ServerEvents.RestartingRound += ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam += ServerHandlers.OnTeamRespawn;
 			
-			WarheadEvents.Starting += ServerHandlers.OnWarheadStart;
 			WarheadEvents.Stopping += ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated += ServerHandlers.OnDetonated;
 			
-			MapEvents.AnnouncingDecontamination += ServerHandlers.OnAnnounceDecont;
-			MapEvents.Decontaminating += ServerHandlers.OnDecontaminating;
-			MapEvents.AnnouncingNtfEntrance += ServerHandlers.OnAnnounceNtf;
-
 			MapEvents.ExplodingGrenade += ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
@@ -174,13 +169,9 @@ namespace SanyaRemastered
 			ServerEvents.RestartingRound -= ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam -= ServerHandlers.OnTeamRespawn;
 			
-			WarheadEvents.Starting -= ServerHandlers.OnWarheadStart;
 			WarheadEvents.Stopping -= ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated -= ServerHandlers.OnDetonated;
 			
-			MapEvents.AnnouncingDecontamination -= ServerHandlers.OnAnnounceDecont;
-			MapEvents.AnnouncingNtfEntrance -= ServerHandlers.OnAnnounceNtf;
-
 			MapEvents.ExplodingGrenade -= ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;

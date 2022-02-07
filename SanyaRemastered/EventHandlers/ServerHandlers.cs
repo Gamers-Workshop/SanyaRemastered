@@ -307,36 +307,16 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnTeamRespawn(RespawningTeamEventArgs ev)
         {
-            Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count()} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated)
-                ev.Players.Clear();
+                ev.IsAllowed = false;
             else if (SanyaRemastered.Instance.Config.GodmodeAfterEndround && !RoundSummary.RoundInProgress())
-                ev.Players.Clear();
+                ev.IsAllowed = false;
             else if (Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60)
-                ev.Players.Clear();
+                ev.IsAllowed = false;
             else if (StopRespawn)
-                ev.Players.Clear();
-        }
-        public void OnWarheadStart(StartingEventArgs ev)
-        {
-            Log.Debug($"[OnWarheadStart] {ev.Player?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-
-            if (SanyaRemastered.Instance.Config.CassieSubtitle)
-            {
-                bool isresumed = AlphaWarheadController._resumeScenario != -1;
-                double left = isresumed ? AlphaWarheadController.Host.timeToDetonation : AlphaWarheadController.Host.timeToDetonation - 4;
-                double count = Math.Truncate(left / 10.0) * 10.0;
-
-                if (!isresumed)
-                {
-                    Methods.SendSubtitle(SubtitlesList.AlphaWarheadStart.Replace("{0}", count.ToString()), 15);
-                }
-                else
-                {
-                    Methods.SendSubtitle(SubtitlesList.AlphaWarheadResume.Replace("{0}", count.ToString()), 10);
-                }
-            }
+                ev.IsAllowed = false;
         }
 
         public void OnWarheadCancel(StoppingEventArgs ev)
@@ -344,11 +324,6 @@ namespace SanyaRemastered.EventHandlers
             Log.Debug($"[OnWarheadCancel] {ev.Player?.Nickname}");
 
             if (AlphaWarheadController.Host._isLocked) return;
-
-            if (SanyaRemastered.Instance.Config.CassieSubtitle)
-            {
-                Methods.SendSubtitle(SubtitlesList.AlphaWarheadCancel, 7);
-            }
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
@@ -367,94 +342,7 @@ namespace SanyaRemastered.EventHandlers
                 RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaRemastered.Instance.Config.OutsidezoneTerminationTimeAfterNuke), Segment.FixedUpdate));
             }
         }
-        public void OnAnnounceDecont(AnnouncingDecontaminationEventArgs ev)
-        {
-            if (ev.Id != 6)
-                Log.Debug($"[OnAnnounceDecont] {ev.Id} {DecontaminationController.Singleton._stopUpdating}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.CassieSubtitle)
-                switch (ev.Id)
-                {
-                    case 0:
-                        {
-                            foreach (Player player in Player.List)
-                            {
-                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, SubtitlesList.DecontaminationInit, shouldClearPrevious: true);
-                            }
-                            break;
-                        }
-                    case 1:
-                        {
-                            foreach (Player player in Player.List)
-                            {
-                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "10"), shouldClearPrevious: true);
-                            }
-                            break;
-                        }
-                    case 2:
-                        {
-                            foreach (Player player in Player.List)
-                            {
-                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "5"), shouldClearPrevious: true);
-                            }
-                            break;
-                        }
-                    case 3:
-                        {
-                            foreach (Player player in Player.List)
-                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                {
-                                    player.Broadcast(20, SubtitlesList.DecontaminationMinutesCount.Replace("{0}", "1"), shouldClearPrevious: true);
-                                }
-                            break;
-                        }
-                    case 4:
-                        {
-                            foreach (Player player in Player.List)
-                                if (player?.CurrentRoom?.Zone == ZoneType.LightContainment)
-                                {
-                                    player.Broadcast(45, SubtitlesList.Decontamination30s.Replace("{0}", "10"), shouldClearPrevious: true);
-                                }
-                            break;
-                        }
-                    default:
-                        break;
-
-                }
-        }
-        public void OnDecontaminating(DecontaminatingEventArgs _)
-        {
-            Log.Debug($"[OnDecontaminating]", SanyaRemastered.Instance.Config.IsDebugged);
-
-            if (plugin.Config.CassieSubtitle)
-                Methods.SendSubtitle(SubtitlesList.DecontaminationLockdown, 15);
-        }
-        public void OnAnnounceNtf(AnnouncingNtfEntranceEventArgs ev)
-        {
-            if (SanyaRemastered.Instance.Config.CassieSubtitle)
-            {
-                int SCPCount = 0;
-                foreach (Player i in Player.List)
-                {
-                    if (i.Team == Team.SCP && i.Role != RoleType.Scp0492)
-                    {
-                        SCPCount++;
-                    }
-                }
-
-                if (SCPCount > 0)
-                {
-                    Methods.SendSubtitle(SubtitlesList.MTFRespawnSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}").Replace("{1}", SCPCount.ToString()), 30);
-                }
-                else
-                {
-                    Methods.SendSubtitle(SubtitlesList.MTFRespawnNOSCPs.Replace("{0}", $"{ev.UnitName}-{ev.UnitNumber}"), 30);
-                }
-            }
-        }
         public void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.GrenadeEffect)
@@ -473,21 +361,7 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            int curgen = Generator.List.Count(x=>x.IsEngaged) + 1;
-            if (SanyaRemastered.Instance.Config.CassieSubtitle)
-            {
-                if (curgen < 3)
-                {
-                    Methods.SendSubtitle(SubtitlesList.GeneratorFinish.Replace("{0}", curgen.ToString()).Replace("{s}", curgen == 1 ? "" : "s"), 10);
-                }
-                else
-                {
-                    Methods.SendSubtitle(SubtitlesList.GeneratorComplete, 20);
-                }
-            }
             if (SanyaRemastered.Instance.Config.GeneratorFinishLock) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
-
-
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {

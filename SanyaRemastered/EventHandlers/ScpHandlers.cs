@@ -160,9 +160,10 @@ namespace SanyaRemastered.EventHandlers
         }
         public void On096Enraging(EnragingEventArgs ev)
         {
+            Log.Debug($"[On096Enraging] {ev.Player.Nickname} : {ev.Scp096.EnrageTimeLeft}", SanyaRemastered.Instance.Config.IsDebugged);
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
-                ev.Scp096.EnrageTimeLeft = 0.5f;
+                ev.Scp096.EnrageTimeLeft = -ev.Scp096.EnrageTimeLeft -12f ;
             }
         }
         public void On096CalmingDown(CalmingDownEventArgs ev)

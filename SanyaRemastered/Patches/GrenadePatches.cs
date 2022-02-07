@@ -34,9 +34,7 @@ namespace SanyaRemastered.Patches
 			__instance.Info.Locked = true;
 			__instance._attacker = attacker;
 			if (__instance.Info.ItemId == ItemType.GrenadeFlash)
-				Methods.SpawnGrenade(__instance.Rb.position, ItemType.GrenadeFlash,0.1f ,Player.Get(attacker.NetId));
-			else if (__instance.Info.ItemId == ItemType.GrenadeHE)
-				Methods.Explode(__instance.Rb.position, attacker.Hub);
+				Methods.SpawnGrenade(__instance.Rb.position, __instance.Info.ItemId, 0.1f ,Player.Get(attacker.NetId));
 			__instance.DestroySelf();
 			return false;
 		}

@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SanyaRemastered
 {
-	public class GateTimerClose : PryableDoor
+	public class GateTimerClose :  BasicDoor
 	{
 
 		private SanyaRemastered _plugin;
@@ -20,15 +20,15 @@ namespace SanyaRemastered
 		private float _timer = 0f;
 		private int _timerBeforeClose = 20;
 		public int _timeBeforeClosing = -1;
+
 		new private void Start()
 		{
 			_plugin = SanyaRemastered.Instance;
 			_door = gameObject.GetComponent<DoorVariant>();
 		}
-
-		private void FixedUpdate()
+		public override void CustomUpdate()
 		{
-			if (!_plugin.Config.IsEnabled) return;
+			base.CustomUpdate();
 
 			_timer += Time.deltaTime;
 			ClosingGate();
@@ -51,6 +51,7 @@ namespace SanyaRemastered
 					Door.Get(_door).IsOpen = false;
 					_timeBeforeClosing = -1;
 				}
+
 				_timeBeforeClosing--;
 			}
 			else if (_timeBeforeClosing != -1)

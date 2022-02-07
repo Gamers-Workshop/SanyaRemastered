@@ -192,90 +192,6 @@ namespace SanyaRemastered.EventHandlers
                 ev.Killer.SendHitmarker(3);
             }
 
-            if (SanyaRemastered.Instance.Config.CassieSubtitle
-                && ev.Target.Team == Team.SCP)
-            {
-                string fullname = CharacterClassManager._staticClasses.Get(ev.Target.Role).fullName;
-                string str;
-                if (ev.Target.Role != RoleType.Scp0492)
-                {
-                    if (ev.Handler.Type == DamageType.Warhead)
-                    {
-                        str = SubtitlesList.SCPDeathWarhead.Replace("{0}", fullname);
-                    }
-                    else if (ev.Handler.Type == DamageType.Tesla)
-                    {
-                        str = SubtitlesList.SCPDeathTesla.Replace("{0}", fullname);
-                    }
-                    else if (ev.Handler.Type == DamageType.Decontamination)
-                    {
-                        str = SubtitlesList.SCPDeathDecont.Replace("{0}", fullname);
-                    }
-                    else
-                    {
-                        Log.Debug($"[CheckTeam] ply:{ev.Target.Id} kill:{ev.Killer.Id} killteam:{ev.Killer.Team}", SanyaRemastered.Instance.Config.IsDebugged);
-                        switch (ev.Killer.Team)
-                        {
-                            case Team.CDP:
-                                {
-                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un classe-D");
-                                    break;
-                                }
-                            case Team.CHI:
-                                {
-                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "l'insurection du chaos");
-                                    break;
-                                }
-                            case Team.RSC:
-                                {
-                                    str = SubtitlesList.SCPDeathTerminated.Replace("{0}", fullname).Replace("{1}", "un scientifique");
-                                    break;
-                                }
-                            case Team.MTF:
-                                {
-                                    string unit = ev.Killer.ReferenceHub.characterClassManager.CurUnitName;
-                                    str = SubtitlesList.SCPDeathContainedMTF.Replace("{0}", fullname).Replace("{1}", unit);
-                                    break;
-                                }
-                            default:
-                                {
-                                    str = SubtitlesList.SCPDeathUnknown.Replace("{0}", fullname);
-                                    break;
-                                }
-                        }
-                    }
-                }
-                else
-                {
-                    str = "{-1}";
-                }
-                int count = 0;
-                bool isFound079 = false;
-                bool isForced = false;
-                foreach (var i in Player.List)
-                {
-                    if (ev.Target.UserId == i.UserId) continue;
-                    if (i.Team == Team.SCP) count++;
-                    if (i.Role == RoleType.Scp079) isFound079 = true;
-                }
-
-                Log.Debug($"[Check079] SCPs:{count} isFound079:{isFound079} Gen:{Generator.Get(GeneratorState.Engaged).Count()}", SanyaRemastered.Instance.Config.IsDebugged);
-                if (count == 1
-                    && isFound079
-                    && Generator.Get(GeneratorState.Engaged).Count() < 2
-                    && ev.Handler.Type == DamageType.Warhead)
-                {
-                    isForced = true;
-                    str = str.Replace("{-1}", "\nTout les SCP ont été sécurisé.\nLa séquence de reconfinement de SCP-079 a commencé\nLa Heavy Containement Zone vas surcharger dans t-moins 1 minutes.");
-                }
-                else
-                {
-                    str = str.Replace("{-1}", string.Empty);
-                }
-                if (!string.IsNullOrWhiteSpace(str))
-                    Methods.SendSubtitle(str, (ushort)(isForced ? 30 : 10));
-            }
-
             if (ev.Handler.Type == DamageType.Decontamination || ev.Handler.Type == DamageType.Warhead || ev.Handler.Type == DamageType.FemurBreaker)
             {
                 ev.Target.Inventory.UserInventory.Items.Clear();
@@ -349,7 +265,6 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
             Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Type}", SanyaRemastered.Instance.Config.IsDebugged);
-
             if (ev.Door.DoorLockType == DoorLockType.Isolation)
             {
                 ev.IsAllowed = false;

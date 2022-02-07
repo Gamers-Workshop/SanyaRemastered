@@ -62,7 +62,6 @@ namespace SanyaRemastered
         public bool EditObjectsOnSurface { get; set; } = false;
         [Description("Game config")]
 
-        public bool CassieSubtitle { get; set; } = false;
         public bool IntercomInformation { get; set; } = false;
         public bool IntercomBrokenOnBlackout { get; set; } = false;
         public bool CloseDoorsOnNukecancel { get; set; } = false;
