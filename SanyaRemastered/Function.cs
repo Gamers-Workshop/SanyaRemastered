@@ -426,7 +426,7 @@ namespace SanyaRemastered.Functions
     {
         public static bool IsHuman(this Player player)
         {
-            return player.Team != Team.SCP && player.Team != Team.RIP;
+            return player.Role.Team != Team.SCP && player.Role.Team != Team.RIP;
         }
         public static bool IsInTheBox(Vector3 posroom,Vector3 max, Vector3 min,float rotation)
         {

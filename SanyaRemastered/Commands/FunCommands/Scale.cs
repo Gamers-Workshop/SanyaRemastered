@@ -42,7 +42,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					pos = new Vector3(x, y, z);
 
 					foreach (Player ply in Player.List)
-						if (ply.Team != Team.RIP)
+						if (ply.Role.Team != Team.RIP)
 							ply.Scale = pos;
 					response = $"All the player position has been change to {pos}";
 					return true;
@@ -71,7 +71,7 @@ namespace SanyaRemastered.Commands.FunCommands
 					response = $"Votre message a bien été envoyé à :\n";
 					foreach (Player ply in PlyList)
 					{
-						if (ply.Team != Team.RIP)
+						if (ply.Role.Team != Team.RIP)
 							ply.Scale = pos;
 						response += $" - {ply.Nickname}\n";
 					}

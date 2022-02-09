@@ -122,13 +122,13 @@ namespace SanyaRemastered
 
 		private void UpdateScpLists()
 		{
-			if ((_player.Team != Team.SCP || _player.Role == RoleType.Scp0492) && _scplists.Contains(_player))
+			if ((_player.Role.Team != Team.SCP || _player.Role == RoleType.Scp0492) && _scplists.Contains(_player))
 			{
 				_scplists.Remove(_player);
 				return;
 			}
 
-			if (_player.Team == Team.SCP && _player.Role != RoleType.Scp0492 && !_scplists.Contains(_player))
+			if (_player.Role.Team == Team.SCP && _player.Role != RoleType.Scp0492 && !_scplists.Contains(_player))
 			{
 				_scplists.Add(_player);
 				return;
@@ -171,7 +171,7 @@ namespace SanyaRemastered
 			}
 
 			//[LIST]
-			if (_player.Team == Team.SCP)
+			if (_player.Role.Team == Team.SCP)
 			{
 				string list = string.Empty;
 				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
@@ -256,7 +256,7 @@ namespace SanyaRemastered
 					Player Spectate = Player.Get(_player.ReferenceHub.spectatorManager.CurrentSpectatedPlayer.gameObject);
 					if (Spectate != null && Spectate.TryGetSessionVariable("NewRole", out Tuple<string, string> newrole))
 					{
-						curText = curText.Replace("[BOTTOM]", FormatStringForHud($"\n<b><color={Spectate.RoleColor.ToHex()}>{newrole.Item2}</color></b>", 2));
+						curText = curText.Replace("[BOTTOM]", FormatStringForHud($"\n<b><color={Spectate.Role.Color.ToHex()}>{newrole.Item2}</color></b>", 2));
 					}
 					else
 						curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));

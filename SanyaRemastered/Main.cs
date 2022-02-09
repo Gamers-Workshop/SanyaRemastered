@@ -132,7 +132,7 @@ namespace SanyaRemastered
 			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem += PlayerHandlers.OnThrowingItem;
 			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
-			PlayerEvents.ItemUsed += PlayerHandlers.OnPlayerItemUsed;
+			PlayerEvents.UsedItem += PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla += PlayerHandlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor += PlayerHandlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += PlayerHandlers.OnPlayerLockerInteract;
@@ -187,7 +187,7 @@ namespace SanyaRemastered
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingItem;
 			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
-			PlayerEvents.ItemUsed -= PlayerHandlers.OnPlayerItemUsed;
+			PlayerEvents.UsedItem -= PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla -= PlayerHandlers.OnPlayerTriggerTesla;
 			PlayerEvents.InteractingDoor -= PlayerHandlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= PlayerHandlers.OnPlayerLockerInteract;

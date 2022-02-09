@@ -49,7 +49,7 @@ namespace SanyaRemastered.EventHandlers
                     case Scp914KnobSetting.Rough:
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
-                            if (ev.Player.Team != Team.SCP)
+                            if (ev.Player.Role.Team != Team.SCP)
                                 ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
                         }
                         break;
@@ -59,7 +59,7 @@ namespace SanyaRemastered.EventHandlers
                             {
                                 ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
                             }
-                            if (ev.Player.Team != Team.SCP)
+                            if (ev.Player.Role.Team != Team.SCP)
                             {
                                 ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914")
                                 {

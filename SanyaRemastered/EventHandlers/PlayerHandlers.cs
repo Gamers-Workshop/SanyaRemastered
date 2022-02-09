@@ -185,7 +185,7 @@ namespace SanyaRemastered.EventHandlers
             }
 
             if (SanyaRemastered.Instance.Config.HitmarkKilled
-                && ev.Killer.Team != Team.SCP
+                && ev.Killer.Role.Team != Team.SCP
                 && !string.IsNullOrEmpty(ev.Killer.UserId)
                 && ev.Killer.UserId != ev.Target.UserId)
             {
@@ -225,7 +225,7 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
                 ev.IsAllowed = false;
         }
-        public void OnPlayerItemUsed(UsedItemEventArgs ev)
+        public void OnPlayerUsedItem(UsedItemEventArgs ev)
         {
             Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item.Type}", SanyaRemastered.Instance.Config.IsDebugged);
             if (ev.Item.Base.ItemTypeId == ItemType.Medkit)
@@ -412,7 +412,7 @@ namespace SanyaRemastered.EventHandlers
                                 List<Camera079> cams = new List<Camera079>();
                                 foreach (var ply in Player.List)
                                 {
-                                    if (ply.Team == Team.SCP && ply.Role != RoleType.Scp079)
+                                    if (ply.Role.Team == Team.SCP && ply.Role != RoleType.Scp079)
                                     {
                                         cams.AddRange(ply.Position.GetNearCams());
                                     }

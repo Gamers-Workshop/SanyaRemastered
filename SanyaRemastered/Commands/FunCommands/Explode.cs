@@ -46,7 +46,7 @@ namespace SanyaRemastered.Commands.FunCommands
 						response = $"You don't have permission to execute this command. Required permission: sanya.{Command}all";
 						return false;
 					}
-					foreach (var ply in Player.List.Where((p) => p.Team != Team.RIP))
+					foreach (var ply in Player.List.Where((p) => p.Role.Team != Team.RIP))
 					{
 						Methods.Explode(ply.Position);
 					}

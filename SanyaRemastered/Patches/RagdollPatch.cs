@@ -4,6 +4,8 @@ using HarmonyLib;
 using Mirror;
 using PlayerStatsSystem;
 using UnityEngine;
+using Exiled.API.Features.DamageHandlers;
+using DamageHandlerBase = PlayerStatsSystem.DamageHandlerBase;
 
 namespace SanyaRemastered.Patches
 {
@@ -24,7 +26,7 @@ namespace SanyaRemastered.Patches
                     return false;
                 }
                 Player player = Player.Get(hub);
-                DamageHandler damage = new DamageHandler(player, handler);
+                DamageHandler damage = new CustomDamageHandler(player, handler);
                 string nick = hub.nicknameSync.DisplayName;
                 double time = NetworkTime.time;
                 //Disable Ragdoll
