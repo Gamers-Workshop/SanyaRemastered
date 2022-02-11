@@ -92,7 +92,7 @@ namespace SanyaRemastered.Patches.CommandPatches
 				}
 			}
 			response = string.Format("Done! The request affected {0} player{1}", num, (num == 1) ? "!" : "s!");
-			return true;
+			return false;
 		}
 	}
 }

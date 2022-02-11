@@ -95,6 +95,7 @@
     <Compile Include="Patches\CommandPatches\KillCommandPatches.cs" />
     <Compile Include="Patches\PatchHint.cs" />
     <Compile Include="Patches\PocketDimensionFix.cs" />
+    <Compile Include="Patches\ScpPatches\NaoBrainIssue.cs" />
     <Compile Include="Patches\ScpPatches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />

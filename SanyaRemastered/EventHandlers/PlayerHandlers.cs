@@ -61,7 +61,7 @@ namespace SanyaRemastered.EventHandlers
             Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})", SanyaRemastered.Instance.Config.IsDebugged);
         }
 
-        public void OnPlayerSetClass(ChangingRoleEventArgs ev)
+        public void OnChangingRole(ChangingRoleEventArgs ev)
         {
             if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -{ev.Reason}> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
@@ -94,11 +94,11 @@ namespace SanyaRemastered.EventHandlers
         }
 
 
-        public void OnPlayerSpawn(SpawningEventArgs ev)
+        public void OnPlayerSpawning(SpawningEventArgs ev)
         {
             if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}", SanyaRemastered.Instance.Config.IsDebugged);
-            ev.Player.ReferenceHub.fpc.staminaController.RemainingStamina += 1;
+
             if (ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
                 ev.Player.Scale = new Vector3(SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size);
 
@@ -108,8 +108,9 @@ namespace SanyaRemastered.EventHandlers
                 ev.Player.EnableEffect(EffectType.Disabled);
             }
         }
-        public void OnPlayerHurt(HurtingEventArgs ev)
+        public void OnPlayerHurting(HurtingEventArgs ev)
         {
+            if (!ev.IsAllowed) return;
             if (ev.Target == null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
@@ -127,7 +128,7 @@ namespace SanyaRemastered.EventHandlers
                     //GrenadeHitmark
                     if (ev.Attacker != null)
                         if (SanyaRemastered.Instance.Config.HitmarkGrenade
-                        && ev.Handler.Type != DamageType.Explosion
+                        && ev.Handler.Type == DamageType.Explosion
                         && ev.Target.UserId != ev.Attacker.UserId)
                         {
                             ev.Attacker.SendHitmarker();
@@ -136,7 +137,7 @@ namespace SanyaRemastered.EventHandlers
                     //USPMultiplier
                     if (ev.Handler.Type == DamageType.Com18)
                     {
-                        if (ev.Target.ReferenceHub.characterClassManager.IsAnyScp())
+                        if (ev.Target.IsScp)
                         {
                             ev.Amount *= SanyaRemastered.Instance.Config.UspDamageMultiplierScp;
                         }

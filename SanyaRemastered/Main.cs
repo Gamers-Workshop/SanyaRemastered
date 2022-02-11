@@ -124,9 +124,9 @@ namespace SanyaRemastered
 			PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
-			PlayerEvents.ChangingRole += PlayerHandlers.OnPlayerSetClass;
-			PlayerEvents.Spawning += PlayerHandlers.OnPlayerSpawn;
-			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurt;
+			PlayerEvents.ChangingRole += PlayerHandlers.OnChangingRole;
+			PlayerEvents.Spawning += PlayerHandlers.OnPlayerSpawning;
+			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurting;
 
 			PlayerEvents.Died += PlayerHandlers.OnDied;
 			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
@@ -180,9 +180,9 @@ namespace SanyaRemastered
 			PlayerEvents.PreAuthenticating -= PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
-			PlayerEvents.ChangingRole -= PlayerHandlers.OnPlayerSetClass;
-			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawn;
-			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurt;
+			PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
+			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawning;
+			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingItem;
