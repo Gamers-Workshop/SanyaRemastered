@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Scp914;
 
 namespace SanyaRemastered.Patches
 {
 
-	[HarmonyPatch(typeof(Scp914.Scp914Controller), nameof(Scp914.Scp914Controller.ServerInteract))]
+	[HarmonyPatch(typeof(Scp914Controller), nameof(Scp914Controller.ServerInteract))]
 	public static class PlayerInteract914
 	{
-		public static bool Prefix(Scp914.Scp914Controller __instance, ReferenceHub ply, byte colliderId)
+		public static bool Prefix(Scp914Controller __instance, ReferenceHub ply, byte colliderId)
 		{
 			try
 			{

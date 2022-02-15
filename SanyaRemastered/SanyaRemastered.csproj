@@ -76,7 +76,7 @@
     <Compile Include="Commands\StaffCommands\Ping.cs" />
     <Compile Include="Component\ContainScpComponent.cs" />
     <Compile Include="Component\GateTimerClose.cs" />
-    <Compile Include="Component\Scp914Effect.cs" />
+    <Compile Include="Component\Scp914.cs" />
     <Compile Include="Contain.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="EventHandlers\PlayerHandlers.cs" />

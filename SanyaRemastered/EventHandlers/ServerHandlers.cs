@@ -154,6 +154,19 @@ namespace SanyaRemastered.EventHandlers
                     }
                 }
             }
+            if (plugin.Config.Scp914Effect)
+            {
+                if (NetworkClient.prefabs.TryGetValue(Guid.Parse("43658aa2-f339-6044-eb2b-937db0c2c4bd"), out GameObject player))
+                {
+                    if (player.name.Equals("Player"))
+                    {
+                        var playerEffects = player.transform.Find("PlayerEffects");
+
+                        var effectObj = new GameObject("Scp914", typeof(Scp914));
+                        effectObj.transform.parent = playerEffects;
+                    }
+                }
+            }
             if (plugin.Config.GateClosingAuto)
             {
                 DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out var GateA);
@@ -230,7 +243,7 @@ namespace SanyaRemastered.EventHandlers
                 light_GateA2.NetworkLightColor = Color.white;
 
                 //SCP-106 Do not go on Container Of 106
-                var room106 = Map.Rooms.First(x => x.Type == RoomType.Hcz106);
+                var room106 = Room.List.First(x => x.Type == RoomType.Hcz106);
 
                 var wall_106 = UnityEngine.Object.Instantiate(primitivePrefab.GetComponent<PrimitiveObjectToy>());
                 wall_106.transform.SetParentAndOffset(room106.transform, new Vector3(7.2f, 2.6f, -14.3f));
@@ -327,7 +340,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
-                foreach (var door in Map.Doors)
+                foreach (var door in Door.List)
                     if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
                         door.Base.NetworkTargetState = false;
             }

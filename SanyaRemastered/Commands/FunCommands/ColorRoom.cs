@@ -68,7 +68,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			}
 			else if (arguments.At(0).ToLower() == "set")
 			{
-				foreach (Room room in Map.Rooms)
+				foreach (Room room in Room.List)
 				{
 					if (room.Type.ToString().Contains(arguments.At(2)))
 					{
@@ -84,7 +84,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			}
 			else if (arguments.At(0) == "reset")
 			{
-				foreach (Room room in Map.Rooms)
+				foreach (Room room in Room.List)
 				{
 					if (room.Type.ToString().ToLower().Contains(arguments.At(1).ToLower()))
 					{

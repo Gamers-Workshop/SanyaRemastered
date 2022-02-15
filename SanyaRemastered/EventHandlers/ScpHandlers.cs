@@ -104,13 +104,13 @@ namespace SanyaRemastered.EventHandlers
                         break;
                     case Scp914KnobSetting.Fine:
                         {
-                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var Death))
+                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>())
                             {
                                 ev.Player.EnableEffect<MovementBoost>();
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(40);
                                 ev.Player.EnableEffect<Invigorated>();
-                                var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
-                                comp.TimerBeforeDeath = 80;
+                                ev.Player.EnableEffect<Scp914>();
+                                ev.Player.ChangeEffectIntensity<Scp914>(1);
                             }
                             else
                             {
@@ -118,19 +118,22 @@ namespace SanyaRemastered.EventHandlers
                                 {
                                     playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity, 0, 255);
                                 }
-                                Death.TimerBeforeDeath = (int)(Death.TimerBeforeDeath / 1.5);
+                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
+                                {
+                                    Death.Intensity = (byte)Mathf.Clamp(2 * Death.Intensity, 0, 255);
+                                }
                             }
                         }
                         break;
                     case Scp914KnobSetting.VeryFine:
                         {
-                            if (!ev.Player.GameObject.TryGetComponent<Scp914Effect>(out var Death))
+                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>())
                             {
                                 ev.Player.EnableEffect<MovementBoost>();
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(80);
                                 ev.Player.EnableEffect<Invigorated>();
-                                var comp = ev.Player.GameObject.AddComponent<Scp914Effect>();
-                                comp.TimerBeforeDeath = 30;
+                                ev.Player.EnableEffect<Scp914>();
+                                ev.Player.ChangeEffectIntensity<Scp914>(10);
                             }
                             else
                             {
@@ -144,7 +147,10 @@ namespace SanyaRemastered.EventHandlers
                                     ev.Player.ChangeEffectIntensity<MovementBoost>(80);
                                     ev.Player.EnableEffect<Invigorated>();
                                 }
-                                Death.TimerBeforeDeath = Mathf.Clamp(Death.TimerBeforeDeath / 3, 0, 30);
+                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
+                                {
+                                    Death.Intensity = (byte)Mathf.Clamp(6 * Death.Intensity, 0, 255);
+                                }
                             }
                         }
                         break;

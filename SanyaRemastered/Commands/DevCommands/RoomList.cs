@@ -26,7 +26,7 @@ namespace SanyaRemastered.Commands.DevCommands
 				return false;
 			}
 			response = $"RoomList\n";
-			foreach (var rooms in Map.Rooms)
+			foreach (var rooms in Room.List)
 			{
 				response += $"{rooms.Name} : {rooms.Position}\n";
 			}

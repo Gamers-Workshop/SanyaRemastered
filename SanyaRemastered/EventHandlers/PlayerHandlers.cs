@@ -304,8 +304,7 @@ namespace SanyaRemastered.EventHandlers
         {
             if (!SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout) return;
 
-            Room RoomIntercom = Map.Rooms.First(x => x.Type == RoomType.EzIntercom);
-            if (RoomIntercom.LightsOff)
+            if (Room.Get(RoomType.EzIntercom).LightsOff)
             {
                 ev.IsAllowed = false;
             }

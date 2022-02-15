@@ -77,7 +77,7 @@ namespace SanyaRemastered.Functions
                 isAirBombGoing = false;
                 isActuallyBombGoing = false;
 
-                Methods.SendCustomCassieSubtitle("The Outside Zone emergency termination sequence as been stoped", CustomSubtitles.AirbombStop);
+                Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stoped", CustomSubtitles.AirbombStop);
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 yield break;
             }
@@ -93,11 +93,11 @@ namespace SanyaRemastered.Functions
                 Log.Debug("Démarage AirSupport timewait");
                 if (AirBombWait == 60f || AirBombWait == 120f || AirBombWait == 300f || AirBombWait == 600f || AirBombWait == 1800f || AirBombWait == 3600f)
                 {
-                    Methods.SendCustomCassieSubtitle($"Alert . The Outside Zone emergency termination sequence activated in t minus {AirBombWait / 60} minutes .", CustomSubtitles.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()));
+                    Cassie.MessageTranslated($"Alert . The Outside Zone emergency termination sequence activated in t minus {AirBombWait / 60} minutes .", CustomSubtitles.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()));
                 }
                 else if (AirBombWait == 30f)
                 {
-                    Methods.SendCustomCassieSubtitle($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", CustomSubtitles.AirbombStartingWait30s);
+                    Cassie.MessageTranslated($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", CustomSubtitles.AirbombStartingWait30s);
                 }
                 else if (AirBombWait == 0)
                 {
@@ -105,7 +105,7 @@ namespace SanyaRemastered.Functions
                 }
                 if (!isAirBombGoing)
                 {
-                    Methods.SendCustomCassieSubtitle("The Outside Zone emergency termination sequence as been stop", CustomSubtitles.AirbombStop);
+                    Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stop", CustomSubtitles.AirbombStop);
                     DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                     Log.Info($"[AirSupportBomb] The AirBomb as stop");
                     yield break;
@@ -119,7 +119,7 @@ namespace SanyaRemastered.Functions
                 Log.Info($"[AirSupportBomb] booting...");
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
                 SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
-                Methods.SendCustomCassieSubtitle("danger.outside zone emergency termination sequence activated", CustomSubtitles.AirbombStarting);
+                Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", CustomSubtitles.AirbombStarting);
                 
                 yield return Timing.WaitForSeconds(5f);
                 Log.Info($"[AirSupportBomb] charging...");
@@ -157,7 +157,7 @@ namespace SanyaRemastered.Functions
                     yield return Timing.WaitForSeconds(0.25f);
                 }
                 
-                Methods.SendCustomCassieSubtitle("outside zone termination completed", CustomSubtitles.AirbombEnded);
+                Cassie.MessageTranslated("outside zone termination completed", CustomSubtitles.AirbombEnded);
                 isActuallyBombGoing = false;
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 Log.Info($"[AirSupportBomb] Ended.");
@@ -299,13 +299,6 @@ namespace SanyaRemastered.Functions
 		{
 			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
 		}
-
-        public static void SendCustomCassieSubtitle(string cassie, string subtitles)
-        {
-            Log.Info($"Cassie {cassie}| Subtitles {subtitles}");
-            subtitles = subtitles.Replace(' ', ' ');
-            RespawnEffectsController.PlayCassieAnnouncement($"{subtitles}<alpha=#00> {cassie} </alpha> ", false, true, true);
-        }
 
         public static void PlayAmbientSound(int id,Player player = null)
         {

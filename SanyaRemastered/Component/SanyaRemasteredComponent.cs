@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror.LiteNetLib4Mirror;
 using Respawning;
 using Exiled.API.Features;
-
+using System.Text;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
 using System.Collections.Generic;
@@ -44,6 +44,8 @@ namespace SanyaRemastered
 		private float _hudBottomTime = -1f;
 		private float _hudBottomTimer = 0f;
 
+        //StringBuilder
+        readonly StringBuilder list = new StringBuilder();
 		//public float soundvolume = -1f;
 		private void Start()
 		{
@@ -173,35 +175,37 @@ namespace SanyaRemastered
 			//[LIST]
 			if (_player.Role.Team == Team.SCP)
 			{
-				string list = string.Empty;
 				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
 				{
-					list += "<color=red><u>SCP</u>\n";
+					list.Append("<color=red><u>SCP</u>\n");
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
 						if (scp.Role == RoleType.Scp079)
-							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n";
+							list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n");
 						else if (scp.Role != RoleType.Scp0492)
-							list += $"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.CurrentRoom.Type}\n";
+						list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.CurrentRoom.Type}\n");
 						else
 							Scp0492++;
 					if (Scp0492 > 0)
-						list += $"Scp049-2:{Scp0492}\n";
-					list.TrimEnd('\n');
-					list += "</color>";
+						list.Append($"Scp049-12:{Scp0492}\n");
+					list.Remove(list.Length - 2, 1);
+					list.Append("</color>");
 				}
 				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
 				{
-					list += "<color=red><u>SCP</u>\n";
 					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
-					list += $"Target : {TargetList.Count()}\n";
-					list += $"Distance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n";
-					foreach (Room room in Map.Rooms.Where(r => r.Players.Where(p => TargetList.Contains(p.ReferenceHub)).Count() != 0))
-						list += $"{room.Type} : {room.Players.Where(x => TargetList.Contains(x.ReferenceHub)).Count()}\n";
-					list.TrimEnd('\n');
-					list += "</color>";
+					list.Append($"<color=red><u>SCP</u>\nTarget : {TargetList.Count()}\nDistance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n");
+
+					foreach (Room room in Room.List)
+                    {
+						int numberoftarget = room.Players.Count(p => TargetList.Contains(p.ReferenceHub));
+						if (numberoftarget != 0)
+							list.Append($"{room.Type} : {numberoftarget}\n");
+					}
+					list.Remove(list.Length - 2, 1);
+					list.Append("</color>");
 				}
-				curText = curText.Replace("[LIST]", FormatStringForHud(list, 7));
+				curText = curText.Replace("[LIST]", FormatStringForHud(list.ToString(), 7));
 			}
 			else
 				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 7));
