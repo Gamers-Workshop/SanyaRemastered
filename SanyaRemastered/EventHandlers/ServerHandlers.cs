@@ -166,6 +166,14 @@ namespace SanyaRemastered.EventHandlers
                         effectObj.transform.parent = playerEffects;
                     }
                 }
+                {
+                    PlayerEffectsController effectcontroller = UnityEngine.Object.FindObjectOfType<PlayerEffectsController>();
+
+                    effectcontroller.AllEffects.Clear();
+                    effectcontroller.syncEffectsIntensity.Clear();
+
+                    effectcontroller.Awake();
+                }
             }
             if (plugin.Config.GateClosingAuto)
             {

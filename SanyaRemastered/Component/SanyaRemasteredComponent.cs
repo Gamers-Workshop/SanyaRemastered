@@ -188,7 +188,7 @@ namespace SanyaRemastered
 							Scp0492++;
 					if (Scp0492 > 0)
 						list.Append($"Scp049-12:{Scp0492}\n");
-					list.Remove(list.Length - 2, 1);
+					list.Remove(list.Length - 2, 0);
 					list.Append("</color>");
 				}
 				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
@@ -202,10 +202,11 @@ namespace SanyaRemastered
 						if (numberoftarget != 0)
 							list.Append($"{room.Type} : {numberoftarget}\n");
 					}
-					list.Remove(list.Length - 2, 1);
+					list.Remove(list.Length - 2, 0);
 					list.Append("</color>");
 				}
 				curText = curText.Replace("[LIST]", FormatStringForHud(list.ToString(), 7));
+				list.Clear();
 			}
 			else
 				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 7));

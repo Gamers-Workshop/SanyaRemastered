@@ -104,7 +104,7 @@ namespace SanyaRemastered.EventHandlers
                         break;
                     case Scp914KnobSetting.Fine:
                         {
-                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>())
+                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
                             {
                                 ev.Player.EnableEffect<MovementBoost>();
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(40);
@@ -127,7 +127,7 @@ namespace SanyaRemastered.EventHandlers
                         break;
                     case Scp914KnobSetting.VeryFine:
                         {
-                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>())
+                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
                             {
                                 ev.Player.EnableEffect<MovementBoost>();
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(80);

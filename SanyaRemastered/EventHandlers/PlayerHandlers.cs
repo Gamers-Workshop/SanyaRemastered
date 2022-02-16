@@ -67,17 +67,19 @@ namespace SanyaRemastered.EventHandlers
             Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -{ev.Reason}> {ev.NewRole}", SanyaRemastered.Instance.Config.IsDebugged);
             if (ev.Player.GameObject.TryGetComponent<ContainScpComponent>(out var comp1))
                 UnityEngine.Object.Destroy(comp1);
-            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.NewRole == RoleType.Scp079)
+
+            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
             {
-                SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
+                if(ev.NewRole == RoleType.Scp079)
                 {
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079First, 20);
-                    ev.Player.ResetInventory(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
-                }));
-            }
-            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
-            {
-                ev.Player.ClearInventory();
+                    ev.Items.AddRange(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
+                    SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
+                    {
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079First, 20);
+                    }));
+                }
+                else if (ev.Player.Role == RoleType.Scp079)
+                    ev.Player.ClearInventory(true);
             }
             if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
             {
