@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommandSystem;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using MapGeneration;
@@ -30,28 +31,26 @@ namespace SanyaRemastered.Commands.FunCommands
 
 			if (arguments.Count > 0 && arguments.At(0).ToLower() == "hcz")
 			{
-				if (float.TryParse(arguments.At(1), out float duration))
-					foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
+				if (arguments.Count > 1 && float.TryParse(arguments.At(1), out float duration))
+				{
+					foreach (Room room in Room.List)
 					{
-						if (RoomIdentifier.RoomsByCoordinates.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier roomIdentifier2) && roomIdentifier2.Zone == MapGeneration.FacilityZone.HeavyContainment && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
-						{
-							flickerableLightController.ServerFlickerLights(duration);
-						}
+						if (room.Zone == ZoneType.HeavyContainment)
+							room.FlickerableLightController.ServerFlickerLights(duration);
 					}
-
-				response = "HCZ blackout!";
-				return true;
+					response = "HCZ blackout!";
+					return true;
+				}
+				response = "need an duration";
+				return false;
 			}
 			if (arguments.Count > 0 && arguments.At(0).ToLower() == "all")
 			{
 				if (arguments.Count > 1 && float.TryParse(arguments.At(1), out float duration))
 				{
-					foreach (FlickerableLightController flickerableLightController in FlickerableLightController.Instances)
+					foreach (Room room in Room.List)
 					{
-						if (RoomIdentifier.RoomsByCoordinates.TryGetValue(RoomIdUtils.PositionToCoords(flickerableLightController.transform.position), out RoomIdentifier _) && flickerableLightController.TryGetComponent(out Scp079Interactable scp079Interactable) && scp079Interactable.type == Scp079Interactable.InteractableType.LightController)
-						{
-							flickerableLightController.ServerFlickerLights(duration);
-						}
+						room.FlickerableLightController.ServerFlickerLights(duration);
 					}
 					response = "ALL blackout!";
 					return true;

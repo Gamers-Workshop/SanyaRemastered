@@ -59,7 +59,6 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new Pocket());
             RegisterCommand(new Scale());
             RegisterCommand(new Scp914Prefix());
-            RegisterCommand(new Subtitle());
             RegisterCommand(new Van());
 
             //StaffCommand
