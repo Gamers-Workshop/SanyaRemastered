@@ -75,7 +75,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.Items.AddRange(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
                     SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
                     {
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079First, 20);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079First, 20);
                     }));
                 }
                 else if (ev.Player.Role == RoleType.Scp079)
@@ -432,7 +432,7 @@ namespace SanyaRemastered.EventHandlers
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Mana)
                                     {
                                         scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Mana);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079NoEnergy, 5);
+                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
                                         break;
                                     }
 
@@ -442,7 +442,7 @@ namespace SanyaRemastered.EventHandlers
                                     break;
                                 }
                             }
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079NoLevel, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoLevel, 5);
                             break;
                         }
                     case HotkeyButton.PrimaryFirearm:
@@ -450,13 +450,13 @@ namespace SanyaRemastered.EventHandlers
 
                             if (!ev.Player.SessionVariables.ContainsKey("scp079_advanced_mode"))
                                 ev.Player.SessionVariables.Add("scp079_advanced_mode", null);
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.ExtendEnabled, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendEnabled, 5);
                             ev.Player.Inventory.ServerSelectItem(4);
                             break;
                         }
                     case HotkeyButton.SecondaryFirearm:
                         {
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.ExtendDisabled, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendDisabled, 5);
                             ev.Player.SessionVariables.Remove("scp079_advanced_mode");
                             ev.Player.Inventory.ServerSelectItem(0);
                             break;
@@ -483,7 +483,7 @@ namespace SanyaRemastered.EventHandlers
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Mana)
                                     {
                                         scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Mana);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079NoEnergy, 5);
+                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
                                         break;
                                     }
 
@@ -493,7 +493,7 @@ namespace SanyaRemastered.EventHandlers
                                     break;
                                 }
                             }
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(HintList.Extend079NoLevel, 5);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoLevel, 5);
                             break;
                         }
                 }

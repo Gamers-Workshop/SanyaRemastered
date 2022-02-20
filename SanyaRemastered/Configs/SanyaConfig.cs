@@ -7,11 +7,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 
-namespace SanyaRemastered
+namespace SanyaRemastered.Configs
 {
-    public sealed class Configs : IConfig
+    public sealed class Config : IConfig
     {
-        public Configs()
+        public Config()
         {
             DataDirectory = Path.Combine(Paths.Plugins, "SanyaRemastered");
         }
@@ -233,7 +233,7 @@ namespace SanyaRemastered
         {
             string returned = "\n";
 
-            PropertyInfo[] infoArray = typeof(Configs).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo[] infoArray = typeof(Config).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (PropertyInfo info in infoArray)
             {
@@ -270,7 +270,7 @@ namespace SanyaRemastered
                 }
             }
 
-            FieldInfo[] fieldInfos = typeof(Configs).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            FieldInfo[] fieldInfos = typeof(Config).GetFields(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (FieldInfo info in fieldInfos)
             {

@@ -23,9 +23,11 @@ using Mirror;
 using System.Reflection;
 using System.Diagnostics;
 
+using SanyaRemastered.Configs;
+
 namespace SanyaRemastered
 {
-	public class SanyaRemastered : Plugin<Configs>
+	public class SanyaRemastered : Plugin<Config,Translation>
 	{
 		public override string Name => "SanyaRemastered";
 		public override string Prefix => "sanya";
