@@ -94,16 +94,13 @@
     <Compile Include="Patches\CommandPatches\KillCommandPatches.cs" />
     <Compile Include="Patches\PatchHint.cs" />
     <Compile Include="Patches\PocketDimensionFix.cs" />
-    <Compile Include="Patches\ScpPatches\NaoBrainIssue.cs" />
     <Compile Include="Patches\ScpPatches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\ScpPatches\Scp096Patches.cs" />
     <Compile Include="Patches\ScpPatches\Scp106Patches.cs" />
     <Compile Include="Patches\ScpPatches\Scp173Patches.cs" />
-    <Compile Include="Patches\RagdollPatch.cs" />
     <Compile Include="Patches\ServerDisconnectPatches.cs" />
-    <Compile Include="Patches\SubtitlePartPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ram.cs" />
     <Compile Include="Configs\SanyaConfig.cs" />

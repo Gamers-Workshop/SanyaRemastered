@@ -18,6 +18,8 @@ using System.Net.Http;
 using System.Text;
 using UnityEngine;
 using Utils.Networking;
+using Camera = Exiled.API.Features.Camera;
+
 namespace SanyaRemastered.Functions
 {
     internal static class Coroutines
@@ -61,6 +63,7 @@ namespace SanyaRemastered.Functions
             {
                 isAirBombGoing = false;
                 isActuallyBombGoing = false;
+                AirBombWait = 0;
 
                 Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stoped", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
@@ -379,7 +382,7 @@ namespace SanyaRemastered.Functions
                 functionHash = GetMethodHash(invokeClass, rpcName),
                 payload = writer.ToArraySegment()
             };
-            conn.Send<RpcMessage>(msg, channelId);
+            conn.Send(msg, channelId);
         }
         private static int GetMethodHash(Type invokeClass, string methodName)
         {
@@ -443,17 +446,6 @@ namespace SanyaRemastered.Functions
         public static void OpenReportWindow(this Player player, string text)
         {
             player.ReferenceHub.GetComponent<GameConsoleTransmission>().SendToClient(player.Connection, "[REPORTING] " + text, "white");
-        }
-        public static IEnumerable<Camera079> GetNearCams(this Vector3 position)
-        {
-            foreach (var cam in Scp079PlayerScript.allCameras)
-            {
-                var dis = Vector3.Distance(position, cam.transform.position);
-                if (dis <= 15f)
-                {
-                    yield return cam;
-                }
-            }
         }
         public static bool IsExmode(this Player player) => player.SessionVariables.ContainsKey("scp079_advanced_mode");
 

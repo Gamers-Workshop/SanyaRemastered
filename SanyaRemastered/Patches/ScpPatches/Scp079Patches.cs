@@ -203,11 +203,11 @@ namespace SanyaRemastered.Patches
                         player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>(10);
-                        player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("GAS.") { Damage = 10});
+                        player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("GAS") { Damage = 10});
                         if (player.Role == RoleType.Spectator)
                         {
                             scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);
-                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous étes mort par le gazage de SCP-079", 20);
+                            player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.DeadBy079Gas, 20);
                         }
                     }
                 }

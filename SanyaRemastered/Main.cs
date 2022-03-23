@@ -32,7 +32,7 @@ namespace SanyaRemastered
 		public override string Name => "SanyaRemastered";
 		public override string Prefix => "sanya";
 		public override string Author => "sanyae2439";
-		public override PluginPriority Priority => (PluginPriority) 1;
+		public override PluginPriority Priority => (PluginPriority) (-1);
 
 		public static SanyaRemastered Instance { get; private set; }
 		public EventHandlers.ServerHandlers ServerHandlers { get; private set; }
@@ -131,6 +131,7 @@ namespace SanyaRemastered
 			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurting;
 
 			PlayerEvents.Died += PlayerHandlers.OnDied;
+			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem += PlayerHandlers.OnThrowingItem;
 			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
@@ -186,6 +187,7 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawning;
 			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
+			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingItem;
 			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;

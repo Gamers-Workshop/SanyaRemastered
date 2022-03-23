@@ -187,7 +187,7 @@ namespace SanyaRemastered
 						else
 							Scp0492++;
 					if (Scp0492 > 0)
-						list.Append($"Scp049-12:{Scp0492}\n");
+						list.Append($"Scp049-2:{Scp0492}\n");
 					list.Remove(list.Length - 2, 0);
 					list.Append("</color>");
 				}
@@ -266,10 +266,17 @@ namespace SanyaRemastered
 					else
 						curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
 				}
-				finally 
+				catch
 				{
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
 				}
+			}
+			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role == RoleType.Scp079)
+            {
+				if (Extensions.IsExmode(_player))
+					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Activé\n<size=25%>Utilisé vos racourcie d'arme pour passé en mode étendue<size=50%>", 2));
+				else 
+					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Désactivé\n<size=25%>Utilisé vos racourcie d'arme désactivé votre mode étendue<size=50%>", 2));
 			}
 			else if (!string.IsNullOrWhiteSpace(SanyaRemastered.Instance.Config.IsBeta))
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 2));

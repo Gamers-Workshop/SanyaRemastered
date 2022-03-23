@@ -119,7 +119,7 @@ namespace SanyaRemastered.EventHandlers
             Coroutines.isActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
             Server.Host.ReferenceHub.characterClassManager.NetworkCurClass = RoleType.Tutorial;
-            Server.Host.Position = new Vector3(54.8f, 3000f, -44.9f);
+            Server.Host.ReferenceHub.playerMovementSync.ForcePosition(new Vector3(54.8f, 3000f, -44.9f));
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
                 foreach (var tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
