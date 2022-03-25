@@ -11,17 +11,10 @@ using UnityEngine;
 
 namespace SanyaRemastered
 {
-	public class Scp914 : PlayerEffect , IHealablePlayerEffect , IDisplayablePlayerEffect
+	public class Scp914 : PlayerEffect , IHealablePlayerEffect
 	{
-		public bool GetSpectatorText(out string s)
-		{
-			s = $"SCP-914 ({Intensity})";
-			return true;
-		}
-		public bool IsHealable(ItemType it)
-		{
-			return it == ItemType.SCP500;
-		}
+		public bool IsHealable(ItemType it) => it == ItemType.SCP500;
+
 		public override void Enabled()
 		{
 			TimeBetweenTicks = 1;
@@ -34,7 +27,7 @@ namespace SanyaRemastered
 			{
 				return;
 			}
-			Log.Info($"Scp914 Hurt {TimeBetweenTicks}");
+
 			TimeLeft = TimeBetweenTicks;
 			if (Intensity == 255)
 			{

@@ -435,9 +435,9 @@ namespace SanyaRemastered.EventHandlers
                             if (scp079.Level + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
                             {
                                 List<Camera> cams = new List<Camera>();
-                                foreach (var ply in Player.List)
+                                foreach (var ply in Player.Get(Team.SCP))
                                 {
-                                    if (ply.Role.Team == Team.SCP && ply.Role != RoleType.Scp079)
+                                    if (ply.Role != RoleType.Scp079)
                                     {
                                         cams.AddRange(Map.GetNearCameras(ply.Position));
                                     }
