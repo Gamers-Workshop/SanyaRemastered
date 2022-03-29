@@ -27,7 +27,7 @@ namespace SanyaRemastered.Patches
                 return false;
             }
 
-            if ((itemBase as ThrowableItem) == null)
+            if ((itemBase as ThrowableItem) is null)
 			{
 				return false;
 			}

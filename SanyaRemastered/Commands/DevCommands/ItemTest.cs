@@ -29,7 +29,7 @@ namespace SanyaRemastered.Commands.DevCommands
                 response = $"You don't have permission to execute this command. Required permission: sanya.dev";
                 return false;
             }
-			if (targetitem == null)
+			if (targetitem is null)
 			{
 				var itemtype = (ItemType)Enum.Parse(typeof(ItemType), arguments.At(0));
 				var itemBase = InventoryItemLoader.AvailableItems[itemtype];

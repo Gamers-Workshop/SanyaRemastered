@@ -37,7 +37,7 @@ namespace SanyaRemastered.Commands.StaffCommands
 			}
 			if (arguments.At(0).ToLower() == "all")
 			{
-				if (player != null && !player.CheckPermission($"sanya.{Command}all"))
+				if (player is not null && !player.CheckPermission($"sanya.{Command}all"))
 				{
 					response = $"You don't have permission to execute this command. Required permission: sanya.{Command}all";
 					return false;
@@ -51,12 +51,12 @@ namespace SanyaRemastered.Commands.StaffCommands
 			}
 
 			string[] Users = arguments.At(0).Split('.');
-			List<Player> PlyList = new List<Player>();
+			List<Player> PlyList = new();
 			foreach (string s in Users)
 			{
-				if (int.TryParse(s, out int id) && Player.Get(id) != null)
+				if (int.TryParse(s, out int id) && Player.Get(id) is not null)
 					PlyList.Add(Player.Get(id));
-				else if (Player.Get(s) != null)
+				else if (Player.Get(s) is not null)
 					PlyList.Add(Player.Get(s));
 			}
 			if (PlyList.Count != 0)

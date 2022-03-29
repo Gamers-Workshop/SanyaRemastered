@@ -87,8 +87,8 @@ namespace SanyaRemastered.Data
 			//SurfaceZone
 			SurfaceNuke,
         }
-		Dictionary<ContainmentRoom, List<Tuple<Vector3,Vector3>>> c = new Dictionary<ContainmentRoom, List<Tuple<Vector3, Vector3>>>
-		{
+		Dictionary<ContainmentRoom, List<Tuple<Vector3,Vector3>>> c = new()
+        {
 			//LightZone
 			{ContainmentRoom.Lcz914Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(2.9f, 0, 10.1f), new Vector3(-10.2f, -5f, -10.2f)) } },
 			{ContainmentRoom.Lcz173Containment,new List<Tuple<Vector3,Vector3>>{ Tuple.Create(new Vector3(-16.4f, -16.8f, -5.2f), new Vector3(-30.2f, -22.3f, -16.7f)) } },

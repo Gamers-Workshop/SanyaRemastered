@@ -44,7 +44,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (plugin.Config.DisablePlayerLists && SanyaRemastered.Instance.ServerHandlers.playerlistnetid > 0)
             {
-                ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage
+                ObjectDestroyMessage objectDestroyMessage = new()
                 {
                     netId = SanyaRemastered.Instance.ServerHandlers.playerlistnetid
                 };
@@ -74,7 +74,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
             {
-                if(ev.NewRole == RoleType.Scp079)
+                if (ev.NewRole == RoleType.Scp079)
                 {
                     ev.Items.AddRange(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
                     SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
@@ -117,7 +117,7 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerHurting(HurtingEventArgs ev)
         {
             if (!ev.IsAllowed) return;
-            if (ev.Target == null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
+            if (ev.Target is null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
             if (ev.Handler.Type == DamageType.Scp && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
@@ -132,7 +132,7 @@ namespace SanyaRemastered.EventHandlers
                     && ev.Handler.Type != DamageType.Scp207)
                 {
                     //GrenadeHitmark
-                    if (ev.Attacker != null)
+                    if (ev.Attacker is not null)
                         if (SanyaRemastered.Instance.Config.HitmarkGrenade
                         && ev.Handler.Type == DamageType.Explosion
                         && ev.Target.UserId != ev.Attacker.UserId)
@@ -184,7 +184,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 ev.Target.Scale = Vector3.one;
             }
-            if (ev.Killer == null) return;
+            if (ev.Killer is null) return;
 
             if (SanyaRemastered.Instance.Config.ScpRecoveryAmount.TryGetValue(ev.Handler.Type.ToString(), out int Heal) && Heal > 0)
             {
@@ -212,15 +212,15 @@ namespace SanyaRemastered.EventHandlers
             double time = NetworkTime.time;
             //Disable Ragdoll
             if (SanyaRemastered.Instance.Config.Scp106RemoveRagdoll && damage.Type == DamageType.Scp106
-                || SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && damage.Type == DamageType.Scp096) 
-            //Disable Recall By 079
-            if (SanyaRemastered.Instance.Config.Scp049Real && damage.Type != DamageType.Scp049) time = double.MinValue;
+                || SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && damage.Type == DamageType.Scp096)
+                //Disable Recall By 079
+                if (SanyaRemastered.Instance.Config.Scp049Real && damage.Type != DamageType.Scp049) time = double.MinValue;
             //TeslaDestroyTheNameOfThePlayer
             if (SanyaRemastered.Instance.Config.TeslaDestroyName && damage.Type == DamageType.Tesla) ev.Nickname = "inconue";
 
 
             ev.Info = new RagdollInfo(ev.Owner.ReferenceHub, ev.DamageHandlerBase, ev.Role, ev.Position, ev.Rotation, ev.Nickname, time);
-            Exiled.API.Features.Ragdoll ragdoll = new Exiled.API.Features.Ragdoll(ev.Info);
+            Exiled.API.Features.Ragdoll ragdoll = new(ev.Info);
 
             ragdoll.Scale = new Vector3(ev.Owner.Scale.x * ragdoll.Scale.x,
                                               ev.Owner.Scale.y * ragdoll.Scale.y,
@@ -255,21 +255,29 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerUsedItem(UsedItemEventArgs ev)
         {
             Log.Debug($"[OnPlayerUsedMedicalItem] {ev.Player.Nickname} -> {ev.Item.Type}", SanyaRemastered.Instance.Config.IsDebugged);
-            if (ev.Item.Base.ItemTypeId == ItemType.Medkit)
+            switch (ev.Item.Type)
             {
-                ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
-                ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
-                ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
-            }
-            if (ev.Item.Base.ItemTypeId == ItemType.Adrenaline)
-            {
-                ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
-            }
-            if (ev.Item.Base.ItemTypeId == ItemType.SCP500)
-            {
-                ev.Player.DisableAllEffects();
-                if (ev.Player.IsInPocketDimension)
-                    ev.Player.EnableEffect(EffectType.Corroding);
+                case ItemType.Medkit:
+                    {
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+                        break;
+                    }
+                case ItemType.Adrenaline:
+                    {
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+                        break;
+                    }
+                case ItemType.SCP500:
+                    {
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+                        break;
+                    }
             }
         }
 
@@ -280,7 +288,7 @@ namespace SanyaRemastered.EventHandlers
                 ev.IsTriggerable = false;
                 ev.IsInIdleRange = false;
             }
-            else if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer 
+            else if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer
                 && ev.Tesla.Room?.Players.Any(p => p.Items.Any(i => i.Base is RadioItem radio && radio.IsUsable)) == true)
             {
                 ev.IsTriggerable = false;
@@ -343,7 +351,7 @@ namespace SanyaRemastered.EventHandlers
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
                 Player target = Player.Get(ev.TargetNetId);
-                if (target != null && target.Role == RoleType.Scp096)
+                if (target is not null && target.Role == RoleType.Scp096)
                 {
                     ev.IsAllowed = false;
                 }
@@ -424,101 +432,99 @@ namespace SanyaRemastered.EventHandlers
         public void OnProcessingHotkey(ProcessingHotkeyEventArgs ev)
         {
             Log.Debug($"[OnProcessingHotkey] {ev.Player.Nickname} -> {ev.Hotkey}", SanyaRemastered.Instance.Config.IsDebugged);
-
-            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role.Is(out Scp079Role scp079))
+            if (!plugin.Config.Scp079ExtendEnabled) 
+                return;
+            if (!ev.Player.Role.Is(out Scp079Role scp079)) 
+                return;
+            
+            ev.IsAllowed = false;
+            switch (ev.Hotkey)
             {
-                ev.IsAllowed = false;
-                switch (ev.Hotkey)
-                {
-                    case HotkeyButton.Keycard:
+                case HotkeyButton.Keycard:
+                    {
+                        if (scp079.Level + 1 < SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
                         {
-                            if (scp079.Level + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindscp)
-                            {
-                                List<Camera> cams = new List<Camera>();
-                                foreach (var ply in Player.Get(Team.SCP))
-                                {
-                                    if (ply.Role != RoleType.Scp079)
-                                    {
-                                        cams.AddRange(Map.GetNearCameras(ply.Position));
-                                    }
-                                }
-
-                                Camera target;
-                                if (cams.Count > 0)
-                                {
-                                    target = cams.GetRandomOne();
-                                }
-                                else break;
-
-                                if (target != null)
-                                {
-                                    if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
-                                    {
-                                        scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
-                                        break;
-                                    }
-
-                                    scp079.SetCamera(target);
-                                    scp079.Energy -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
-                                    break;
-                                }
-                            }
                             ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoLevel, 5);
                             break;
                         }
-                    case HotkeyButton.PrimaryFirearm:
-                        {
 
-                            if (!ev.Player.SessionVariables.ContainsKey("scp079_advanced_mode"))
-                                ev.Player.SessionVariables.Add("scp079_advanced_mode", null);
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendEnabled, 5);
-                            ev.Player.Inventory.ServerSelectItem(4);
-                            break;
-                        }
-                    case HotkeyButton.SecondaryFirearm:
+                        List<Camera> cams = new();
+                        foreach (var ply in Player.Get(Team.SCP))
                         {
-                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendDisabled, 5);
-                            ev.Player.SessionVariables.Remove("scp079_advanced_mode");
-                            ev.Player.Inventory.ServerSelectItem(0);
-                            break;
-                        }
-                    case HotkeyButton.Medical:
-                        {
-                            if (scp079.Level + 1 >= SanyaRemastered.Instance.Config.Scp079ExtendLevelFindGeneratorActive)
+                            if (ply.Role != RoleType.Scp079)
                             {
-                                List<Camera> cams = new List<Camera>();
-                                foreach (var gen in Generator.Get(GeneratorState.Engaged))
-                                {
-                                    cams.AddRange(Map.GetNearCameras(gen.Base.transform.position));
-                                }
-
-                                Camera target;
-                                if (cams.Count > 0)
-                                {
-                                    target = cams.GetRandomOne();
-                                }
-                                else break;
-
-                                if (target != null)
-                                {
-                                    if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
-                                    {
-                                        scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
-                                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
-                                        break;
-                                    }
-
-                                    scp079.SetCamera(target);
-                                    scp079.Energy -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindGeneratorActive;
-                                    break;
-                                }
+                                cams.AddRange(Map.GetNearCameras(ply.Position));
                             }
+                        }
+
+                        if (cams.Count <= 0)
+                            break;
+                        Camera target = cams.GetRandomOne();
+
+                        if (target is null)
+                            break;
+                        if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
+                        {
+                            scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
+                            break;
+                        }
+
+                        scp079.SetCamera(target);
+                        scp079.Energy -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp;
+                        break;
+                    }
+                case HotkeyButton.PrimaryFirearm:
+                    {
+
+                        if (!ev.Player.SessionVariables.ContainsKey("scp079_advanced_mode"))
+                            ev.Player.SessionVariables.Add("scp079_advanced_mode", null);
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendEnabled, 5);
+                        ev.Player.Inventory.ServerSelectItem(4);
+                        break;
+                    }
+                case HotkeyButton.SecondaryFirearm:
+                    {
+                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.ExtendDisabled, 5);
+                        ev.Player.SessionVariables.Remove("scp079_advanced_mode");
+                        ev.Player.Inventory.ServerSelectItem(0);
+                        break;
+                    }
+                case HotkeyButton.Medical:
+                    {
+                        if (scp079.Level + 1 < SanyaRemastered.Instance.Config.Scp079ExtendLevelFindGeneratorActive)
+                        {
                             ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoLevel, 5);
                             break;
                         }
-                }
+
+                        List<Camera> cams = new();
+                        foreach (var gen in Generator.Get(GeneratorState.Engaged))
+                        {
+                            cams.AddRange(Map.GetNearCameras(gen.Base.transform.position));
+                        }
+
+                        if (cams.Count <= 0)
+                            break;
+
+                        Camera target = cams.GetRandomOne();
+
+                        if (target is null) 
+                            break;
+
+                        if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
+                        {
+                            scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
+                            break;
+                        }
+
+                        scp079.SetCamera(target);
+                        scp079.Energy -= SanyaRemastered.Instance.Config.Scp079ExtendCostFindGeneratorActive;
+                        break;
+                    }
             }
+
         }
     }
 }

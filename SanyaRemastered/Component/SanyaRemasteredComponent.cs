@@ -25,13 +25,13 @@ namespace SanyaRemastered
 	public class SanyaRemasteredComponent : MonoBehaviour
 	{
 
-		public static readonly HashSet<Player> _scplists = new HashSet<Player>();
+		public static readonly HashSet<Player> _scplists = new();
 
 		public bool DisableHud = false;
 
 		private SanyaRemastered _plugin;
 		private Player _player;
-		private string _hudTemplate = "<line-height=95%><voffset=8.5em><align=left><size=50%><alpha=#44>([STATS])<alpha=#ff></size></align>\n<align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]";
+		private readonly string _hudTemplate = "<line-height=95%><voffset=8.5em><align=left><size=50%><alpha=#44>([STATS])<alpha=#ff></size></align>\n<align=right>[LIST]</align><align=center>[CENTER_UP][CENTER][CENTER_DOWN][BOTTOM]";
 		private float _timer = 0f;
 		private int _respawnCounter = -1;
 		private string _hudText = string.Empty;
@@ -45,7 +45,7 @@ namespace SanyaRemastered
 		private float _hudBottomTimer = 0f;
 
         //StringBuilder
-        readonly StringBuilder list = new StringBuilder();
+        readonly StringBuilder list = new();
 		//public float soundvolume = -1f;
 		private void Start()
 		{
@@ -259,7 +259,7 @@ namespace SanyaRemastered
 				try
 				{
 					Player Spectate = Player.Get(_player.ReferenceHub.spectatorManager.CurrentSpectatedPlayer.gameObject);
-					if (Spectate != null && Spectate.TryGetSessionVariable("NewRole", out Tuple<string, string> newrole))
+					if (Spectate is not null && Spectate.TryGetSessionVariable("NewRole", out Tuple<string, string> newrole))
 					{
 						curText = curText.Replace("[BOTTOM]", FormatStringForHud($"\n<b><color={Spectate.Role.Color.ToHex()}>{newrole.Item2}</color></b>", 2));
 					}

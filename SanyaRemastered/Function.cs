@@ -164,7 +164,7 @@ namespace SanyaRemastered.Functions
     internal static class Methods
     {
         
-        public static HttpClient httpClient = new HttpClient();
+        public static HttpClient httpClient = new();
         public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
 
         public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
@@ -238,7 +238,7 @@ namespace SanyaRemastered.Functions
         }
         public static void Explode(Vector3 position,ReferenceHub hub = null)
         {
-            if (hub == null)
+            if (hub is null)
             {
                 hub = Server.Host.ReferenceHub;
             }
@@ -290,7 +290,7 @@ namespace SanyaRemastered.Functions
 
         public static void PlayAmbientSound(int id,Player player = null)
         {
-            if (player == null)
+            if (player is null)
             PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
             else
             {
@@ -316,7 +316,7 @@ namespace SanyaRemastered.Functions
         public static void MoveNetworkIdentityObject(NetworkIdentity identity, Vector3 pos)
         {
             identity.gameObject.transform.position = pos;
-            ObjectDestroyMessage objectDestroyMessage = new ObjectDestroyMessage
+            ObjectDestroyMessage objectDestroyMessage = new()
             {
                 netId = identity.netId
             };
@@ -375,7 +375,7 @@ namespace SanyaRemastered.Functions
                 Debug.LogError("TargetRPC Function " + rpcName + " called on client.");
                 return;
             }
-            RpcMessage msg = new RpcMessage
+            RpcMessage msg = new()
             {
                 netId = netid,
                 componentIndex = componentindex,

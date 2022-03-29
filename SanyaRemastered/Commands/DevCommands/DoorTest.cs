@@ -29,7 +29,7 @@ namespace SanyaRemastered.Commands.DevCommands
                 response = $"You don't have permission to execute this command. Required permission: sanya.dev";
                 return false;
             }
-            if (targetdoor == null)
+            if (targetdoor is null)
             {
                 var prefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
                 var door = UnityEngine.Object.Instantiate(prefab.TargetPrefab, new UnityEngine.Vector3(float.Parse(arguments.At(0)), float.Parse(arguments.At(1)), float.Parse(arguments.At(2))), Quaternion.Euler(Vector3.up * 180f));

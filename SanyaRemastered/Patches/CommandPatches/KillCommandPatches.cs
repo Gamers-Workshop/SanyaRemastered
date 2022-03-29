@@ -33,11 +33,11 @@ namespace SanyaRemastered.Patches.CommandPatches
             List<ReferenceHub> list = Utils.RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out string[] _, false);
             StringBuilder stringBuilder = StringBuilderPool.Shared.Rent();
 			int num = 0;
-			if (list != null)
+			if (list is not null)
 			{
 				foreach (ReferenceHub referenceHub in list)
 				{
-					if (referenceHub != null && referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Kill By Admin")))
+					if (referenceHub is not null && referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Kill By Admin")))
 
 					{
 						if (num != 0)

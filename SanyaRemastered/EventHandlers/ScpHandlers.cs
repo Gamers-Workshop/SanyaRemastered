@@ -21,140 +21,139 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
+            if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
+                return;
+
+            switch (ev.NewLevel)
             {
-                switch (ev.NewLevel)
-                {
-                    case 1:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv2, 10);
-                        break;
-                    case 2:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv3, 10);
-                        break;
-                    case 3:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv4, 10);
-                        break;
-                    case 4:
-                        ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv5, 10);
-                        break;
-                }
+                case 1:
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv2, 10);
+                    break;
+                case 2:
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv3, 10);
+                    break;
+                case 3:
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv4, 10);
+                    break;
+                case 4:
+                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079Lv5, 10);
+                    break;
             }
         }
         public void On914UpgradingPlayer(UpgradingPlayerEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.Scp914Effect)
+            if (!SanyaRemastered.Instance.Config.Scp914Effect)
+                return;
+
+            switch (ev.KnobSetting)
             {
-                switch (ev.KnobSetting)
-                {
-                    case Scp914KnobSetting.Rough:
+                case Scp914KnobSetting.Rough:
+                    {
+                        ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
+                        if (ev.Player.Role.Team != Team.SCP)
+                            ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
+                    }
+                    break;
+                case Scp914KnobSetting.Coarse:
+                    {
+                        if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
-                            if (ev.Player.Role.Team != Team.SCP)
-                                ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
                         }
-                        break;
-                    case Scp914KnobSetting.Coarse:
+                        if (ev.Player.Role.Team != Team.SCP)
                         {
-                            if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
+                            ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914")
                             {
-                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
-                            }
-                            if (ev.Player.Role.Team != Team.SCP)
-                            {
-                                ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914")
-                                {
-                                    Damage = 70,
-                                });
-                                ev.Player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>();
-                                ev.Player.ReferenceHub.playerEffectsController.GetEffect<Bleeding>();
-                                ev.Player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
-                                if (ev.Player.IsAlive)
-                                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous remarquez d'innombrables petites incisions dans votre corps.", 10);
-                            }
+                                Damage = 70,
+                            });
+                            ev.Player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>();
+                            ev.Player.ReferenceHub.playerEffectsController.GetEffect<Bleeding>();
+                            ev.Player.ReferenceHub.playerEffectsController.GetEffect<Disabled>();
+                            if (ev.Player.IsAlive)
+                                ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous remarquez d'innombrables petites incisions dans votre corps.", 10);
                         }
-                        break;
-                    case Scp914KnobSetting.OneToOne:
+                    }
+                    break;
+                case Scp914KnobSetting.OneToOne:
+                    {
+                        if (ev.Player.Role == RoleType.Scp93953)
                         {
-                            if (ev.Player.Role == RoleType.Scp93953)
-                            {
-                                ev.Player.SetRole(RoleType.Scp93989, lite: true);
-                                break;
-                            }
-                            else if (ev.Player.Role == RoleType.Scp93989)
-                            {
-                                ev.Player.SetRole(RoleType.Scp93953, lite: true);
-                                break;
-                            }
-                            else if (ev.Player.Role != RoleType.Scp106)
-                            {
-                                if (ev.Player.Scale.y < 0)
-                                {
-                                    ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, ev.Player.Scale.z);
-                                }
-                                else if (ev.Player.Scale.z < 0 && ev.Player.Scale.z < 0)
-                                {
-                                    ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
-                                }
-                                else
-                                {
-                                    ev.Player.Scale = new Vector3(-ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
-                                }
-                            }
+                            ev.Player.SetRole(RoleType.Scp93989, lite: true);
+                            break;
                         }
-                        break;
-                    case Scp914KnobSetting.Fine:
+                        else if (ev.Player.Role == RoleType.Scp93989)
                         {
-                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
+                            ev.Player.SetRole(RoleType.Scp93953, lite: true);
+                            break;
+                        }
+                        else if (ev.Player.Role != RoleType.Scp106)
+                        {
+                            if (ev.Player.Scale.y < 0)
                             {
-                                ev.Player.EnableEffect<MovementBoost>();
-                                ev.Player.ChangeEffectIntensity<MovementBoost>(40);
-                                ev.Player.EnableEffect<Invigorated>();
-                                ev.Player.EnableEffect<Scp914>();
-                                ev.Player.ChangeEffectIntensity<Scp914>(1);
+                                ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, ev.Player.Scale.z);
+                            }
+                            else if (ev.Player.Scale.z < 0 && ev.Player.Scale.z < 0)
+                            {
+                                ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
                             }
                             else
                             {
-                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
-                                {
-                                    playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity, 0, 255);
-                                }
-                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
-                                {
-                                    Death.Intensity = (byte)Mathf.Clamp(2 * Death.Intensity, 0, 255);
-                                }
+                                ev.Player.Scale = new Vector3(-ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
                             }
                         }
-                        break;
-                    case Scp914KnobSetting.VeryFine:
+                    }
+                    break;
+                case Scp914KnobSetting.Fine:
+                    {
+                        if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
                         {
-                            if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
+                            ev.Player.EnableEffect<MovementBoost>();
+                            ev.Player.ChangeEffectIntensity<MovementBoost>(40);
+                            ev.Player.EnableEffect<Invigorated>();
+                            ev.Player.EnableEffect<Scp914>();
+                        }
+                        else
+                        {
+                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                            {
+                                playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity, 0, 255);
+                            }
+                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
+                            {
+                                Death.Intensity = (byte)Mathf.Clamp(2 * Death.Intensity, 0, 255);
+                            }
+                        }
+                    }
+                    break;
+                case Scp914KnobSetting.VeryFine:
+                    {
+                        if (!ev.Player.ReferenceHub.playerEffectsController.GetEffect<Scp914>().IsEnabled)
+                        {
+                            ev.Player.EnableEffect<MovementBoost>();
+                            ev.Player.ChangeEffectIntensity<MovementBoost>(80);
+                            ev.Player.EnableEffect<Invigorated>();
+                            ev.Player.EnableEffect<Scp914>();
+                            ev.Player.ChangeEffectIntensity<Scp914>(10);
+                        }
+                        else
+                        {
+                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                            {
+                                playerEffect.Intensity = (byte)Mathf.Clamp((float)2 * playerEffect.Intensity, 0, 255);
+                            }
+                            else
                             {
                                 ev.Player.EnableEffect<MovementBoost>();
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(80);
                                 ev.Player.EnableEffect<Invigorated>();
-                                ev.Player.EnableEffect<Scp914>();
-                                ev.Player.ChangeEffectIntensity<Scp914>(10);
                             }
-                            else
+                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
                             {
-                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
-                                {
-                                    playerEffect.Intensity = (byte)Mathf.Clamp((float)2 * playerEffect.Intensity, 0, 255);
-                                }
-                                else
-                                {
-                                    ev.Player.EnableEffect<MovementBoost>();
-                                    ev.Player.ChangeEffectIntensity<MovementBoost>(80);
-                                    ev.Player.EnableEffect<Invigorated>();
-                                }
-                                if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
-                                {
-                                    Death.Intensity = (byte)Mathf.Clamp(6 * Death.Intensity, 0, 255);
-                                }
+                                Death.Intensity = (byte)Mathf.Clamp(6 * Death.Intensity, 0, 255);
                             }
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
         public void On096AddingTarget(AddingTargetEventArgs ev)

@@ -21,7 +21,7 @@ namespace SanyaRemastered.Patches
                 if (__instance._disconnectDrop)
                 {
                     NetworkIdentity identity = conn.identity;
-                    if (identity != null && ReferenceHub.TryGetHubNetID(identity.netId, out ReferenceHub referenceHub))
+                    if (identity is not null && ReferenceHub.TryGetHubNetID(identity.netId, out ReferenceHub referenceHub))
                     {
                         referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Disconect"));
                     }

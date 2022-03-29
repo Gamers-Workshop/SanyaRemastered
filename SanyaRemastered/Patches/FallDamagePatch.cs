@@ -19,7 +19,7 @@ namespace SanyaRemastered.Patches
             {
 				if (SanyaRemastered.Instance.Config.ScpFallDamage.Contains(__instance._ccm.CurRole.roleId.ToString()) && SanyaRemastered.Instance.Config.ScpTakeFallDamage && __instance._ccm.CurRole.team == Team.SCP)
 				{
-					if (__instance._footstepSync != null)
+					if (__instance._footstepSync is not null)
 					{
 						__instance._footstepSync.RpcPlayLandingFootstep(true);
 					}

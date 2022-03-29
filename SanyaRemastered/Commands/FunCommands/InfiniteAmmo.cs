@@ -52,7 +52,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				else
 				{
 					Player target = Player.Get(arguments.At(0));
-					if (target != null)
+					if (target is not null)
 					{
 						if (target.SessionVariables.ContainsKey("InfAmmo"))
 							target.SessionVariables.Remove("InfAmmo");

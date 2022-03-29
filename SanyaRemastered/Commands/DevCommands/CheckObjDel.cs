@@ -38,7 +38,7 @@ namespace SanyaRemastered.Commands.DevCommands
 				Log.Warn($"HasComponents:");
 				foreach (var i in casy.transform.gameObject.GetComponents<Component>())
 				{
-					if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+					if (i.transform.gameObject.GetComponents<NetworkIdentity>() is not null)
 					{
 						Log.Warn($"    {i.name}:{i.GetType()}");
 						GameObject.Destroy(i.gameObject);
@@ -47,7 +47,7 @@ namespace SanyaRemastered.Commands.DevCommands
 				Log.Warn($"HasComponentsInChildren:");
 				foreach (var i in casy.transform.gameObject.GetComponentsInChildren<Component>())
 				{
-					if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+					if (i.transform.gameObject.GetComponents<NetworkIdentity>() is not null)
 					{
 						Log.Warn($"    {i.name}:{i.GetType()}");
 						GameObject.Destroy(i.gameObject);
@@ -56,7 +56,7 @@ namespace SanyaRemastered.Commands.DevCommands
 				Log.Warn($"HasComponentsInParent:");
 				foreach (var i in casy.transform.gameObject.GetComponentsInParent<Component>())
 				{
-					if (i.transform.gameObject.GetComponents<NetworkIdentity>() != null)
+					if (i.transform.gameObject.GetComponents<NetworkIdentity>() is not null)
 					{
 						Log.Warn($"    {i.name}:{i.GetType()}");
 					}

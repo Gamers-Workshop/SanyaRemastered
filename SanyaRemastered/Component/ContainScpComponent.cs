@@ -21,7 +21,7 @@ namespace SanyaRemastered
 		private Room _room = null;
 		public int TimeBeforeContain = 25;
 		public string CassieAnnounceContain;
-		public List<Door> doors = new List<Door>();
+		public List<Door> doors = new();
 
 		private void Start()
 		{

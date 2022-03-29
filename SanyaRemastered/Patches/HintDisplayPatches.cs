@@ -19,7 +19,7 @@ namespace SanyaRemastered.Patches
 			if (hint.GetType() == typeof(TranslationHint))
 				return false;
 
-			if (hint._effects != null && hint._effects.Length > 0)
+			if (hint._effects is not null && hint._effects.Length > 0)
 				return false;
 
 			return true;

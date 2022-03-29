@@ -53,7 +53,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				{
 					foreach (var generator in Recontainer079.AllGenerators)
 					{
-						if (generator != null && !generator.Engaged)
+						if (generator is not null && !generator.Engaged)
 						{
 							generator.Engaged = true;
 							generator._currentTime = 1000;
@@ -68,7 +68,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				{
 					var gen = Recontainer079.AllGenerators.FirstOrDefault(x => !x.Engaged);
 
-					if (gen != null)
+					if (gen is not null)
 					{
 						gen.Engaged = true;
 						gen._currentTime = 1000;

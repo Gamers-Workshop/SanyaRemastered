@@ -23,7 +23,7 @@ namespace SanyaRemastered.Commands.DevCommands
                 response = $"You don't have permission to execute this command. Required permission: sanya.dev";
                 return false;
             }
-            if (targetTarget == null)
+            if (targetTarget is null)
             {
                 var gameObject = UnityEngine.Object.Instantiate(CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("dboyTarget")),
                     new UnityEngine.Vector3(float.Parse(arguments.At(0)), float.Parse(arguments.At(1)), float.Parse(arguments.At(2))),

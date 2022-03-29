@@ -52,12 +52,12 @@ namespace SanyaRemastered.Commands.FunCommands
 			}
 
 			string[] Users = arguments.At(0).Split('.');
-			List<Player> PlyList = new List<Player>();
+			List<Player> PlyList = new();
 			foreach (string s in Users)
 			{
-				if (int.TryParse(s, out int id) && Player.Get(id) != null)
+				if (int.TryParse(s, out int id) && Player.Get(id) is not null)
 					PlyList.Add(Player.Get(id));
-				else if (Player.Get(s) != null)
+				else if (Player.Get(s) is not null)
 					PlyList.Add(Player.Get(s));
 			}
 			if (PlyList.Count != 0)
@@ -66,7 +66,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				&& float.TryParse(arguments.At(2), out float y)
 				&& float.TryParse(arguments.At(3), out float z))
                 {
-					Vector3 pos = new Vector3(x, y, z);
+					Vector3 pos = new(x, y, z);
 
 					response = $"Votre message a bien été envoyé à :\n";
 					foreach (Player ply in PlyList)

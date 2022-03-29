@@ -27,7 +27,7 @@ namespace SanyaRemastered.EventHandlers
     {
         public ServerHandlers(SanyaRemastered plugin) => this.plugin = plugin;
         internal readonly SanyaRemastered plugin;
-        internal List<CoroutineHandle> roundCoroutines = new List<CoroutineHandle>();
+        internal List<CoroutineHandle> roundCoroutines = new();
         internal bool loaded = false;
 
 
@@ -103,7 +103,7 @@ namespace SanyaRemastered.EventHandlers
         /** Flag Params **/
         private readonly int grenade_pickup_mask = 1049088;
         public bool StopRespawn = false;
-        public List<Vector3> DecalList = new List<Vector3>();
+        public List<Vector3> DecalList = new();
 
         public List<CoroutineHandle> RoundCoroutines { get => roundCoroutines; set => roundCoroutines = value; }
 
@@ -166,14 +166,12 @@ namespace SanyaRemastered.EventHandlers
                         effectObj.transform.parent = playerEffects;
                     }
                 }
-                {
-                    PlayerEffectsController effectcontroller = UnityEngine.Object.FindObjectOfType<PlayerEffectsController>();
+                PlayerEffectsController effectcontroller = UnityEngine.Object.FindObjectOfType<PlayerEffectsController>();
 
-                    effectcontroller.AllEffects.Clear();
-                    effectcontroller.syncEffectsIntensity.Clear();
+                effectcontroller.AllEffects.Clear();
+                effectcontroller.syncEffectsIntensity.Clear();
 
-                    effectcontroller.Awake();
-                }
+                effectcontroller.Awake();
             }
             if (plugin.Config.GateClosingAuto)
             {
@@ -184,7 +182,7 @@ namespace SanyaRemastered.EventHandlers
             }
             if (plugin.Config.AddDoorsOnSurface)
             {
-                Vector3 DoorScale = new Vector3(1f, 1f, 1.8f);
+                Vector3 DoorScale = new(1f, 1f, 1.8f);
                 var LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
                 var EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
                 var HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
@@ -386,45 +384,45 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            if (ev.Position != Vector3.zero && Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, grenade_pickup_mask))
+            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, grenade_pickup_mask))
             {
-                if (raycastHit.transform.TryGetComponent<ItemPickupBase>(out var pickup))
+                return;
+            }
+            if (raycastHit.transform.TryGetComponent<ItemPickupBase>(out var pickup))
+            {
+                if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
                 {
-                    if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
+                    var thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
+                    if (thrownProjectile is not null && thrownProjectile.Info.ItemId != ItemType.SCP018)
                     {
-                        var thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
-                        if (thrownProjectile != null && thrownProjectile.Info.ItemId != ItemType.SCP018)
+                        var timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
+                        if (timeGrenade is not null)
                         {
-                            var timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
-                            if (timeGrenade != null)
-                            {
-                                timeGrenade.TargetTime = 0.1f;
-                                goto finish;
-                            }
+                            timeGrenade.TargetTime = 0.1f;
+                            return;
                         }
                     }
-                    if (SanyaRemastered.Instance.Config.Item_shoot_move)
-                    {
-                        pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
-                        goto finish;
-                    }
                 }
+                if (SanyaRemastered.Instance.Config.Item_shoot_move)
+                {
+                    pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                    return;
+                }
+            }
 
-                if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
+            if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
+            {
+                var basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
+                if (basicDoor is not null)
                 {
-                    var basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
-                    if (basicDoor != null)
+                    if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed) return;
+                    if (basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f) return;
+                    if (basicDoor.NetworkActiveLocks != 0) return;
+                    if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(basicDoor is PryableDoor))
                     {
-                        if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed) goto finish;
-                        if (basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f) goto finish;
-                        if (basicDoor.NetworkActiveLocks != 0) goto finish;
-                        if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(basicDoor is PryableDoor))
-                        {
-                            basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
-                        }
+                        basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
                     }
                 }
-            finish:;
             }
         }
         public void OnDamagingWindow(DamagingWindowEventArgs ev)

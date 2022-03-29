@@ -28,7 +28,7 @@ namespace SanyaRemastered.Commands.DevCommands
                 response = $"You don't have permission to execute this command. Required permission: sanya.dev";
                 return false;
             }
-            if (targetLight == null)
+            if (targetLight is null)
             {
                 var prefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
                 var pobject = UnityEngine.Object.Instantiate(prefab.GetComponent<LightSourceToy>());

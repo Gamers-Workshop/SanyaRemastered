@@ -53,18 +53,18 @@ namespace SanyaRemastered.Patches
                         return false;
                     }
                     Room room = player.CurrentRoom;
-                    List<DoorVariant> doors = new List<DoorVariant>();
+                    List<DoorVariant> doors = new();
                     HashSet<Scp079Interactable> scp079Interactables = Scp079Interactable.InteractablesByRoomId[__instance.CurrentRoom.UniqueId];
                     foreach (Scp079Interactable scp079Interactable in scp079Interactables)
                     {
-                        if (!(scp079Interactable == null))
+                        if (scp079Interactable is not null)
                         {
                             IDamageableDoor damageableDoor;
                             if (scp079Interactable.type != Scp079Interactable.InteractableType.Door)
                             {
                                 continue;
                             }
-                            else if (scp079Interactable.TryGetComponent(out DoorVariant doorVariant) && (damageableDoor = (doorVariant as IDamageableDoor)) != null && damageableDoor.IsDestroyed)
+                            else if (scp079Interactable.TryGetComponent(out DoorVariant doorVariant) && (damageableDoor = (doorVariant as IDamageableDoor)) is not null && damageableDoor.IsDestroyed)
                             {
                                 player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079GazFail, 10);
                                 return false;
@@ -75,7 +75,7 @@ namespace SanyaRemastered.Patches
                             }
                         }
                     }
-                    if (room == null)
+                    if (room is null)
                     {
                         player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079GazFail, 10);
                         return false;
@@ -120,7 +120,7 @@ namespace SanyaRemastered.Patches
                             return false;
                         }
                         var door = target.GetComponent<DoorVariant>();
-                        if (door != null && door.syncInterval <= 0f)
+                        if (door is not null && door.syncInterval <= 0f)
                         {
 
                             door.syncInterval = 0.5f;
@@ -148,11 +148,11 @@ namespace SanyaRemastered.Patches
                         return false;
                     }
 
-                    if (__instance.CurrentRoom != null)
+                    if (__instance.CurrentRoom is not null)
                     {
                         foreach (FlickerableLightController flickerableLightController in __instance.CurrentRoom.GetComponentsInChildren<FlickerableLightController>())
                         {
-                            if (flickerableLightController != null)
+                            if (flickerableLightController is not null)
                             {
                                 flickerableLightController.ServerFlickerLights(30f);
                             }

@@ -33,7 +33,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			if (arguments.Count > 0)
 			{
 				Player target = Player.Get(arguments.At(0));
-				if (target != null && target.Role != RoleType.Spectator)
+				if (target is not null && target.Role != RoleType.Spectator)
 				{
 					Methods.Explode(target.Position);
 					response = $"success. target:{target.Nickname}";
@@ -61,7 +61,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			}
 			else
 			{
-				if (player != null)
+				if (player is not null)
 				{
 					Methods.Explode(player.Position);
 					response = $"success. target:{Player.Get(player.ReferenceHub.gameObject).Nickname}";

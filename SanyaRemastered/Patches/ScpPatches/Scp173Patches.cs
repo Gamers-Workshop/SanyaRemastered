@@ -37,7 +37,7 @@ namespace SanyaRemastered.Patches
 				{
 					return false;
 				}
-				if (msg.TargetHub == null || msg.TargetHub.characterClassManager.IsAnyScp())
+				if (msg.TargetHub is null || msg.TargetHub.characterClassManager.IsAnyScp())
 				{
 					return false;
 				}

@@ -28,11 +28,11 @@ namespace SanyaRemastered.Patches.CommandPatches
 
             List<ReferenceHub> list = Utils.RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out string[] newargs, false);
             RemoteAdmin.PlayerCommandSender playerCommandSender;
-			bool flag = list.Count == 1 && (playerCommandSender = (sender as RemoteAdmin.PlayerCommandSender)) != null && playerCommandSender.ReferenceHub == list[0];
+			bool flag = list.Count == 1 && (playerCommandSender = (sender as RemoteAdmin.PlayerCommandSender)) is not null && playerCommandSender.ReferenceHub == list[0];
             if (!int.TryParse(newargs[0], out int roleId) || roleId < 0 || roleId >= RemoteAdmin.QueryProcessor.LocalCCM.Classes.Length)
             {
                 Role role = RemoteAdmin.QueryProcessor.LocalCCM.Classes.SingleOrDefault((Role c) => c.fullName.Replace(" ", string.Empty).ToLower() == newargs[0].ToLower());
-                if (role == null)
+                if (role is null)
                 {
                     response = "Invalid class ID / name.";
                     return false;
@@ -76,7 +76,7 @@ namespace SanyaRemastered.Patches.CommandPatches
 			int num = 0;
 			foreach (ReferenceHub referenceHub in list)
 			{
-				if (referenceHub != null)
+				if (referenceHub is not null)
 				{
 					RemoteAdmin.QueryProcessor.LocalCCM.SetPlayersClass((RoleType)roleId, referenceHub.gameObject, CharacterClassManager.SpawnReason.ForceClass, false);
 					ServerLogs.AddLog(ServerLogs.Modules.ClassChange, string.Concat(new string[]
