@@ -454,7 +454,7 @@ namespace SanyaRemastered.EventHandlers
                                 {
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
                                     {
-                                        scp079.Scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
+                                        scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
                                         ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
                                         break;
                                     }
@@ -504,7 +504,7 @@ namespace SanyaRemastered.EventHandlers
                                 {
                                     if (SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp > scp079.Energy)
                                     {
-                                        scp079.Scp079.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
+                                        scp079.Script.RpcNotEnoughMana(SanyaRemastered.Instance.Config.Scp079ExtendCostFindscp, scp079.Energy);
                                         ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079NoEnergy, 5);
                                         break;
                                     }
