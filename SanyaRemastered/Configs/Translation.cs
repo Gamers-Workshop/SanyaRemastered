@@ -14,8 +14,8 @@ namespace SanyaRemastered.Configs
         [Description("#Traduction du SanyaRemastered")]
         public bool IsEnabled { get; set; } = true;
         [Description("# Traduction des message hint")]
-        public HintList HintList { get; set; } = new HintList();
+        public HintList HintList { get; set; } = new();
         [Description("# Traduction des Cassie")]
-        public CustomSubtitles CustomSubtitles { get; set; } = new CustomSubtitles();
+        public CustomSubtitles CustomSubtitles { get; set; } = new();
     }
 }

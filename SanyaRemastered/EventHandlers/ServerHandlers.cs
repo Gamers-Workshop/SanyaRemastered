@@ -427,7 +427,7 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnDamagingWindow(DamagingWindowEventArgs ev)
         {
-            if (plugin.Config.ContainCommand && Map.FindParentRoom(ev.Window.gameObject).Type == RoomType.Hcz049)
+            if (plugin.Config.ContainCommand && ev.Window.Type == GlassType.Scp049)
             {
                 ev.Damage = 0;
             }

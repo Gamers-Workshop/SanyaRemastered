@@ -68,7 +68,7 @@ namespace SanyaRemastered.Configs
         public bool FemurBreakerCanBeUsedWithNo106 { get; set; } = false;
         public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
         [Description("Désactivé la microhid pour les rôle")]
-        public List<RoleType> MicroHidNotActive { get; set; } = new List<RoleType>{RoleType.ClassD, RoleType.Scientist };
+        public List<RoleType> MicroHidNotActive { get; set; } = new() {RoleType.ClassD, RoleType.Scientist };
 
         [Description("Generator Config")]
         public bool GeneratorUnlockOpen { get; set; } = false;
@@ -122,7 +122,7 @@ namespace SanyaRemastered.Configs
         public bool Scp049Real { get; set; } = false;
         public bool Scp173Real { get; set; } = false;
         public bool ScpTakeFallDamage { get; set; } = false;
-        public List<string> ScpFallDamage { get; set; } = new List<string>
+        public List<string> ScpFallDamage { get; set; } = new()
         {
             "Scp049",
             "Scp0492",
@@ -138,7 +138,7 @@ namespace SanyaRemastered.Configs
 
 
         [Description("Recovery Amount")]
-        public Dictionary<string, int> ScpRecoveryAmount { get; set; } = new Dictionary<string, int>()
+        public Dictionary<string, int> ScpRecoveryAmount { get; set; } = new()
         {
             {"Scp049", 0},
             {"Scp0492", 0},
@@ -148,7 +148,7 @@ namespace SanyaRemastered.Configs
             {"Scp939", 0}
         };
         [Description("Multiplicateur de dégats")]
-        public Dictionary<RoleType, float> ScpDamageMultiplicator { get; set; } = new Dictionary<RoleType, float>()
+        public Dictionary<RoleType, float> ScpDamageMultiplicator { get; set; } = new()
         {
             {RoleType.Scp049, 1f},
             {RoleType.Scp0492, 1f},
@@ -181,7 +181,7 @@ namespace SanyaRemastered.Configs
         public float Scp079ExtendCostBlackoutIntercom { get; set; } = 5f;
 
         [Description("SCP-079 GAS Config")]
-        public List<string> GazBlacklistRooms { get; set; } = new List<string>();
+        public List<string> GazBlacklistRooms { get; set; } = new();
         public int GasDuration { get; set; } = 60;
         public int GasTimerWait { get; set; } = 60;
         public int GasExpGain { get; set; } = 10;
@@ -190,7 +190,7 @@ namespace SanyaRemastered.Configs
         public int GasWaitingTime { get; set; } = 60;
 
         [Description("SCP-079 Config")]
-        public Dictionary<string, float> Scp079ManaCost { get; set; } = new Dictionary<string, float>()
+        public Dictionary<string, float> Scp079ManaCost { get; set; } = new()
         {
             {"Camera Switch",                   1f },
             {"Door Lock",                       4f },
@@ -215,7 +215,7 @@ namespace SanyaRemastered.Configs
         };
         [Description("SCP Can't interact Now")]
         public bool ScpCantInteract { get; set; } = false;
-        public Dictionary<string, List<RoleType>> ScpCantInteractList { get; set; } = new Dictionary<string, List<RoleType>>()
+        public Dictionary<string, List<RoleType>> ScpCantInteractList { get; set; } = new()
         {
             {"Use914",                   new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
             {"Contain106",               new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },

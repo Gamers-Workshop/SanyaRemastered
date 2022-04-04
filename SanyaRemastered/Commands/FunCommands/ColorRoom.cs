@@ -41,10 +41,10 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				if (arguments.Count > 1 && arguments.At(1).ToLower() == "rand")
 				{
-					System.Random rng = new System.Random();
+					System.Random rng = new();
 					foreach (var i in FlickerableLightController.Instances)
 					{
-						i.WarheadLightColor = new Color((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
+						i.WarheadLightColor = new((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
 						i.WarheadLightOverride = true;
 					}
 					response = "random color ok.";
@@ -57,7 +57,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				{
 					foreach (var i in FlickerableLightController.Instances)
 					{
-						i.WarheadLightColor = new Color(r / 255f, g / 255f, b / 255f);
+						i.WarheadLightColor = new(r / 255f, g / 255f, b / 255f);
 						i.WarheadLightOverride = true;
 					}
 					response = $"color set:{r},{g},{b}";
@@ -77,7 +77,7 @@ namespace SanyaRemastered.Commands.FunCommands
 						&& float.TryParse(arguments.At(2), out var g)
 						&& float.TryParse(arguments.At(3), out var b))
 						{
-							room.Color = new Color(r / 255f, g / 255f, b / 255f);
+							room.Color = new(r / 255f, g / 255f, b / 255f);
 						}
 					}
 				}

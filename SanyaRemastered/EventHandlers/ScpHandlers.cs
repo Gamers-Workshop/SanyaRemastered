@@ -90,15 +90,15 @@ namespace SanyaRemastered.EventHandlers
                         {
                             if (ev.Player.Scale.y < 0)
                             {
-                                ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, ev.Player.Scale.z);
+                                ev.Player.Scale = new(ev.Player.Scale.x, -ev.Player.Scale.y, ev.Player.Scale.z);
                             }
                             else if (ev.Player.Scale.z < 0 && ev.Player.Scale.z < 0)
                             {
-                                ev.Player.Scale = new Vector3(ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
+                                ev.Player.Scale = new(ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
                             }
                             else
                             {
-                                ev.Player.Scale = new Vector3(-ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
+                                ev.Player.Scale = new(-ev.Player.Scale.x, -ev.Player.Scale.y, -ev.Player.Scale.z);
                             }
                         }
                     }

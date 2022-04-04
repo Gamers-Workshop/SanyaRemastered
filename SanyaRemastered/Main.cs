@@ -39,7 +39,7 @@ namespace SanyaRemastered
 		public EventHandlers.PlayerHandlers PlayerHandlers { get; private set; }
 		public EventHandlers.ScpHandlers ScpHandlers { get; private set; }
 
-		private Harmony Harmony = new Harmony("dev.Yamato");
+		private Harmony Harmony = new("dev.Yamato");
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
@@ -52,7 +52,7 @@ namespace SanyaRemastered
 			if (!Config.IsEnabled) return;
 			
 			int processId = Process.GetCurrentProcess().Id;
-			_memoryService = new Ram.MemoryService(processId);
+			_memoryService = new(processId);
 			//Only run if memory is going to be asked for
 			if (Config.RamInfo)
 			{
@@ -72,7 +72,7 @@ namespace SanyaRemastered
 			if (!Config.IsEnabled) return;
 
 			int processId = Process.GetCurrentProcess().Id;
-			_memoryService = new Ram.MemoryService(processId);
+			_memoryService = new(processId);
 			//Only run if memory is going to be asked for
 			if (Config.RamInfo)
 			{
@@ -104,9 +104,9 @@ namespace SanyaRemastered
 
 		private void RegistEvents()
 		{
-			ServerHandlers = new EventHandlers.ServerHandlers(this);
-			PlayerHandlers = new EventHandlers.PlayerHandlers(this);
-			ScpHandlers = new EventHandlers.ScpHandlers(this);
+			ServerHandlers = new(this);
+			PlayerHandlers = new(this);
+			ScpHandlers = new(this);
 
 			//
 			ServerEvents.WaitingForPlayers += ServerHandlers.OnWaintingForPlayers;
@@ -226,7 +226,7 @@ namespace SanyaRemastered
 		{
 			try
 			{
-				Harmony = new Harmony(Author + "." + Name + ++patchCounter);
+				Harmony = new(Author + "." + Name + ++patchCounter);
 				Harmony.PatchAll();
 			}
 			catch (Exception ex)
