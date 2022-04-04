@@ -42,6 +42,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new TargetTest());
             RegisterCommand(new Test());
             RegisterCommand(new WallTest());
+            RegisterCommand(new WindowList());
             RegisterCommand(new WorkTest());
 
             //Fun Commands

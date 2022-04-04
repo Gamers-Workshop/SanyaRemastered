@@ -36,6 +36,7 @@
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Commands\DevCommands\Config.cs" />
     <Compile Include="Commands\DevCommands\Now.cs" />
+    <Compile Include="Commands\DevCommands\WindowList.cs" />
     <Compile Include="Commands\FunCommands\AirBomb.cs" />
     <Compile Include="Commands\FunCommands\ColorRoom.cs" />
     <Compile Include="Commands\FunCommands\Explode.cs" />
