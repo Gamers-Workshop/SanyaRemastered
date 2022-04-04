@@ -399,6 +399,7 @@ namespace SanyaRemastered.EventHandlers
                         if (timeGrenade is not null)
                         {
                             timeGrenade.TargetTime = 0.1f;
+                            pickup.PreviousOwner = ev.Owner.Footprint;
                             return;
                         }
                     }
@@ -406,6 +407,7 @@ namespace SanyaRemastered.EventHandlers
                 if (SanyaRemastered.Instance.Config.Item_shoot_move)
                 {
                     pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                    pickup.PreviousOwner = ev.Owner.Footprint;
                     return;
                 }
             }
