@@ -122,14 +122,14 @@ namespace SanyaRemastered.EventHandlers
             Server.Host.ReferenceHub.playerMovementSync.ForcePosition(new Vector3(54.8f, 3000f, -44.9f));
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
-                foreach (var tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
+                foreach (TeslaGate tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
                 {
                     tesla.sizeOfTrigger = SanyaRemastered.Instance.Config.TeslaRange;
                 }
             }
             if (plugin.Config.DisablePlayerLists)
             {
-                foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
+                foreach (NetworkIdentity identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
                 {
                     if (identity.name == "PlayerList")
                     {
@@ -139,18 +139,16 @@ namespace SanyaRemastered.EventHandlers
             }
             if (plugin.Config.Scp096Real)
             {
-                foreach (var cp in UnityEngine.Object.FindObjectsOfType<CheckpointDoor>())
+                foreach (CheckpointDoor cp in UnityEngine.Object.FindObjectsOfType<CheckpointDoor>())
                 {
-                    if (cp.TryGetComponent(out DoorNametagExtension name))
+                    if (!cp.TryGetComponent(out DoorNametagExtension name))
+                        continue;
+                    foreach (DoorVariant door in cp._subDoors)
                     {
-                        foreach (var door in cp._subDoors)
-                        {
-                            if (door is BreakableDoor dr)
-                            {
-                                dr._remainingHealth = 750f;
-                                dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
-                            }
-                        }
+                        if (door is not BreakableDoor dr)
+                            continue;
+                        dr._remainingHealth = 750f;
+                        dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
                     }
                 }
             }
@@ -160,9 +158,9 @@ namespace SanyaRemastered.EventHandlers
                 {
                     if (player.name.Equals("Player"))
                     {
-                        var playerEffects = player.transform.Find("PlayerEffects");
+                        Transform playerEffects = player.transform.Find("PlayerEffects");
 
-                        var effectObj = new GameObject("Scp914", typeof(Scp914));
+                        GameObject effectObj = new("Scp914", typeof(Scp914));
                         effectObj.transform.parent = playerEffects;
                     }
                 }
@@ -175,24 +173,24 @@ namespace SanyaRemastered.EventHandlers
             }
             if (plugin.Config.GateClosingAuto)
             {
-                DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out var GateA);
-                var CheckpointA = GateA.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
-                DoorNametagExtension.NamedDoors.TryGetValue("GATE_B", out var GateB);
-                var CheckpointB = GateB.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
+                DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out DoorNametagExtension GateA);
+                GateA.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
+                DoorNametagExtension.NamedDoors.TryGetValue("GATE_B", out DoorNametagExtension GateB);
+                GateB.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
             }
             if (plugin.Config.AddDoorsOnSurface)
             {
                 Vector3 DoorScale = new(1f, 1f, 1.8f);
-                var LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
-                var EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
-                var HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+                DoorSpawnpoint LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
+                DoorSpawnpoint EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
+                DoorSpawnpoint HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
 
                 // Couloir spawn Chaos
-                var door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
-                var door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -23.2f), Quaternion.Euler(Vector3.zero));
+                DoorVariant door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
+                DoorVariant door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -23.2f), Quaternion.Euler(Vector3.zero));
                 // Exit
-                var door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
-                var door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
+                DoorVariant door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
+                DoorVariant door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
                 //Scale
                 door1.transform.localScale = DoorScale;
                 door2.transform.localScale = DoorScale;
@@ -210,50 +208,50 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.EditObjectsOnSurface)
             {
                 //Prefabの確保
-                var primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Primitive"));
-                var lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
-                var stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
+                GameObject primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Primitive"));
+                GameObject lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
+                GameObject stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
 
                 //ElevatorA
-                var station1 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(-0.15f, 1000f, 9.75f), Quaternion.Euler(Vector3.up * 180f));
+                GameObject station1 = UnityEngine.Object.Instantiate(stationPrefab, new(-0.15f, 1000f, 9.75f), Quaternion.Euler(Vector3.up * 180f));
                 //En face l'ElevatorB
-                var station2 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(86.69f, 987.2f, -70.85f), Quaternion.Euler(Vector3.up));
+                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(86.69f, 987.2f, -70.85f), Quaternion.Euler(Vector3.up));
                 //MTF
-                var station3 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
+                GameObject station3 = UnityEngine.Object.Instantiate(stationPrefab, new(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
                 //ElevatorB
-                var station4 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(83f, 992.77f, -46.35f), Quaternion.Euler(Vector3.up * 90f));
+                GameObject station4 = UnityEngine.Object.Instantiate(stationPrefab, new(83f, 992.77f, -46.35f), Quaternion.Euler(Vector3.up * 90f));
                 //CI
-                var station5 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
+                GameObject station5 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
                 //Surface
-                var station6 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(56.5f, 1000f, -68.5f), Quaternion.Euler(Vector3.up * 270f));
-                var station7 = UnityEngine.Object.Instantiate(stationPrefab, new Vector3(56.5f, 1000f, -71.85f), Quaternion.Euler(Vector3.up * 270f));
+                GameObject station6 = UnityEngine.Object.Instantiate(stationPrefab, new(56.5f, 1000f, -68.5f), Quaternion.Euler(Vector3.up * 270f));
+                GameObject station7 = UnityEngine.Object.Instantiate(stationPrefab, new(56.5f, 1000f, -71.85f), Quaternion.Euler(Vector3.up * 270f));
 
                 //Light Nuke Red
-                var light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_nuke.transform.position = new Vector3(40.75f, 991f, -35.75f);
+                LightSourceToy light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_nuke.transform.position = new(40.75f, 991f, -35.75f);
                 light_nuke.NetworkLightRange = 4.5f;
                 light_nuke.NetworkLightIntensity = 2f;
                 light_nuke.NetworkLightColor = Color.red;
 
                 //Lumiére dans le couloir de la GateA 
-                var light_GateA1 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_GateA1.transform.position = new Vector3(-1, 1005.2f, -37);
+                LightSourceToy light_GateA1 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_GateA1.transform.position = new(-1, 1005.2f, -37);
                 light_GateA1.NetworkLightRange = 6f;
                 light_GateA1.NetworkLightIntensity = 1f;
                 light_GateA1.NetworkLightColor = Color.white;
 
-                var light_GateA2 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_GateA2.transform.position = new Vector3(-1, 1005.2f, -29.5f);
+                LightSourceToy light_GateA2 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
+                light_GateA2.transform.position = new(-1, 1005.2f, -29.5f);
                 light_GateA2.NetworkLightRange = 6f;
                 light_GateA2.NetworkLightIntensity = 1f;
                 light_GateA2.NetworkLightColor = Color.white;
 
                 //SCP-106 Do not go on Container Of 106
-                var room106 = Room.List.First(x => x.Type == RoomType.Hcz106);
+                Room room106 = Room.List.First(x => x.Type == RoomType.Hcz106);
 
-                var wall_106 = UnityEngine.Object.Instantiate(primitivePrefab.GetComponent<PrimitiveObjectToy>());
-                wall_106.transform.SetParentAndOffset(room106.transform, new Vector3(7.2f, 2.6f, -14.3f));
-                wall_106.transform.localScale = new Vector3(20, 5, 14);
+                PrimitiveObjectToy wall_106 = UnityEngine.Object.Instantiate(primitivePrefab.GetComponent<PrimitiveObjectToy>());
+                wall_106.transform.SetParentAndOffset(room106.transform, new(7.2f, 2.6f, -14.3f));
+                wall_106.transform.localScale = new(20, 5, 14);
                 if (room106.transform.forward == Vector3.left || room106.transform.forward == Vector3.right)
                     wall_106.transform.rotation = Quaternion.Euler(Vector3.up * 90f);
                 wall_106.UpdatePositionServer();
@@ -300,9 +298,7 @@ namespace SanyaRemastered.EventHandlers
             if (SanyaRemastered.Instance.Config.GodmodeAfterEndround)
             {
                 foreach (Player player in Player.List)
-                {
                     player.ReferenceHub.characterClassManager.GodMode = true;
-                }
             }
             Coroutines.isAirBombGoing = false;
         }
@@ -310,15 +306,15 @@ namespace SanyaRemastered.EventHandlers
         public void OnRoundRestart()
         {
             Log.Info($"[OnRoundRestart] Restarting...");
-            foreach (var player in Player.List)
-                if (player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out var comp))
+            foreach (Player player in Player.List)
+                if (player.GameObject.TryGetComponent(out SanyaRemasteredComponent comp))
                     UnityEngine.Object.Destroy(comp);
-            foreach (var player in Player.List)
-                if (player.GameObject.TryGetComponent<ContainScpComponent>(out var comp))
+            foreach (Player player in Player.List)
+                if (player.GameObject.TryGetComponent(out ContainScpComponent comp))
                     UnityEngine.Object.Destroy(comp);
             SanyaRemasteredComponent._scplists.Clear();
 
-            foreach (var cor in RoundCoroutines)
+            foreach (CoroutineHandle cor in RoundCoroutines)
                 Timing.KillCoroutines(cor);
             RoundCoroutines.Clear();
 
@@ -328,13 +324,9 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count()} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated)
-                ev.IsAllowed = false;
-            else if (SanyaRemastered.Instance.Config.GodmodeAfterEndround && !RoundSummary.RoundInProgress())
-                ev.IsAllowed = false;
-            else if (Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60)
-                ev.IsAllowed = false;
-            else if (StopRespawn)
+            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated 
+                || Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60 
+                || StopRespawn)
                 ev.IsAllowed = false;
         }
 
@@ -346,7 +338,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
-                foreach (var door in Door.List)
+                foreach (Door door in Door.List)
                     if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
                         door.Base.NetworkTargetState = false;
             }
@@ -366,13 +358,11 @@ namespace SanyaRemastered.EventHandlers
         {
             if (SanyaRemastered.Instance.Config.GrenadeEffect)
             {
-                foreach (var ply in Player.List)
+                foreach (Player ply in Player.List)
                 {
-                    var dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
-                    if (dis < 15)
-                    {
-                        ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
-                    }
+                    float dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
+                    if (dis >= 15) continue;
+                    ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
                 }
             }
         }
@@ -380,7 +370,8 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.GeneratorFinishLock) ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
+            if (SanyaRemastered.Instance.Config.GeneratorFinishLock) 
+                ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
@@ -388,14 +379,14 @@ namespace SanyaRemastered.EventHandlers
             {
                 return;
             }
-            if (raycastHit.transform.TryGetComponent<ItemPickupBase>(out var pickup))
+            if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
             {
                 if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
                 {
-                    var thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
+                    ThrownProjectile thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
                     if (thrownProjectile is not null && thrownProjectile.Info.ItemId != ItemType.SCP018)
                     {
-                        var timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
+                        TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
                         if (timeGrenade is not null)
                         {
                             timeGrenade.TargetTime = 0.1f;
@@ -407,6 +398,7 @@ namespace SanyaRemastered.EventHandlers
                 if (SanyaRemastered.Instance.Config.Item_shoot_move)
                 {
                     pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+
                     pickup.PreviousOwner = ev.Owner.Footprint;
                     return;
                 }
@@ -414,12 +406,14 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
             {
-                var basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
+                BasicDoor basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
                 if (basicDoor is not null)
                 {
-                    if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed) return;
-                    if (basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f) return;
-                    if (basicDoor.NetworkActiveLocks != 0) return;
+                    if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed 
+                        || basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f 
+                        || basicDoor.NetworkActiveLocks != 0) 
+                        return;
+
                     if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(basicDoor is PryableDoor))
                     {
                         basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
