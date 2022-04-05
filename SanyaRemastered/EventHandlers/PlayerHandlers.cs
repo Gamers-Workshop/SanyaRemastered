@@ -266,16 +266,14 @@ namespace SanyaRemastered.EventHandlers
                     }
                 case ItemType.Adrenaline:
                     {
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
                         break;
                     }
                 case ItemType.SCP500:
                     {
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Bleeding>();
-                        ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Burned>();
+                        ev.Player.DisableAllEffects();
+                        if (ev.Player.IsInPocketDimension)
+                            ev.Player.EnableEffect(EffectType.Corroding);
                         break;
                     }
             }
