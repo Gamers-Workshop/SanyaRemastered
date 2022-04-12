@@ -118,8 +118,6 @@ namespace SanyaRemastered.EventHandlers
             Coroutines.isAirBombGoing = false;
             Coroutines.isActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
-            Server.Host.ReferenceHub.characterClassManager.NetworkCurClass = RoleType.Tutorial;
-            Server.Host.ReferenceHub.playerMovementSync.ForcePosition(new Vector3(54.8f, 3000f, -44.9f));
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
                 foreach (TeslaGate tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
@@ -368,10 +366,10 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
         {
-            Log.Debug($"[OnGeneratorFinish] {ev.Generator.gameObject.GetComponent<Room>()?.Name}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnGeneratorFinish] {ev.Generator.Room.Type}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.GeneratorFinishLock) 
-                ev.Generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
+            if (SanyaRemastered.Instance.Config.GeneratorFinishLock)
+                ev.Generator.Base.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
@@ -421,11 +419,11 @@ namespace SanyaRemastered.EventHandlers
                 }
             }
         }
-        public void OnDamagingWindow(DamagingWindowEventArgs ev)
+        public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
         {
             if (plugin.Config.ContainCommand && ev.Window.Type == GlassType.Scp049)
             {
-                ev.Damage = 0;
+                ev.Handler.DealtHealthDamage = 0;
             }
         }
     }

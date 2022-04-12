@@ -27,10 +27,10 @@ namespace SanyaRemastered.Commands.DevCommands
 				return false;
 			}
 			response = $"WindowList\n";
-			foreach (Window rooms in Window.List)
+			/*foreach (Window rooms in Window.List)
 			{
 				response += $"{rooms}\n";
-			}
+			}*/
 			return true;
 		}
 	}
