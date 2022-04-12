@@ -412,7 +412,7 @@ namespace SanyaRemastered.EventHandlers
                         || basicDoor.NetworkActiveLocks != 0) 
                         return;
 
-                    if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && !(basicDoor is PryableDoor))
+                    if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && basicDoor is not PryableDoor)
                     {
                         basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
                     }
