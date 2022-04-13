@@ -28,6 +28,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new CheckObj());
             RegisterCommand(new CheckObjDel());
             RegisterCommand(new Config());
+            RegisterCommand(new DoorList());
             RegisterCommand(new DoorTest());
             RegisterCommand(new Hud());
             RegisterCommand(new IdentityPos());

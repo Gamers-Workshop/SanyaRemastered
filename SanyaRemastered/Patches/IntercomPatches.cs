@@ -34,7 +34,7 @@ namespace SanyaRemastered.Patches
                     __instance.CustomContent = SanyaRemastered.Instance.SpecialTextIntercom;
                     return;
                 }
-                if (!SanyaRemastered.Instance.Config.IntercomInformation)
+                if (!SanyaRemastered.Instance.Config.IntercomInformation || Warhead.Controller is null)
                     return;
                 if (!(Room.Get(RoomType.EzIntercom)?.LightsOn ?? true && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout))
                 {

@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Commands\DevCommands\Config.cs" />
+    <Compile Include="Commands\DevCommands\DoorList.cs" />
     <Compile Include="Commands\DevCommands\Now.cs" />
     <Compile Include="Commands\DevCommands\WindowList.cs" />
     <Compile Include="Commands\FunCommands\AirBomb.cs" />
