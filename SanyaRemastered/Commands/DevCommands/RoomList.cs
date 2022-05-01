@@ -29,7 +29,7 @@ namespace SanyaRemastered.Commands.DevCommands
 			response = $"RoomList\n";
 			foreach (var rooms in Room.List)
 			{
-				response += $"{rooms.Type} : {rooms.Doors.Count()} : {rooms.Cameras.Count()} : {rooms.TeslaGate is null}\n";
+				response += $"{rooms.Zone} : {rooms.Type} : {rooms.Doors.Count()} : {rooms.Cameras.Count()} : {rooms.TeslaGate is null}\n";
 			}
 			return true;
 		}

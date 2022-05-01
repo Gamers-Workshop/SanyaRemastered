@@ -38,7 +38,6 @@ namespace SanyaRemastered.Patches.CommandPatches
 				foreach (ReferenceHub referenceHub in list)
 				{
 					if (referenceHub is not null && referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Kill By Admin")))
-
 					{
 						if (num != 0)
 						{

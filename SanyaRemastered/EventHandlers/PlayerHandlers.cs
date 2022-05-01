@@ -281,12 +281,7 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
         {
-            if (ev.Tesla.InactiveTime > 0)
-            {
-                ev.IsTriggerable = false;
-                ev.IsInIdleRange = false;
-            }
-            else if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer
+            if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer
                 && ev.Tesla.Room?.Players.Any(p => p.Items.Any(i => i.Base is RadioItem radio && radio.IsUsable)) == true)
             {
                 ev.IsTriggerable = false;

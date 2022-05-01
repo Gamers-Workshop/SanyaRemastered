@@ -15,7 +15,8 @@ using Scp106Events = Exiled.Events.Handlers.Scp106;
 using Scp096Events = Exiled.Events.Handlers.Scp096;
 using Scp049Events = Exiled.Events.Handlers.Scp049;
 using Scp173Events = Exiled.Events.Handlers.Scp173;
-
+using Scp330Events = Exiled.Events.Handlers.Scp330;
+using Scp244Events = Exiled.Events.Handlers.Scp244;
 using System.Collections.Generic;
 using NorthwoodLib.Pools;
 using System.Reflection.Emit;
@@ -217,6 +218,7 @@ namespace SanyaRemastered
 			Scp096Events.Enraging -= ScpHandlers.On096Enraging;
 			Scp096Events.CalmingDown -= ScpHandlers.On096CalmingDown;
 			Scp049Events.FinishingRecall -= ScpHandlers.On049FinishingRecall;
+
 			ServerHandlers = null;
 			PlayerHandlers = null;
 			ScpHandlers = null;

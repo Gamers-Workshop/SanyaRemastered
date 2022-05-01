@@ -12,7 +12,9 @@ using UnityEngine;
 
 namespace SanyaRemastered
 {
-    public class ContainScpComponent : MonoBehaviour
+#pragma warning disable IDE0051
+
+	public class ContainScpComponent : MonoBehaviour
     {
 
 		private SanyaRemastered _plugin;
@@ -23,8 +25,8 @@ namespace SanyaRemastered
 		public string CassieAnnounceContain;
 		public List<Door> doors = new();
 
-		private void Start()
-		{
+        private void Start()
+        {
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
 			_room = _player.CurrentRoom;

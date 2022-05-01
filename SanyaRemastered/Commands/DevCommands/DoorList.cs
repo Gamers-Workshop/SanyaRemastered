@@ -29,9 +29,7 @@ namespace SanyaRemastered.Commands.DevCommands
 			response = $"DoorList {Door.List.Count()}\n";
 			foreach (var door in Door.List)
 			{
-				response += $"{door.Type} : {door.Position} : {door.Nametag} : {door.GameObject.name}\n";
-				if (door.Type == Exiled.API.Enums.DoorType.UnknownDoor)
-					Player.Get(sender).Position = door.Position;
+				response += $"{door.Type} : {door.Zone} : {door.Nametag} : {door.GameObject.name}\n";
 			}
 			return true;
 		}
