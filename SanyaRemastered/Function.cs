@@ -27,40 +27,32 @@ namespace SanyaRemastered.Functions
         public static bool isAirBombGoing = false;
         public static bool isActuallyBombGoing = false;
         public static int AirBombWait = 0;
-        public static IEnumerator<float> CloseNukeCap()
-        {
-            var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
-            yield return Timing.WaitForSeconds(0.1f);
-            outsite.NetworkkeycardEntered = false;
-            yield break;
-        }
+
         public static IEnumerator<float> RestartServer()
         {
             yield return Timing.WaitForSeconds(30f);
-            if (Player.List.Count() == 0)
+            if (Player.List.IsEmpty())
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
                 RoundRestart.ChangeLevel(true);
+                yield break;
             }
-            else
+            if (ServerStatic.StopNextRound == ServerStatic.NextRoundAction.Restart)
             {
-                if (ServerStatic.StopNextRound == ServerStatic.NextRoundAction.Restart)
-                {
-                    ServerStatic.StopNextRound = ServerStatic.NextRoundAction.DoNothing;
-                    ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionResetEntry));
-                }
-                else
-                {
-                    ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
-                    ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
-                }
+                ServerStatic.StopNextRound = ServerStatic.NextRoundAction.DoNothing;
+                ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionResetEntry)); 
+                yield break;
             }
+            ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
+            ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
         }
         public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
         {
             AirBombWait = timewait;
-            if (isAirBombGoing && stop)
+            if (isAirBombGoing)
             {
+                if (!stop)
+                    yield break;
                 isAirBombGoing = false;
                 isActuallyBombGoing = false;
                 AirBombWait = 0;
@@ -69,10 +61,7 @@ namespace SanyaRemastered.Functions
                 DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
                 yield break;
             }
-            else if (isAirBombGoing && !stop)
-            {
-                yield break;
-            }
+
             DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n";
 
             isAirBombGoing = true;
@@ -101,56 +90,52 @@ namespace SanyaRemastered.Functions
                 AirBombWait--;
                 yield return Timing.WaitForSeconds(1);
             }
-            if (isAirBombGoing)
-            {
-                isActuallyBombGoing = true;
-                Log.Info($"[AirSupportBomb] booting...");
-                DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-                SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
-                Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
-                
-                yield return Timing.WaitForSeconds(5f);
-                Log.Info($"[AirSupportBomb] charging...");
-                {
-                    int waitforready = 5;
-                    while (waitforready >= 0)
-                    {
-                        Methods.PlayAmbientSound(7);
-                        waitforready--;
-                        if (!isAirBombGoing)
-                        {
-                            isActuallyBombGoing = false;
-                        }
-                        yield return Timing.WaitForSeconds(1f);
-                    }
-                }
-                Log.Info($"[AirSupportBomb] throwing...");
-                while (isAirBombGoing)
-                {
-                    List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
-                    foreach (var pos in randampos)
-                    {
-                        Methods.Explode(pos);
-                        yield return Timing.WaitForSeconds(0.1f);
-                    }
-                    if (TimeEnd != -1)
-                    {
-                        if (TimeEnd <= Time.deltaTime)
-                        {
-                            isAirBombGoing = false;
-                            Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
-                            break;
-                        }
-                    }
-                    yield return Timing.WaitForSeconds(0.25f);
-                }
-                
-                Cassie.MessageTranslated("outside zone termination completed", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombEnded);
-                isActuallyBombGoing = false;
-                DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
-                Log.Info($"[AirSupportBomb] Ended.");
+            if (!isAirBombGoing)
                 yield break;
+            isActuallyBombGoing = true;
+            Log.Info($"[AirSupportBomb] booting...");
+            DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
+            SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
+            Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
+
+            yield return Timing.WaitForSeconds(5f);
+            Log.Info($"[AirSupportBomb] charging...");
+            {
+                int waitforready = 5;
+                while (waitforready >= 0)
+                {
+                    Methods.PlayAmbientSound(7);
+                    waitforready--;
+                    if (!isAirBombGoing)
+                    {
+                        isActuallyBombGoing = false;
+                    }
+                    yield return Timing.WaitForSeconds(1f);
+                }
             }
+            Log.Info($"[AirSupportBomb] throwing...");
+            while (isAirBombGoing)
+            {
+                List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
+                foreach (var pos in randampos)
+                {
+                    Methods.Explode(pos);
+                    yield return Timing.WaitForSeconds(0.1f);
+                }
+                if (TimeEnd != -1 && TimeEnd <= Time.deltaTime)
+                {
+                    isAirBombGoing = false;
+                    Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
+                    break;
+                }
+                yield return Timing.WaitForSeconds(0.25f);
+            }
+
+            Cassie.MessageTranslated("outside zone termination completed", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombEnded);
+            isActuallyBombGoing = false;
+            DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
+            Log.Info($"[AirSupportBomb] Ended.");
+            yield break;
         }
         public static IEnumerator<float> RepeatAirBombSound()
         {
@@ -239,9 +224,7 @@ namespace SanyaRemastered.Functions
         public static void Explode(Vector3 position,ReferenceHub hub = null)
         {
             if (hub is null)
-            {
                 hub = Server.Host.ReferenceHub;
-            }
             if (CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))
             {
                 new CandyPink.CandyExplosionMessage

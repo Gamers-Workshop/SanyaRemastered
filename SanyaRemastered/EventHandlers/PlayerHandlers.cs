@@ -381,7 +381,10 @@ namespace SanyaRemastered.EventHandlers
             var outsite = UnityEngine.Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
             if (SanyaRemastered.Instance.Config.Nukecapclose && outsite.keycardEntered)
             {
-                Timing.RunCoroutine(Coroutines.CloseNukeCap(), Segment.FixedUpdate);
+                Timing.CallDelayed(0.1f,() => 
+                {
+                    outsite.NetworkkeycardEntered = false;
+                });
             }
             else if (outsite.keycardEntered)
             {
