@@ -33,8 +33,8 @@ namespace SanyaRemastered.Patches
 			}
 			__instance.Info.Locked = true;
 			__instance._attacker = attacker;
-			if (__instance.Info.ItemId == ItemType.GrenadeFlash)
-				Methods.SpawnGrenade(__instance.Rb.position, __instance.Info.ItemId, 0.1f ,Player.Get(attacker.NetId));
+			if (__instance.Info.ItemId != ItemType.SCP018)
+    			Methods.SpawnGrenade(__instance.Rb.position, __instance.Info.ItemId, 0.1f , attacker.Hub);
 			__instance.DestroySelf();
 			return false;
 		}

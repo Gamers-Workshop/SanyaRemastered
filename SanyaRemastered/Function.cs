@@ -188,32 +188,37 @@ namespace SanyaRemastered.Functions
             }
             return result;
         }
-        public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, Player player = null)
+        public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, ReferenceHub hub = null)
         {
+            if (hub is null)
+                hub = Server.Host.ReferenceHub;
             try
             {
-                var item = Item.Create(Grenade, player);
+                switch (Grenade)
                 {
-                    if (item.Base.TryGetComponent(out FlashGrenade flashGrenade))
-                    {
+                    case ItemType.GrenadeFlash:
+                        FlashGrenade Flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash);
+                        Flash.Base.Owner = hub;
                         if (fusedur != -1)
-                            flashGrenade.SpawnActive(position, player);
-                        else
-                        {
-                            flashGrenade.FuseTime = fusedur;
-                            flashGrenade.SpawnActive(position, player);
-                        }
-                    }
-                    else if (item.Base.TryGetComponent(out ExplosiveGrenade explosiveGrenade))
-                    {
+                            Flash.FuseTime = fusedur;
+                        Flash.SpawnActive(position);
+                        break;
+                    case ItemType.GrenadeHE:
+                        ExplosiveGrenade grenade = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE);
+                        grenade.Base.Owner = hub;
                         if (fusedur != -1)
-                            explosiveGrenade.SpawnActive(position, player);
-                        else
-                        {
-                            explosiveGrenade.FuseTime = fusedur;
-                            explosiveGrenade.SpawnActive(position, player);
-                        }
-                    }
+                            grenade.FuseTime = fusedur;
+                        grenade.SpawnActive(position);
+                        break;
+                    case ItemType.SCP018:
+                        ExplosiveGrenade SCP018 = (ExplosiveGrenade)Item.Create(ItemType.SCP018);
+                        SCP018.Base.Owner = hub;
+                        if (fusedur != -1)
+                            SCP018.FuseTime = fusedur;
+                        SCP018.SpawnActive(position);
+                        break;
+                    default:
+                        break;
                 }
             }
             catch (Exception ex)

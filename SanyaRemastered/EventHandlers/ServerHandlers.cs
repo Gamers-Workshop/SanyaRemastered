@@ -210,19 +210,10 @@ namespace SanyaRemastered.EventHandlers
                 GameObject lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
                 GameObject stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
 
-                //ElevatorA
-                GameObject station1 = UnityEngine.Object.Instantiate(stationPrefab, new(-0.15f, 1000f, 9.75f), Quaternion.Euler(Vector3.up * 180f));
-                //En face l'ElevatorB
-                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(86.69f, 987.2f, -70.85f), Quaternion.Euler(Vector3.up));
                 //MTF
-                GameObject station3 = UnityEngine.Object.Instantiate(stationPrefab, new(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
-                //ElevatorB
-                GameObject station4 = UnityEngine.Object.Instantiate(stationPrefab, new(83f, 992.77f, -46.35f), Quaternion.Euler(Vector3.up * 90f));
+                GameObject station1 = UnityEngine.Object.Instantiate(stationPrefab, new(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
                 //CI
-                GameObject station5 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
-                //Surface
-                GameObject station6 = UnityEngine.Object.Instantiate(stationPrefab, new(56.5f, 1000f, -68.5f), Quaternion.Euler(Vector3.up * 270f));
-                GameObject station7 = UnityEngine.Object.Instantiate(stationPrefab, new(56.5f, 1000f, -71.85f), Quaternion.Euler(Vector3.up * 270f));
+                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
 
                 //Light Nuke Red
                 LightSourceToy light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
@@ -257,11 +248,6 @@ namespace SanyaRemastered.EventHandlers
 
                 NetworkServer.Spawn(station1);
                 NetworkServer.Spawn(station2);
-                NetworkServer.Spawn(station3);
-                NetworkServer.Spawn(station4);
-                NetworkServer.Spawn(station5);
-                NetworkServer.Spawn(station6);
-                NetworkServer.Spawn(station7);
 
                 NetworkServer.Spawn(light_nuke.gameObject);
                 NetworkServer.Spawn(light_GateA1.gameObject);
