@@ -77,8 +77,8 @@ namespace SanyaRemastered.Configs
 
         [Description("\n  # Human Balanced")]
         public bool StopRespawnAfterDetonated { get; set; } = false;
-        public bool Item_shoot_move { get; set; } = false;
-        public bool Grenade_shoot_fuse { get; set; } = false;
+        public bool ItemShootMove { get; set; } = false;
+        public bool GrenadeShootFuse { get; set; } = false;
         public bool OpenDoorOnShoot { get; set; } = false;
         public bool GrenadeChainSametiming { get; set; } = false;
         public bool GodmodeAfterEndround { get; set; } = false;

@@ -11,11 +11,10 @@ namespace SanyaRemastered.Patches
     [HarmonyPatch(typeof(Player), nameof(Player.ShowHint))]
     public static class PatchHint
     {
-        public static bool Prefix(Player __instance,string message, float duration = 3)
+        public static bool Prefix(Player __instance, string message, float duration = 3)
         {
-            if (SanyaRemastered.Instance.Config.ExHudEnabled)
+            if (SanyaRemastered.Instance.Config.ExHudEnabled && __instance.GameObject.TryGetComponent(out SanyaRemasteredComponent sanyaRemastered))
             {
-                __instance.GameObject.TryGetComponent(out SanyaRemasteredComponent sanyaRemastered);
                 sanyaRemastered.AddHudCenterDownText(message, (ulong)duration);
                 return false;
             }

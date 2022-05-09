@@ -122,6 +122,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade += ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
+			MapEvents.ChangingIntoGrenade += ServerHandlers.OnChangingIntoGrenade;
 			PlayerEvents.PlayerDamageWindow += ServerHandlers.OnPlayerDamageWindow;
 
 			PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
@@ -179,6 +180,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade -= ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
+			MapEvents.ChangingIntoGrenade -= ServerHandlers.OnChangingIntoGrenade;
 			PlayerEvents.PlayerDamageWindow -= ServerHandlers.OnPlayerDamageWindow;
 
 			PlayerEvents.PreAuthenticating -= PlayerHandlers.OnPreAuth;

@@ -188,34 +188,31 @@ namespace SanyaRemastered.Functions
             }
             return result;
         }
-        public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, ReferenceHub hub = null)
+        public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, Player hub = null)
         {
             if (hub is null)
-                hub = Server.Host.ReferenceHub;
+                hub = Server.Host;
             try
             {
                 switch (Grenade)
                 {
                     case ItemType.GrenadeFlash:
                         FlashGrenade Flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash);
-                        Flash.Base.Owner = hub;
                         if (fusedur != -1)
                             Flash.FuseTime = fusedur;
-                        Flash.SpawnActive(position);
+                        Flash.SpawnActive(position, hub);
                         break;
                     case ItemType.GrenadeHE:
                         ExplosiveGrenade grenade = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE);
-                        grenade.Base.Owner = hub;
                         if (fusedur != -1)
                             grenade.FuseTime = fusedur;
-                        grenade.SpawnActive(position);
+                        grenade.SpawnActive(position, hub);
                         break;
                     case ItemType.SCP018:
                         ExplosiveGrenade SCP018 = (ExplosiveGrenade)Item.Create(ItemType.SCP018);
-                        SCP018.Base.Owner = hub;
                         if (fusedur != -1)
                             SCP018.FuseTime = fusedur;
-                        SCP018.SpawnActive(position);
+                        SCP018.SpawnActive(position, hub);
                         break;
                     default:
                         break;
@@ -228,6 +225,7 @@ namespace SanyaRemastered.Functions
         }
         public static void Explode(Vector3 position,ReferenceHub hub = null)
         {
+            Log.Info("Explode Sanya");
             if (hub is null)
                 hub = Server.Host.ReferenceHub;
             if (CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))

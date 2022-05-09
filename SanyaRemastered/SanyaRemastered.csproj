@@ -91,7 +91,6 @@
     <Compile Include="Patches\CommandPatches\IntercomTextCommandPatches.cs" />
     <Compile Include="Patches\FallDamagePatch.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
-    <Compile Include="Patches\GrenadePatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />
     <Compile Include="Patches\DoorInteractPatch.cs" />
     <Compile Include="Patches\CommandPatches\KillCommandPatches.cs" />

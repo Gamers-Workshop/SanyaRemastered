@@ -25,24 +25,24 @@ namespace SanyaRemastered.Commands.DevCommands
             response = string.Empty;
             foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
             {
-                response += $"{identity.transform.name} (layer{identity.transform.gameObject.layer})";
-                response += $"HasComponents:";
+                response += $"{identity.transform.name} (layer{identity.transform.gameObject.layer})\n";
+                response += $"HasComponents:\n";
                 foreach (var i in identity.transform.gameObject.GetComponents<Component>())
                 {
-                    response = $"    {i?.name}:{i?.GetType()}";
+                    response = $"    {i?.name}:{i?.GetType()}\n";
                 }
-                response += $"HasComponentsInChildren:";
+                response += $"HasComponentsInChildren:\n";
                 foreach (var i in identity.transform.gameObject.GetComponentsInChildren<Component>())
                 {
-                    response += $"    {i?.name}:{i?.GetType()}";
+                    response += $"    {i?.name}:{i?.GetType()}\n";
                 }
-                response += $"HasComponentsInParent:";
+                response += $"HasComponentsInParent:\n";
                 foreach (var i in identity.transform.gameObject.GetComponentsInParent<Component>())
                 {
-                    response += $"    {i?.name}:{i?.GetType()}";
+                    response += $"    {i?.name}:{i?.GetType()}\n";
                 }
             }
-            response = "ok.";
+            response += "ok.";
             return true;
         }
     }

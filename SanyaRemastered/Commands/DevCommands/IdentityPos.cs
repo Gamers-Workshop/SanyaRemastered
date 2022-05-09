@@ -27,9 +27,9 @@ namespace SanyaRemastered.Commands.DevCommands
             response = string.Empty;
             foreach (var identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
             {
-                response += $"{identity.transform.name}{identity.transform.position}";
+                response += $"{identity.transform.name}{identity.transform.position}\n";
             }
-            response = "ok.";
+            response += "ok.";
             return true;
         }
     }

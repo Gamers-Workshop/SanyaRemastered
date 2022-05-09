@@ -101,7 +101,6 @@ namespace SanyaRemastered.EventHandlers
             }
         }
         /** Flag Params **/
-        private readonly int grenade_pickup_mask = 1049088;
         public bool StopRespawn = false;
         public List<Vector3> DecalList = new();
 
@@ -359,27 +358,27 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, grenade_pickup_mask))
-            {
+            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit))
                 return;
-            }
+            Log.Info($"ItemPickup : {raycastHit.transform.TryGetComponent(out ItemPickupBase _)}");
             if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
             {
-                if (SanyaRemastered.Instance.Config.Grenade_shoot_fuse)
+                if (SanyaRemastered.Instance.Config.GrenadeShootFuse)
                 {
-                    ThrownProjectile thrownProjectile = pickup.transform.GetComponentInParent<ThrownProjectile>();
-                    if (thrownProjectile is not null && thrownProjectile.Info.ItemId != ItemType.SCP018)
+                    TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
+                    Log.Info($"timeGrenade is null : {timeGrenade is null} ItemType {timeGrenade.Info.ItemId}");
+                    if (timeGrenade is not null && timeGrenade.Info.ItemId != ItemType.SCP018)
                     {
-                        TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
-                        if (timeGrenade is not null)
-                        {
-                            timeGrenade.TargetTime = 0.1f;
-                            pickup.PreviousOwner = ev.Owner.Footprint;
-                            return;
-                        }
+                        if (timeGrenade.Info.ItemId == ItemType.GrenadeHE)
+                            Methods.Explode(pickup.Info.Position, ev.Owner.ReferenceHub);
+                        else
+                            Methods.SpawnGrenade(pickup.Info.Position, timeGrenade.Info.ItemId, 0.1f, ev.Owner);
+                        pickup.DestroySelf();
+
+                        return;
                     }
                 }
-                if (SanyaRemastered.Instance.Config.Item_shoot_move)
+                if (SanyaRemastered.Instance.Config.ItemShootMove)
                 {
                     pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
 
@@ -404,6 +403,11 @@ namespace SanyaRemastered.EventHandlers
                     }
                 }
             }
+        }
+        public void OnChangingIntoGrenade(ChangingIntoGrenadeEventArgs ev)
+        {
+            if (plugin.Config.GrenadeChainSametiming)
+                ev.FuseTime = 0.1f;
         }
         public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
         {
