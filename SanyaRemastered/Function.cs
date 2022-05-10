@@ -225,7 +225,6 @@ namespace SanyaRemastered.Functions
         }
         public static void Explode(Vector3 position,ReferenceHub hub = null)
         {
-            Log.Info("Explode Sanya");
             if (hub is null)
                 hub = Server.Host.ReferenceHub;
             if (CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))

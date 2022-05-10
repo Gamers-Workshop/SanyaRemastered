@@ -358,15 +358,14 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit))
+            //1*2^22 + 1*2^21 + 1*2^9 = 6291968 // Smoke Grenade Pickup
+            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, 6291968))
                 return;
-            Log.Info($"ItemPickup : {raycastHit.transform.TryGetComponent(out ItemPickupBase _)}");
             if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
             {
                 if (SanyaRemastered.Instance.Config.GrenadeShootFuse)
                 {
                     TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
-                    Log.Info($"timeGrenade is null : {timeGrenade is null} ItemType {timeGrenade.Info.ItemId}");
                     if (timeGrenade is not null && timeGrenade.Info.ItemId != ItemType.SCP018)
                     {
                         if (timeGrenade.Info.ItemId == ItemType.GrenadeHE)
