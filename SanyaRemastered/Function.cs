@@ -95,7 +95,7 @@ namespace SanyaRemastered.Functions
             isActuallyBombGoing = true;
             Log.Info($"[AirSupportBomb] booting...");
             DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-            SanyaRemastered.Instance.ServerHandlers.RoundCoroutines.Add(Timing.RunCoroutine(RepeatAirBombSound(), Segment.FixedUpdate));
+            Timing.RunCoroutine(AudioPlayer.API.AudioController.PlayFromFile("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.mp3", 75, true));
             Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
 
             yield return Timing.WaitForSeconds(5f);
@@ -135,25 +135,12 @@ namespace SanyaRemastered.Functions
             isActuallyBombGoing = false;
             DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
             Log.Info($"[AirSupportBomb] Ended.");
+            AudioPlayer.API.AudioController.LoopMusic = false;
             yield break;
-        }
-        public static IEnumerator<float> RepeatAirBombSound()
-        {
-            while (isActuallyBombGoing)
-            {
-                CommsHack.AudioAPI.API.PlayFileRaw("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.raw", 0.1f);
-                yield return Timing.WaitForSeconds(11);
-            }
         }
     }
     internal static class Methods
     {
-        
-        public static HttpClient httpClient = new();
-        public static void PlayFileRaw(string path, ushort id, float volume, bool _3d, Vector3 position) => PlayStream(File.OpenRead(path), id, volume, _3d, position);
-
-        public static void PlayStream(Stream stream, ushort id, float volume, bool _3d, Vector3 position) => CommsHack.AudioAPI.API.PlayWithParams(stream, id, volume, _3d, position);
-
         public static void SpawnDummyModel(Vector3 position, RoleType role, string nick, Quaternion rotation, Vector3 scale)
         {
             try
