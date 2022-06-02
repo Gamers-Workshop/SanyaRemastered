@@ -69,6 +69,7 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new Hint());
             RegisterCommand(new List());
             RegisterCommand(new Ping());
+            RegisterCommand(new Redirect());
         }
 
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)

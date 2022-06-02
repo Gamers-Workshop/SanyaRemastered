@@ -29,10 +29,10 @@ namespace SanyaRemastered.Commands.StaffCommands
 				return false;
 			}
 
-			response = $"Players List ({PlayerManager.players.Count}/{Server.MaxPlayerCount})\n";
+			response = $"Players List ({Player.List.Count()}/{Server.MaxPlayerCount})\n";
 			foreach (var i in Player.List)
 			{
-				response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i?.CurrentRoom.Type}\n";
+				response += $"[{i.Id}]{i.Nickname}({i.UserId})<{i.Role}/{i.Health}HP> {i.CurrentRoom?.Type}\n";
 			}
 			return true;
 		}

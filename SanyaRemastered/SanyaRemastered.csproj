@@ -76,6 +76,7 @@
     <Compile Include="Commands\StaffCommands\Hint.cs" />
     <Compile Include="Commands\StaffCommands\List.cs" />
     <Compile Include="Commands\StaffCommands\Ping.cs" />
+    <Compile Include="Commands\StaffCommands\Redirect.cs" />
     <Compile Include="Component\ContainScpComponent.cs" />
     <Compile Include="Component\GateTimerClose.cs" />
     <Compile Include="Component\Scp914.cs" />

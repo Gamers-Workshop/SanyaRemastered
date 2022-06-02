@@ -88,7 +88,7 @@ namespace SanyaRemastered.EventHandlers
             if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
             {
                 bool IsAnTarget = false;
-                foreach (Player scp096 in Player.List.Where(x => x.Role == RoleType.Scp096))
+                foreach (Player scp096 in Player.Get(RoleType.Scp096))
                     if (scp096.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096.HasTarget(ev.Player.ReferenceHub))
                         IsAnTarget = true;
                 if (IsAnTarget)
@@ -120,7 +120,7 @@ namespace SanyaRemastered.EventHandlers
             if (ev.Target is null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (ev.Handler.Type == DamageType.Scp && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
+            if (ev.Handler.Type == DamageType.Scp939 && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
             {
                 ev.Amount = BodyArmorUtils.ProcessDamage(bodyArmor.VestEfficacy, ev.Amount, SanyaRemastered.Instance.Config.Scp939EffectiveArmor);
             }
@@ -349,7 +349,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
-            if (ev.Shooter.SessionVariables.ContainsKey("InfAmmo") && ev.Shooter?.CurrentItem is Firearm firearm)
+            if (ev.Shooter.SessionVariables.ContainsKey("InfAmmo") && ev.Shooter.CurrentItem is Firearm firearm)
             {
                 firearm.Ammo++;
             }
@@ -427,7 +427,15 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnProcessingHotkey(ProcessingHotkeyEventArgs ev)
         {
-            Log.Debug($"[OnProcessingHotkey] {ev.Player.Nickname} -> {ev.Hotkey}", SanyaRemastered.Instance.Config.IsDebugged);
+            try
+            {
+                Log.Debug($"[OnProcessingHotkey] {ev.Player.Nickname} -> {ev.Hotkey}", SanyaRemastered.Instance.Config.IsDebugged);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[OnProcessingHotkey] event null {ev is null} Player null { ev?.Player is null} -> HotKey null {ev?.Hotkey is null} \n" + ex);
+                return;
+            }
             if (!plugin.Config.Scp079ExtendEnabled) 
                 return;
             if (!ev.Player.Role.Is(out Scp079Role scp079)) 

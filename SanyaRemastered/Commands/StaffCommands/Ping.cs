@@ -32,7 +32,7 @@ namespace SanyaRemastered.Commands.StaffCommands
 			response = "Pings:\n";
 			foreach (var ply in Player.List)
 			{
-				response += $"{ply?.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId]?.Ping}ms\n";
+				response += $"{ply.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId].Ping}ms\n";
 			}
 			return true;
 		}
