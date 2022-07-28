@@ -46,10 +46,8 @@ namespace SanyaRemastered.EventHandlers
                     {
                         foreach (Player player in Player.List)
                         {
-                            if (player.IsHuman() && player.GetHealthAmountPercent() > SanyaRemastered.Instance.Config.PainEffectStart)
-                            {
+                            if (player.IsHuman && player.GetHealthAmountPercent() > SanyaRemastered.Instance.Config.PainEffectStart)
                                 player.EnableEffect<Disabled>(1.2f);
-                            }
                         }
                     }
                 }
@@ -128,7 +126,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 foreach (NetworkIdentity identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
                 {
-                    if (identity.name == "PlayerList")
+                    if (identity.name is "PlayerList")
                     {
                         playerlistnetid = identity.netId;
                     }
@@ -322,7 +320,7 @@ namespace SanyaRemastered.EventHandlers
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
                 foreach (Door door in Door.List)
-                    if (door.Base.NetworkActiveLocks == (ushort)DoorLockReason.Warhead)
+                    if (door.Base.NetworkActiveLocks is (ushort)DoorLockReason.Warhead)
                         door.Base.NetworkTargetState = false;
             }
         }
@@ -366,7 +364,7 @@ namespace SanyaRemastered.EventHandlers
                 if (SanyaRemastered.Instance.Config.GrenadeShootFuse)
                 {
                     TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
-                    if (timeGrenade is not null && timeGrenade.Info.ItemId != ItemType.SCP018)
+                    if (timeGrenade is not null && timeGrenade.Info.ItemId is not ItemType.SCP018)
                     {
                         if (timeGrenade.Info.ItemId == ItemType.GrenadeHE)
                             Methods.Explode(pickup.Info.Position, ev.Owner.ReferenceHub);
@@ -392,14 +390,12 @@ namespace SanyaRemastered.EventHandlers
                 if (basicDoor is not null)
                 {
                     if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed 
-                        || basicDoor.GetExactState() != 1f && basicDoor.GetExactState() != 0f 
-                        || basicDoor.NetworkActiveLocks != 0) 
+                        || basicDoor.GetExactState() is not 1f or 0f 
+                        || basicDoor.NetworkActiveLocks is not 0) 
                         return;
 
-                    if (basicDoor.RequiredPermissions.RequiredPermissions == Interactables.Interobjects.DoorUtils.KeycardPermissions.None && basicDoor is not PryableDoor)
-                    {
+                    if (basicDoor.RequiredPermissions.RequiredPermissions is Interactables.Interobjects.DoorUtils.KeycardPermissions.None && basicDoor is not PryableDoor)
                         basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
-                    }
                 }
             }
         }
@@ -410,7 +406,7 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
         {
-            if (plugin.Config.ContainCommand && ev.Window.Type == GlassType.Scp049)
+            if (plugin.Config.ContainCommand && ev.Window.Type is GlassType.Scp049)
             {
                 ev.Handler.DealtHealthDamage = 0;
             }

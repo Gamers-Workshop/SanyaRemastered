@@ -37,7 +37,7 @@ namespace SanyaRemastered.Functions
                 RoundRestart.ChangeLevel(true);
                 yield break;
             }
-            if (ServerStatic.StopNextRound == ServerStatic.NextRoundAction.Restart)
+            if (ServerStatic.StopNextRound is ServerStatic.NextRoundAction.Restart)
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.DoNothing;
                 ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionResetEntry)); 
@@ -68,15 +68,15 @@ namespace SanyaRemastered.Functions
             while (AirBombWait > 0)
             {
                 Log.Debug("Démarage AirSupport timewait");
-                if (AirBombWait == 60f || AirBombWait == 120f || AirBombWait == 300f || AirBombWait == 600f || AirBombWait == 1800f || AirBombWait == 3600f)
+                if (AirBombWait is 60 or 120 or 300 or 600 or 1800 or 3600)
                 {
                     Cassie.MessageTranslated($"Alert . The Outside Zone emergency termination sequence activated in t minus {AirBombWait / 60} minutes .", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStartingWaitMinutes.Replace("{0}", (AirBombWait / 60).ToString()));
                 }
-                else if (AirBombWait == 30f)
+                else if (AirBombWait is 30)
                 {
                     Cassie.MessageTranslated($"Alert . The Outside Zone emergency termination sequence activated in t minus 30 seconds .", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStartingWait30s);
                 }
-                else if (AirBombWait == 0)
+                else if (AirBombWait is 0)
                 {
                     break;
                 }
@@ -312,25 +312,18 @@ namespace SanyaRemastered.Functions
                 && raycastHit.transform.name == player.name;
         }
 
-        public static int GetMTFTickets()
-        {
-            if (CustomLiteNetLib4MirrorTransport.DelayConnections) return -1;
-            return RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
-        }
+        public static int GetMTFTickets() => CustomLiteNetLib4MirrorTransport.DelayConnections
+                ? -1
+                : RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
 
-        public static int GetCITickets()
-        {
-            if (CustomLiteNetLib4MirrorTransport.DelayConnections) return -1;
-            return RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
-        }
+        public static int GetCITickets() => CustomLiteNetLib4MirrorTransport.DelayConnections
+                ? -1
+                : RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
 
-   
+
 
         // API, dont change
-        public static int GetComponentIndex(NetworkIdentity identity, Type type)
-        {
-            return Array.FindIndex(identity.NetworkBehaviours, (x) => x.GetType() == type);
-        }
+        public static int GetComponentIndex(NetworkIdentity identity, Type type) => Array.FindIndex(identity.NetworkBehaviours, (x) => x.GetType() == type);
 
         // API, dont change
         public static ulong GetDirtyBit(Type targetType, string PropertyName)
@@ -377,10 +370,6 @@ namespace SanyaRemastered.Functions
     }
     internal static class Extensions
     {
-        public static bool IsHuman(this Player player)
-        {
-            return player.Role.Team != Team.SCP && player.Role.Team != Team.RIP;
-        }
         public static bool IsInTheBox(Vector3 posroom,Vector3 max, Vector3 min,float rotation)
         {
             Vector3 end;

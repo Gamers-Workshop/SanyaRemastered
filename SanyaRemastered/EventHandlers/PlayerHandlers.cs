@@ -74,7 +74,7 @@ namespace SanyaRemastered.EventHandlers
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
             {
-                if (ev.NewRole == RoleType.Scp079)
+                if (ev.NewRole is RoleType.Scp079)
                 {
                     ev.Items.AddRange(new List<ItemType> { ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.GunCOM15, ItemType.GunShotgun, ItemType.Medkit, ItemType.GrenadeFlash });
                     SanyaRemastered.Instance.ServerHandlers.roundCoroutines.Add(Timing.CallDelayed(5f, () =>
@@ -82,10 +82,10 @@ namespace SanyaRemastered.EventHandlers
                         ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.Extend079First, 20);
                     }));
                 }
-                else if (ev.Player.Role == RoleType.Scp079)
+                else if (ev.Player.Role.Type is RoleType.Scp079)
                     ev.Player.ClearInventory(true);
             }
-            if (ev.Reason == SpawnReason.Escaped && plugin.Config.Scp096Real)
+            if (plugin.Config.Scp096Real && ev.Reason is SpawnReason.Escaped)
             {
                 bool IsAnTarget = false;
                 foreach (Player scp096 in Player.Get(RoleType.Scp096))
@@ -105,11 +105,11 @@ namespace SanyaRemastered.EventHandlers
             if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.RoleType}-> {ev.Position}", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
+            if (ev.Player.Role.Type is RoleType.Scp93953 or RoleType.Scp93989)
                 ev.Player.Scale = new Vector3(SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size, SanyaRemastered.Instance.Config.Scp939Size);
 
-            if (SanyaRemastered.Instance.Config.Scp106slow && ev.Player.Role == RoleType.Scp106
-                || SanyaRemastered.Instance.Config.Scp939slow && ev.Player.Role == (RoleType.Scp93953 | RoleType.Scp93989))
+            if (SanyaRemastered.Instance.Config.Scp106slow && ev.Player.Role.Type is RoleType.Scp106
+                || SanyaRemastered.Instance.Config.Scp939slow && ev.Player.Role.Type is RoleType.Scp93953 or RoleType.Scp93989)
             {
                 ev.Player.EnableEffect(EffectType.Disabled);
             }
@@ -117,58 +117,48 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerHurting(HurtingEventArgs ev)
         {
             if (!ev.IsAllowed) return;
-            if (ev.Target is null || ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected || !ev.IsAllowed) return;
+            if (ev.Target is null || ev.Target.IsHost || ev.Target.Role.Type is RoleType.Spectator || ev.Target.IsGodModeEnabled || ev.Target.IsSpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnPlayerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.Handler.Type}({ev.Amount})-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (ev.Handler.Type == DamageType.Scp939 && SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
-            {
+            if (SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && ev.Handler.Type is DamageType.Scp939 && BodyArmorUtils.TryGetBodyArmor(ev.Target.Inventory, out BodyArmor bodyArmor))
                 ev.Amount = BodyArmorUtils.ProcessDamage(bodyArmor.VestEfficacy, ev.Amount, SanyaRemastered.Instance.Config.Scp939EffectiveArmor);
-            }
+            if (ev.Handler.Type is not DamageType.Warhead or DamageType.Decontamination or DamageType.Crushed or DamageType.Tesla or DamageType.Scp207)
             {
-                if (ev.Handler.Type != DamageType.Warhead
-                    && ev.Handler.Type != DamageType.Decontamination
-                    && ev.Handler.Type != DamageType.Crushed
-                    && ev.Handler.Type != DamageType.Tesla
-                    && ev.Handler.Type != DamageType.Scp207)
-                {
-                    //GrenadeHitmark
-                    if (ev.Attacker is not null)
-                        if (SanyaRemastered.Instance.Config.HitmarkGrenade
-                        && ev.Handler.Type == DamageType.Explosion
-                        && ev.Target.UserId != ev.Attacker.UserId)
-                        {
-                            ev.Attacker.SendHitmarker();
-                        }
-
-                    //USPMultiplier
-                    if (ev.Handler.Type == DamageType.Com18)
+                //GrenadeHitmark
+                if (ev.Attacker is not null)
+                    if (SanyaRemastered.Instance.Config.HitmarkGrenade
+                    && ev.Handler.Type is DamageType.Explosion
+                    && ev.Target.UserId != ev.Attacker.UserId)
                     {
-                        if (ev.Target.IsScp)
-                        {
-                            ev.Amount *= SanyaRemastered.Instance.Config.UspDamageMultiplierScp;
-                        }
-                        else
-                        {
-                            ev.Amount *= SanyaRemastered.Instance.Config.UspDamageMultiplierHuman;
-                            ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(5f);
-                        }
+                        ev.Attacker.SendHitmarker();
                     }
 
-                    //SCPsMultiplicator
-                    if (ev.Target.IsScp
-                        && ev.Handler.Type != DamageType.Recontainment
-                        && ev.Handler.Type != DamageType.Poison)
+                //USPMultiplier
+                if (ev.Handler.Type is DamageType.Com18)
+                {
+                    if (ev.Target.IsScp)
                     {
-                        if (ev.Target.ArtificialHealth < ev.Amount && SanyaRemastered.Instance.Config.ScpDamageMultiplicator.TryGetValue(ev.Target.Role, out float AmmountDamage) && AmmountDamage != 1)
-                        {
-                            ev.Amount *= AmmountDamage;
-                        }
-                        if (ev.Target.Role == RoleType.Scp106)
-                        {
-                            if (ev.Handler.Type != DamageType.Explosion) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
-                            if (ev.Handler.Type != DamageType.MicroHid && ev.Handler.Type != DamageType.Tesla)
-                                ev.Amount *= SanyaRemastered.Instance.Config.Scp106DamageMultiplicator;
-                        }
+                        ev.Amount *= SanyaRemastered.Instance.Config.UspDamageMultiplierScp;
+                    }
+                    else
+                    {
+                        ev.Amount *= SanyaRemastered.Instance.Config.UspDamageMultiplierHuman;
+                        ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(5f);
+                    }
+                }
+
+                //SCPsMultiplicator
+                if (ev.Target.IsScp && ev.Handler.Type is not DamageType.Recontainment or DamageType.Poison)
+                {
+                    if (ev.Target.ArtificialHealth < ev.Amount && SanyaRemastered.Instance.Config.ScpDamageMultiplicator.TryGetValue(ev.Target.Role, out float AmmountDamage) && AmmountDamage != 1)
+                    {
+                        ev.Amount *= AmmountDamage;
+                    }
+                    if (ev.Target.Role == RoleType.Scp106)
+                    {
+                        if (ev.Handler.Type is not DamageType.Explosion) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
+                        if (ev.Handler.Type is not DamageType.MicroHid or DamageType.Tesla)
+                            ev.Amount *= SanyaRemastered.Instance.Config.Scp106DamageMultiplicator;
                     }
                 }
             }
@@ -192,14 +182,14 @@ namespace SanyaRemastered.EventHandlers
             }
 
             if (SanyaRemastered.Instance.Config.HitmarkKilled
-                && ev.Killer.Role.Team != Team.SCP
+                && ev.Killer.Role.Team is not Team.SCP
                 && !string.IsNullOrEmpty(ev.Killer.UserId)
                 && ev.Killer.UserId != ev.Target.UserId)
             {
                 ev.Killer.SendHitmarker(3);
             }
 
-            if (ev.Handler.Type == DamageType.Decontamination || ev.Handler.Type == DamageType.Warhead || ev.Handler.Type == DamageType.FemurBreaker)
+            if (ev.Handler.Type is DamageType.Decontamination or DamageType.Warhead or DamageType.FemurBreaker)
             {
                 ev.Target.Inventory.UserInventory.Items.Clear();
                 ev.Target.Inventory.UserInventory.ReserveAmmo.Clear();
@@ -229,7 +219,7 @@ namespace SanyaRemastered.EventHandlers
         public void OnPocketDimDeath(FailingEscapePocketDimensionEventArgs ev)
         {
             Log.Debug($"[OnPocketDimDeath] {ev.Player.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-            List<Player> Scp106 = Player.List.Where(x => x.Role == RoleType.Scp106).ToList();
+            var Scp106 = Player.Get(RoleType.Scp106);
             foreach (Player player in Scp106)
             {
                 player.SendHitmarker();
@@ -244,12 +234,12 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnThrowingItem(ThrowingItemEventArgs ev)
         {
-            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role.Type is RoleType.Scp079)
                 ev.IsAllowed = false;
         }
         public void OnPlayerUsingItem(UsingItemEventArgs ev)
         {
-            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role == RoleType.Scp079)
+            if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role.Type is RoleType.Scp079)
                 ev.IsAllowed = false;
         }
         public void OnPlayerUsedItem(UsedItemEventArgs ev)
@@ -282,7 +272,7 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerTriggerTesla(TriggeringTeslaEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.TeslaNoTriggerRadioPlayer
-                && ev.Tesla.Room?.Players.Any(p => p.Items.Any(i => i.Base is RadioItem radio && radio.IsUsable)) == true)
+                && ev.Tesla.Room?.Players.Any(p => p.Items.Any(i => i.Base is RadioItem radio && radio.IsUsable)) is true)
             {
                 ev.IsTriggerable = false;
                 ev.IsInIdleRange = false;
@@ -308,7 +298,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
-            if (ev.Door.Type == (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent<GateTimerClose>(out var Gate))
+            if (ev.Door.Type == (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent(out GateTimerClose Gate))
             {
                 Gate._timeBeforeClosing = -1;
             }
@@ -366,7 +356,7 @@ namespace SanyaRemastered.EventHandlers
             if (!ReferenceHub.LocalHub.characterClassManager.RoundStarted) return;
 
             if (SanyaRemastered.Instance.Config.StaminaLostJump > 0
-                && ev.Player.IsHuman()
+                && ev.Player.IsHuman
                 && !ev.Player.Stamina._invigorated.IsEnabled
                 && !ev.Player.Stamina._scp207.IsEnabled)
             {

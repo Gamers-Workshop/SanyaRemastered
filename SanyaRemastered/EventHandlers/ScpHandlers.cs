@@ -51,17 +51,17 @@ namespace SanyaRemastered.EventHandlers
                 case Scp914KnobSetting.Rough:
                     {
                         ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
-                        if (ev.Player.Role.Team != Team.SCP)
+                        if (ev.Player.Role.Team is not Team.SCP)
                             ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
                     }
                     break;
                 case Scp914KnobSetting.Coarse:
                     {
-                        if (ev.Player.Role == RoleType.Scp93953 || ev.Player.Role == RoleType.Scp93989)
+                        if (ev.Player.Role.Type.Is939())
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
                         }
-                        if (ev.Player.Role.Team != Team.SCP)
+                        if (ev.Player.Role.Team is not Team.SCP)
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914")
                             {
@@ -77,17 +77,17 @@ namespace SanyaRemastered.EventHandlers
                     break;
                 case Scp914KnobSetting.OneToOne:
                     {
-                        if (ev.Player.Role == RoleType.Scp93953)
+                        if (ev.Player.Role.Type is RoleType.Scp93953)
                         {
                             ev.Player.SetRole(RoleType.Scp93989, lite: true);
                             break;
                         }
-                        else if (ev.Player.Role == RoleType.Scp93989)
+                        else if (ev.Player.Role.Type is RoleType.Scp93989)
                         {
                             ev.Player.SetRole(RoleType.Scp93953, lite: true);
                             break;
                         }
-                        else if (ev.Player.Role != RoleType.Scp106)
+                        else if (ev.Player.Role.Type is not RoleType.Scp106)
                         {
                             if (ev.Player.Scale.y < 0)
                             {
@@ -174,7 +174,7 @@ namespace SanyaRemastered.EventHandlers
         }
         public void On096CalmingDown(CalmingDownEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.ToList().Count != 0)
+            if (SanyaRemastered.Instance.Config.Scp096Real && ev.Scp096._targets.Count is not 0)
             {
                 ev.IsAllowed = false;
                 ev.Scp096.EnrageTimeLeft = 0.5f;

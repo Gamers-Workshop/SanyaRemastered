@@ -16,7 +16,6 @@ using Scp096Events = Exiled.Events.Handlers.Scp096;
 using Scp049Events = Exiled.Events.Handlers.Scp049;
 using Scp173Events = Exiled.Events.Handlers.Scp173;
 using Scp330Events = Exiled.Events.Handlers.Scp330;
-using Scp244Events = Exiled.Events.Handlers.Scp244;
 using System.Collections.Generic;
 using NorthwoodLib.Pools;
 using System.Reflection.Emit;
