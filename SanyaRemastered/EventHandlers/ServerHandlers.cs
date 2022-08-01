@@ -341,7 +341,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 foreach (Player ply in Player.List)
                 {
-                    float dis = Vector3.Distance(ev.Grenade.transform.position, ply.Position);
+                    float dis = Vector3.Distance(ev.Grenade.Position, ply.Position);
                     if (dis >= 15) continue;
                     ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
                 }
