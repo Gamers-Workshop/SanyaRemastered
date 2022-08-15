@@ -19,6 +19,7 @@ using Dissonance;
 using Dissonance.Integrations.MirrorIgnorance;
 using MapGeneration.Distributors;
 using Exiled.API.Enums;
+using Exiled.API.Features.Roles;
 
 namespace SanyaRemastered
 {
@@ -115,7 +116,7 @@ namespace SanyaRemastered
 
 		private void UpdateRespawnCounter()
 		{
-			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role != RoleType.Spectator) return;
+			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role.Type is not RoleType.Spectator) return;
 			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown)
 				_respawnCounter = (int)Math.Truncate(RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds);
 			else
@@ -124,13 +125,13 @@ namespace SanyaRemastered
 
 		private void UpdateScpLists()
 		{
-			if ((_player.Role.Team != Team.SCP || _player.Role == RoleType.Scp0492) && _scplists.Contains(_player))
+			if ((_player.Role.Team is not Team.SCP || _player.Role.Type is RoleType.Scp0492) && _scplists.Contains(_player))
 			{
 				_scplists.Remove(_player);
 				return;
 			}
 
-			if (_player.Role.Team == Team.SCP && _player.Role != RoleType.Scp0492 && !_scplists.Contains(_player))
+			if (_player.Role.Team is Team.SCP && _player.Role.Type is not RoleType.Scp0492 && !_scplists.Contains(_player))
 			{
 				_scplists.Add(_player);
 				return;
@@ -173,16 +174,16 @@ namespace SanyaRemastered
 			}
 
 			//[LIST]
-			if (_player.Role.Team == Team.SCP)
+			if (_player.Role.Team is Team.SCP)
 			{
-				if (_player.Role == RoleType.Scp079 && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
+				if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleType.Scp079)
 				{
 					list.Append("<color=red><u>SCP</u>\n");
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
-						if (scp.Role == RoleType.Scp079)
+						if (scp.Role.Type is not RoleType.Scp079)
 							list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n");
-						else if (scp.Role != RoleType.Scp0492)
+						else if (scp.Role.Type is not RoleType.Scp0492)
 						list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.CurrentRoom.Type}\n");
 						else
 							Scp0492++;
@@ -191,15 +192,15 @@ namespace SanyaRemastered
 					list.Remove(list.Length - 2, 0);
 					list.Append("</color>");
 				}
-				if (_player.Role == RoleType.Scp096 && SanyaRemastered.Instance.Config.ExHudScp096 && _player.CurrentScp is PlayableScps.Scp096 Scp096 && Scp096._targets.Count() != 0)
+				if (SanyaRemastered.Instance.Config.ExHudScp096 && _player.Role.Is(out Scp096Role scp096) && scp096.Targets.Any())
 				{
-					var TargetList = Scp096._targets.OrderBy(x => Vector3.Distance(_player.Position, x.gameObject.transform.position));
-					list.Append($"<color=red><u>SCP</u>\nTarget : {TargetList.Count()}\nDistance : {(int)Vector3.Distance(_player.Position, TargetList.First().gameObject.transform.position)}m\n");
+					var TargetList = scp096.Targets.OrderBy(x => Vector3.Distance(_player.Position, x.Position));
+					list.Append($"<color=red><u>SCP</u>\nTarget : {TargetList.Count()}\nDistance : {(int)Vector3.Distance(_player.Position, TargetList.First().Position)}m\n");
 
 					foreach (Room room in Room.List)
                     {
-						int numberoftarget = room.Players.Count(p => TargetList.Contains(p.ReferenceHub));
-						if (numberoftarget != 0)
+						int numberoftarget = room.Players.Count(p => TargetList.Contains(p));
+						if (numberoftarget is not 0)
 							list.Append($"{room.Type} : {numberoftarget}\n");
 					}
 					list.Remove(list.Length - 2, 0);
@@ -215,7 +216,7 @@ namespace SanyaRemastered
 			curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
-			if (_player.Role == RoleType.Scp079 && _player.Zone == ZoneType.HeavyContainment && SanyaRemastered.Instance.Config.ExHudScp079Moreinfo)
+			if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleType.Scp079 && _player.Zone is ZoneType.HeavyContainment)
             {
 				string InfoGen = string.Empty;
 				foreach (Generator gen in Generator.Get(GeneratorState.Activating))
@@ -228,22 +229,22 @@ namespace SanyaRemastered
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
-			else if (_player.Role == RoleType.Spectator)
+			else if (_player.Role.Type is RoleType.Spectator)
 			{
 				if (Coroutines.isActuallyBombGoing)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn tant que le bombardement est activé.", 5));
-				else if (Coroutines.AirBombWait != 0 && Coroutines.AirBombWait < 60)
+				else if (Coroutines.AirBombWait is not 0 && Coroutines.AirBombWait < 60)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 5));
 				else if (Warhead.IsDetonated && SanyaRemastered.Instance.Config.StopRespawnAfterDetonated)
-					if (Coroutines.AirBombWait != 0)
+					if (Coroutines.AirBombWait is not 0)
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
 					else
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site.", 5));
 				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Il n'y a plus de tickets disponibles.", 5));
-				else if (_respawnCounter == 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
+				else if (_respawnCounter is 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 5));
-				else if (_respawnCounter != -1)
+				else if (_respawnCounter is not -1)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Prochain respawn dans {_respawnCounter} seconde{(_respawnCounter <= 1 ? "" : "s")}.", 5));
 				else
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(string.Empty, 5));
@@ -254,11 +255,11 @@ namespace SanyaRemastered
 			//[BOTTOM]
 			if (!string.IsNullOrEmpty(_hudBottomString))
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(_hudBottomString, 2));
-			else if (_player.Role == RoleType.Spectator) 
+			else if (_player.Role.Is(out SpectatorRole spectator))
 			{
 				try
 				{
-					Player Spectate = Player.Get(_player.ReferenceHub.spectatorManager.CurrentSpectatedPlayer.gameObject);
+					Player Spectate = spectator.SpectatedPlayer;
 					if (Spectate is not null && Spectate.TryGetSessionVariable("NewRole", out Tuple<string, string> newrole))
 					{
 						curText = curText.Replace("[BOTTOM]", FormatStringForHud($"\n<b><color={Spectate.Role.Color.ToHex()}>{newrole.Item2}</color></b>", 2));
@@ -271,7 +272,7 @@ namespace SanyaRemastered
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
 				}
 			}
-			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role == RoleType.Scp079)
+			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role.Type is RoleType.Scp079)
             {
 				if (Extensions.IsExmode(_player))
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Activé\n<size=25%>Utilisé vos racourcie d'arme pour passé en mode étendue<size=50%>", 2));

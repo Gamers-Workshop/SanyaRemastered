@@ -341,7 +341,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 foreach (Player ply in Player.List)
                 {
-                    float dis = Vector3.Distance(ev.Grenade.Position, ply.Position);
+                    float dis = Vector3.Distance(ev.Position, ply.Position);
                     if (dis >= 15) continue;
                     ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
                 }
@@ -356,8 +356,10 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            //1*2^22 + 1*2^21 + 1*2^9 = 6291968 // Smoke Grenade Pickup
-            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, 6291968))
+            if (Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit Debug))
+                Log.Info($"LayerMask is {Debug.collider?.gameObject?.layer}");
+            // Smoke Grenade Pickup ButtonDoor
+            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))
                 return;
             if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
             {
@@ -390,7 +392,7 @@ namespace SanyaRemastered.EventHandlers
                 if (basicDoor is not null)
                 {
                     if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed 
-                        || basicDoor.GetExactState() is not 1f or 0f 
+                        || basicDoor.GetExactState() is not (1f or 0f) 
                         || basicDoor.NetworkActiveLocks is not 0) 
                         return;
 
