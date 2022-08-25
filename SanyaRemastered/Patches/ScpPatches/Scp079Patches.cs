@@ -1,4 +1,5 @@
 ﻿using CustomPlayerEffects;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
@@ -181,7 +182,7 @@ namespace SanyaRemastered.Patches
             {
                 foreach (var player in room.Players)
                 {
-                    Methods.PlayAmbientSound(7,player);
+                    player.PlayBeepSound();
                 }
                 room.Color = FlickerableLightController.DefaultWarheadColor;
                 yield return Timing.WaitForSeconds(0.5f);
@@ -198,13 +199,13 @@ namespace SanyaRemastered.Patches
             {
                 foreach (var player in room.Players)
                 {
-                    if (player.IsAlive && player.Role != RoleType.Scp079)
+                    if (player.IsAlive && player.Role.Type is not RoleType.Scp079)
                     {
                         player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>(10);
                         player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("GAS") { Damage = 10});
-                        if (player.Role == RoleType.Spectator)
+                        if (player.Role.Type is not RoleType.Spectator)
                         {
                             scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);
                             player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.DeadBy079Gas, 20);

@@ -43,7 +43,7 @@ namespace SanyaRemastered.Patches
                 }
 
                 int leftdecont = (int)Math.Truncate(DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger - Math.Truncate(DecontaminationController.GetServerTime));
-                int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
+                int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() is RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
                 int TimeWarhead = (int)Math.Truncate(Warhead.DetonationTimer);
 
                 leftdecont = Mathf.Clamp(leftdecont, 0, leftdecont);
@@ -96,7 +96,7 @@ namespace SanyaRemastered.Patches
                 }
 
                 //Générateur 079
-                if (Generator.Get(GeneratorState.Engaged).Count() == 3)
+                if (Generator.Get(GeneratorState.Engaged).Count() is 3)
                 {
                     stringBuilder.Append("Tous les générateurs du site sont activés\n");
                 }
@@ -124,7 +124,7 @@ namespace SanyaRemastered.Patches
 
                 //Prochain spawn + durée MTF
 
-                if (RespawnManager.Singleton.NextKnownTeam == SpawnableTeamType.ChaosInsurgency)
+                if (RespawnManager.Singleton.NextKnownTeam is SpawnableTeamType.ChaosInsurgency)
                     stringBuilder.Append($"Les renforts se préparent\n");
                 else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0)
                     stringBuilder.Append($"Aucun renforts prévus pour le site\n");
@@ -144,7 +144,7 @@ namespace SanyaRemastered.Patches
                 {
                     stringBuilder.Append($"Temps avant redémarrage : {Mathf.CeilToInt(__instance.remainingCooldown)} seconde{(__instance.remainingCooldown <= 1 ? "" : "s")} ");
                 }
-                else if (__instance.speechRemainingTime == -77f)
+                else if (__instance.speechRemainingTime is -77f)
                 {
                     stringBuilder.Append($"{Player.Get(__instance.Networkspeaker)?.DisplayNickname} à une diffusion prioritaire");
                 }

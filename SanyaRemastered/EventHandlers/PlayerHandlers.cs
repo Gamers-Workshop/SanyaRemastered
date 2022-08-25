@@ -157,7 +157,7 @@ namespace SanyaRemastered.EventHandlers
                     if (ev.Target.Role == RoleType.Scp106)
                     {
                         if (ev.Handler.Type is not DamageType.Explosion) ev.Amount *= SanyaRemastered.Instance.Config.Scp106GrenadeMultiplicator;
-                        if (ev.Handler.Type is not DamageType.MicroHid or DamageType.Tesla)
+                        if (ev.Handler.Type is not (DamageType.MicroHid or DamageType.Tesla))
                             ev.Amount *= SanyaRemastered.Instance.Config.Scp106DamageMultiplicator;
                     }
                 }
@@ -201,12 +201,12 @@ namespace SanyaRemastered.EventHandlers
             DamageHandler damage = new CustomDamageHandler(ev.Owner, ev.DamageHandlerBase);
             double time = NetworkTime.time;
             //Disable Ragdoll
-            if (SanyaRemastered.Instance.Config.Scp106RemoveRagdoll && damage.Type == DamageType.Scp106
-                || SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && damage.Type == DamageType.Scp096)
+            if (SanyaRemastered.Instance.Config.Scp106RemoveRagdoll && damage.Type is DamageType.Scp106
+                || SanyaRemastered.Instance.Config.Scp096RemoveRagdoll && damage.Type is DamageType.Scp096)
                 //Disable Recall By 079
-                if (SanyaRemastered.Instance.Config.Scp049Real && damage.Type != DamageType.Scp049) time = double.MinValue;
+                if (SanyaRemastered.Instance.Config.Scp049Real && damage.Type is not DamageType.Scp049) time = double.MinValue;
             //TeslaDestroyTheNameOfThePlayer
-            if (SanyaRemastered.Instance.Config.TeslaDestroyName && damage.Type == DamageType.Tesla) ev.Nickname = "inconue";
+            if (SanyaRemastered.Instance.Config.TeslaDestroyName && damage.Type is DamageType.Tesla) ev.Nickname = "inconue";
 
 
             ev.Info = new RagdollInfo(ev.Owner.ReferenceHub, ev.DamageHandlerBase, ev.Role, ev.Position, ev.Rotation, ev.Nickname, time);
@@ -232,7 +232,7 @@ namespace SanyaRemastered.EventHandlers
                 }
             }
         }
-        public void OnThrowingItem(ThrowingItemEventArgs ev)
+        public void OnThrowingRequest(ThrowingRequestEventArgs ev)
         {
             if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role.Type is RoleType.Scp079)
                 ev.IsAllowed = false;
@@ -298,7 +298,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
-            if (ev.Door.Type == (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent(out GateTimerClose Gate))
+            if (ev.Door.Type is (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent(out GateTimerClose Gate))
             {
                 Gate._timeBeforeClosing = -1;
             }
@@ -329,12 +329,12 @@ namespace SanyaRemastered.EventHandlers
         public void OnShooting(ShootingEventArgs ev)
         {
             Log.Debug($"[OnShooting] {ev.Shooter.Nickname} -{ev.ShotPosition}-> {Player.Get(ev.TargetNetId)?.Nickname}", SanyaRemastered.Instance.Config.IsDebugged);
-            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Shooter.Role == RoleType.Scp079)
+            if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && ev.Shooter.Role.Type is RoleType.Scp079)
                 ev.IsAllowed = false;
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
                 Player target = Player.Get(ev.TargetNetId);
-                if (target is not null && target.Role == RoleType.Scp096)
+                if (target is not null && target.Role.Type is RoleType.Scp096)
                 {
                     ev.IsAllowed = false;
                 }

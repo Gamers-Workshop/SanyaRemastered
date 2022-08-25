@@ -30,7 +30,7 @@ namespace SanyaRemastered.Commands.FunCommands
 
 			if (arguments.Count > 0 && int.TryParse(arguments.At(0), out int sound))
 			{
-				Methods.PlayAmbientSound(sound);
+				Map.PlayAmbientSound(sound);
 			}
 			response = $"Ambient sound \n";
 			return true;

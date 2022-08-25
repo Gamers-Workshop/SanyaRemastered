@@ -14,7 +14,7 @@ namespace SanyaRemastered.Patches
 		public static bool Prefix(RespawnEffectsController.EffectType type, SpawnableTeamType team)
 		{
 			Log.Debug($"[RespawnEffectPatch] {type}:{team}");
-			if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated && type == RespawnEffectsController.EffectType.Selection) return false;
+			if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated && type is RespawnEffectsController.EffectType.Selection) return false;
 			else return true;
 		}
 	}

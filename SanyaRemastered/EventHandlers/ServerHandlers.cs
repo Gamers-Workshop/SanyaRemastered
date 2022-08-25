@@ -401,7 +401,7 @@ namespace SanyaRemastered.EventHandlers
                 }
             }
         }
-        public void OnChangingIntoGrenade(ChangingIntoGrenadeEventArgs ev)
+        public void OnChangingIntoGrenade(ChangedIntoGrenadeEventArgs ev)
         {
             if (plugin.Config.GrenadeChainSametiming)
                 ev.FuseTime = 0.1f;

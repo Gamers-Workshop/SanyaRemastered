@@ -104,7 +104,7 @@ namespace SanyaRemastered.Functions
                 int waitforready = 5;
                 while (waitforready >= 0)
                 {
-                    Methods.PlayAmbientSound(7);
+                    Map.PlayAmbientSound(7);
                     waitforready--;
                     if (!isAirBombGoing)
                     {
@@ -177,51 +177,43 @@ namespace SanyaRemastered.Functions
         }
         public static void SpawnGrenade(Vector3 position, ItemType Grenade, float fusedur = -1, Player hub = null)
         {
-            if (hub is null)
-                hub = Server.Host;
-            try
+            hub ??= Server.Host;
+            
+            switch (Grenade) 
             {
-                switch (Grenade)
-                {
-                    case ItemType.GrenadeFlash:
-                        FlashGrenade Flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash);
-                        if (fusedur != -1)
-                            Flash.FuseTime = fusedur;
-                        Flash.SpawnActive(position, hub);
-                        break;
-                    case ItemType.GrenadeHE:
-                        ExplosiveGrenade grenade = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE);
-                        if (fusedur != -1)
-                            grenade.FuseTime = fusedur;
-                        grenade.SpawnActive(position, hub);
-                        break;
-                    case ItemType.SCP018:
-                        ExplosiveGrenade SCP018 = (ExplosiveGrenade)Item.Create(ItemType.SCP018);
-                        if (fusedur != -1)
-                            SCP018.FuseTime = fusedur;
-                        SCP018.SpawnActive(position, hub);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"[SpawnGrenade] Error: {ex}");
+                case ItemType.GrenadeFlash:
+                    FlashGrenade Flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash);
+                    if (fusedur is not -1)
+                        Flash.FuseTime = fusedur;
+                    Flash.SpawnActive(position, hub);
+                    return;
+                case ItemType.GrenadeHE:
+                    ExplosiveGrenade grenade = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE);
+                    if (fusedur is not -1)
+                        grenade.FuseTime = fusedur;
+                    grenade.SpawnActive(position, hub);
+                    return;
+                case ItemType.SCP018:
+                    ExplosiveGrenade SCP018 = (ExplosiveGrenade)Item.Create(ItemType.SCP018);
+                    if (fusedur is not -1)
+                        SCP018.FuseTime = fusedur;
+                    SCP018.SpawnActive(position, hub);
+                    return;
+                default:
+                    return;
             }
         }
-        public static void Explode(Vector3 position,ReferenceHub hub = null)
+        public static void Explode(Vector3 position, ReferenceHub hub = null)
         {
-            if (hub is null)
-                hub = Server.Host.ReferenceHub;
-            if (CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))
+            hub ??= Server.Host.ReferenceHub;
+            if (!CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))
+                return;
+
+            new CandyPink.CandyExplosionMessage
             {
-                new CandyPink.CandyExplosionMessage
-                {
-                    Origin = position
-                }.SendToAuthenticated(0);
-                ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
-            }
+                Origin = position
+            }.SendToAuthenticated(0);
+            ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
         }
         public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
         {
@@ -259,19 +251,6 @@ namespace SanyaRemastered.Functions
 		{
 			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
 		}
-
-        public static void PlayAmbientSound(int id,Player player = null)
-        {
-            if (player is null)
-            PlayerManager.localPlayer.GetComponent<AmbientSoundPlayer>().RpcPlaySound(Mathf.Clamp(id, 0, 32));
-            else
-            {
-                PooledNetworkWriter writer = NetworkWriterPool.GetWriter();
-                writer.WriteInt32(id);
-                var networkIdentity = player.ReferenceHub.networkIdentity.NetworkBehaviours.First(x => x.netId == player.NetworkIdentity.netId);
-                player.ReferenceHub.TargetSendRpc(player.ReferenceHub.GetComponent<AmbientSoundPlayer>(),"RpcPlaySound", writer);
-            }
-        }
 
         public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
         {

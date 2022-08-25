@@ -121,8 +121,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade += ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
-			MapEvents.ChangingIntoGrenade += ServerHandlers.OnChangingIntoGrenade;
-			PlayerEvents.PlayerDamageWindow += ServerHandlers.OnPlayerDamageWindow;
+			MapEvents.ChangedIntoGrenade += ServerHandlers.OnChangingIntoGrenade;
 
 			PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
@@ -134,7 +133,7 @@ namespace SanyaRemastered
 			PlayerEvents.Died += PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem += PlayerHandlers.OnThrowingItem;
+			PlayerEvents.ThrowingRequest += PlayerHandlers.OnThrowingRequest;
 			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
 			PlayerEvents.UsedItem += PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla += PlayerHandlers.OnPlayerTriggerTesla;
@@ -179,8 +178,7 @@ namespace SanyaRemastered
 			MapEvents.ExplodingGrenade -= ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
-			MapEvents.ChangingIntoGrenade -= ServerHandlers.OnChangingIntoGrenade;
-			PlayerEvents.PlayerDamageWindow -= ServerHandlers.OnPlayerDamageWindow;
+			MapEvents.ChangedIntoGrenade -= ServerHandlers.OnChangingIntoGrenade;
 
 			PlayerEvents.PreAuthenticating -= PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
@@ -191,7 +189,7 @@ namespace SanyaRemastered
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingItem;
+			PlayerEvents.ThrowingRequest -= PlayerHandlers.OnThrowingRequest;
 			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
 			PlayerEvents.UsedItem -= PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla -= PlayerHandlers.OnPlayerTriggerTesla;
