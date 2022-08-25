@@ -3,6 +3,10 @@ using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Map;
+using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Server;
+using Exiled.Events.EventArgs.Warhead;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Pickups;
@@ -356,10 +360,10 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            if (Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit Debug))
+            if (Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit Debug))
                 Log.Info($"LayerMask is {Debug.collider?.gameObject?.layer}");
             // Smoke Grenade Pickup ButtonDoor
-            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Owner.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))
+            if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))
                 return;
             if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
             {
@@ -368,10 +372,10 @@ namespace SanyaRemastered.EventHandlers
                     TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
                     if (timeGrenade is not null && timeGrenade.Info.ItemId is not ItemType.SCP018)
                     {
-                        if (timeGrenade.Info.ItemId == ItemType.GrenadeHE)
-                            Methods.Explode(pickup.Info.Position, ev.Owner.ReferenceHub);
+                        if (timeGrenade.Info.ItemId is ItemType.GrenadeHE)
+                            Methods.Explode(pickup.Info.Position, ev.Player.ReferenceHub);
                         else
-                            Methods.SpawnGrenade(pickup.Info.Position, timeGrenade.Info.ItemId, 0.1f, ev.Owner);
+                            Methods.SpawnGrenade(pickup.Info.Position, timeGrenade.Info.ItemId, 0.1f, ev.Player);
                         pickup.DestroySelf();
 
                         return;
@@ -379,9 +383,9 @@ namespace SanyaRemastered.EventHandlers
                 }
                 if (SanyaRemastered.Instance.Config.ItemShootMove)
                 {
-                    pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Owner.Position, 500f, 3f, ForceMode.Impulse);
+                    pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Player.Position, 500f, 3f, ForceMode.Impulse);
 
-                    pickup.PreviousOwner = ev.Owner.Footprint;
+                    pickup.PreviousOwner = ev.Player.Footprint;
                     return;
                 }
             }
@@ -397,7 +401,7 @@ namespace SanyaRemastered.EventHandlers
                         return;
 
                     if (basicDoor.RequiredPermissions.RequiredPermissions is Interactables.Interobjects.DoorUtils.KeycardPermissions.None && basicDoor is not PryableDoor)
-                        basicDoor.ServerInteract(ev.Owner.ReferenceHub, 0);
+                        basicDoor.ServerInteract(ev.Player.ReferenceHub, 0);
                 }
             }
         }

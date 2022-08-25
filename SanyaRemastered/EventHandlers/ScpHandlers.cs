@@ -1,6 +1,10 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Scp049;
+using Exiled.Events.EventArgs.Scp079;
+using Exiled.Events.EventArgs.Scp096;
+using Exiled.Events.EventArgs.Scp914;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerStatsSystem;
 using SanyaRemastered.Data;
