@@ -168,10 +168,10 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnDied(DiedEventArgs ev)
         {
-            if (ev.Target.IsHost || ev.Target.Role == RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
+            if (ev.Target.IsHost || ev.Target.Role.Type is RoleType.Spectator || ev.Target.ReferenceHub.characterClassManager.GodMode || ev.Target.ReferenceHub.characterClassManager.SpawnProtected) return;
             Log.Debug($"[OnPlayerDeath] {ev.Player?.Nickname}[{ev.Player?.Role}] -{ev.DamageHandler.Type}-> {ev.Target?.Nickname}[{ev.Target?.Role}]", SanyaRemastered.Instance.Config.IsDebugged);
 
-            if (SanyaRemastered.Instance.Config.Scp939Size != 1)
+            if (SanyaRemastered.Instance.Config.Scp939Size is not 1)
             {
                 ev.Target.Scale = Vector3.one;
             }

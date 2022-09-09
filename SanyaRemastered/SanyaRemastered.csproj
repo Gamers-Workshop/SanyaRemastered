@@ -131,8 +131,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="AudioPlayer">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\AudioPlayer.dll</HintPath>
+    <Reference Include="AudioPlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\AudioPlayer\.github\AudioPlayer\bin\Debug\AudioPlayer.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

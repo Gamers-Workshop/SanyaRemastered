@@ -261,14 +261,14 @@ namespace SanyaRemastered.EventHandlers
         {
             Timing.CallDelayed(1f, () =>
             {
-                if (Player.Get(RoleType.Scp049).Count() > 0 && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                if (Player.Get(RoleType.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
                 {
                     Door.Get(door.TargetDoor).IsOpen = true;
                 }
             });
             Timing.CallDelayed(5f, () =>
             {
-                if (Player.Get(RoleType.Scp049).Count() > 0 && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                if (Player.Get(RoleType.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
                 {
                     Door.Get(door.TargetDoor).IsOpen = true;
                 }

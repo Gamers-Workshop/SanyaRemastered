@@ -50,7 +50,7 @@ namespace SanyaRemastered.Patches.CommandPatches
 			}
 			if (num > 0)
 			{
-				ServerLogs.AddLog(ServerLogs.Modules.Administrative, string.Format("{0} administratively killed player{1}{2}.", sender.LogName, (num == 1) ? " " : "s ", stringBuilder), ServerLogs.ServerLogType.RemoteAdminActivity_GameChanging, false);
+				ServerLogs.AddLog(ServerLogs.Modules.Administrative, string.Format("{0} administratively killed player{1}{2}.", sender.LogName, (num is 1) ? " " : "s ", stringBuilder), ServerLogs.ServerLogType.RemoteAdminActivity_GameChanging, false);
 			}
 			StringBuilderPool.Shared.Return(stringBuilder);
 			response = string.Format("Done! The request affected {0} player{1}", num, (num == 1) ? "!" : "s!");

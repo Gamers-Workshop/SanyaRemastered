@@ -95,7 +95,7 @@ namespace SanyaRemastered.Functions
             isActuallyBombGoing = true;
             Log.Info($"[AirSupportBomb] booting...");
             DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-            Timing.RunCoroutine(AudioPlayer.API.AudioController.PlayFromFile("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.mp3", 75, true));
+            AudioPlayer.API.AudioController.PlayFromFile("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.mp3", 60, true);
             Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
 
             yield return Timing.WaitForSeconds(5f);
