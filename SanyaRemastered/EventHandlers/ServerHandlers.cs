@@ -113,6 +113,7 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.RamRestartNoPlayer > 0 || plugin.Config.RamRestartWithPlayer > 0 || plugin.Config.RamInfo)
                 RoundCoroutines.Add(Timing.RunCoroutine(Every30minute(), Segment.RealtimeUpdate));
             loaded = true;
+            Cassie.MessageTranslated("Hello world", "Emergency Alert, Unauthorized Military Group... Scaning threat... Threat designated as <color=green>Chaos Insurgency</color>");
             RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
 
             DecalList.Clear();
@@ -405,7 +406,7 @@ namespace SanyaRemastered.EventHandlers
                 }
             }
         }
-        public void OnChangingIntoGrenade(ChangedIntoGrenadeEventArgs ev)
+        public void OnChangingIntoGrenade(ChangingIntoGrenadeEventArgs ev)
         {
             if (plugin.Config.GrenadeChainSametiming)
                 ev.FuseTime = 0.1f;

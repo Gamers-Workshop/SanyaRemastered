@@ -233,7 +233,7 @@ namespace SanyaRemastered.EventHandlers
                 }
             }
         }
-        public void OnThrowingRequest(ThrowingRequestEventArgs ev)
+        public void OnThrowingRequest(ThrowingItemEventArgs ev)
         {
             if (plugin.Config.Scp079ExtendEnabled && ev.Player.Role.Type is RoleType.Scp079)
                 ev.IsAllowed = false;
