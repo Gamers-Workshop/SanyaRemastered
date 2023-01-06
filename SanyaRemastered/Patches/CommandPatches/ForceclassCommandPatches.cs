@@ -5,94 +5,75 @@ using HarmonyLib;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using NorthwoodLib.Pools;
+using PlayerRoles;
 using PlayerStatsSystem;
+using RemoteAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SanyaRemastered.Patches.CommandPatches
 {
-	[HarmonyPatch(typeof(ForceClassCommand), nameof(ForceClassCommand.Execute))]
+	[HarmonyPatch(typeof(ForceRoleCommand), nameof(ForceRoleCommand.Execute))]
 	public static class ForceclassCommandPatches
 	{
-		public static bool Prefix(ForceClassCommand __instance, ref bool __result, ArraySegment<string> arguments, ICommandSender sender, out string response)
+		public static bool Prefix(ForceRoleCommand __instance, ref bool __result, ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
-			if (arguments.Count < 2)
-			{
-				response = "To execute this command provide at least 2 arguments!\nUsage: " + arguments.Array[0] + " " + __instance.DisplayCommandUsage();
-				return false;
-			}
-			CharacterClassManager characterClassManager = ReferenceHub.HostHub.characterClassManager;
-
-            List<ReferenceHub> list = Utils.RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out string[] newargs, false);
-            RemoteAdmin.PlayerCommandSender playerCommandSender;
-			bool flag = list.Count == 1 && (playerCommandSender = (sender as RemoteAdmin.PlayerCommandSender)) is not null && playerCommandSender.ReferenceHub == list[0];
-            if (!int.TryParse(newargs[0], out int roleId) || roleId < 0 || roleId >= RemoteAdmin.QueryProcessor.LocalCCM.Classes.Length)
+            if (!ReferenceHub.TryGetHostHub(out ReferenceHub referenceHub))
             {
-                Role role = RemoteAdmin.QueryProcessor.LocalCCM.Classes.SingleOrDefault((Role c) => c.fullName.Replace(" ", string.Empty).ToLower() == newargs[0].ToLower());
-                if (role is null)
-                {
-                    response = "Invalid class ID / name.";
-                    return false;
-                }
-                roleId = (int)role.roleId;
+                response = "You are not connected to a server.";
+                __result = false;
+                return false;
             }
-            bool flag2 = roleId == 2;
-			string fullName = RemoteAdmin.QueryProcessor.LocalCCM.Classes.SafeGet(roleId).fullName;
-			if (flag && flag2 && !sender.CheckPermission(new PlayerPermissions[]
-			{
-				PlayerPermissions.ForceclassWithoutRestrictions,
-				PlayerPermissions.ForceclassToSpectator,
-				PlayerPermissions.ForceclassSelf
-			}, out response))
-			{
-				return false;
-			}
-			if (flag && !flag2 && !sender.CheckPermission(new PlayerPermissions[]
-			{
-				PlayerPermissions.ForceclassWithoutRestrictions,
-				PlayerPermissions.ForceclassSelf
-			}, out response))
-			{
-				return false;
-			}
-			if (!flag && flag2 && !sender.CheckPermission(new PlayerPermissions[]
-			{
-				PlayerPermissions.ForceclassWithoutRestrictions,
-				PlayerPermissions.ForceclassToSpectator
-			}, out response))
-			{
-				return false;
-			}
-			if (!flag && !flag2 && !sender.CheckPermission(new PlayerPermissions[]
-			{
-				PlayerPermissions.ForceclassWithoutRestrictions
-			}, out response))
-			{
-				return false;
-			}
-			int num = 0;
-			foreach (ReferenceHub referenceHub in list)
-			{
-				if (referenceHub is not null)
-				{
-					RemoteAdmin.QueryProcessor.LocalCCM.SetPlayersClass((RoleType)roleId, referenceHub.gameObject, CharacterClassManager.SpawnReason.ForceClass, false);
-					ServerLogs.AddLog(ServerLogs.Modules.ClassChange, string.Concat(new string[]
-					{
-						sender.LogName,
-						" changed class of player ",
-						referenceHub.LoggedNameFromRefHub(),
-						" to ",
-						fullName,
-						"."
-					}), ServerLogs.ServerLogType.RemoteAdminActivity_GameChanging, false);
-					num++;
-				}
-			}
-			response = string.Format("Done! The request affected {0} player{1}", num, (num == 1) ? "!" : "s!");
-			__result = true;
+            if (arguments.Count < 2)
+            {
+                response = "To execute this command provide at least 2 arguments!\nUsage: " + arguments.Array[0] + " " + __instance.DisplayCommandUsage();
+                __result = false;
+                return false;
+            }
+            CharacterClassManager characterClassManager = referenceHub.characterClassManager;
+            if (characterClassManager == null || !characterClassManager.isLocalPlayer || !characterClassManager.isServer)
+            {
+                response = "Please start round before using this command.";
+                __result = false;
+                return false;
+            }
+            List<ReferenceHub> list = RAUtils.ProcessPlayerIdOrNamesList(arguments, 0, out string[] array, false);
+            bool flag = list.Count == 1 && sender is PlayerCommandSender playerCommandSender && playerCommandSender.ReferenceHub == list[0];
+            if (!__instance.TryParseRole(array[0], out PlayerRoleBase playerRoleBase))
+            {
+                response = "Invalid class ID / name.";
+                __result = false;
+                return false;
+            }
+            if (!__instance.HasPerms(playerRoleBase.RoleTypeId, flag, sender, out response))
+            {
+                __result = false;
+                return false;
+            }
+            int num = 0;
+            foreach (ReferenceHub referenceHub2 in list)
+            {
+                if (!(referenceHub2 == null) && referenceHub2.GetRoleId() != playerRoleBase.RoleTypeId)
+                {
+                    referenceHub2.roleManager.ServerSetRole(playerRoleBase.RoleTypeId, RoleChangeReason.RemoteAdmin);
+                    ServerLogs.AddLog(ServerLogs.Modules.ClassChange, string.Concat(new string[]
+                    {
+                        sender.LogName,
+                        " changed class of player ",
+                        referenceHub2.LoggedNameFromRefHub(),
+                        " to ",
+                        playerRoleBase.RoleName,
+                        "."
+                    }), ServerLogs.ServerLogType.RemoteAdminActivity_GameChanging, false);
+                    num++;
+                }
+            }
+            response = string.Format("Done! Changed role of {0} player{1} to {2}!", num, (num == 1) ? "" : "s", playerRoleBase.RoleName);
+            __result = true;
 			return false;
 		}
 	}

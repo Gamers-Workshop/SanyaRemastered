@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CommandSystem;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
@@ -29,9 +30,9 @@ namespace SanyaRemastered.Commands.DevCommands
 			response = $"RoomList\n";
 			foreach (var rooms in Room.List)
 			{
-				response += $"{rooms.Zone} : {rooms.Type} : {rooms.Doors.Count()} : {rooms.Cameras.Count()} : {rooms.TeslaGate is null}\n";
+				response += $"{rooms.Zone} : {rooms.Type} : {rooms.Doors?.Count()} : {rooms.Cameras?.Count()} : {rooms.TeslaGate is null}\n";
 			}
-			return true;
+            return true;
 		}
 	}
 }

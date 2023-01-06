@@ -133,7 +133,7 @@ namespace SanyaRemastered
 			PlayerEvents.Died += PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem += PlayerHandlers.OnThrowingRequest;
+			PlayerEvents.ThrowingRequest += PlayerHandlers.OnThrowingRequest;
 			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
 			PlayerEvents.UsedItem += PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla += PlayerHandlers.OnPlayerTriggerTesla;
@@ -157,9 +157,9 @@ namespace SanyaRemastered
 			Scp079Events.GainingLevel += ScpHandlers.On079LevelGain;
 			Scp914Events.UpgradingPlayer += ScpHandlers.On914UpgradingPlayer;
 
-			Scp096Events.AddingTarget += ScpHandlers.On096AddingTarget;
+			/*Scp096Events.AddingTarget += ScpHandlers.On096AddingTarget;
 			Scp096Events.Enraging += ScpHandlers.On096Enraging;
-			Scp096Events.CalmingDown += ScpHandlers.On096CalmingDown;
+			Scp096Events.CalmingDown += ScpHandlers.On096CalmingDown;*/
 
 			Scp049Events.FinishingRecall += ScpHandlers.On049FinishingRecall;
 		}
@@ -189,7 +189,7 @@ namespace SanyaRemastered
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingItem -= PlayerHandlers.OnThrowingRequest;
+			PlayerEvents.ThrowingRequest -= PlayerHandlers.OnThrowingRequest;
 			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
 			PlayerEvents.UsedItem -= PlayerHandlers.OnPlayerUsedItem;
 			PlayerEvents.TriggeringTesla -= PlayerHandlers.OnPlayerTriggerTesla;
@@ -213,9 +213,9 @@ namespace SanyaRemastered
 			Scp079Events.GainingLevel -= ScpHandlers.On079LevelGain;
 			Scp914Events.UpgradingPlayer -= ScpHandlers.On914UpgradingPlayer;
 
-			Scp096Events.AddingTarget -= ScpHandlers.On096AddingTarget;
+			/*Scp096Events.AddingTarget -= ScpHandlers.On096AddingTarget;
 			Scp096Events.Enraging -= ScpHandlers.On096Enraging;
-			Scp096Events.CalmingDown -= ScpHandlers.On096CalmingDown;
+			Scp096Events.CalmingDown -= ScpHandlers.On096CalmingDown;*/
 			Scp049Events.FinishingRecall -= ScpHandlers.On049FinishingRecall;
 
 			ServerHandlers = null;

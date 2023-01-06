@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using CommandSystem;
+using Dissonance;
+using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
@@ -31,7 +33,14 @@ namespace SanyaRemastered.Commands.DevCommands
 			{
 				response += $"{door.Type} : {door.Zone} : {door.Nametag} : {door.GameObject.name}\n";
 			}
-			return true;
+            response += "--------------------------------------\n";
+
+            foreach (var door in Door.List.Where(x => x.Type is DoorType.UnknownDoor))
+			{
+                response += $"{door.Nametag} : {door.Room} : {door.Room?.gameObject.name}\n";
+            }
+
+            return true;
 		}
 	}
 }

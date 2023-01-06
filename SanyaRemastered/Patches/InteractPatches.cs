@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Scp914;
+using AudioPlayer.Core.Commands;
+using PlayerRoles;
+#pragma warning disable IDE0060 // Supprimer le paramètre inutilisé
 
 namespace SanyaRemastered.Patches
 {
@@ -19,30 +22,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("Use914", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("Use914", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(ply.characterClassManager.CurRole.roleId))
-						return false;
-				}
-				return true;
-			}
-			catch (System.Exception ex)
-			{
-				Log.Error(ex);
-				return true;
-			}
-		}
-	}
-	[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_RpcContain106))]
-	public static class PlayerInteractContain106
-	{
-		public static bool Prefix(PlayerInteract __instance)
-		{
-			try
-			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("Contain106", out List<RoleType> roles))
-				{
-					if (roles.Contains(__instance._ccm.CurRole.roleId))
+					if (roles.Contains(ply.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;
@@ -61,9 +43,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DetonateWarhead", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("DetonateWarhead", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(__instance._ccm.CurRole.roleId))
+					if (roles.Contains(__instance._hub.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;
@@ -82,9 +64,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("AlphaWarheadButton", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("AlphaWarheadButton", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(__instance._ccm.CurRole.roleId))
+					if (roles.Contains(__instance._hub.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;
@@ -103,9 +85,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseGenerator", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseGenerator", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(ply.characterClassManager.CurRole.roleId))
+					if (roles.Contains(ply.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;
@@ -124,9 +106,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseLocker", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseLocker", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(ply.characterClassManager.CurRole.roleId))
+					if (roles.Contains(ply.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;
@@ -145,9 +127,9 @@ namespace SanyaRemastered.Patches
 		{
 			try
 			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseAlphaWarheadPanel", out List<RoleType> roles))
+				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseAlphaWarheadPanel", out List<RoleTypeId> roles))
 				{
-					if (roles.Contains(__instance._ccm.CurRole.roleId))
+					if (roles.Contains(__instance._hub.roleManager.CurrentRole.RoleTypeId))
 						return false;
 				}
 				return true;

@@ -2,6 +2,7 @@
 using Exiled.API.Features;
 using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
+using PlayerRoles;
 using SanyaRemastered.Functions;
 using System;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ namespace SanyaRemastered
 					}
 					Cassie.GlitchyMessage(CassieAnnounceContain, 0.05f, 0.05f);
 
-					_player.SetRole(RoleType.Spectator);
+					_player.Role.Set(RoleTypeId.Spectator);
 					Destroy(this);
 				}
 			}

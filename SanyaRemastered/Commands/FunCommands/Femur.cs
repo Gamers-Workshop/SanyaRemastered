@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SanyaRemastered.Commands.FunCommands
 {
 
-	public class Femur : ICommand
+	/*public class Femur : ICommand
 	{
 		public string Command => "Femur";
 
@@ -31,5 +31,5 @@ namespace SanyaRemastered.Commands.FunCommands
 			response = "ok.";
 			return true;
 		}
-	}
+	}*/
 }

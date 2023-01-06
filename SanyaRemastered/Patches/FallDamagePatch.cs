@@ -1,5 +1,7 @@
 ﻿using Exiled.API.Features;
 using HarmonyLib;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
 using System;
 using System.Collections.Generic;
@@ -10,33 +12,39 @@ using UnityEngine;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(FallDamage), nameof(FallDamage.OnTouchdown))]
+	[HarmonyPatch(typeof(FpcMotor), nameof(FpcMotor.UpdateGrounded))]
 	public static class AddFallDammageOnSCP
 	{
-		public static bool Prefix(FallDamage __instance)
+		public static bool Prefix(FpcMotor __instance,ref Vector3 moveDir, ref bool sendJump, float jumpSpeed)
 		{
             try
             {
-				if (SanyaRemastered.Instance.Config.ScpFallDamage.Contains(__instance._ccm.CurRole.roleId.ToString()) && SanyaRemastered.Instance.Config.ScpTakeFallDamage && __instance._ccm.CurRole.team == Team.SCP)
-				{
-					if (__instance._footstepSync is not null)
-					{
-						__instance._footstepSync.RpcPlayLandingFootstep(true);
-					}
-					Vector3 position = __instance.transform.position;
-					float num = __instance.damageOverDistance.Evaluate(__instance.PreviousHeight - position.y);
-					if (num <= 5f || __instance._ccm.NoclipEnabled || __instance._ccm.GodMode || __instance._pms.InSafeTime)
-					{
-						return false;
-					}
-					__instance.RpcDoSound();
-					__instance._ccm.RpcPlaceBlood(position, 0, Mathf.Clamp(num / 30f, 0.8f, 2f));
-					__instance._hub.playerStats.DealDamage(new UniversalDamageHandler(num, DeathTranslations.Falldown, null));
-				}
-			}
-			catch(Exception ex)
+                if (__instance.WantsToJump)
+                {
+                    if (jumpSpeed > 0f)
+                    {
+                        moveDir.y = jumpSpeed;
+                    }
+                    __instance._requestedJump = false;
+                    __instance.IsJumping = true;
+                    sendJump = true;
+                }
+                else
+                {
+                    moveDir.y = -10f;
+                    __instance.IsJumping = false;
+                }
+                if (__instance._maxFallSpeed > 14.5f && (__instance.Hub.GetTeam() is not Team.SCPs 
+                    || SanyaRemastered.Instance.Config.ScpFallDamage.Contains(__instance.Hub.GetRoleId().ToString()) && SanyaRemastered.Instance.Config.ScpTakeFallDamage))
+                {
+                    __instance.ServerProcessFall(__instance._maxFallSpeed - 14.5f);
+                }
+                __instance._maxFallSpeed = 14.5f;
+                return false;
+            }
+            catch (Exception ex)
             {
-				Log.Error("FallDamage" + ex);
+                Log.Error("FallDamage" + ex);
             }
 			return true;
 		}

@@ -5,6 +5,7 @@ using Exiled.Permissions.Extensions;
 using SanyaRemastered.Commands.DevCommands;
 using SanyaRemastered.Commands.FunCommands;
 using SanyaRemastered.Commands.StaffCommands;
+using Hint = SanyaRemastered.Commands.StaffCommands.Hint;
 
 namespace SanyaRemastered.Commands
 {
@@ -25,6 +26,7 @@ namespace SanyaRemastered.Commands
             //Developement
             RegisterCommand(new Args());
             RegisterCommand(new AvlCol());
+            RegisterCommand(new CameraList());
             RegisterCommand(new CheckObj());
             RegisterCommand(new CheckObjDel());
             RegisterCommand(new Config());
@@ -51,17 +53,17 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new Blackout());
             RegisterCommand(new ColorRoom());
             RegisterCommand(new Explode());
-            RegisterCommand(new Femur());
+            //RegisterCommand(new Femur());
             RegisterCommand(new GeneratorControl());
             RegisterCommand(new Heli());
             RegisterCommand(new InfiniteAmmo());
             RegisterCommand(new NukeCap());
-            RegisterCommand(new NukeLock());
+            //RegisterCommand(new NukeLock());
             RegisterCommand(new PlayAmbiant());
             RegisterCommand(new Pocket());
             RegisterCommand(new Scale());
             RegisterCommand(new Scp914Prefix());
-            RegisterCommand(new Speed());
+            //RegisterCommand(new Speed());
             RegisterCommand(new Van());
 
             //StaffCommand

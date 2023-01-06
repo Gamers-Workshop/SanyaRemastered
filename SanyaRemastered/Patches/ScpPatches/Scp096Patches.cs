@@ -10,7 +10,7 @@ using static HarmonyLib.AccessTools;
 
 namespace SanyaRemastered.Patches
 {
-    [HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.OnDamage))]
+    /*[HarmonyPatch(typeof(PlayableScps.Scp096), nameof(PlayableScps.Scp096.OnDamage))]
     public static class Scp096CancelEnrageByDamage
     {
         public static bool Prefix(PlayableScps.Scp096 __instance)
@@ -18,5 +18,5 @@ namespace SanyaRemastered.Patches
             if (SanyaRemastered.Instance.Config.Scp096Real) return false;
             return true;
         }
-    }
+    }*/
 }

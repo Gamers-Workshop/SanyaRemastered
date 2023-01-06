@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using MapGeneration.Distributors;
 using Mirror;
+using PlayerRoles.PlayableScps.Scp079;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			{
 				if (arguments.At(0).ToLower() == "unlock")
 				{
-					foreach (var generator in Recontainer079.AllGenerators)
+					foreach (var generator in Scp079Recontainer.AllGenerators)
 					{
 						generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Unlocked, true);
 					}
@@ -41,7 +42,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				else if (arguments.At(0).ToLower() == "door")
 				{
-					foreach (var generator in Recontainer079.AllGenerators)
+					foreach (var generator in Scp079Recontainer.AllGenerators)
 					{
 						generator.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, !generator.HasFlag(generator._flags, Scp079Generator.GeneratorFlags.Open));
 						generator._targetCooldown = generator._doorToggleCooldownTime;
@@ -51,7 +52,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				else if (arguments.At(0).ToLower() == "set")
 				{
-					foreach (var generator in Recontainer079.AllGenerators)
+					foreach (var generator in Scp079Recontainer.AllGenerators)
 					{
 						if (generator is not null && !generator.Engaged)
 						{
@@ -66,7 +67,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 				else if (arguments.At(0).ToLower() == "once")
 				{
-					var gen = Recontainer079.AllGenerators.FirstOrDefault(x => !x.Engaged);
+					var gen = Scp079Recontainer.AllGenerators.FirstOrDefault(x => !x.Engaged);
 
 					if (gen is not null)
 					{

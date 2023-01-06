@@ -11,16 +11,18 @@ using UnityEngine;
 
 namespace SanyaRemastered
 {
-	public class Scp914 : PlayerEffect , IHealablePlayerEffect
+	public class Scp914 : StatusEffectBase, IHealablePlayerEffect
 	{
 		public bool IsHealable(ItemType it) => it == ItemType.SCP500;
 
-		public override void Enabled()
+		int TimeBetweenTicks;
+
+        public override void Enabled()
 		{
 			TimeBetweenTicks = 1;
 			TimeLeft = TimeBetweenTicks;
 		}
-		public override void OnUpdate()
+		public override void OnEffectUpdate()
 		{
 			TimeLeft -= Time.deltaTime;
 			if (TimeLeft > 0f)

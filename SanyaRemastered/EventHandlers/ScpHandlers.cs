@@ -6,6 +6,7 @@ using Exiled.Events.EventArgs.Scp079;
 using Exiled.Events.EventArgs.Scp096;
 using Exiled.Events.EventArgs.Scp914;
 using InventorySystem.Items.Usables.Scp330;
+using PlayerRoles;
 using PlayerStatsSystem;
 using SanyaRemastered.Data;
 using Scp914;
@@ -24,7 +25,7 @@ namespace SanyaRemastered.EventHandlers
         internal readonly SanyaRemastered plugin;
         public void On079LevelGain(GainingLevelEventArgs ev)
         {
-            Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[On079LevelGain] {ev.Player.Nickname} : {ev.NewLevel}");
 
             if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled)
                 return;
@@ -55,17 +56,17 @@ namespace SanyaRemastered.EventHandlers
                 case Scp914KnobSetting.Rough:
                     {
                         ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
-                        if (ev.Player.Role.Team is not Team.SCP)
+                        if (ev.Player.Role.Team is not Team.SCPs)
                             ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Un cadavre gravement mutilé a été trouvé à l'intérieur de SCP-914. Le sujet a évidemment été affiné par le SCP-914 sur le réglage Rough.", 30);
                     }
                     break;
                 case Scp914KnobSetting.Coarse:
                     {
-                        if (ev.Player.Role.Type.Is939())
+                        if (ev.Player.Role.Type is RoleTypeId.Scp939)
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914"));
                         }
-                        if (ev.Player.Role.Team is not Team.SCP)
+                        if (ev.Player.Role.Team is not Team.SCPs)
                         {
                             ev.Player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("SCP-914")
                             {
@@ -81,17 +82,7 @@ namespace SanyaRemastered.EventHandlers
                     break;
                 case Scp914KnobSetting.OneToOne:
                     {
-                        if (ev.Player.Role.Type is RoleType.Scp93953)
-                        {
-                            ev.Player.SetRole(RoleType.Scp93989, lite: true);
-                            break;
-                        }
-                        else if (ev.Player.Role.Type is RoleType.Scp93989)
-                        {
-                            ev.Player.SetRole(RoleType.Scp93953, lite: true);
-                            break;
-                        }
-                        else if (ev.Player.Role.Type is not RoleType.Scp106)
+                        if (ev.Player.Role.Type is not RoleTypeId.Scp106)
                         {
                             if (ev.Player.Scale.y < 0)
                             {
@@ -119,14 +110,14 @@ namespace SanyaRemastered.EventHandlers
                         }
                         else
                         {
-                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                            /*if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGet(typeof(MovementBoost), out StatusEffectBase playerEffect))
                             {
                                 playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity, 0, 255);
                             }
-                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
+                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGet(typeof(Scp914), out StatusEffectBase Death))
                             {
                                 Death.Intensity = (byte)Mathf.Clamp(2 * Death.Intensity, 0, 255);
-                            }
+                            }*/
                         }
                     }
                     break;
@@ -142,7 +133,7 @@ namespace SanyaRemastered.EventHandlers
                         }
                         else
                         {
-                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                           /* if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
                             {
                                 playerEffect.Intensity = (byte)Mathf.Clamp((float)2 * playerEffect.Intensity, 0, 255);
                             }
@@ -155,13 +146,13 @@ namespace SanyaRemastered.EventHandlers
                             if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
                             {
                                 Death.Intensity = (byte)Mathf.Clamp(6 * Death.Intensity, 0, 255);
-                            }
+                            }*/
                         }
                     }
                     break;
             }
         }
-        public void On096AddingTarget(AddingTargetEventArgs ev)
+        /*public void On096AddingTarget(AddingTargetEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
@@ -170,7 +161,7 @@ namespace SanyaRemastered.EventHandlers
         }
         public void On096Enraging(EnragingEventArgs ev)
         {
-            Log.Debug($"[On096Enraging] {ev.Player.Nickname} : {ev.Scp096.EnrageTimeLeft}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[On096Enraging] {ev.Player.Nickname} : {ev.Scp096.EnrageTimeLeft}");
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
                 ev.Scp096.EnrageTimeLeft = -ev.Scp096.EnrageTimeLeft -12f ;
@@ -183,7 +174,8 @@ namespace SanyaRemastered.EventHandlers
                 ev.IsAllowed = false;
                 ev.Scp096.EnrageTimeLeft = 0.5f;
             }
-        }
+        }*/
+
         public void On049FinishingRecall(FinishingRecallEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp0492effect)
@@ -191,7 +183,7 @@ namespace SanyaRemastered.EventHandlers
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Ensnared>(3f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(5f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Blinded>(3f);
-                ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Amnesia>(5f);
+                ev.Target.ReferenceHub.playerEffectsController.EnableEffect<AmnesiaItems>(5f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.2f);
             }
         }

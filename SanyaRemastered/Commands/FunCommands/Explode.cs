@@ -5,6 +5,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
+using PlayerRoles;
 using RemoteAdmin;
 using SanyaRemastered.Functions;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			if (arguments.Count > 0)
 			{
 				Player target = Player.Get(arguments.At(0));
-				if (target is not null && target.Role != RoleType.Spectator)
+				if (target is not null && target.Role.Type is not RoleTypeId.Spectator)
 				{
 					Methods.Explode(target.Position);
 					response = $"success. target:{target.Nickname}";
@@ -46,7 +47,7 @@ namespace SanyaRemastered.Commands.FunCommands
 						response = $"You don't have permission to execute this command. Required permission: sanya.{Command}all";
 						return false;
 					}
-					foreach (var ply in Player.List.Where((p) => p.Role.Team != Team.RIP))
+					foreach (var ply in Player.List.Where((p) => p.Role.Team != Team.Dead))
 					{
 						Methods.Explode(ply.Position);
 					}

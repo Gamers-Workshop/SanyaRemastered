@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SanyaRemastered.Commands.FunCommands
 {
 
-	public class Speed : ICommand
+	/*public class Speed : ICommand
 	{
 		public string Command => "Speed";
 
@@ -184,5 +184,5 @@ namespace SanyaRemastered.Commands.FunCommands
 				}
 			}
 		}
-	}
+	}*/
 }

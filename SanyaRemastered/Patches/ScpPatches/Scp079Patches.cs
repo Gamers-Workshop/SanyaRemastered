@@ -14,7 +14,7 @@ using Player = Exiled.API.Features.Player;
 
 namespace SanyaRemastered.Patches
 {
-    [HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
+    /*[HarmonyPatch(typeof(Scp079PlayerScript), nameof(Scp079PlayerScript.Start))]
     public static class Scp079ManaPatch
     {
         public static void Postfix(Scp079PlayerScript __instance)
@@ -36,7 +36,7 @@ namespace SanyaRemastered.Patches
                 if (!SanyaRemastered.Instance.Config.Scp079ExtendEnabled) return true;
                 __instance.RefreshCurrentRoom();
                 var player = Player.Dictionary[__instance.gameObject];
-                Log.Debug($"[Scp079InteractPatch] {player.IsExmode()} -> {command} Room {__instance.CurrentRoom.Name}", SanyaRemastered.Instance.Config.IsDebugged);
+                Log.Debug($"[Scp079InteractPatch] {player.IsExmode()} -> {command} Room {__instance.CurrentRoom.Name}");
 
                 if (!player.IsExmode()) return true;
 
@@ -199,13 +199,13 @@ namespace SanyaRemastered.Patches
             {
                 foreach (var player in room.Players)
                 {
-                    if (player.IsAlive && player.Role.Type is not RoleType.Scp079)
+                    if (player.IsAlive && player.Role.Type is not RoleTypeId.Scp079)
                     {
                         player.ReferenceHub.playerEffectsController.EnableEffect<Disabled>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Asphyxiated>(10);
                         player.ReferenceHub.playerEffectsController.EnableEffect<Poisoned>(10);
                         player.ReferenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("GAS") { Damage = 10});
-                        if (player.Role.Type is not RoleType.Spectator)
+                        if (player.Role.Type is not RoleTypeId.Spectator)
                         {
                             scp.scp079PlayerScript.AddExperience(SanyaRemastered.Instance.Config.GasExpGain);
                             player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText(SanyaRemastered.Instance.Translation.HintList.DeadBy079Gas, 20);
@@ -221,5 +221,5 @@ namespace SanyaRemastered.Patches
                 door.NetworkTargetState = true;
             }
         }
-    }
+    }*/
 }

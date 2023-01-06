@@ -1,5 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Interfaces;
+using PlayerRoles;
 using SanyaRemastered.Functions;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace SanyaRemastered.Configs
 
 
         [Description("WIP")]
-        public bool IsDebugged { get; set; } = false;
+        public bool Debug { get; set; } = false;
         public bool Coroding106 { get; set; } = false;
         public bool ExplodingGrenadeTesla { get; set; } = false;
         public bool GateClosingAuto { get; set; } = false;
@@ -68,7 +69,7 @@ namespace SanyaRemastered.Configs
         public bool FemurBreakerCanBeUsedWithNo106 { get; set; } = false;
         public int OutsidezoneTerminationTimeAfterNuke { get; set; } = -1;
         [Description("Désactivé la microhid pour les rôle")]
-        public List<RoleType> MicroHidNotActive { get; set; } = new() {RoleType.ClassD, RoleType.Scientist };
+        public List<RoleTypeId> MicroHidNotActive { get; set; } = new() { RoleTypeId.ClassD, RoleTypeId.Scientist };
 
         [Description("Generator Config")]
         public bool GeneratorUnlockOpen { get; set; } = false;
@@ -148,14 +149,13 @@ namespace SanyaRemastered.Configs
             {"Scp939", 0}
         };
         [Description("Multiplicateur de dégats")]
-        public Dictionary<RoleType, float> ScpDamageMultiplicator { get; set; } = new()
+        public Dictionary<RoleTypeId, float> ScpDamageMultiplicator { get; set; } = new()
         {
-            {RoleType.Scp049, 1f},
-            {RoleType.Scp0492, 1f},
-            {RoleType.Scp096, 1f},
-            {RoleType.Scp173, 1f},
-            {RoleType.Scp93953, 1f},
-            {RoleType.Scp93989, 1f},
+            {RoleTypeId.Scp049, 1f},
+            {RoleTypeId.Scp0492, 1f},
+            {RoleTypeId.Scp096, 1f},
+            {RoleTypeId.Scp173, 1f},
+            {RoleTypeId.Scp939, 1f},
         };
         [Description("Ne comprends pas la MicroHid Ni la Tesla")]
         public float Scp106DamageMultiplicator { get; set; } = 1f;
@@ -215,18 +215,18 @@ namespace SanyaRemastered.Configs
         };
         [Description("SCP Can't interact Now")]
         public bool ScpCantInteract { get; set; } = false;
-        public Dictionary<string, List<RoleType>> ScpCantInteractList { get; set; } = new()
+        public Dictionary<string, List<RoleTypeId>> ScpCantInteractList { get; set; } = new()
         {
-            {"Use914",                   new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"Contain106",               new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"DetonateWarhead",          new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"AlphaWarheadButton",       new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"UseElevator",              new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"UseGenerator",             new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"UseLocker",                new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"UseAlphaWarheadPanel",     new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"DoorInteractOpen",         new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
-            {"DoorInteractClose",        new List<RoleType>{RoleType.Scp173,RoleType.Scp106,RoleType.Scp096,RoleType.Scp049,RoleType.Scp0492, RoleType.Scp93953, RoleType.Scp93989, RoleType.Scp079 } },
+            {"Use914",                   new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"Contain106",               new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"DetonateWarhead",          new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"AlphaWarheadButton",       new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"UseElevator",              new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"UseGenerator",             new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"UseLocker",                new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"UseAlphaWarheadPanel",     new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"DoorInteractOpen",         new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
+            {"DoorInteractClose",        new List<RoleTypeId>{RoleTypeId.Scp173,RoleTypeId.Scp106,RoleTypeId.Scp096,RoleTypeId.Scp049,RoleTypeId.Scp0492, RoleTypeId.Scp939, RoleTypeId.Scp079 } },
         };
 
         public string GetConfigs()

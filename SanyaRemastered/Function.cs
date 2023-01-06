@@ -6,6 +6,8 @@ using InventorySystem.Items.Usables.Scp330;
 using MEC;
 using Mirror;
 using NorthwoodLib.Pools;
+using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079.Cameras;
 using RemoteAdmin;
 using Respawning;
 using RoundRestarting;
@@ -141,7 +143,7 @@ namespace SanyaRemastered.Functions
     }
     internal static class Methods
     {
-        public static void SpawnDummyModel(Vector3 position, RoleType role, string nick, Quaternion rotation, Vector3 scale)
+        public static void SpawnDummyModel(Vector3 position, RoleTypeId role, string nick, Quaternion rotation, Vector3 scale)
         {
             try
             {
@@ -151,11 +153,9 @@ namespace SanyaRemastered.Functions
                 gameObject.transform.localScale = scale;
                 gameObject.transform.rotation = rotation;
                 gameObject.transform.position = position;
-                characterClassManager.CurClass = role;
+                characterClassManager._hub.roleManager.ServerSetRole(role, RoleChangeReason.RemoteAdmin);
                 characterClassManager.GodMode = true;
                 gameObject.GetComponent<NicknameSync>().Network_myNickSync = nick;
-                queryProcessor.PlayerId = 9999;
-                queryProcessor.NetworkPlayerId = 9999;
                 NetworkServer.Spawn(gameObject);
             }
             catch (Exception ex)
@@ -169,7 +169,7 @@ namespace SanyaRemastered.Functions
                 bool flag = collider.name.Contains("Hitbox") || collider.name.Contains("mixamorig") || collider.name.Equals("Player") || collider.name.Equals("PlyCenter") || collider.name.Equals("Antijumper");
                 if (!flag)
                 {
-                    Log.Debug($"Detect:{collider.name}", SanyaRemastered.Instance.Config.IsDebugged);
+                    Log.Debug($"Detect:{collider.name}");
                     result = true;
                 }
             }
@@ -277,29 +277,19 @@ namespace SanyaRemastered.Functions
                 typeof(NetworkServer).GetMethod("SendSpawnMessage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { identity, ply.Connection });
             }
         }
-        public static bool CanLookToPlayer(this Camera079 camera, ReferenceHub player)
+        public static bool CanLookToPlayer(this Scp079Camera camera, ReferenceHub player)
         {
             Player EPlayer = Player.Dictionary[player.gameObject];
-            if (EPlayer.Role == RoleType.Spectator || EPlayer.Role == RoleType.Scp079 || EPlayer.Role == RoleType.None)
+            if (EPlayer.Role.Type is RoleTypeId.Spectator or RoleTypeId.Scp079 or RoleTypeId.None)
                 return false;
 
             Vector3 vector = player.transform.position - camera.transform.position;
-            float num = Vector3.Dot(camera.head.transform.forward, vector);
+            float num = Vector3.Dot(camera._cameraAnchor.transform.forward, vector);
 
             return (num >= 0f && num * num / vector.sqrMagnitude > 0.4225f)
                 && Physics.Raycast(camera.transform.position, vector, out RaycastHit raycastHit, 100f, -117407543)
                 && raycastHit.transform.name == player.name;
         }
-
-        public static int GetMTFTickets() => CustomLiteNetLib4MirrorTransport.DelayConnections
-                ? -1
-                : RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
-
-        public static int GetCITickets() => CustomLiteNetLib4MirrorTransport.DelayConnections
-                ? -1
-                : RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox);
-
-
 
         // API, dont change
         public static int GetComponentIndex(NetworkIdentity identity, Type type) => Array.FindIndex(identity.NetworkBehaviours, (x) => x.GetType() == type);
@@ -332,51 +322,9 @@ namespace SanyaRemastered.Functions
         {
             return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
         }
-
-        public static GameObject SpawnDummy(RoleType role, Vector3 pos, Quaternion rot)
-        {
-            GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.spawnPrefabs.FirstOrDefault(p => p.gameObject.name == "Player"));
-            CharacterClassManager ccm = gameObject.GetComponent<CharacterClassManager>();
-            ccm.CurClass = role;
-            ccm.RefreshPlyModel();
-            gameObject.GetComponent<NicknameSync>().Network_myNickSync = "Yamato";
-            gameObject.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-            gameObject.transform.position = pos;
-            gameObject.transform.rotation = rot;
-            NetworkServer.Spawn(gameObject);
-            return gameObject;
-        }
     }
     internal static class Extensions
     {
-        public static bool IsInTheBox(Vector3 posroom,Vector3 max, Vector3 min,float rotation)
-        {
-            Vector3 end;
-            Vector3 end2;
-            if (rotation == 0f)
-            {
-                end = new Vector3(max.x, max.y, max.z);
-                end2 = new Vector3(min.x, min.y, min.z);
-            }
-            else if (rotation == 90f)
-            {
-                end = new Vector3(max.z, max.y, -min.x);
-                end2 = new Vector3(min.z, min.y, -max.x);
-            }
-            else if (rotation == 180f)
-            {
-                end = new Vector3(-min.x, max.y, -min.z);
-                end2 = new Vector3(-max.x, min.y, -max.z);
-            }
-            else
-            {
-                end = new Vector3(-min.z, max.y, max.x);
-                end2 = new Vector3(-max.z, min.y, min.x);
-            }
-
-            return end2.x < posroom.x && posroom.x < end.x && end2.y < posroom.y && posroom.y < end.y && end2.z < posroom.z && posroom.z < end.z;
-
-        }
         public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
 
         public static float GetHealthAmountPercent(this Player player)

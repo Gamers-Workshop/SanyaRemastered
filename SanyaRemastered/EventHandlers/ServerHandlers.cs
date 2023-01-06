@@ -2,6 +2,7 @@
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
@@ -16,6 +17,7 @@ using MapGeneration;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
 using System;
@@ -113,7 +115,7 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.RamRestartNoPlayer > 0 || plugin.Config.RamRestartWithPlayer > 0 || plugin.Config.RamInfo)
                 RoundCoroutines.Add(Timing.RunCoroutine(Every30minute(), Segment.RealtimeUpdate));
             loaded = true;
-            Cassie.MessageTranslated("Hello world", "Emergency Alert, Unauthorized Military Group... Scaning threat... Threat designated as <color=green>Chaos Insurgency</color>");
+
             RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
 
             DecalList.Clear();
@@ -122,9 +124,9 @@ namespace SanyaRemastered.EventHandlers
             Coroutines.AirBombWait = 0;
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
-                foreach (TeslaGate tesla in UnityEngine.Object.FindObjectsOfType<TeslaGate>())
+                foreach (Exiled.API.Features.TeslaGate tesla in Exiled.API.Features.TeslaGate.List)
                 {
-                    tesla.sizeOfTrigger = SanyaRemastered.Instance.Config.TeslaRange;
+                    tesla.TriggerRange = SanyaRemastered.Instance.Config.TeslaRange;
                 }
             }
             if (plugin.Config.DisablePlayerLists)
@@ -147,12 +149,12 @@ namespace SanyaRemastered.EventHandlers
                     {
                         if (door is not BreakableDoor dr)
                             continue;
-                        dr._remainingHealth = 750f;
+                        dr.RemainingHealth = 750f;
                         dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
                     }
                 }
             }
-            if (plugin.Config.Scp914Effect)
+            /*if (plugin.Config.Scp914Effect)
             {
                 if (NetworkClient.prefabs.TryGetValue(Guid.Parse("43658aa2-f339-6044-eb2b-937db0c2c4bd"), out GameObject player))
                 {
@@ -170,7 +172,7 @@ namespace SanyaRemastered.EventHandlers
                 effectcontroller.syncEffectsIntensity.Clear();
 
                 effectcontroller.Awake();
-            }
+            }*/
             if (plugin.Config.GateClosingAuto)
             {
                 DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out DoorNametagExtension GateA);
@@ -181,9 +183,9 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.AddDoorsOnSurface)
             {
                 Vector3 DoorScale = new(1f, 1f, 1.8f);
-                DoorSpawnpoint LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("LCZ"));
-                DoorSpawnpoint EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("EZ"));
-                DoorSpawnpoint HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().First(x => x.TargetPrefab.name.Contains("HCZ"));
+                DoorSpawnpoint LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("LCZ"));
+                DoorSpawnpoint EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("EZ"));
+                DoorSpawnpoint HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("HCZ"));
 
                 // Couloir spawn Chaos
                 DoorVariant door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
@@ -208,14 +210,14 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.EditObjectsOnSurface)
             {
                 //Prefabの確保
-                GameObject primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Primitive"));
-                GameObject lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("LightSource"));
-                GameObject stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.First(x => x.name.Contains("Station"));
+                GameObject primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("Primitive"));
+                GameObject lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("LightSource"));
+                /*GameObject stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("Station"));
 
                 //MTF
                 GameObject station1 = UnityEngine.Object.Instantiate(stationPrefab, new(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
                 //CI
-                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));
+                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));*/
 
                 //Light Nuke Red
                 LightSourceToy light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
@@ -247,14 +249,15 @@ namespace SanyaRemastered.EventHandlers
                     wall_106.transform.rotation = Quaternion.Euler(Vector3.up * 90f);
                 wall_106.UpdatePositionServer();
                 wall_106.NetworkPrimitiveType = PrimitiveType.Cube;
-
+                /*
                 NetworkServer.Spawn(station1);
                 NetworkServer.Spawn(station2);
-
+                */
                 NetworkServer.Spawn(light_nuke.gameObject);
                 NetworkServer.Spawn(light_GateA1.gameObject);
                 NetworkServer.Spawn(light_GateA2.gameObject);
             }
+
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
 
@@ -262,14 +265,14 @@ namespace SanyaRemastered.EventHandlers
         {
             Timing.CallDelayed(1f, () =>
             {
-                if (Player.Get(RoleType.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                if (Player.Get(RoleTypeId.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
                 {
                     Door.Get(door.TargetDoor).IsOpen = true;
                 }
             });
             Timing.CallDelayed(5f, () =>
             {
-                if (Player.Get(RoleType.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
+                if (Player.Get(RoleTypeId.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
                 {
                     Door.Get(door.TargetDoor).IsOpen = true;
                 }
@@ -304,13 +307,13 @@ namespace SanyaRemastered.EventHandlers
                 Timing.KillCoroutines(cor);
             RoundCoroutines.Clear();
 
-            RoundSummary.singleton.RoundEnded = true;
+            RoundSummary.singleton._roundEnded = true;
         }
         public void OnTeamRespawn(RespawningTeamEventArgs ev)
         {
-            Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count()} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count()} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}");
 
-            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Host.detonated 
+            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Singleton._alreadyDetonated 
                 || Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60 
                 || StopRespawn)
                 ev.IsAllowed = false;
@@ -320,7 +323,7 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnWarheadCancel] {ev.Player?.Nickname}");
 
-            if (AlphaWarheadController.Host._isLocked) return;
+            //if (AlphaWarheadController.Singleton._isLocked) return;
 
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
@@ -332,7 +335,7 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnDetonated()
         {
-            Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnDetonated] Detonated:{RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}");
 
             if (SanyaRemastered.Instance.Config.OutsidezoneTerminationTimeAfterNuke >= 0)
             {
@@ -354,7 +357,7 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
         {
-            Log.Debug($"[OnGeneratorFinish] {ev.Generator.Room.Type}", SanyaRemastered.Instance.Config.IsDebugged);
+            Log.Debug($"[OnGeneratorFinish] {ev.Generator.Room.Type}");
 
             if (SanyaRemastered.Instance.Config.GeneratorFinishLock)
                 ev.Generator.Base.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
@@ -408,8 +411,8 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnChangingIntoGrenade(ChangingIntoGrenadeEventArgs ev)
         {
-            if (plugin.Config.GrenadeChainSametiming)
-                ev.FuseTime = 0.1f;
+            if (plugin.Config.GrenadeChainSametiming && ev.Pickup is TimeGrenadeProjectile timeGrenadeProjectile)
+                timeGrenadeProjectile.FuseTime = 0.1f;
         }
         public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
         {

@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SanyaRemastered.Commands.FunCommands
 {
 
-	public class NukeLock : ICommand
+	/*public class NukeLock : ICommand
 	{
 		public string Command => "NukeLock";
 
@@ -27,10 +27,10 @@ namespace SanyaRemastered.Commands.FunCommands
 				return false;
 			}
 
-			response = $"ok.[{AlphaWarheadController.Host._isLocked}] -> ";
-			AlphaWarheadController.Host._isLocked = !AlphaWarheadController.Host._isLocked;
+			response = $"ok.[{AlphaWarheadController.Singleton._isLocked}] -> ";
+			AlphaWarheadController.Singleton._isLocked = !AlphaWarheadController.Host._isLocked;
 			response += $"[{AlphaWarheadController.Host._isLocked}]";
 			return true;
 		}
-	}
+	}*/
 }

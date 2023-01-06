@@ -14,12 +14,10 @@ using CustomPlayerEffects;
 using Exiled.API.Extensions;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
-using Assets._Scripts.Dissonance;
-using Dissonance;
-using Dissonance.Integrations.MirrorIgnorance;
 using MapGeneration.Distributors;
 using Exiled.API.Enums;
 using Exiled.API.Features.Roles;
+using PlayerRoles;
 
 namespace SanyaRemastered
 {
@@ -67,7 +65,6 @@ namespace SanyaRemastered
 
 			UpdateTimers();
 
-			UpdateContainScp();
 			UpdateRespawnCounter();
 			UpdateScpLists();
 			UpdateHint();
@@ -116,7 +113,7 @@ namespace SanyaRemastered
 
 		private void UpdateRespawnCounter()
 		{
-			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role.Type is not RoleType.Spectator) return;
+			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role.Team is not Team.Dead) return;
 			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown)
 				_respawnCounter = (int)Math.Truncate(RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds);
 			else
@@ -125,22 +122,17 @@ namespace SanyaRemastered
 
 		private void UpdateScpLists()
 		{
-			if ((_player.Role.Team is not Team.SCP || _player.Role.Type is RoleType.Scp0492) && _scplists.Contains(_player))
+			if ((_player.Role.Team is not Team.SCPs || _player.Role.Type is RoleTypeId.Scp0492) && _scplists.Contains(_player))
 			{
 				_scplists.Remove(_player);
 				return;
 			}
 
-			if (_player.Role.Team is Team.SCP && _player.Role.Type is not RoleType.Scp0492 && !_scplists.Contains(_player))
+			if (_player.Role.Team is Team.SCPs && _player.Role.Type is not RoleTypeId.Scp0492 && !_scplists.Contains(_player))
 			{
 				_scplists.Add(_player);
 				return;
 			}
-		}
-		public void UpdateContainScp()
-        {
-			if (!SanyaRemastered.Instance.Config.ContainCommand || !_player.IsScp || !(_timer > 1f) || _player.GameObject.TryGetComponent(out ContainScpComponent _)) return;
-			Contain.IsCanBeContain(_player);
 		}
 		public void UpdateHint()
 		{
@@ -167,24 +159,24 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = string.Empty;
-			if (_player.IsInvisible)
-				info += $"<b>vous êtes invisible</b> ";
+			/*if (_player.IsInvisible)
+				info += $"<b>vous êtes invisible</b> ";*/
 			{
 				curText = curText.Replace("([STATS])", info);
 			}
 
 			//[LIST]
-			if (_player.Role.Team is Team.SCP)
+			if (_player.Role.Team is Team.SCPs)
 			{
-				if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleType.Scp079)
+				if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role is Scp079Role scp079role)
 				{
 					list.Append("<color=red><u>SCP</u>\n");
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
-						if (scp.Role.Type is not RoleType.Scp079)
-							list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:Tier{scp.ReferenceHub.scp079PlayerScript.Lvl + 1}\n");
-						else if (scp.Role.Type is not RoleType.Scp0492)
-						list.Append($"{scp.ReferenceHub.characterClassManager.CurRole.fullName}:{scp.CurrentRoom.Type}\n");
+						if (scp.Role.Type is not RoleTypeId.Scp079)
+							list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleTypeId}:Tier{scp079role.Level + 1}\n");
+						else if (scp.Role.Type is not RoleTypeId.Scp0492)
+						list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleName}:{scp.CurrentRoom.Type}\n");
 						else
 							Scp0492++;
 					if (Scp0492 > 0)
@@ -216,7 +208,7 @@ namespace SanyaRemastered
 			curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
-			if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleType.Scp079 && _player.Zone is ZoneType.HeavyContainment)
+			if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleTypeId.Scp079 && _player.Zone is ZoneType.HeavyContainment)
             {
 				string InfoGen = string.Empty;
 				foreach (Generator gen in Generator.Get(GeneratorState.Activating))
@@ -229,7 +221,7 @@ namespace SanyaRemastered
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
-			else if (_player.Role.Type is RoleType.Spectator)
+			else if (_player.Role.Type is RoleTypeId.Spectator)
 			{
 				if (Coroutines.isActuallyBombGoing)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn tant que le bombardement est activé.", 5));
@@ -240,7 +232,7 @@ namespace SanyaRemastered
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
 					else
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site.", 5));
-				else if (RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTickets.Singleton.GetAvailableTickets(SpawnableTeamType.ChaosInsurgency) <= 0)
+				else if (RespawnTokensManager.GetTeamDominance(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTokensManager.GetTeamDominance(SpawnableTeamType.ChaosInsurgency) <= 0)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Il n'y a plus de tickets disponibles.", 5));
 				else if (_respawnCounter is 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 5));
@@ -272,7 +264,7 @@ namespace SanyaRemastered
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
 				}
 			}
-			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role.Type is RoleType.Scp079)
+			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role.Type is RoleTypeId.Scp079)
             {
 				if (Extensions.IsExmode(_player))
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Activé\n<size=25%>Utilisé vos racourcie d'arme pour passé en mode étendue<size=50%>", 2));

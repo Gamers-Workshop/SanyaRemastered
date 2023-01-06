@@ -19,10 +19,16 @@ namespace SanyaRemastered.Commands.DevCommands
         public string[] Aliases => new string[] { };
 
         public string Description => "The test command";
-
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "ok.";
+            response = "NetworkClient";
+            foreach (var i in NetworkClient.prefabs)
+                Log.Debug($"{i.Key} , {i.Value}");
+
+            response = "CustomNetworkManager";
+            foreach (var i in CustomNetworkManager.singleton.spawnPrefabs)
+                Log.Debug($"Name : {i.name} gameObject.name : {i.gameObject.name}");
+
             return true;
         }
     }

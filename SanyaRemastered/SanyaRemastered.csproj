@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\Commands.cs" />
+    <Compile Include="Commands\DevCommands\CameraList.cs" />
     <Compile Include="Commands\DevCommands\Config.cs" />
     <Compile Include="Commands\DevCommands\DoorList.cs" />
     <Compile Include="Commands\DevCommands\Now.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="Component\ContainScpComponent.cs" />
     <Compile Include="Component\GateTimerClose.cs" />
     <Compile Include="Component\Scp914.cs" />
-    <Compile Include="Contain.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="EventHandlers\PlayerHandlers.cs" />
     <Compile Include="EventHandlers\ScpHandlers.cs" />
@@ -105,7 +105,6 @@
     <Compile Include="Patches\IntercomPatches.cs" />
     <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\ScpPatches\Scp096Patches.cs" />
-    <Compile Include="Patches\ScpPatches\Scp106Patches.cs" />
     <Compile Include="Patches\ScpPatches\Scp173Patches.cs" />
     <Compile Include="Patches\ServerDisconnectPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -127,9 +126,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-Publicized">
+      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll</HintPath>
     </Reference>
     <Reference Include="AudioPlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -177,6 +175,9 @@
     <Reference Include="NorthwoodLib, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
+    </Reference>
+    <Reference Include="PluginAPI">
+      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\PluginAPI.dll</HintPath>
     </Reference>
     <Reference Include="SemVer">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\SemVer.dll</HintPath>

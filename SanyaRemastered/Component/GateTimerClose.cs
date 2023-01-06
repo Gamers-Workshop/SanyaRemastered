@@ -25,9 +25,9 @@ namespace SanyaRemastered
 		{
 			_door = gameObject.GetComponent<DoorVariant>();
 		}
-		public override void CustomUpdate()
+		public override void Update()
 		{
-			base.CustomUpdate();
+			base.Update();
 
 			_timer += Time.deltaTime;
 			ClosingGate();
