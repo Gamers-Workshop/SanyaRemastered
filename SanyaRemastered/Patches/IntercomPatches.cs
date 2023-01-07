@@ -9,17 +9,21 @@ using Exiled.API.Enums;
 using System.Text;
 using PlayerRoles.Voice;
 using PlayerRoles;
+using Intercom = PlayerRoles.Voice.Intercom;
+using ExiledIntercom = Exiled.API.Features.Intercom;
+using VoiceChat;
+
 namespace SanyaRemastered.Patches
 {
 
-	[HarmonyPatch(typeof(PlayerRoles.Voice.Intercom), nameof(PlayerRoles.Voice.Intercom.Update))]
+	[HarmonyPatch(typeof(Intercom), nameof(Intercom.CheckPlayer))]
 	class IntercomUpdateSpeaker
 	{
-		public static void Prefix()
+		public static void Postfix(Intercom __instance, ref bool __result)
         {
-			if (SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout && ((!Room.Get(RoomType.EzIntercom)?.AreLightsOff) ?? false))
-                PlayerRoles.Voice.Intercom._singleton._curSpeaker = null;
-		}
+            if (__result is true && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout && (Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? false))
+                __result = false;
+        }
 	}
 
 	[HarmonyPatch(typeof(IntercomDisplay), nameof(IntercomDisplay.Update))]
@@ -37,7 +41,7 @@ namespace SanyaRemastered.Patches
                 }
                 if (!SanyaRemastered.Instance.Config.IntercomInformation || Warhead.Controller is null)
                     return;
-                if (!(Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? true && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout))
+                if (Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? false && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
                 {
                     __instance.Network_overrideText = " ";
                     return;
@@ -57,7 +61,7 @@ namespace SanyaRemastered.Patches
 
                 totalvoltagefloat = Mathf.CeilToInt(totalvoltagefloat);
 
-                StringBuilder stringBuilder = new($"<color=#fffffff>──── Centre d'information FIM Epsilon-11 ────</color>\n" +
+                StringBuilder stringBuilder = new($"<color=#fffffff>────── Centre d'information FIM Epsilon-11 ──────</color>\n" +
                             $"Durée de la brèche : {RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}\n" +
                             $"SCP restants : {RoundSummary.singleton.CountTeam(Team.SCPs) - RoundSummary.singleton.CountRole(RoleTypeId.Scp0492):00}/{RoundSummary.singleton.classlistStart.scps_except_zombies:00}\n" +
                             $"Classe-D restants : {RoundSummary.singleton.CountTeam(Team.ClassD):00}/{RoundSummary.singleton.classlistStart.class_ds:00}\n" +
@@ -112,33 +116,8 @@ namespace SanyaRemastered.Patches
                     stringBuilder.Append($"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}\n");
 
                 //Speak Intercom
-                switch (PlayerRoles.Voice.Intercom.State)
-                {
-                    case IntercomState.InUse:
-                        if (__instance._icom.BypassMode)
-                        {
-                            if (__instance._icom._curSpeaker is null)
-                                stringBuilder.Append("<color=#ff0000>L'administrateur a la priorité sur les équipements de diffusion.</color>");
-                            else
-                                stringBuilder.Append($"{Player.Get(__instance._icom._curSpeaker)?.DisplayNickname} à une diffusion prioritaire");
-                        }
-                        else
-                            stringBuilder.Append($"{Player.Get(__instance._icom._curSpeaker)?.DisplayNickname} Diffuse : {Mathf.CeilToInt(__instance._icom.RemainingTime)} seconde{(__instance._icom.RemainingTime <= 1 ? "" : "s")} ");
+                stringBuilder.Append(SpeakIntercom(__instance));
 
-                        break;
-                    case IntercomState.Ready:
-                        stringBuilder.Append("Intercom prêt à l'emploi.");
-                        break;
-                    case IntercomState.Starting:
-                        stringBuilder.Append($"Mise en ligne de {Player.Get(__instance._icom._curSpeaker)?.DisplayNickname} dans : {Mathf.CeilToInt(__instance._icom._cooldownTime)} seconde{(__instance._icom._cooldownTime <= 1 ? "" : "s")} ");
-                        break;
-                    case IntercomState.Cooldown:
-                        stringBuilder.Append($"Temps avant redémarrage : {Mathf.CeilToInt(__instance._icom._cooldownTime)} seconde{(__instance._icom._cooldownTime <= 1 ? "" : "s")} ");
-                        break;
-                    case IntercomState.NotFound:
-                        stringBuilder.Append("<color=#ff0000>Accréditation insuffisante.</color>");
-                        break;
-                }
                 __instance.Network_overrideText = stringBuilder.ToString();
                 stringBuilder.Clear();
                 return;
@@ -148,6 +127,18 @@ namespace SanyaRemastered.Patches
                 Log.Error($"Intercom::UpdateText Prefix : {ex}\n {ex.StackTrace}");
             }
         }
+
+        public static string SpeakIntercom(IntercomDisplay __instance) => Intercom.State switch
+        {
+            IntercomState.Ready => VoiceChatMuteIndicator.ReceivedFlags > VcMuteFlags.None ? "<color=#ff0000>Accréditation insuffisante.</color>" : "Intercom prêt à l'emploi.",
+            IntercomState.Starting => "Attendez que l'intercom soit en ligne",
+            IntercomState.InUse => __instance._icom.BypassMode ? 
+                                      $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} à une diffusion prioritaire" 
+                                    : $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} Diffuse : {Mathf.Round(__instance._icom.RemainingTime)} seconde{(__instance._icom.RemainingTime <= 1 ? "" : "s")}",
+            IntercomState.Cooldown => $"Temps avant redémarrage : {Mathf.Round(__instance._icom._cooldownTime)} seconde{(__instance._icom._cooldownTime <= 1 ? "" : "s")}",
+            IntercomState.NotFound => $"Unknown",
+            _ => "ERROR",
+        };
     }
 }
 

@@ -91,8 +91,6 @@
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Patches\BreakableDoorPatches.cs" />
-    <Compile Include="Patches\CommandPatches\ForceclassCommandPatches.cs" />
-    <Compile Include="Patches\CommandPatches\IntercomTextCommandPatches.cs" />
     <Compile Include="Patches\FallDamagePatch.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
     <Compile Include="Patches\InteractPatches.cs" />

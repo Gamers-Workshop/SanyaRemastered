@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SanyaRemastered.Patches
 {
-    [HarmonyPatch(typeof(Player), nameof(Player.ShowHint))]
+    [HarmonyPatch(typeof(Player), nameof(Player.ShowHint), new[] { typeof(string), typeof(float) })]
     public static class PatchHint
     {
         public static bool Prefix(Player __instance, string message, float duration = 3)
