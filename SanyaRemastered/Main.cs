@@ -140,9 +140,9 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingDoor += PlayerHandlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker += PlayerHandlers.OnPlayerLockerInteract;
 			PlayerEvents.InteractingElevator += PlayerHandlers.OnInteractingElevator;
-			PlayerEvents.IntercomSpeaking += PlayerHandlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting += PlayerHandlers.OnShooting;
+			ItemEvents.ChangingAmmo += PlayerHandlers.OnChangingAmmo;
+            PlayerEvents.Shooting += PlayerHandlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel += PlayerHandlers.OnActivatingWarheadPanel;
@@ -187,7 +187,7 @@ namespace SanyaRemastered
 			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawning;
 			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
-			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
+			PlayerEvents.SpawningRagdoll -= PlayerHandlers.OnSpawningRagdoll;
 			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
 			PlayerEvents.ThrowingRequest -= PlayerHandlers.OnThrowingRequest;
 			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
@@ -196,10 +196,10 @@ namespace SanyaRemastered
 			PlayerEvents.InteractingDoor -= PlayerHandlers.OnPlayerDoorInteract;
 			PlayerEvents.InteractingLocker -= PlayerHandlers.OnPlayerLockerInteract;
 			PlayerEvents.InteractingElevator -= PlayerHandlers.OnInteractingElevator;
-			PlayerEvents.IntercomSpeaking -= PlayerHandlers.OnIntercomSpeaking;
 
-			PlayerEvents.Shooting -= PlayerHandlers.OnShooting;
-			PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
+            ItemEvents.ChangingAmmo -= PlayerHandlers.OnChangingAmmo;
+            PlayerEvents.Shooting -= PlayerHandlers.OnShooting;
+            PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
 			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel -= PlayerHandlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator -= PlayerHandlers.OnGeneratorUnlock;

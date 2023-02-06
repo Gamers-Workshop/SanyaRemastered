@@ -28,16 +28,11 @@ namespace SanyaRemastered.Commands.StaffCommands
 				response = $"You don't have permission to execute this command. Required permission: sanya.{Command}";
 				return false;
 			}
-			Player player;
-			if (sender is PlayerCommandSender playerCommandSender) player = Player.Get(playerCommandSender.SenderId);
-			else
-			{
-				response = $"You need to be an player to used this command";
-				return false;
-			}
+
+			Player player = Player.Get(sender) ?? Server.Host;
 			if (arguments.At(0).ToLower() == "all")
 			{
-				if (player is not null && !player.CheckPermission($"sanya.{Command}all"))
+				if (player is not null && !sender.CheckPermission($"sanya.{Command}all"))
 				{
 					response = $"You don't have permission to execute this command. Required permission: sanya.{Command}all";
 					return false;

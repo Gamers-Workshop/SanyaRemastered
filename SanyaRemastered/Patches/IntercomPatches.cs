@@ -15,17 +15,6 @@ using VoiceChat;
 
 namespace SanyaRemastered.Patches
 {
-
-	[HarmonyPatch(typeof(Intercom), nameof(Intercom.CheckPlayer))]
-	class IntercomUpdateSpeaker
-	{
-		public static void Postfix(Intercom __instance, ref bool __result)
-        {
-            if (__result is true && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout && (Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? false))
-                __result = false;
-        }
-	}
-
 	[HarmonyPatch(typeof(IntercomDisplay), nameof(IntercomDisplay.Update))]
 
 	class IntercomUpdateTextPatches
@@ -44,6 +33,10 @@ namespace SanyaRemastered.Patches
                 if (Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? false && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
                 {
                     __instance.Network_overrideText = " ";
+
+                    if (ExiledIntercom.InUse)
+                        ExiledIntercom.Timeout();
+
                     return;
                 }
 
@@ -58,7 +51,6 @@ namespace SanyaRemastered.Patches
                 {
                     totalvoltagefloat += i.CurrentTime;
                 }
-
                 totalvoltagefloat = Mathf.CeilToInt(totalvoltagefloat);
 
                 StringBuilder stringBuilder = new($"<color=#fffffff>────── Centre d'information FIM Epsilon-11 ──────</color>\n" +

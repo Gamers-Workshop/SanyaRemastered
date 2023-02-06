@@ -159,8 +159,8 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = string.Empty;
-			/*if (_player.IsInvisible)
-				info += $"<b>vous êtes invisible</b> ";*/
+			if (_player.Role is FpcRole fpcRole && fpcRole.IsInvisible)
+				info += $"<b>vous êtes invisible</b> ";
 			{
 				curText = curText.Replace("([STATS])", info);
 			}
@@ -221,7 +221,7 @@ namespace SanyaRemastered
 			//[CENTER_DOWN]
 			if (!string.IsNullOrEmpty(_hudCenterDownString))
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
-			else if (_player.Role.Type is RoleTypeId.Spectator)
+			else if (_player.Role.Type is RoleTypeId.Spectator or RoleTypeId.Overwatch)
 			{
 				if (Coroutines.isActuallyBombGoing)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn tant que le bombardement est activé.", 5));

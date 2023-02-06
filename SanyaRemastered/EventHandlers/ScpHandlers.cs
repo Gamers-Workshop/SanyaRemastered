@@ -110,14 +110,14 @@ namespace SanyaRemastered.EventHandlers
                         }
                         else
                         {
-                            /*if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGet(typeof(MovementBoost), out StatusEffectBase playerEffect))
+                            if (ev.Player.ReferenceHub.playerEffectsController.TryGetEffect(out MovementBoost movementBoost))
                             {
-                                playerEffect.Intensity = (byte)Mathf.Clamp(1.5f * playerEffect.Intensity, 0, 255);
+                                movementBoost.Intensity = (byte)Mathf.Clamp(1.5f * movementBoost.Intensity, 0, 255);
                             }
-                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGet(typeof(Scp914), out StatusEffectBase Death))
+                            if (ev.Player.ReferenceHub.playerEffectsController.TryGetEffect(out Scp914 Death))
                             {
                                 Death.Intensity = (byte)Mathf.Clamp(2 * Death.Intensity, 0, 255);
-                            }*/
+                            }
                         }
                     }
                     break;
@@ -133,9 +133,9 @@ namespace SanyaRemastered.EventHandlers
                         }
                         else
                         {
-                           /* if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(MovementBoost), out PlayerEffect playerEffect))
+                            if (ev.Player.ReferenceHub.playerEffectsController.TryGetEffect(out MovementBoost movementBoost))
                             {
-                                playerEffect.Intensity = (byte)Mathf.Clamp((float)2 * playerEffect.Intensity, 0, 255);
+                                movementBoost.Intensity = (byte)Mathf.Clamp((float)2 * movementBoost.Intensity, 0, 255);
                             }
                             else
                             {
@@ -143,16 +143,16 @@ namespace SanyaRemastered.EventHandlers
                                 ev.Player.ChangeEffectIntensity<MovementBoost>(80);
                                 ev.Player.EnableEffect<Invigorated>();
                             }
-                            if (ev.Player.ReferenceHub.playerEffectsController.AllEffects.TryGetValue(typeof(Scp914), out PlayerEffect Death))
+                            if (ev.Player.ReferenceHub.playerEffectsController.TryGetEffect(out Scp914 Death))
                             {
                                 Death.Intensity = (byte)Mathf.Clamp(6 * Death.Intensity, 0, 255);
-                            }*/
+                            }
                         }
                     }
                     break;
             }
-        }
-        /*public void On096AddingTarget(AddingTargetEventArgs ev)
+        }/*
+        public void On096AddingTarget(AddingTargetEventArgs ev)
         {
             if (SanyaRemastered.Instance.Config.Scp096Real)
             {
@@ -183,8 +183,6 @@ namespace SanyaRemastered.EventHandlers
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Ensnared>(3f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(5f);
                 ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Blinded>(3f);
-                ev.Target.ReferenceHub.playerEffectsController.EnableEffect<AmnesiaItems>(5f);
-                ev.Target.ReferenceHub.playerEffectsController.EnableEffect<Flashed>(0.2f);
             }
         }
     }

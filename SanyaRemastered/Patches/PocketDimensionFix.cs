@@ -1,4 +1,6 @@
-﻿using HarmonyLib;
+﻿using CustomPlayerEffects;
+using Exiled.API.Features;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ namespace SanyaRemastered.Patches
     {
         public static bool Prefix()
         {
-            return GameCore.ConfigFile.ServerConfig.GetBool("pd_refresh_exit", true);
+            return !Player.List.Any(x => x.IsInPocketDimension && x.IsEffectActive<Corroding>());
 		}
     }
 }

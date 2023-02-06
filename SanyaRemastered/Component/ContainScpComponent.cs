@@ -20,8 +20,8 @@ namespace SanyaRemastered
 
 		private SanyaRemastered _plugin;
 		private Player _player;
-		private float _timer = 0f;
-		private Room _room = null;
+		private float _timer;
+		private Room _room;
 		public int TimeBeforeContain = 25;
 		public string CassieAnnounceContain;
 		public List<Door> doors = new();

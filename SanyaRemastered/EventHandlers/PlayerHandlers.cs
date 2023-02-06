@@ -6,10 +6,15 @@ using Exiled.API.Features.DamageHandlers;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Roles;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Item;
 using Exiled.Events.EventArgs.Player;
+using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Armor;
+using InventorySystem.Items.Firearms.Modules;
+using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
+using InventorySystem.Items.ThrowableProjectiles;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
@@ -62,13 +67,16 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnPlayerDestroying(DestroyingEventArgs ev)
         {
-            if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
+            if ((Round.IsLocked || Round.IsLobbyLocked) && ev.Player.RemoteAdminAccess && !Player.List.Any(x => x != ev.Player && x.RemoteAdminAccess))
+            {
+                Round.IsLocked = false;
+                Round.IsLobbyLocked = false;
+            }
         }
 
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -{ev.Reason}> {ev.NewRole}");
             if (ev.Player.GameObject.TryGetComponent<ContainScpComponent>(out var comp1))
                 UnityEngine.Object.Destroy(comp1);
@@ -86,24 +94,17 @@ namespace SanyaRemastered.EventHandlers
                 else if (ev.Player.Role.Type is RoleTypeId.Scp079)
                     ev.Player.ClearInventory(true);
             }
-            if (plugin.Config.Scp096Real && ev.Reason is SpawnReason.Escaped)
+            if (plugin.Config.Scp096Real && ev.Reason is SpawnReason.Escaped
+                && Player.List.Any(x => x.Role is Scp096Role Scp096 && Scp096.HasTarget(ev.Player)))
             {
-                bool IsAnTarget = false;
-                foreach (Player scp096 in Player.Get(RoleTypeId.Scp096))
-                    if (scp096.Role is Scp096Role Scp096 && Scp096.HasTarget(ev.Player))
-                        IsAnTarget = true;
-                if (IsAnTarget)
-                {
-                    ev.NewRole = RoleTypeId.Spectator;
-                    ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous avez été abatue a la sortie car vous avez vue le visage de SCP-096", 10);
-                }
+                ev.NewRole = RoleTypeId.Spectator;
+                ev.Player.ReferenceHub.GetComponent<SanyaRemasteredComponent>().AddHudCenterDownText("Vous avez été abatue a la sortie car vous avez vue le visage de SCP-096", 10);
             }
         }
 
 
         public void OnPlayerSpawning(SpawningEventArgs ev)
         {
-            if (ev.Player.IsHost) return;
             Log.Debug($"[OnPlayerSpawn] {ev.Player.Nickname} -{ev.Player.Role.Type}-> {ev.Position}");
 
             if (ev.Player.Role.Type is RoleTypeId.Scp939)
@@ -118,7 +119,7 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerHurting(HurtingEventArgs ev)
         {
             if (!ev.IsAllowed) return;
-            if (ev.Player is null || ev.Player.IsHost || ev.Player.Role.Type is RoleTypeId.Spectator || ev.Player.IsGodModeEnabled || ev.Player.IsSpawnProtected || !ev.IsAllowed) return;
+            if (ev.Player is null || ev.Player.Role.Type is RoleTypeId.Spectator || ev.Player.IsGodModeEnabled || ev.Player.IsSpawnProtected || !ev.IsAllowed) return;
             Log.Debug($"[OnAttackerHurt:Before] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.DamageHandler.Type}({ev.Amount})-> {ev.Player?.Nickname}[{ev.Player?.Role}]");
 
             if (SanyaRemastered.Instance.Config.Scp939EffectiveArmor > 0 && ev.DamageHandler.Type is DamageType.Scp939 && BodyArmorUtils.TryGetBodyArmor(ev.Player.Inventory, out BodyArmor bodyArmor))
@@ -168,7 +169,7 @@ namespace SanyaRemastered.EventHandlers
 
         public void OnDied(DiedEventArgs ev)
         {
-            if (ev.Player.IsHost || ev.Player.Role.Type is RoleTypeId.Spectator || ev.Player.ReferenceHub.characterClassManager.GodMode || ev.Player.IsSpawnProtected) return;
+            if (ev.Player.Role.Type is RoleTypeId.Spectator || ev.Player.ReferenceHub.characterClassManager.GodMode || ev.Player.IsSpawnProtected) return;
             Log.Debug($"[OnAttackerDeath] {ev.Attacker?.Nickname}[{ev.Attacker?.Role}] -{ev.DamageHandler.Type}-> {ev.Player?.Nickname}[{ev.Player?.Role}]");
 
             if (SanyaRemastered.Instance.Config.Scp939Size is not 1)
@@ -262,9 +263,9 @@ namespace SanyaRemastered.EventHandlers
                     }
                 case ItemType.SCP500:
                     {
-                        ev.Player.DisableAllEffects();
-                        if (ev.Player.IsInPocketDimension)
-                            ev.Player.EnableEffect(EffectType.Corroding);
+                        ev.Player.DisableEffects(
+                            Enum.GetValues(typeof(EffectType)).Cast<EffectType>()
+                            .Select(x => !x.IsPositive() && x is not (EffectType.Corroding | EffectType.SeveredHands | EffectType.InsufficientLighting)).Cast<EffectType>());
                         break;
                     }
             }
@@ -284,7 +285,7 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerDoorInteract(InteractingDoorEventArgs ev)
         {
             Log.Debug($"[OnPlayerDoorInteract] {ev.Player.Nickname}:{ev.Door?.Type}");
-            if (ev.Door.DoorLockType == DoorLockType.Isolation)
+            if (ev.Door.DoorLockType is DoorLockType.Isolation)
             {
                 ev.IsAllowed = false;
             }
@@ -299,7 +300,7 @@ namespace SanyaRemastered.EventHandlers
                     ev.IsAllowed = false;
                 }
             }
-            if (ev.Door.Type is (DoorType.GateA | DoorType.GateB) && ev.Door.Base.TryGetComponent(out GateTimerClose Gate))
+            if (ev.Door.Type is (DoorType.GateA or DoorType.GateB) && ev.Door.Base.TryGetComponent(out GateTimerClose Gate))
             {
                 Gate._timeBeforeClosing = -1;
             }
@@ -311,18 +312,16 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnInteractingElevator(InteractingElevatorEventArgs ev)
         {
-            Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Name : {ev.Elevator.GetType().Name}");
+            Log.Debug($"[OnInteractingElevator] Player : {ev.Player}  Name : {ev.Lift.Type}");
             if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseElevator", out List<RoleTypeId> roles))
             {
                 if (roles.Contains(ev.Player.Role.Type))
                     ev.IsAllowed = false;
             }
         }
-        public void OnIntercomSpeaking(IntercomSpeakingEventArgs ev)
+        public void OnChangingAmmo(ChangingAmmoEventArgs ev)
         {
-            if (!SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout) return;
-
-            if (!Room.Get(RoomType.EzIntercom).AreLightsOff)
+            if (ev.Player.SessionVariables.ContainsKey("InfAmmo"))
             {
                 ev.IsAllowed = false;
             }
@@ -339,10 +338,6 @@ namespace SanyaRemastered.EventHandlers
                 {
                     ev.IsAllowed = false;
                 }
-            }
-            if (ev.Player.SessionVariables.ContainsKey("InfAmmo") && ev.Player.CurrentItem is Firearm firearm)
-            {
-                firearm.Ammo++;
             }
         }
         public void OnUsingMicroHIDEnergy(UsingMicroHIDEnergyEventArgs ev)

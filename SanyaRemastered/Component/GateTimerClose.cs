@@ -17,7 +17,7 @@ namespace SanyaRemastered
 	{
 
 		private DoorVariant _door;
-		private float _timer = 0f;
+		private float _timer;
 		private readonly int _timerBeforeClose = 20;
 		public int _timeBeforeClosing = -1;
 

@@ -365,7 +365,8 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
             if (Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit Debug))
-                Log.Info($"LayerMask is {Debug.collider?.gameObject?.layer}");
+                Log.Info($"LayerMask zis {Debug.collider?.gameObject?.layer}");
+
             // Smoke Grenade Pickup ButtonDoor
             if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))
                 return;
@@ -387,7 +388,8 @@ namespace SanyaRemastered.EventHandlers
                 }
                 if (SanyaRemastered.Instance.Config.ItemShootMove)
                 {
-                    pickup.Rb.AddExplosionForce((2.5f / (pickup.Info.Weight + 1)) + 4, ev.Player.Position, 500f, 3f, ForceMode.Impulse);
+                    if (pickup.Info.ItemId > ItemType.KeycardO5)
+                        pickup.Rb.AddExplosionForce(Mathf.Min(1 / pickup.Info.Weight * 4, 5), ev.Player.Position, 500f, 3f, ForceMode.Impulse);
 
                     pickup.PreviousOwner = ev.Player.Footprint;
                     return;
