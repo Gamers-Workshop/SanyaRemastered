@@ -12,6 +12,7 @@ using Interactables.Interobjects;
 using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
+using InventorySystem.Items.Usables.Scp330;
 using LightContainmentZoneDecontamination;
 using MapGeneration;
 using MapGeneration.Distributors;
@@ -416,6 +417,7 @@ namespace SanyaRemastered.EventHandlers
             if (plugin.Config.GrenadeChainSametiming && ev.Pickup is TimeGrenadeProjectile timeGrenadeProjectile)
                 timeGrenadeProjectile.FuseTime = 0.1f;
         }
+
         public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
         {
             if (plugin.Config.ContainCommand && ev.Window.Type is GlassType.Scp049)

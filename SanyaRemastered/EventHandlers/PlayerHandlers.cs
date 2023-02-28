@@ -47,7 +47,10 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerVerified(VerifiedEventArgs ev)
         {
             Log.Info($"[OnPlayerJoin] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
-
+            if (plugin.Config.AllStar && !ev.Player.HasCustomName)
+            {
+                ev.Player.CustomName = ev.Player.Nickname;
+            }
             if (plugin.Config.DisablePlayerLists && SanyaRemastered.Instance.ServerHandlers.playerlistnetid > 0)
             {
                 ObjectDestroyMessage objectDestroyMessage = new()
@@ -261,13 +264,6 @@ namespace SanyaRemastered.EventHandlers
                         ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Disabled>();
                         break;
                     }
-                case ItemType.SCP500:
-                    {
-                        ev.Player.DisableEffects(
-                            Enum.GetValues(typeof(EffectType)).Cast<EffectType>()
-                            .Select(x => !x.IsPositive() && x is not (EffectType.Corroding | EffectType.SeveredHands | EffectType.InsufficientLighting)).Cast<EffectType>());
-                        break;
-                    }
             }
         }
 
@@ -304,6 +300,7 @@ namespace SanyaRemastered.EventHandlers
             {
                 Gate._timeBeforeClosing = -1;
             }
+            ev.IsAllowed = true;
         }
 
         public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)

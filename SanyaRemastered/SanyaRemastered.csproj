@@ -46,6 +46,7 @@
     <Compile Include="Commands\FunCommands\Explode.cs" />
     <Compile Include="Commands\FunCommands\GeneratorControl.cs" />
     <Compile Include="Commands\FunCommands\Heli.cs" />
+    <Compile Include="Commands\FunCommands\Npcs.cs" />
     <Compile Include="Commands\FunCommands\PlayAmbiant.cs" />
     <Compile Include="Commands\DevCommands\Pocket106.cs" />
     <Compile Include="Commands\DevCommands\Args.cs" />
@@ -65,12 +66,10 @@
     <Compile Include="Commands\DevCommands\Test.cs" />
     <Compile Include="Commands\DevCommands\WallTest.cs" />
     <Compile Include="Commands\DevCommands\WorkTest.cs" />
-    <Compile Include="Commands\FunCommands\Blackout.cs" />
     <Compile Include="Commands\FunCommands\Femur.cs" />
     <Compile Include="Commands\FunCommands\InfiniteAmmo.cs" />
     <Compile Include="Commands\FunCommands\NukeCap.cs" />
     <Compile Include="Commands\FunCommands\NukeLock.cs" />
-    <Compile Include="Commands\FunCommands\Pocket.cs" />
     <Compile Include="Commands\FunCommands\Scale.cs" />
     <Compile Include="Commands\FunCommands\Scp914.cs" />
     <Compile Include="Commands\FunCommands\Speed.cs" />
@@ -81,9 +80,10 @@
     <Compile Include="Commands\StaffCommands\List.cs" />
     <Compile Include="Commands\StaffCommands\Ping.cs" />
     <Compile Include="Commands\StaffCommands\Redirect.cs" />
-    <Compile Include="Component\ContainScpComponent.cs" />
-    <Compile Include="Component\GateTimerClose.cs" />
-    <Compile Include="Component\Scp914.cs" />
+    <Compile Include="Components\ContainScpComponent.cs" />
+    <Compile Include="Components\FakeConnection.cs" />
+    <Compile Include="Components\GateTimerClose.cs" />
+    <Compile Include="Components\Scp914.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="EventHandlers\PlayerHandlers.cs" />
     <Compile Include="EventHandlers\ScpHandlers.cs" />
@@ -108,7 +108,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ram.cs" />
     <Compile Include="Configs\SanyaConfig.cs" />
-    <Compile Include="Component\SanyaRemasteredComponent.cs" />
+    <Compile Include="Components\SanyaRemasteredComponent.cs" />
     <Compile Include="Configs\Subtitles.cs" />
     <Compile Include="Configs\Translation.cs" />
   </ItemGroup>
@@ -126,10 +126,6 @@
     </Reference>
     <Reference Include="Assembly-CSharp-Publicized">
       <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="AudioPlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\AudioPlayer\.github\AudioPlayer\bin\Debug\AudioPlayer.dll</HintPath>
     </Reference>
     <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

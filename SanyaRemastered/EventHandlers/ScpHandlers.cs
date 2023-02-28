@@ -151,14 +151,16 @@ namespace SanyaRemastered.EventHandlers
                     }
                     break;
             }
-        }/*
+        }
         public void On096AddingTarget(AddingTargetEventArgs ev)
         {
-            if (SanyaRemastered.Instance.Config.Scp096Real)
+            if (ev.Target.IsGodModeEnabled)
+                ev.IsAllowed = false;
+            /*if (SanyaRemastered.Instance.Config.Scp096Real)
             {
                 ev.EnrageTimeToAdd = 0f;
-            }
-        }
+            }*/
+        }/*
         public void On096Enraging(EnragingEventArgs ev)
         {
             Log.Debug($"[On096Enraging] {ev.Player.Nickname} : {ev.Scp096.EnrageTimeLeft}");

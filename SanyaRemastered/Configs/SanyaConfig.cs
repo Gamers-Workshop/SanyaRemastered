@@ -26,16 +26,17 @@ namespace SanyaRemastered.Configs
         public bool Coroding106 { get; set; } = false;
         public bool ExplodingGrenadeTesla { get; set; } = false;
         public bool GateClosingAuto { get; set; } = false;
-
         public string BoxMessageOnJoin { get; set; } = string.Empty;
 
         [Description("Ram Testing")]
         public bool RamInfo { get; set; } = false;
+
         [Description("Ram Restart if to much ram (Go)")]
         public double RamRestartNoPlayer { get; set; } = -1;
         public double RamRestartWithPlayer { get; set; } = -1;
 
-
+        [Description("Affiche une étoile pour tous les joueurs (comme le setnick)")]
+        public bool AllStar { get; set; } = false;
         [Description("RandomRespawnPosPercent")]
         public int RandomRespawnPosPercent { get; set; } = -1;
         [Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]

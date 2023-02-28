@@ -123,7 +123,7 @@ namespace SanyaRemastered
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
 			MapEvents.ChangingIntoGrenade += ServerHandlers.OnChangingIntoGrenade;
 
-			PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
+            PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.ChangingRole += PlayerHandlers.OnChangingRole;
@@ -171,7 +171,7 @@ namespace SanyaRemastered
 			ServerEvents.RoundEnded -= ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound -= ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam -= ServerHandlers.OnTeamRespawn;
-			
+
 			WarheadEvents.Stopping -= ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated -= ServerHandlers.OnDetonated;
 			
