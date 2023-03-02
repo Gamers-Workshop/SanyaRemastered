@@ -2,9 +2,11 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
+using PluginAPI.Core.Zones;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -32,6 +34,15 @@ namespace SanyaRemastered.Commands.DevCommands
 			{
 				response += $"{rooms.Zone} : {rooms.Type} : {rooms.Doors?.Count()} : {rooms.Cameras?.Count()} : {rooms.TeslaGate is null}\n";
 			}
+
+            response += "--------------------------------------\n";
+
+            foreach (var rooms in Room.List.Where(x => x.Type is RoomType.Unknown || x.Zone is (ZoneType.Entrance | ZoneType.HeavyContainment)))
+            {
+                response += $"{rooms.Zone} : {rooms.Type} : {rooms.Name} : {rooms.gameObject.name.RemoveBracketsOnEndOfName()} : {rooms.gameObject.transform.parent.name} : {rooms.Position}\n";
+            }
+
+
             return true;
 		}
 	}

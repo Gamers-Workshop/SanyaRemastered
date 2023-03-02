@@ -55,7 +55,7 @@ namespace SanyaRemastered.Commands.FunCommands
 			else if (arguments.At(0).ToLower() == "stop")
 			{
 				Coroutines.AirSupportBomb(true);
-				Coroutines.isAirBombGoing = false;
+				Coroutines.IsAirBombGoing = false;
 				response = $"Stop ok.";
 				return true;
 			}

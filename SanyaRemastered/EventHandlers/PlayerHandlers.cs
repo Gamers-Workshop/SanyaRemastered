@@ -300,7 +300,6 @@ namespace SanyaRemastered.EventHandlers
             {
                 Gate._timeBeforeClosing = -1;
             }
-            ev.IsAllowed = true;
         }
 
         public void OnPlayerLockerInteract(InteractingLockerEventArgs ev)

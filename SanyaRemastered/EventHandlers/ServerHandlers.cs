@@ -120,8 +120,8 @@ namespace SanyaRemastered.EventHandlers
             RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
 
             DecalList.Clear();
-            Coroutines.isAirBombGoing = false;
-            Coroutines.isActuallyBombGoing = false;
+            Coroutines.IsAirBombGoing = false;
+            Coroutines.IsActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
@@ -290,7 +290,7 @@ namespace SanyaRemastered.EventHandlers
                 foreach (Player player in Player.List)
                     player.ReferenceHub.characterClassManager.GodMode = true;
             }
-            Coroutines.isAirBombGoing = false;
+            Coroutines.IsAirBombGoing = false;
         }
 
         public void OnRoundRestart()
@@ -314,8 +314,8 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnTeamRespawn] Queues:{ev.Players.Count()} NextKnowTeam:{ev.NextKnownTeam} MaxAmount:{ev.MaximumRespawnAmount}");
 
-            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && AlphaWarheadController.Singleton._alreadyDetonated 
-                || Coroutines.isAirBombGoing && Coroutines.AirBombWait < 60 
+            if (SanyaRemastered.Instance.Config.StopRespawnAfterDetonated && Warhead.IsDetonated
+                || Coroutines.IsAirBombGoing && Coroutines.AirBombWait < 60
                 || StopRespawn)
                 ev.IsAllowed = false;
         }

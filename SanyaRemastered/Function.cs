@@ -26,9 +26,9 @@ namespace SanyaRemastered.Functions
 {
     internal static class Coroutines
     {
-        public static bool isAirBombGoing = false;
-        public static bool isActuallyBombGoing = false;
-        public static int AirBombWait = 0;
+        public static bool IsAirBombGoing { get; set; }
+        public static bool IsActuallyBombGoing { get; set; }
+        public static int AirBombWait { get; set; }
 
         public static IEnumerator<float> RestartServer()
         {
@@ -51,12 +51,12 @@ namespace SanyaRemastered.Functions
         public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
         {
             AirBombWait = timewait;
-            if (isAirBombGoing)
+            if (IsAirBombGoing)
             {
                 if (!stop)
                     yield break;
-                isAirBombGoing = false;
-                isActuallyBombGoing = false;
+                IsAirBombGoing = false;
+                IsActuallyBombGoing = false;
                 AirBombWait = 0;
 
                 Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stoped", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
@@ -66,7 +66,7 @@ namespace SanyaRemastered.Functions
 
             DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n";
 
-            isAirBombGoing = true;
+            IsAirBombGoing = true;
             while (AirBombWait > 0)
             {
                 Log.Debug("Démarage AirSupport timewait");
@@ -82,7 +82,7 @@ namespace SanyaRemastered.Functions
                 {
                     break;
                 }
-                if (!isAirBombGoing)
+                if (!IsAirBombGoing)
                 {
                     Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stop", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
                     DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
@@ -92,9 +92,9 @@ namespace SanyaRemastered.Functions
                 AirBombWait--;
                 yield return Timing.WaitForSeconds(1);
             }
-            if (!isAirBombGoing)
+            if (!IsAirBombGoing)
                 yield break;
-            isActuallyBombGoing = true;
+            IsActuallyBombGoing = true;
             Log.Info($"[AirSupportBomb] booting...");
             DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
             //AudioPlayer.API.AudioController.PlayFromFile("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.mp3", 60, true);
@@ -108,15 +108,15 @@ namespace SanyaRemastered.Functions
                 {
                     Map.PlayAmbientSound(7);
                     waitforready--;
-                    if (!isAirBombGoing)
+                    if (!IsAirBombGoing)
                     {
-                        isActuallyBombGoing = false;
+                        IsActuallyBombGoing = false;
                     }
                     yield return Timing.WaitForSeconds(1f);
                 }
             }
             Log.Info($"[AirSupportBomb] throwing...");
-            while (isAirBombGoing)
+            while (IsAirBombGoing)
             {
                 List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
                 foreach (var pos in randampos)
@@ -126,7 +126,7 @@ namespace SanyaRemastered.Functions
                 }
                 if (TimeEnd != -1 && TimeEnd <= Time.deltaTime)
                 {
-                    isAirBombGoing = false;
+                    IsAirBombGoing = false;
                     Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
                     break;
                 }
@@ -134,7 +134,7 @@ namespace SanyaRemastered.Functions
             }
 
             Cassie.MessageTranslated("outside zone termination completed", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombEnded);
-            isActuallyBombGoing = false;
+            IsActuallyBombGoing = false;
             DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
             Log.Info($"[AirSupportBomb] Ended.");
             //AudioPlayer.API.AudioController.LoopMusic = false;
@@ -247,10 +247,8 @@ namespace SanyaRemastered.Functions
             }
             return -1;
         }
-		public static void SendTextHintNotEffect(this Player player, string text, float time)
-		{
-			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
-		}
+        public static void SendTextHintNotEffect(this Player player, string text, float time) 
+            => player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
 
         public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
         {
@@ -318,50 +316,25 @@ namespace SanyaRemastered.Functions
             };
             conn.Send(msg, channelId);
         }
-        private static int GetMethodHash(Type invokeClass, string methodName)
-        {
-            return invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
-        }
+        private static int GetMethodHash(Type invokeClass, string methodName) => invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
     }
     internal static class Extensions
     {
         public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
 
-        public static float GetHealthAmountPercent(this Player player)
-        {
-            return (100f - player.Health / player.MaxHealth * 100f);
-        }
-        public static void OpenReportWindow(this Player player, string text)
-        {
-            player.ReferenceHub.GetComponent<GameConsoleTransmission>().SendToClient(player.Connection, "[REPORTING] " + text, "white");
-        }
+        public static float GetHealthAmountPercent(this Player player) => 100f - player.Health / player.MaxHealth * 100f;
         public static bool IsExmode(this Player player) => player.SessionVariables.ContainsKey("scp079_advanced_mode");
 
-        public static bool IsList(this Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
-        }
+        public static bool IsList(this Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
 
-        public static bool IsDictionary(this Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
-        }
+        public static bool IsDictionary(this Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>);
 
-        public static Type GetListArgs(this Type type)
-        {
-            return type.GetGenericArguments()[0];
-        }
+        public static Type GetListArgs(this Type type) => type.GetGenericArguments()[0];
 
-        public static T GetRandomOne<T>(this List<T> list)
-        {
-            return list[UnityEngine.Random.Range(0, list.Count)];
-        }
+        public static T GetRandomOne<T>(this List<T> list) => list[UnityEngine.Random.Range(0, list.Count)];
 
-        public static T Random<T>(this IEnumerable<T> ie)
-        {
-            if (!ie.Any()) return default;
-            return ie.ElementAt(SanyaRemastered.Instance.Random.Next(ie.Count()));
-        }
+        public static T Random<T>(this IEnumerable<T> ie) => ie.Any() ? (ie.ElementAt(SanyaRemastered.Instance.Random.Next(ie.Count()))) : default;
+
         public static string FormatArguments(ArraySegment<string> sentence, int index)
         {
             StringBuilder SB = StringBuilderPool.Shared.Rent();

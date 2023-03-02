@@ -174,7 +174,7 @@ namespace SanyaRemastered
 					int Scp0492 = 0;
 					foreach (var scp in _scplists)
 						if (scp.Role.Type is not RoleTypeId.Scp079)
-							list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleTypeId}:Tier{scp079role.Level + 1}\n");
+							list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleName}:Tier{scp079role.Level + 1}\n");
 						else if (scp.Role.Type is not RoleTypeId.Scp0492)
 						list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleName}:{scp.CurrentRoom.Type}\n");
 						else
@@ -223,7 +223,7 @@ namespace SanyaRemastered
 				curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud(_hudCenterDownString, 5));
 			else if (_player.Role.Type is RoleTypeId.Spectator or RoleTypeId.Overwatch)
 			{
-				if (Coroutines.isActuallyBombGoing)
+				if (Coroutines.IsActuallyBombGoing)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn tant que le bombardement est activé.", 5));
 				else if (Coroutines.AirBombWait is not 0 && Coroutines.AirBombWait < 60)
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Un bombardement est prévu sur le site dans {Coroutines.AirBombWait} seconde{(Coroutines.AirBombWait <= 1 ? "" : "s")} !", 5));
@@ -232,8 +232,6 @@ namespace SanyaRemastered
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site, un bombardement vas être effectuer.", 5));
 					else
 						curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn après l'explosion du site.", 5));
-				else if (RespawnTokensManager.GetTeamDominance(SpawnableTeamType.NineTailedFox) <= 0 && RespawnTokensManager.GetTeamDominance(SpawnableTeamType.ChaosInsurgency) <= 0)
-					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Aucun respawn. Il n'y a plus de tickets disponibles.", 5));
 				else if (_respawnCounter is 0)//{(Respawn.NextKnownTeam == SpawnableTeamType.NineTailedFox ? "" : (Respawn.NextKnownTeam == SpawnableTeamType.ChaosInsurgency ? "":""))}
 					curText = curText.Replace("[CENTER_DOWN]", FormatStringForHud($"Respawn en cours...", 5));
 				else if (_respawnCounter is not -1)
