@@ -3,24 +3,22 @@ using Exiled.API.Features.Items;
 using Hints;
 using InventorySystem.Items.ThrowableProjectiles;
 using InventorySystem.Items.Usables.Scp330;
+using MapEditorReborn.API.Features.Objects;
+using MapEditorReborn.API.Features.Serializable;
 using MEC;
 using Mirror;
 using NorthwoodLib.Pools;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using RemoteAdmin;
-using Respawning;
 using RoundRestarting;
-using SanyaRemastered.Data;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using UnityEngine;
 using Utils.Networking;
-using Camera = Exiled.API.Features.Camera;
+using Random = UnityEngine.Random;
 
 namespace SanyaRemastered.Functions
 {
@@ -118,19 +116,16 @@ namespace SanyaRemastered.Functions
             Log.Info($"[AirSupportBomb] throwing...");
             while (IsAirBombGoing)
             {
-                List<Vector3> randampos = OutsideRandomAirbombPos.Load().OrderBy(x => Guid.NewGuid()).ToList();
-                foreach (var pos in randampos)
-                {
-                    Methods.Explode(pos);
-                    yield return Timing.WaitForSeconds(0.1f);
-                }
+                for (int i = 0; i < 3; i++)
+                    Methods.Explode(Methods.RandomSurface());
+                yield return Timing.WaitForSeconds(0.1f);
                 if (TimeEnd != -1 && TimeEnd <= Time.deltaTime)
                 {
                     IsAirBombGoing = false;
                     Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
                     break;
                 }
-                yield return Timing.WaitForSeconds(0.25f);
+                yield return Timing.WaitForSeconds(0.1f);
             }
 
             Cassie.MessageTranslated("outside zone termination completed", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombEnded);
@@ -143,6 +138,80 @@ namespace SanyaRemastered.Functions
     }
     internal static class Methods
     {
+        internal static Dictionary<float, GameObject> SurfaceBombArea = new();
+        internal static float MaxChance;
+        public static Vector3 RandomSurface()
+        {
+            try
+            {
+                if (SurfaceBombArea.IsEmpty())
+                {
+                    SchematicObjectDataList Map = MapEditorReborn.API.Features.MapUtils.GetSchematicDataByName("SufaceBomb");
+                    if (Map == null)
+                        Log.Error("Fail to load (SufaceBomb)");
+                    foreach (SchematicBlockData block in Map.Blocks)
+                    {
+                        GameObject Primitive = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                        Primitive.transform.position = block.Position;
+                        Primitive.transform.rotation = Quaternion.Euler(block.Rotation);
+                        Primitive.transform.localScale = block.Scale;
+                        SurfaceBombArea.Add(block.Scale.x * block.Scale.z, Primitive);
+                        MaxChance += block.Scale.x * block.Scale.z;
+                    }
+                }
+
+                float RandomChance = Random.Range(0f, MaxChance);
+                GameObject gameObject = null;
+                foreach (KeyValuePair<float, GameObject> Area in SurfaceBombArea)
+                {
+                    Log.Info($"RandomChance {RandomChance} {Area.Key}");
+                    RandomChance -= Area.Key;
+                    if (RandomChance <= 0)
+                    {
+                        gameObject = Area.Value;
+                        break;
+                    }
+                }
+
+                // Get the MeshFilter and Mesh of the GameObject
+                MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+
+                Mesh mesh = meshFilter.mesh;
+
+                // Choose a random triangle from the Mesh
+                int triangleIndex = Random.Range(0, mesh.triangles.Length / 3);
+                int index1 = mesh.triangles[triangleIndex * 3];
+                int index2 = mesh.triangles[triangleIndex * 3 + 1];
+                int index3 = mesh.triangles[triangleIndex * 3 + 2];
+
+                // Get the vertices of the triangle
+                Vector3 vertex1 = mesh.vertices[index1];
+                Vector3 vertex2 = mesh.vertices[index2];
+                Vector3 vertex3 = mesh.vertices[index3];
+
+                // Choose a random point on the triangle
+                float r1 = Random.Range(0f, 1f);
+                float r2 = Random.Range(0f, 1f);
+
+                if (r1 + r2 > 1f)
+                {
+                    r1 = 1f - r1;
+                    r2 = 1f - r2;
+                }
+
+                Vector3 randomPoint = vertex1 + r1 * (vertex2 - vertex1) + r2 * (vertex3 - vertex1);
+
+                // Convert the point from local space to world space
+                randomPoint = gameObject.transform.TransformPoint(randomPoint);
+
+                return randomPoint;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                return Vector3.zero;
+            }
+        }
         public static void SpawnDummyModel(Vector3 position, RoleTypeId role, string nick, Quaternion rotation, Vector3 scale)
         {
             try

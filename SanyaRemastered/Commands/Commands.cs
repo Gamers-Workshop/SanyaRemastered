@@ -52,13 +52,11 @@ namespace SanyaRemastered.Commands
             RegisterCommand(new AirBomb());
             RegisterCommand(new ColorRoom());
             RegisterCommand(new Explode());
-            //RegisterCommand(new Femur());
             RegisterCommand(new GeneratorControl());
             RegisterCommand(new Heli());
             RegisterCommand(new InfiniteAmmo());
             RegisterCommand(new Npcs());
             RegisterCommand(new NukeCap());
-            //RegisterCommand(new NukeLock());
             RegisterCommand(new PlayAmbiant());
             RegisterCommand(new Scale());
             RegisterCommand(new Scp914Prefix());

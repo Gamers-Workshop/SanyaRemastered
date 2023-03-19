@@ -66,10 +66,8 @@
     <Compile Include="Commands\DevCommands\Test.cs" />
     <Compile Include="Commands\DevCommands\WallTest.cs" />
     <Compile Include="Commands\DevCommands\WorkTest.cs" />
-    <Compile Include="Commands\FunCommands\Femur.cs" />
     <Compile Include="Commands\FunCommands\InfiniteAmmo.cs" />
     <Compile Include="Commands\FunCommands\NukeCap.cs" />
-    <Compile Include="Commands\FunCommands\NukeLock.cs" />
     <Compile Include="Commands\FunCommands\Scale.cs" />
     <Compile Include="Commands\FunCommands\Scp914.cs" />
     <Compile Include="Commands\FunCommands\Speed.cs" />
@@ -161,6 +159,9 @@
     </Reference>
     <Reference Include="Exiled.Updater">
       <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Updater.dll</HintPath>
+    </Reference>
+    <Reference Include="MapEditorReborn">
+      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\MapEditorReborn.dll</HintPath>
     </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
