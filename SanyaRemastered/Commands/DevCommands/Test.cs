@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminToys;
 using CommandSystem;
 using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Permissions.Extensions;
 using Mirror;
+using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079;
+using PlayerRoles.PlayableScps.Scp079.Pinging;
+using RelativePositioning;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -21,14 +27,13 @@ namespace SanyaRemastered.Commands.DevCommands
         public string Description => "The test command";
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "NetworkClient";
-            foreach (var i in NetworkClient.prefabs)
-                Log.Debug($"{i.Key} , {i.Value}");
+            if (!sender.CheckPermission($"sanya.dev"))
+            {
+                response = $"You don't have permission to execute this command. Required permission: sanya.dev";
+                return false;
+            }
 
-            response = "CustomNetworkManager";
-            foreach (var i in CustomNetworkManager.singleton.spawnPrefabs)
-                Log.Debug($"Name : {i.name} gameObject.name : {i.gameObject.name}");
-
+            response = $"ok.";
             return true;
         }
     }

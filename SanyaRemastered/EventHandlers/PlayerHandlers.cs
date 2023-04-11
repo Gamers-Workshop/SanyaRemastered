@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using AudioPlayer;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -23,6 +24,7 @@ using PlayerStatsSystem;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
 using Scp914;
+using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +68,11 @@ namespace SanyaRemastered.EventHandlers
             //Component
             if (!ev.Player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out _))
                 ev.Player.GameObject.AddComponent<SanyaRemasteredComponent>();
+            try
+            {
+                Methods.AddPlayerAudio(ev.Player);
+            }
+            catch { }
         }
 
         public void OnPlayerDestroying(DestroyingEventArgs ev)
@@ -76,12 +83,17 @@ namespace SanyaRemastered.EventHandlers
                 Round.IsLocked = false;
                 Round.IsLobbyLocked = false;
             }
+            try
+            {
+                Methods.RemovePlayerAudio(ev.Player);
+            }
+            catch { }
         }
 
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
             Log.Debug($"[OnPlayerSetClass] {ev.Player.Nickname} -{ev.Reason}> {ev.NewRole}");
-            if (ev.Player.GameObject.TryGetComponent<ContainScpComponent>(out var comp1))
+            if (ev.Player.GameObject.TryGetComponent(out ContainScpComponent comp1))
                 UnityEngine.Object.Destroy(comp1);
 
             if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled)

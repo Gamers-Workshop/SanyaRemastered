@@ -41,6 +41,7 @@ namespace SanyaRemastered.Configs
         public int RandomRespawnPosPercent { get; set; } = -1;
         [Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
         public string DataDirectory { get; private set; } = string.Empty;
+        public string AudioSoundAirBomb { get; private set; } = "/home/scp/.config/EXILED/Configs/AudioAPI/Siren.ogg";
 
         [Description("Hud Activé")]
         public bool ExHudEnabled { get; set; } = false;

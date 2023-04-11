@@ -1,4 +1,5 @@
 ﻿using AdminToys;
+using AudioPlayer;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -21,6 +22,7 @@ using Mirror;
 using PlayerRoles;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
+using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -258,7 +260,21 @@ namespace SanyaRemastered.EventHandlers
                 NetworkServer.Spawn(light_GateA1.gameObject);
                 NetworkServer.Spawn(light_GateA2.gameObject);
             }
+            Timing.CallDelayed(Timing.WaitForOneFrame, () =>
+            {
+                try
+                {
+                    Plugin.plugin.FakeConnectionsIds.Add(Server.Host.Id,
+                        new FakeConnectionList()
+                        {
+                            fakeConnection = new(Server.Host.Id),
+                            audioplayer = AudioPlayerBase.Get(Server.Host.ReferenceHub),
+                            hubPlayer = Server.Host.ReferenceHub,
+                        });
+                }
+                catch { }
 
+            });
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
 

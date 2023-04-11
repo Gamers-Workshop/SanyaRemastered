@@ -9,18 +9,14 @@ namespace SanyaRemastered
 {
     public class FakeConnection : NetworkConnectionToClient
     {
-        public FakeConnection(int connectionId) : base(connectionId, false, 0f)
+        private static int Id = int.MaxValue;
+
+        public FakeConnection() : base(Id--, false, 0f)
         {
 
         }
 
-        public override string address
-        {
-            get
-            {
-                return "localhost";
-            }
-        }
+        public override string address => "localhost";
 
         public override void Send(ArraySegment<byte> segment, int channelId = 0)
         {

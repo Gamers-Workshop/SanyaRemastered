@@ -1,4 +1,5 @@
-﻿using Exiled.API.Features;
+﻿using AudioPlayer;
+using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Hints;
 using InventorySystem.Items.ThrowableProjectiles;
@@ -12,6 +13,7 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using RemoteAdmin;
 using RoundRestarting;
+using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +60,11 @@ namespace SanyaRemastered.Functions
                 AirBombWait = 0;
 
                 Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stoped", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
-                DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
+                try
+                {
+                    Methods.DiscordLog(":airplane_arriving: Arrêt  du bombardement\n");
+                }
+                catch { }
                 yield break;
             }
 
@@ -84,7 +90,7 @@ namespace SanyaRemastered.Functions
                 {
                     Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stop", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
                     DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
-                    Log.Info($"[AirSupportBomb] The AirBomb as stop");
+                    Log.Debug($"[AirSupportBomb] The AirBomb as stop");
                     yield break;
                 }
                 AirBombWait--;
@@ -93,13 +99,22 @@ namespace SanyaRemastered.Functions
             if (!IsAirBombGoing)
                 yield break;
             IsActuallyBombGoing = true;
-            Log.Info($"[AirSupportBomb] booting...");
-            DiscordLog.DiscordLog.Instance.LOG += ":airplane: Bombardement en cours\n";
-            //AudioPlayer.API.AudioController.PlayFromFile("/home/scp/.config/EXILED/Configs/AudioAPI/Siren.mp3", 60, true);
+            Log.Debug($"[AirSupportBomb] booting...");
+            try
+            {
+                Methods.DiscordLog(":airplane: Bombardement en cours\n");
+            }
+            catch { }
+
+            try
+            {
+                Methods.PlaySirenAudio();
+            }
+            catch { }
             Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
 
             yield return Timing.WaitForSeconds(5f);
-            Log.Info($"[AirSupportBomb] charging...");
+            Log.Debug($"[AirSupportBomb] charging...");
             {
                 int waitforready = 5;
                 while (waitforready >= 0)
@@ -113,16 +128,16 @@ namespace SanyaRemastered.Functions
                     yield return Timing.WaitForSeconds(1f);
                 }
             }
-            Log.Info($"[AirSupportBomb] throwing...");
+            Log.Debug($"[AirSupportBomb] throwing...");
             while (IsAirBombGoing)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                     Methods.Explode(Methods.RandomSurface());
                 yield return Timing.WaitForSeconds(0.1f);
                 if (TimeEnd != -1 && TimeEnd <= Time.deltaTime)
                 {
                     IsAirBombGoing = false;
-                    Log.Info($"[AirSupportBomb] TimeBombing:{TimeEnd}");
+                    Log.Debug($"[AirSupportBomb] TimeBombing:{TimeEnd}");
                     break;
                 }
                 yield return Timing.WaitForSeconds(0.1f);
@@ -130,9 +145,17 @@ namespace SanyaRemastered.Functions
 
             Cassie.MessageTranslated("outside zone termination completed", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombEnded);
             IsActuallyBombGoing = false;
-            DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
-            Log.Info($"[AirSupportBomb] Ended.");
-            //AudioPlayer.API.AudioController.LoopMusic = false;
+            try
+            {
+                Methods.DiscordLog(":airplane_arriving: Arrêt  du bombardement\n");
+            }
+            catch { }
+            Log.Debug($"[AirSupportBomb] Ended.");
+            try
+            {
+                Methods.StopSirenAudio();
+            }
+            catch { }
             yield break;
         }
     }
@@ -164,7 +187,6 @@ namespace SanyaRemastered.Functions
                 GameObject gameObject = null;
                 foreach (KeyValuePair<float, GameObject> Area in SurfaceBombArea)
                 {
-                    Log.Info($"RandomChance {RandomChance} {Area.Key}");
                     RandomChance -= Area.Key;
                     if (RandomChance <= 0)
                     {
@@ -202,7 +224,7 @@ namespace SanyaRemastered.Functions
                 Vector3 randomPoint = vertex1 + r1 * (vertex2 - vertex1) + r2 * (vertex3 - vertex1);
 
                 // Convert the point from local space to world space
-                randomPoint = gameObject.transform.TransformPoint(randomPoint);
+                randomPoint = gameObject.transform.TransformPoint(randomPoint) + Vector3.up * 0.25f;
 
                 return randomPoint;
             }
@@ -212,23 +234,47 @@ namespace SanyaRemastered.Functions
                 return Vector3.zero;
             }
         }
-        public static void SpawnDummyModel(Vector3 position, RoleTypeId role, string nick, Quaternion rotation, Vector3 scale)
+        public static void DiscordLog(string message)
+    => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10, id: Server.Host.Id);
+
+        public static void PlaySirenAudio() 
+            => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10, id: Server.Host.Id);
+        public static void StopSirenAudio() => AudioPlayer.API.AudioController.LoopAudio(false, Server.Host.Id);
+        public static void AddPlayerAudio(Player player)
+        {
+            FakeConnectionList fakeConnection = new()
+            {
+                fakeConnection = new(player.Id),
+                audioplayer = AudioPlayerBase.Get(player.ReferenceHub),
+                hubPlayer = player.ReferenceHub,
+            };
+
+            fakeConnection.audioplayer.Volume = 1f;
+            Plugin.plugin.FakeConnectionsIds.Add(player.Id, fakeConnection);
+        }
+        public static void RemovePlayerAudio(Player player) => Plugin.plugin.FakeConnectionsIds.Remove(player.Id);
+        public static ReferenceHub SpawnDummyModel(Vector3 position, RoleTypeId role, string nick, Vector3 rotation, Vector3 scale)
         {
             try
             {
-                GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-                CharacterClassManager characterClassManager = gameObject.GetComponent<CharacterClassManager>();
-                QueryProcessor queryProcessor = gameObject.GetComponent<QueryProcessor>();
-                gameObject.transform.localScale = scale;
-                gameObject.transform.rotation = rotation;
-                gameObject.transform.position = position;
-                characterClassManager._hub.roleManager.ServerSetRole(role, RoleChangeReason.RemoteAdmin);
-                characterClassManager.GodMode = true;
-                gameObject.GetComponent<NicknameSync>().Network_myNickSync = nick;
-                NetworkServer.Spawn(gameObject);
+                GameObject newPlayer = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
+                FakeConnection fakeConnection = new();
+                ReferenceHub hubPlayer = newPlayer.GetComponent<ReferenceHub>();
+                NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
+                hubPlayer.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
+                hubPlayer.characterClassManager._hub.roleManager.ServerSetRole(role, RoleChangeReason.RemoteAdmin);
+                hubPlayer.characterClassManager.GodMode = true;
+                newPlayer.GetComponent<NicknameSync>().Network_myNickSync = nick;
+                newPlayer.transform.localScale = scale;
+                newPlayer.transform.rotation = Quaternion.Euler(rotation);
+                newPlayer.transform.position = position;
+                return hubPlayer;
             }
             catch (Exception ex)
-            { Log.Error("Error In create Dummy " + ex); }
+            { 
+                Log.Error("Error In create Dummy " + ex);
+                return null;
+            }
         }
         public static bool IsStuck(Vector3 pos)
         {

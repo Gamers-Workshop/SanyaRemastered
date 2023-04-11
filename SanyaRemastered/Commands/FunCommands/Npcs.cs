@@ -6,6 +6,7 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
 using RemoteAdmin;
+using SanyaRemastered.Functions;
 using UnityEngine;
 
 
@@ -18,8 +19,7 @@ namespace SanyaRemastered.Commands.FunCommands
 
         public string[] Aliases => new string[] { };
 
-        public string Description => "Change the cap of the warhead";
-        int Id = int.MaxValue;
+        public string Description => "Spawn an npc";
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission($"sanya.{Command}"))
@@ -29,16 +29,13 @@ namespace SanyaRemastered.Commands.FunCommands
             }
 
             if (!int.TryParse(arguments.ElementAtOrDefault(0), out int number))
-                number = 1;
-            int count = 0;
+                number = 0;
+            int count = 1;
 
             do
             {
-                var newPlayer = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-                var fakeConnection = new FakeConnection(Id--);
-                var hubPlayer = newPlayer.GetComponent<ReferenceHub>();
-                NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
-                hubPlayer.characterClassManager.InstanceMode = ClientInstanceMode.ReadyClient;
+                Player player = Player.Get(sender) ?? Server.Host;
+                Methods.SpawnDummyModel(player.Position, player.Role.Type, player.CustomName, player.Rotation, player.Scale);
                 count++;
                 Log.Info($"TEST{count} <= {number}");
             }
