@@ -125,6 +125,7 @@ namespace SanyaRemastered.EventHandlers
             Coroutines.IsAirBombGoing = false;
             Coroutines.IsActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
+            Methods.SurfaceBombArea.Clear();
             if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
             {
                 foreach (Exiled.API.Features.TeslaGate tesla in Exiled.API.Features.TeslaGate.List)
