@@ -11,7 +11,7 @@ namespace SanyaRemastered
     {
         private static int Id = int.MaxValue;
 
-        public FakeConnection() : base(Id--, false, 0f)
+        public FakeConnection() : base(Id--)
         {
 
         }

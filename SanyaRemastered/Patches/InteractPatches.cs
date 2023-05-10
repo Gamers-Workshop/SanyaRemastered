@@ -119,25 +119,4 @@ namespace SanyaRemastered.Patches
 			}
 		}
 	}
-	[HarmonyPatch(typeof(PlayerInteract), nameof(PlayerInteract.UserCode_CmdUsePanel))]
-	public static class PlayerInteractUsePanel
-	{
-		public static bool Prefix(PlayerInteract __instance)
-		{
-			try
-			{
-				if (SanyaRemastered.Instance.Config.ScpCantInteract && SanyaRemastered.Instance.Config.ScpCantInteractList.TryGetValue("UseAlphaWarheadPanel", out List<RoleTypeId> roles))
-				{
-					if (roles.Contains(__instance._hub.roleManager.CurrentRole.RoleTypeId))
-						return false;
-				}
-				return true;
-			}
-			catch (System.Exception ex)
-			{
-				Log.Error(ex);
-				return true;
-			}
-		}
-	}
 }

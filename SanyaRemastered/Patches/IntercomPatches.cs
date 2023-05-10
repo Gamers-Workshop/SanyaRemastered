@@ -15,7 +15,7 @@ using VoiceChat;
 
 namespace SanyaRemastered.Patches
 {
-	[HarmonyPatch(typeof(IntercomDisplay), nameof(IntercomDisplay.Update))]
+	[HarmonyPatch(typeof(Intercom), nameof(Intercom.Update))]
 
 	class IntercomUpdateTextPatches
 	{

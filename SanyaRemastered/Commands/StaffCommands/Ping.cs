@@ -5,7 +5,6 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using Mirror;
-using Mirror.LiteNetLib4Mirror;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -32,7 +31,7 @@ namespace SanyaRemastered.Commands.StaffCommands
 			response = "Pings:\n";
 			foreach (var ply in Player.List)
 			{
-				response += $"{ply.Nickname} : {LiteNetLib4MirrorServer.Peers[ply.Connection.connectionId].Ping * 2}ms\n";
+				response += $"{ply.Nickname} : {ply.Ping}ms\n";
 			}
 			return true;
 		}

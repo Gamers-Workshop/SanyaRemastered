@@ -1,7 +1,9 @@
 ﻿using AudioPlayer;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using Footprinting;
 using Hints;
+using InventorySystem;
 using InventorySystem.Items.ThrowableProjectiles;
 using InventorySystem.Items.Usables.Scp330;
 using MapEditorReborn.API.Features.Objects;
@@ -19,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Utils;
 using Utils.Networking;
 using Random = UnityEngine.Random;
 
@@ -320,15 +323,13 @@ namespace SanyaRemastered.Functions
         }
         public static void Explode(Vector3 position, ReferenceHub hub = null)
         {
-            hub ??= Server.Host.ReferenceHub;
-            if (!CandyPink.TryGetGrenade(out ExplosionGrenade settingsReference))
-                return;
-
-            new CandyPink.CandyExplosionMessage
+            if (!InventoryItemLoader.TryGetItem(ItemType.GrenadeHE, out ThrowableItem throwableItem)
+                || throwableItem.Projectile is not ExplosionGrenade explosionGrenade)
             {
-                Origin = position
-            }.SendToAuthenticated(0);
-            ExplosionGrenade.Explode(new Footprinting.Footprint(hub), position, settingsReference);
+                return;
+            }
+            ExplosionUtils.ServerSpawnEffect(position, ItemType.GrenadeHE);
+            ExplosionGrenade.Explode(new Footprint(hub), position, explosionGrenade);
         }
         public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
         {
@@ -364,18 +365,6 @@ namespace SanyaRemastered.Functions
         }
         public static void SendTextHintNotEffect(this Player player, string text, float time) 
             => player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
-
-        public static void TargetSendRpc<T>(this ReferenceHub sendto, T target, string rpcName, NetworkWriter writer) where T : NetworkBehaviour
-        {
-            var msg = new RpcMessage
-            {
-                netId = target.netId,
-                componentIndex = target.ComponentIndex,
-                functionHash = target.GetType().FullName.GetStableHashCode() * 503 + rpcName.GetStableHashCode(),
-                payload = writer.ToArraySegment()
-            };
-            sendto?.characterClassManager.connectionToClient.Send(msg, 0);
-        }
         
         public static void MoveNetworkIdentityObject(NetworkIdentity identity, Vector3 pos)
         {
@@ -415,22 +404,6 @@ namespace SanyaRemastered.Functions
         }
 
        
-        public static void SendTargetRPCInternal(NetworkConnection conn, Type invokeClass, string rpcName, NetworkWriter writer, int channelId, uint netid, int componentindex)
-        {
-            if (!NetworkServer.active)
-            {
-                Debug.LogError("TargetRPC Function " + rpcName + " called on client.");
-                return;
-            }
-            RpcMessage msg = new()
-            {
-                netId = netid,
-                componentIndex = componentindex,
-                functionHash = GetMethodHash(invokeClass, rpcName),
-                payload = writer.ToArraySegment()
-            };
-            conn.Send(msg, channelId);
-        }
         private static int GetMethodHash(Type invokeClass, string methodName) => invokeClass.FullName.GetStableHashCode() * 503 + methodName.GetStableHashCode();
     }
     internal static class Extensions

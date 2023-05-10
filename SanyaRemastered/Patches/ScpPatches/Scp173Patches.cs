@@ -12,7 +12,7 @@ using UnityEngine;
 using Utils.Networking;
 
 namespace SanyaRemastered.Patches
-{
+{/*
     [HarmonyPatch(typeof(Scp173BreakneckSpeedsAbility), nameof(Scp173BreakneckSpeedsAbility.UpdateServerside))]
     public static class Scp173Patches
     {
@@ -68,5 +68,5 @@ namespace SanyaRemastered.Patches
 			}
 			return true;
 		}
-	}
+	}*/
 }

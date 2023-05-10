@@ -1,37 +1,20 @@
-﻿using AudioPlayer;
-using CustomPlayerEffects;
+﻿using CustomPlayerEffects;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.DamageHandlers;
-using Exiled.API.Features.Items;
 using Exiled.API.Features.Roles;
-using Exiled.Events.EventArgs;
 using Exiled.Events.EventArgs.Item;
 using Exiled.Events.EventArgs.Player;
-using Interactables.Interobjects;
-using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Armor;
-using InventorySystem.Items.Firearms.Modules;
-using InventorySystem.Items.Pickups;
 using InventorySystem.Items.Radio;
-using InventorySystem.Items.ThrowableProjectiles;
 using MapGeneration.Distributors;
 using MEC;
 using Mirror;
 using PlayerRoles;
-using PlayerStatsSystem;
-using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
-using Scp914;
-using SCPSLAudioApi.AudioCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Camera = Exiled.API.Features.Camera;
 
 
 namespace SanyaRemastered.EventHandlers
