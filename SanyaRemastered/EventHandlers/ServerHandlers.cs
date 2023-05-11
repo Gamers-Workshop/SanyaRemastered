@@ -81,7 +81,7 @@ namespace SanyaRemastered.EventHandlers
                     double slRamUsage = Ram.MemoryService.CurrentProcessRamUsage;
                     if (SanyaRemastered.Instance.Config.RamInfo)
                         DiscordLog.DiscordLog.Instance.LOGStaff += $"SL Ram Usage: {slRamUsage / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((slRamUsage / metrics.Total) * 100):0.##}%]\n";
-                    if (Player.List.Count() == 0)
+                    if (Player.List.IsEmpty())
                     {
                         if (plugin.Config.RamRestartNoPlayer < slRamUsage / 1024 && plugin.Config.RamRestartNoPlayer > 0)
                         {
