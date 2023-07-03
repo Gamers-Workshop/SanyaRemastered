@@ -3,6 +3,7 @@ using AudioPlayer;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs;
 using Exiled.Events.EventArgs.Map;
@@ -45,29 +46,6 @@ namespace SanyaRemastered.EventHandlers
 
 
         /** Update **/
-        internal IEnumerator<float> EverySecond()
-        {
-            while (true)
-            {
-                try
-                {
-                    if (plugin.Config.PainEffectStart > 0)
-                    {
-                        foreach (Player player in Player.List)
-                        {
-                            if (player.IsHuman && player.GetHealthAmountPercent() > SanyaRemastered.Instance.Config.PainEffectStart)
-                                player.EnableEffect<Disabled>(1.2f);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"[EverySecond] {e}");
-                }
-                //Chaque seconde
-                yield return Timing.WaitForSeconds(1f);
-            }
-        }
         internal IEnumerator<float> Every30minute()
         {
             yield return Timing.WaitForSeconds(30f);
@@ -77,15 +55,40 @@ namespace SanyaRemastered.EventHandlers
                 {
                     MemoryMetrics metrics = Ram.MemoryService.CurrentTotalMetrics;
                     if (SanyaRemastered.Instance.Config.RamInfo)
-                        DiscordLog.DiscordLog.Instance.LOGStaff += $"Total Ram Usage: {metrics.Used / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((metrics.Used / metrics.Total) * 100):0.##}%]\n";
+                        try
+                        {
+                            Methods.DiscordLogPlayer($"Total Ram Usage: {metrics.Used / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((metrics.Used / metrics.Total) * 100):0.##}%]\n");
+                        }
+                        catch (Exception ex){
+
+                            Log.Error(ex);
+                        }
                     double slRamUsage = Ram.MemoryService.CurrentProcessRamUsage;
                     if (SanyaRemastered.Instance.Config.RamInfo)
-                        DiscordLog.DiscordLog.Instance.LOGStaff += $"SL Ram Usage: {slRamUsage / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((slRamUsage / metrics.Total) * 100):0.##}%]\n";
+                        try
+                        {
+                            Methods.DiscordLogStaff($"SL Ram Usage: {slRamUsage / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((slRamUsage / metrics.Total) * 100):0.##}%]\n");
+                        }
+                        catch (Exception ex)
+                        {
+
+                            Log.Error(ex);
+                        }
+
                     if (Player.List.IsEmpty())
                     {
                         if (plugin.Config.RamRestartNoPlayer < slRamUsage / 1024 && plugin.Config.RamRestartNoPlayer > 0)
                         {
-                            DiscordLog.DiscordLog.Instance.LOGStaff += $"**The Ram exceed the limit NP**:\n";
+                            try
+                            {
+                                Methods.DiscordLogStaff($"**The Ram exceed the limit NP**:\n");
+                            }
+                            catch (Exception ex)
+                            {
+
+                                Log.Error(ex);
+                            }
+
                             RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.RestartServer(), Segment.RealtimeUpdate));
                         }
                     }
@@ -93,7 +96,16 @@ namespace SanyaRemastered.EventHandlers
                     {
                         if (plugin.Config.RamRestartWithPlayer < slRamUsage / 1024 && plugin.Config.RamRestartWithPlayer > 0)
                         {
-                            DiscordLog.DiscordLog.Instance.LOGStaff += $"**The Ram exceed the limit WP**:\n";
+                            try
+                            {
+                                Methods.DiscordLogStaff($"**The Ram exceed the limit WP**:\n");
+                            }
+                            catch (Exception ex)
+                            {
+
+                                Log.Error(ex);
+                            }
+
                             RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.RestartServer(), Segment.RealtimeUpdate));
                         }
                     }
@@ -109,7 +121,6 @@ namespace SanyaRemastered.EventHandlers
         }
         /** Flag Params **/
         public bool StopRespawn = false;
-        public List<Vector3> DecalList = new();
 
         public List<CoroutineHandle> RoundCoroutines { get => roundCoroutines; set => roundCoroutines = value; }
 
@@ -119,183 +130,12 @@ namespace SanyaRemastered.EventHandlers
                 RoundCoroutines.Add(Timing.RunCoroutine(Every30minute(), Segment.RealtimeUpdate));
             loaded = true;
 
-            RoundCoroutines.Add(Timing.RunCoroutine(EverySecond(), Segment.FixedUpdate));
-
-            DecalList.Clear();
             Coroutines.IsAirBombGoing = false;
             Coroutines.IsActuallyBombGoing = false;
             Coroutines.AirBombWait = 0;
             Methods.SurfaceBombArea.Clear();
-            if (SanyaRemastered.Instance.Config.TeslaRange != 5.5f)
-            {
-                foreach (Exiled.API.Features.TeslaGate tesla in Exiled.API.Features.TeslaGate.List)
-                {
-                    tesla.TriggerRange = SanyaRemastered.Instance.Config.TeslaRange;
-                }
-            }
-            if (plugin.Config.DisablePlayerLists)
-            {
-                foreach (NetworkIdentity identity in UnityEngine.Object.FindObjectsOfType<NetworkIdentity>())
-                {
-                    if (identity.name is "PlayerList")
-                    {
-                        playerlistnetid = identity.netId;
-                    }
-                }
-            }
-            if (plugin.Config.Scp096Real)
-            {
-                foreach (CheckpointDoor cp in UnityEngine.Object.FindObjectsOfType<CheckpointDoor>())
-                {
-                    if (!cp.TryGetComponent(out DoorNametagExtension name))
-                        continue;
-                    foreach (DoorVariant door in cp._subDoors)
-                    {
-                        if (door is not BreakableDoor dr)
-                            continue;
-                        dr.RemainingHealth = 750f;
-                        dr._ignoredDamageSources &= ~DoorDamageType.Scp096;
-                    }
-                }
-            }
-            /*if (plugin.Config.Scp914Effect)
-            {
-                if (NetworkClient.prefabs.TryGetValue(Guid.Parse("43658aa2-f339-6044-eb2b-937db0c2c4bd"), out GameObject player))
-                {
-                    if (player.name.Equals("Player"))
-                    {
-                        Transform playerEffects = player.transform.Find("PlayerEffects");
-
-                        GameObject effectObj = new("Scp914", typeof(Scp914));
-                        effectObj.transform.parent = playerEffects;
-                    }
-                }
-                PlayerEffectsController effectcontroller = UnityEngine.Object.FindObjectOfType<PlayerEffectsController>();
-
-                effectcontroller.AllEffects.Clear();
-                effectcontroller.syncEffectsIntensity.Clear();
-
-                effectcontroller.Awake();
-            }*/
-            if (plugin.Config.GateClosingAuto)
-            {
-                DoorNametagExtension.NamedDoors.TryGetValue("GATE_A", out DoorNametagExtension GateA);
-                GateA.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
-                DoorNametagExtension.NamedDoors.TryGetValue("GATE_B", out DoorNametagExtension GateB);
-                GateB.TargetDoor.gameObject.GetComponent<PryableDoor>().gameObject.AddComponent<GateTimerClose>();
-            }
-            if (plugin.Config.AddDoorsOnSurface)
-            {
-                Vector3 DoorScale = new(1f, 1f, 1.8f);
-                DoorSpawnpoint LCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("LCZ"));
-                DoorSpawnpoint EZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("EZ"));
-                DoorSpawnpoint HCZprefab = UnityEngine.Object.FindObjectsOfType<DoorSpawnpoint>().FirstOrDefault(x => x.TargetPrefab.name.Contains("HCZ"));
-
-                // Couloir spawn Chaos
-                DoorVariant door1 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -43.525f), Quaternion.Euler(Vector3.zero));
-                DoorVariant door2 = UnityEngine.Object.Instantiate(LCZprefab.TargetPrefab, new Vector3(14.425f, 995.2f, -23.2f), Quaternion.Euler(Vector3.zero));
-                // Exit
-                DoorVariant door3 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(176.2f, 983.24f, 35.23f), Quaternion.Euler(Vector3.up * 180f));
-                DoorVariant door4 = UnityEngine.Object.Instantiate(EZprefab.TargetPrefab, new Vector3(174.4f, 983.24f, 29.1f), Quaternion.Euler(Vector3.up * 90f));
-                //Scale
-                door1.transform.localScale = DoorScale;
-                door2.transform.localScale = DoorScale;
-                door3.transform.localScale = DoorScale;
-                door4.transform.localScale = DoorScale;
-                //name
-                door3.gameObject.AddComponent<DoorNametagExtension>().UpdateName("EXIT_1");
-                door4.gameObject.AddComponent<DoorNametagExtension>().UpdateName("EXIT_2");
-                //spawn
-                NetworkServer.Spawn(door1.gameObject);
-                NetworkServer.Spawn(door2.gameObject);
-                NetworkServer.Spawn(door3.gameObject);
-                NetworkServer.Spawn(door4.gameObject);
-            }
-            if (plugin.Config.EditObjectsOnSurface)
-            {
-                //Prefabの確保
-                GameObject primitivePrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("Primitive"));
-                GameObject lightPrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("LightSource"));
-                /*GameObject stationPrefab = CustomNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name.Contains("Station"));
-
-                //MTF
-                GameObject station1 = UnityEngine.Object.Instantiate(stationPrefab, new(147.9f, 992.77f, -46.2f), Quaternion.Euler(Vector3.up * 90f));
-                //CI
-                GameObject station2 = UnityEngine.Object.Instantiate(stationPrefab, new(10.37f, 987.5f, -47.5f), Quaternion.Euler(Vector3.up * 180f));*/
-
-                //Light Nuke Red
-                LightSourceToy light_nuke = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_nuke.transform.position = new(40.75f, 991f, -35.75f);
-                light_nuke.NetworkLightRange = 4.5f;
-                light_nuke.NetworkLightIntensity = 2f;
-                light_nuke.NetworkLightColor = Color.red;
-
-                //Lumiére dans le couloir de la GateA 
-                LightSourceToy light_GateA1 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_GateA1.transform.position = new(-1, 1005.2f, -37);
-                light_GateA1.NetworkLightRange = 6f;
-                light_GateA1.NetworkLightIntensity = 1f;
-                light_GateA1.NetworkLightColor = Color.white;
-
-                LightSourceToy light_GateA2 = UnityEngine.Object.Instantiate(lightPrefab.GetComponent<LightSourceToy>());
-                light_GateA2.transform.position = new(-1, 1005.2f, -29.5f);
-                light_GateA2.NetworkLightRange = 6f;
-                light_GateA2.NetworkLightIntensity = 1f;
-                light_GateA2.NetworkLightColor = Color.white;
-
-                //SCP-106 Do not go on Container Of 106
-                Room room106 = Room.List.First(x => x.Type == RoomType.Hcz106);
-
-                PrimitiveObjectToy wall_106 = UnityEngine.Object.Instantiate(primitivePrefab.GetComponent<PrimitiveObjectToy>());
-                wall_106.transform.SetParentAndOffset(room106.transform, new(7.2f, 2.6f, -14.3f));
-                wall_106.transform.localScale = new(20, 5, 14);
-                if (room106.transform.forward == Vector3.left || room106.transform.forward == Vector3.right)
-                    wall_106.transform.rotation = Quaternion.Euler(Vector3.up * 90f);
-                wall_106.UpdatePositionServer();
-                wall_106.NetworkPrimitiveType = PrimitiveType.Cube;
-                /*
-                NetworkServer.Spawn(station1);
-                NetworkServer.Spawn(station2);
-                */
-                NetworkServer.Spawn(light_nuke.gameObject);
-                NetworkServer.Spawn(light_GateA1.gameObject);
-                NetworkServer.Spawn(light_GateA2.gameObject);
-            }
-            Timing.CallDelayed(Timing.WaitForOneFrame, () =>
-            {
-                try
-                {
-                    Plugin.plugin.FakeConnectionsIds.Add(Server.Host.Id,
-                        new FakeConnectionList()
-                        {
-                            fakeConnection = new(Server.Host.Id),
-                            audioplayer = AudioPlayerBase.Get(Server.Host.ReferenceHub),
-                            hubPlayer = Server.Host.ReferenceHub,
-                        });
-                }
-                catch { }
-
-            });
+            SanyaRemastered.Instance.PlayerHandlers.Scp0492UserID.Clear();
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
-        }
-
-        public void OnRoundStart()
-        {
-            Timing.CallDelayed(1f, () =>
-            {
-                if (Player.Get(RoleTypeId.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
-                {
-                    Door.Get(door.TargetDoor).IsOpen = true;
-                }
-            });
-            Timing.CallDelayed(5f, () =>
-            {
-                if (Player.Get(RoleTypeId.Scp049).Any() && DoorNametagExtension.NamedDoors.TryGetValue("049_GATE", out DoorNametagExtension door))
-                {
-                    Door.Get(door.TargetDoor).IsOpen = true;
-                }
-            });
-            Log.Info($"[OnRoundStart] Round Start!");
         }
 
         public void OnRoundEnd(RoundEndedEventArgs ev)
@@ -316,10 +156,6 @@ namespace SanyaRemastered.EventHandlers
             foreach (Player player in Player.List)
                 if (player.GameObject.TryGetComponent(out SanyaRemasteredComponent comp))
                     UnityEngine.Object.Destroy(comp);
-            foreach (Player player in Player.List)
-                if (player.GameObject.TryGetComponent(out ContainScpComponent comp))
-                    UnityEngine.Object.Destroy(comp);
-            SanyaRemasteredComponent._scplists.Clear();
 
             foreach (CoroutineHandle cor in RoundCoroutines)
                 Timing.KillCoroutines(cor);
@@ -341,13 +177,11 @@ namespace SanyaRemastered.EventHandlers
         {
             Log.Debug($"[OnWarheadCancel] {ev.Player?.Nickname}");
 
-            //if (AlphaWarheadController.Singleton._isLocked) return;
-
             if (SanyaRemastered.Instance.Config.CloseDoorsOnNukecancel)
             {
                 foreach (Door door in Door.List)
-                    if (door.Base.NetworkActiveLocks is (ushort)DoorLockReason.Warhead)
-                        door.Base.NetworkTargetState = false;
+                    if (door.DoorLockType is DoorLockType.Warhead)
+                        door.IsOpen = false;
             }
         }
 
@@ -360,19 +194,6 @@ namespace SanyaRemastered.EventHandlers
                 RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaRemastered.Instance.Config.OutsidezoneTerminationTimeAfterNuke), Segment.FixedUpdate));
             }
         }
-
-        public void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
-        {
-            if (SanyaRemastered.Instance.Config.GrenadeEffect)
-            {
-                foreach (Player ply in Player.List)
-                {
-                    float dis = Vector3.Distance(ev.Position, ply.Position);
-                    if (dis >= 15) continue;
-                    ply.ReferenceHub.playerEffectsController.EnableEffect<Deafened>(20f / dis, true);
-                }
-            }
-        }
         public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
         {
             Log.Debug($"[OnGeneratorFinish] {ev.Generator.Room.Type}");
@@ -382,64 +203,30 @@ namespace SanyaRemastered.EventHandlers
         }
         public void OnPlacingBulletHole(PlacingBulletHole ev)
         {
-            if (Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit Debug))
-                Log.Info($"LayerMask zis {Debug.collider?.gameObject?.layer}");
-
             // Smoke Grenade Pickup ButtonDoor
             if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))
                 return;
-            if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickup))
-            {
-                if (SanyaRemastered.Instance.Config.GrenadeShootFuse)
-                {
-                    TimeGrenade timeGrenade = raycastHit.transform.GetComponentInParent<TimeGrenade>();
-                    if (timeGrenade is not null && timeGrenade.Info.ItemId is not ItemType.SCP018)
-                    {
-                        if (timeGrenade.Info.ItemId is ItemType.GrenadeHE)
-                            Methods.Explode(pickup.Info.Position, ev.Player.ReferenceHub);
-                        else
-                            Methods.SpawnGrenade(pickup.Info.Position, timeGrenade.Info.ItemId, 0.1f, ev.Player);
-                        pickup.DestroySelf();
-
-                        return;
-                    }
-                }
-                if (SanyaRemastered.Instance.Config.ItemShootMove)
-                {
-                    if (pickup.Info.ItemId > ItemType.KeycardO5)
-                        pickup.Rb.AddExplosionForce(Mathf.Min(1 / pickup.Info.Weight * 4, 5), ev.Player.Position, 500f, 3f, ForceMode.Impulse);
-
-                    pickup.PreviousOwner = ev.Player.Footprint;
-                    return;
-                }
-            }
-
             if (SanyaRemastered.Instance.Config.OpenDoorOnShoot)
             {
                 BasicDoor basicDoor = raycastHit.transform.GetComponentInParent<BasicDoor>();
                 if (basicDoor is not null)
                 {
-                    if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed 
-                        || basicDoor.GetExactState() is not (1f or 0f) 
-                        || basicDoor.NetworkActiveLocks is not 0) 
+                    if ((basicDoor is IDamageableDoor damageableDoor) && damageableDoor.IsDestroyed
+                        || basicDoor.GetExactState() is not (1f or 0f)
+                        || basicDoor.NetworkActiveLocks is not 0)
                         return;
 
                     if (basicDoor.RequiredPermissions.RequiredPermissions is Interactables.Interobjects.DoorUtils.KeycardPermissions.None && basicDoor is not PryableDoor)
                         basicDoor.ServerInteract(ev.Player.ReferenceHub, 0);
                 }
             }
-        }
-        public void OnChangingIntoGrenade(ChangingIntoGrenadeEventArgs ev)
-        {
-            if (plugin.Config.GrenadeChainSametiming && ev.Pickup is TimeGrenadeProjectile timeGrenadeProjectile)
-                timeGrenadeProjectile.FuseTime = 0.1f;
-        }
-
-        public void OnPlayerDamageWindow(DamagingWindowEventArgs ev)
-        {
-            if (plugin.Config.ContainCommand && ev.Window.Type is GlassType.Scp049)
+            if (SanyaRemastered.Instance.Config.ItemShootMove && raycastHit.transform.TryGetComponent(out Rigidbody rigidbody))
             {
-                ev.Handler.DealtHealthDamage = 0;
+                if (raycastHit.transform.TryGetComponent(out ItemPickupBase pickupBase))
+                {
+                    pickupBase.PreviousOwner = ev.Player.Footprint;
+                }
+                rigidbody.AddExplosionForce(Mathf.Min(1 / rigidbody.mass * 4 + 1, 5), ev.Player.Position, 500f, 3f, ForceMode.Impulse);
             }
         }
     }

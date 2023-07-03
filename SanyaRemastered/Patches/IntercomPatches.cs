@@ -19,20 +19,20 @@ namespace SanyaRemastered.Patches
 
 	class IntercomUpdateTextPatches
 	{
-		public static void Prefix(IntercomDisplay __instance)
+		public static void Prefix(Intercom __instance)
 		{
             try
             {
                 if (!string.IsNullOrEmpty(SanyaRemastered.Instance.SpecialTextIntercom))
                 {
-                    __instance.Network_overrideText = SanyaRemastered.Instance.SpecialTextIntercom;
+                    IntercomDisplay._singleton.Network_overrideText = SanyaRemastered.Instance.SpecialTextIntercom;
                     return;
                 }
                 if (!SanyaRemastered.Instance.Config.IntercomInformation || Warhead.Controller is null)
                     return;
                 if (Room.Get(RoomType.EzIntercom)?.AreLightsOff ?? false && SanyaRemastered.Instance.Config.IntercomBrokenOnBlackout)
                 {
-                    __instance.Network_overrideText = " ";
+                    IntercomDisplay._singleton.Network_overrideText = " ";
 
                     if (ExiledIntercom.InUse)
                         ExiledIntercom.Timeout();
@@ -53,7 +53,7 @@ namespace SanyaRemastered.Patches
                 }
                 totalvoltagefloat = Mathf.CeilToInt(totalvoltagefloat);
 
-                StringBuilder stringBuilder = new($"<color=#fffffff>────── Centre d'information FIM Epsilon-11 ──────</color>\n" +
+                StringBuilder stringBuilder = new($"<nobr><color=#FFFFFF>───── Centre d'information FIM Epsilon-11 ─────</color></nobr>\n" +
                             $"Durée de la brèche : {RoundSummary.roundTime / 60:00}:{RoundSummary.roundTime % 60:00}\n" +
                             $"SCP restants : {RoundSummary.singleton.CountTeam(Team.SCPs) - RoundSummary.singleton.CountRole(RoleTypeId.Scp0492):00}/{RoundSummary.singleton.classlistStart.scps_except_zombies:00}\n" +
                             $"Classe-D restants : {RoundSummary.singleton.CountTeam(Team.ClassD):00}/{RoundSummary.singleton.classlistStart.class_ds:00}\n" +
@@ -108,9 +108,9 @@ namespace SanyaRemastered.Patches
                     stringBuilder.Append($"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}\n");
 
                 //Speak Intercom
-                stringBuilder.Append(SpeakIntercom(__instance));
+                stringBuilder.Append(SpeakIntercom());
 
-                __instance.Network_overrideText = stringBuilder.ToString();
+                IntercomDisplay._singleton.Network_overrideText = stringBuilder.ToString();
                 stringBuilder.Clear();
                 return;
             }
@@ -120,14 +120,14 @@ namespace SanyaRemastered.Patches
             }
         }
 
-        public static string SpeakIntercom(IntercomDisplay __instance) => Intercom.State switch
+        public static string SpeakIntercom() => Intercom.State switch
         {
             IntercomState.Ready => VoiceChatMuteIndicator.ReceivedFlags > VcMuteFlags.None ? "<color=#ff0000>Accréditation insuffisante.</color>" : "Intercom prêt à l'emploi.",
             IntercomState.Starting => "Attendez que l'intercom soit en ligne",
-            IntercomState.InUse => __instance._icom.BypassMode ? 
+            IntercomState.InUse => IntercomDisplay._singleton._icom.BypassMode ? 
                                       $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} à une diffusion prioritaire" 
-                                    : $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} Diffuse : {Mathf.Round(__instance._icom.RemainingTime)} seconde{(__instance._icom.RemainingTime <= 1 ? "" : "s")}",
-            IntercomState.Cooldown => $"Temps avant redémarrage : {Mathf.Round(__instance._icom._cooldownTime)} seconde{(__instance._icom._cooldownTime <= 1 ? "" : "s")}",
+                                    : $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} Diffuse : {Mathf.Round(IntercomDisplay._singleton._icom.RemainingTime)} seconde{(IntercomDisplay._singleton._icom.RemainingTime <= 1 ? "" : "s")}",
+            IntercomState.Cooldown => $"Temps avant redémarrage : {(int)ExiledIntercom.RemainingCooldown} seconde{(ExiledIntercom.RemainingCooldown <= 1 ? "" : "s")}",
             IntercomState.NotFound => $"Unknown",
             _ => "ERROR",
         };

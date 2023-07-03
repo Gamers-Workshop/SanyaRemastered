@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Diagnostics;
 
 using SanyaRemastered.Configs;
+using DiscordLog;
 
 namespace SanyaRemastered
 {
@@ -35,7 +36,7 @@ namespace SanyaRemastered
 		public override PluginPriority Priority => (PluginPriority) (-1);
 
 		public static SanyaRemastered Instance { get; private set; }
-		public EventHandlers.ServerHandlers ServerHandlers { get; private set; }
+        public EventHandlers.ServerHandlers ServerHandlers { get; private set; }
 		public EventHandlers.PlayerHandlers PlayerHandlers { get; private set; }
 		public EventHandlers.ScpHandlers ScpHandlers { get; private set; }
 
@@ -43,15 +44,14 @@ namespace SanyaRemastered
 		public Random Random { get; } = new Random();
 		private int patchCounter;
 
-		public SanyaRemastered() => Instance = this;
 		private Ram.MemoryService _memoryService;
 
 		public string SpecialTextIntercom = null;
 		public override void OnEnabled()
-		{
-			if (!Config.IsEnabled) return;
-			
-			int processId = Process.GetCurrentProcess().Id;
+        {
+            Instance = this;
+
+            int processId = Process.GetCurrentProcess().Id;
 			_memoryService = new(processId);
 			//Only run if memory is going to be asked for
 			if (Config.RamInfo)
@@ -69,8 +69,6 @@ namespace SanyaRemastered
 		}
         public override void OnReloaded()
         {
-			if (!Config.IsEnabled) return;
-
 			int processId = Process.GetCurrentProcess().Id;
 			_memoryService = new(processId);
 			//Only run if memory is going to be asked for
@@ -110,7 +108,6 @@ namespace SanyaRemastered
 
 			//
 			ServerEvents.WaitingForPlayers += ServerHandlers.OnWaintingForPlayers;
-			ServerEvents.RoundStarted += ServerHandlers.OnRoundStart;
 			ServerEvents.RoundEnded += ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound += ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam += ServerHandlers.OnTeamRespawn;
@@ -118,56 +115,28 @@ namespace SanyaRemastered
 			WarheadEvents.Stopping += ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated += ServerHandlers.OnDetonated;
 			
-			MapEvents.ExplodingGrenade += ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
-			MapEvents.ChangingIntoGrenade += ServerHandlers.OnChangingIntoGrenade;
-
-            PlayerEvents.PreAuthenticating += PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
-			PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.ChangingRole += PlayerHandlers.OnChangingRole;
-			PlayerEvents.Spawning += PlayerHandlers.OnPlayerSpawning;
+            PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurting;
 
 			PlayerEvents.Died += PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
-			PlayerEvents.FailingEscapePocketDimension  += PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingRequest += PlayerHandlers.OnThrowingRequest;
-			PlayerEvents.UsingItem += PlayerHandlers.OnPlayerUsingItem;
-			PlayerEvents.UsedItem += PlayerHandlers.OnPlayerUsedItem;
-			PlayerEvents.TriggeringTesla += PlayerHandlers.OnPlayerTriggerTesla;
-			PlayerEvents.InteractingDoor += PlayerHandlers.OnPlayerDoorInteract;
-			PlayerEvents.InteractingLocker += PlayerHandlers.OnPlayerLockerInteract;
-			PlayerEvents.InteractingElevator += PlayerHandlers.OnInteractingElevator;
 
 			ItemEvents.ChangingAmmo += PlayerHandlers.OnChangingAmmo;
-            PlayerEvents.Shooting += PlayerHandlers.OnShooting;
 			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel += PlayerHandlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator += PlayerHandlers.OnGeneratorUnlock;
-			PlayerEvents.StoppingGenerator += PlayerHandlers.OnStoppingGenerator;
-			PlayerEvents.OpeningGenerator  += PlayerHandlers.OnGeneratorOpen;
-			PlayerEvents.ClosingGenerator += PlayerHandlers.OnGeneratorClose;
 			PlayerEvents.ActivatingGenerator += PlayerHandlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing += PlayerHandlers.OnHandcuffing;
-			PlayerEvents.ProcessingHotkey += PlayerHandlers.OnProcessingHotkey;
+			Scp096Events.AddingTarget += ScpHandlers.OnAddingTarget;
+        }
 
-			Scp079Events.GainingLevel += ScpHandlers.On079LevelGain;
-			Scp914Events.UpgradingPlayer += ScpHandlers.On914UpgradingPlayer;
-
-			/*Scp096Events.AddingTarget += ScpHandlers.On096AddingTarget;
-			Scp096Events.Enraging += ScpHandlers.On096Enraging;
-			Scp096Events.CalmingDown += ScpHandlers.On096CalmingDown;*/
-
-			Scp049Events.FinishingRecall += ScpHandlers.On049FinishingRecall;
-		}
-
-		private void UnRegistEvents()
+        private void UnRegistEvents()
 		{
 			ServerEvents.WaitingForPlayers -= ServerHandlers.OnWaintingForPlayers;
-			ServerEvents.RoundStarted -= ServerHandlers.OnRoundStart;
 			ServerEvents.RoundEnded -= ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound -= ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam -= ServerHandlers.OnTeamRespawn;
@@ -175,50 +144,24 @@ namespace SanyaRemastered
 			WarheadEvents.Stopping -= ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated -= ServerHandlers.OnDetonated;
 			
-			MapEvents.ExplodingGrenade -= ServerHandlers.OnExplodingGrenade;
 			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
-			MapEvents.ChangingIntoGrenade -= ServerHandlers.OnChangingIntoGrenade;
-
-			PlayerEvents.PreAuthenticating -= PlayerHandlers.OnPreAuth;
 			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
-			PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
-			PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
-			PlayerEvents.Spawning -= PlayerHandlers.OnPlayerSpawning;
+            PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
+            PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
 			PlayerEvents.SpawningRagdoll -= PlayerHandlers.OnSpawningRagdoll;
-			PlayerEvents.FailingEscapePocketDimension -= PlayerHandlers.OnPocketDimDeath;
-			PlayerEvents.ThrowingRequest -= PlayerHandlers.OnThrowingRequest;
-			PlayerEvents.UsingItem -= PlayerHandlers.OnPlayerUsingItem;
-			PlayerEvents.UsedItem -= PlayerHandlers.OnPlayerUsedItem;
-			PlayerEvents.TriggeringTesla -= PlayerHandlers.OnPlayerTriggerTesla;
-			PlayerEvents.InteractingDoor -= PlayerHandlers.OnPlayerDoorInteract;
-			PlayerEvents.InteractingLocker -= PlayerHandlers.OnPlayerLockerInteract;
-			PlayerEvents.InteractingElevator -= PlayerHandlers.OnInteractingElevator;
 
             ItemEvents.ChangingAmmo -= PlayerHandlers.OnChangingAmmo;
-            PlayerEvents.Shooting -= PlayerHandlers.OnShooting;
             PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
-			PlayerEvents.Jumping -= PlayerHandlers.OnJumping;
 			PlayerEvents.ActivatingWarheadPanel -= PlayerHandlers.OnActivatingWarheadPanel;
 			PlayerEvents.UnlockingGenerator -= PlayerHandlers.OnGeneratorUnlock;
-			PlayerEvents.StoppingGenerator -= PlayerHandlers.OnStoppingGenerator;
-			PlayerEvents.OpeningGenerator -= PlayerHandlers.OnGeneratorOpen;
-			PlayerEvents.ClosingGenerator -= PlayerHandlers.OnGeneratorClose;
 			PlayerEvents.ActivatingGenerator -= PlayerHandlers.OnActivatingGenerator;
 			PlayerEvents.Handcuffing -= PlayerHandlers.OnHandcuffing;
-			PlayerEvents.ProcessingHotkey -= PlayerHandlers.OnProcessingHotkey;
+            Scp096Events.AddingTarget -= ScpHandlers.OnAddingTarget;
 
-			Scp079Events.GainingLevel -= ScpHandlers.On079LevelGain;
-			Scp914Events.UpgradingPlayer -= ScpHandlers.On914UpgradingPlayer;
-
-			/*Scp096Events.AddingTarget -= ScpHandlers.On096AddingTarget;
-			Scp096Events.Enraging -= ScpHandlers.On096Enraging;
-			Scp096Events.CalmingDown -= ScpHandlers.On096CalmingDown;*/
-			Scp049Events.FinishingRecall -= ScpHandlers.On049FinishingRecall;
-
-			ServerHandlers = null;
+            ServerHandlers = null;
 			PlayerHandlers = null;
 			ScpHandlers = null;
 		}

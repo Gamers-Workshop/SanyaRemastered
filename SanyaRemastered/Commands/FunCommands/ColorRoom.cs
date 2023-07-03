@@ -31,10 +31,9 @@ namespace SanyaRemastered.Commands.FunCommands
 			{
 				if (arguments.Count > 1 && arguments.At(1).ToLower() == "reset")
 				{
-					foreach (var i in FlickerableLightController.Instances)
+					foreach (var i in Room.List)
 					{
-						i.WarheadLightColor = FlickerableLightController.DefaultWarheadColor;
-						i.WarheadLightOverride = false;
+						i.ResetColor();
 					}
 					response = "reset ok.";
 					return true;
@@ -42,10 +41,9 @@ namespace SanyaRemastered.Commands.FunCommands
 				if (arguments.Count > 1 && arguments.At(1).ToLower() == "rand")
 				{
 					System.Random rng = new();
-					foreach (var i in FlickerableLightController.Instances)
-					{
-						i.WarheadLightColor = new((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
-						i.WarheadLightOverride = true;
+                    foreach (var i in Room.List)
+                    {
+                        i.Color = new((float)rng.NextDouble(), (float)rng.NextDouble(), (float)rng.NextDouble());
 					}
 					response = "random color ok.";
 					return true;
@@ -55,10 +53,9 @@ namespace SanyaRemastered.Commands.FunCommands
 					&& float.TryParse(arguments.At(2), out var g)
 					&& float.TryParse(arguments.At(3), out var b))
 				{
-					foreach (var i in FlickerableLightController.Instances)
-					{
-						i.WarheadLightColor = new(r / 255f, g / 255f, b / 255f);
-						i.WarheadLightOverride = true;
+                    foreach (var i in Room.List)
+                    {
+                        i.Color = new(r / 255f, g / 255f, b / 255f);
 					}
 					response = $"color set:{r},{g},{b}";
 					return true;

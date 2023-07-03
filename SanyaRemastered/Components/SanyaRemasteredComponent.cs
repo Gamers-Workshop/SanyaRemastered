@@ -22,9 +22,6 @@ namespace SanyaRemastered
 {
 	public class SanyaRemasteredComponent : MonoBehaviour
 	{
-
-		public static readonly HashSet<Player> _scplists = new();
-
 		public bool DisableHud = false;
 
 		private SanyaRemastered _plugin;
@@ -50,11 +47,6 @@ namespace SanyaRemastered
 			_plugin = SanyaRemastered.Instance;
 			_player = Player.Get(gameObject);
 		}
-		private void OnDestroy()
-		{
-			if (_scplists.Contains(_player))
-				_scplists.Remove(_player);
-		}
 
 		private void FixedUpdate()
 		{
@@ -65,7 +57,6 @@ namespace SanyaRemastered
 			UpdateTimers();
 
 			UpdateRespawnCounter();
-			UpdateScpLists();
 			UpdateHint();
 			UpdateExHud();
 
@@ -119,20 +110,6 @@ namespace SanyaRemastered
 				_respawnCounter = 0;
 		}
 
-		private void UpdateScpLists()
-		{
-			if ((_player.Role.Team is not Team.SCPs || _player.Role.Type is RoleTypeId.Scp0492) && _scplists.Contains(_player))
-			{
-				_scplists.Remove(_player);
-				return;
-			}
-
-			if (_player.Role.Team is Team.SCPs && _player.Role.Type is not RoleTypeId.Scp0492 && !_scplists.Contains(_player))
-			{
-				_scplists.Add(_player);
-				return;
-			}
-		}
 		public void UpdateHint()
 		{
 			if (DisableHud || !_plugin.Config.ExHudEnabled || !(_timer > 1f)) return;
@@ -158,62 +135,19 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = string.Empty;
-			if (_player.Role is FpcRole fpcRole && fpcRole.IsInvisible)
+			if (_player.Role is FpcRole fpcRole1)
+				info += $"<alpha=#44>{fpcRole1.FirstPersonController.FpcModule.JumpSpeed}/{fpcRole1.FirstPersonController.FpcModule.Motor._maxFallSpeed}/{Mathf.Pow(fpcRole1.FirstPersonController.FpcModule.Motor._maxFallSpeed - 14.5f, 0.8f) * 31.4f + 10f}<alpha=#FF>\n";
+            if (_player.Role is FpcRole fpcRole && fpcRole.IsInvisible)
 				info += $"<b>vous êtes invisible</b> ";
-			{
-				curText = curText.Replace("([STATS])", info);
-			}
+			curText = curText.Replace("([STATS])", info);
 
 			//[LIST]
-			if (_player.Role.Team is Team.SCPs)
-			{
-				if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role is Scp079Role scp079role)
-				{
-					list.Append("<color=red><u>SCP</u>\n");
-					int Scp0492 = 0;
-					foreach (var scp in _scplists)
-						if (scp.Role.Type is not RoleTypeId.Scp079)
-							list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleName}:Tier{scp079role.Level + 1}\n");
-						else if (scp.Role.Type is not RoleTypeId.Scp0492)
-						list.Append($"{scp.ReferenceHub.roleManager.CurrentRole.RoleName}:{scp.CurrentRoom.Type}\n");
-						else
-							Scp0492++;
-					if (Scp0492 > 0)
-						list.Append($"Scp049-2:{Scp0492}\n");
-					list.Remove(list.Length - 2, 0);
-					list.Append("</color>");
-				}
-				if (SanyaRemastered.Instance.Config.ExHudScp096 && _player.Role.Is(out Scp096Role scp096) && scp096.Targets.Any())
-				{
-					var TargetList = scp096.Targets.OrderBy(x => Vector3.Distance(_player.Position, x.Position));
-					list.Append($"<color=red><u>SCP</u>\nTarget : {TargetList.Count()}\nDistance : {(int)Vector3.Distance(_player.Position, TargetList.First().Position)}m\n");
-
-					foreach (Room room in Room.List)
-                    {
-						int numberoftarget = room.Players.Count(p => TargetList.Contains(p));
-						if (numberoftarget is not 0)
-							list.Append($"{room.Type} : {numberoftarget}\n");
-					}
-					list.Remove(list.Length - 2, 0);
-					list.Append("</color>");
-				}
-				curText = curText.Replace("[LIST]", FormatStringForHud(list.ToString(), 7));
-				list.Clear();
-			}
-			else
-				curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 7));
+			curText = curText.Replace("[LIST]", FormatStringForHud(string.Empty, 7));
 
 			//[CENTER_UP]
 			curText = curText.Replace("[CENTER_UP]", FormatStringForHud(string.Empty, 6));
 
 			//[CENTER]
-			if (SanyaRemastered.Instance.Config.ExHudScp079Moreinfo && _player.Role.Type is RoleTypeId.Scp079 && _player.Zone is ZoneType.HeavyContainment)
-            {
-				string InfoGen = string.Empty;
-				foreach (Generator gen in Generator.Get(GeneratorState.Activating))
-					InfoGen += $"<color=#ffff00>({gen.Room.Type}){Mathf.FloorToInt(gen.CurrentTime) / 60:00} : {Mathf.FloorToInt(gen.CurrentTime) % 60:00}</color>\n";
-				curText = curText.Replace("[CENTER]", FormatStringForHud(InfoGen, 6));
-			}
 			curText = curText.Replace("[CENTER]", FormatStringForHud(string.Empty, 6));
 
 			
@@ -260,13 +194,6 @@ namespace SanyaRemastered
 				{
 					curText = curText.Replace("[BOTTOM]", FormatStringForHud(string.Empty, 2));
 				}
-			}
-			else if (SanyaRemastered.Instance.Config.Scp079ExtendEnabled && _player.Role.Type is RoleTypeId.Scp079)
-            {
-				if (Extensions.IsExmode(_player))
-					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Activé\n<size=25%>Utilisé vos racourcie d'arme pour passé en mode étendue<size=50%>", 2));
-				else 
-					curText = curText.Replace("[BOTTOM]", FormatStringForHud($"Mode étendue : Désactivé\n<size=25%>Utilisé vos racourcie d'arme désactivé votre mode étendue<size=50%>", 2));
 			}
 			else if (!string.IsNullOrWhiteSpace(SanyaRemastered.Instance.Config.IsBeta))
 				curText = curText.Replace("[BOTTOM]", FormatStringForHud(SanyaRemastered.Instance.Config.IsBeta, 2));

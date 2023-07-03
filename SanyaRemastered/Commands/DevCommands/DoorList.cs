@@ -31,12 +31,19 @@ namespace SanyaRemastered.Commands.DevCommands
 			foreach (var door in Door.List)
 			{
 				response += $"{door.Type} : {door.Zone} : {door.Nametag} : {door.GameObject.name}\n";
-			}
+            }
+            response += "--------------------------------------\n";
+
+            foreach (var door in Door.List.Where(x => x.Type is DoorType.Scp049Gate))
+            {
+                response += $"{door.Position.y}\n";
+            }
+
             response += "--------------------------------------\n";
 
             foreach (var door in Door.List.Where(x => x.Type is DoorType.UnknownDoor))
 			{
-                response += $"{door.Nametag} : {door.Room} : {door.Room?.gameObject.name}\n";
+                response += $"{door.Nametag?.GetName} : {door.Room} : {door.Room?.gameObject.name}\n";
             }
 
             return true;

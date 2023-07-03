@@ -35,7 +35,7 @@ namespace SanyaRemastered.Commands.FunCommands
             do
             {
                 Player player = Player.Get(sender) ?? Server.Host;
-                Methods.SpawnDummyModel(player.Position, player.Role.Type, player.CustomName, player.Rotation, player.Scale);
+                // Methods.SpawnDummyModel(player.Position, player.Role.Type, player.CustomName, player.Rotation, player.Scale);
                 count++;
                 Log.Info($"TEST{count} <= {number}");
             }

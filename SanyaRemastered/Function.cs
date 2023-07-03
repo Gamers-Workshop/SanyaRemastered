@@ -45,11 +45,11 @@ namespace SanyaRemastered.Functions
             if (ServerStatic.StopNextRound is ServerStatic.NextRoundAction.Restart)
             {
                 ServerStatic.StopNextRound = ServerStatic.NextRoundAction.DoNothing;
-                ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionResetEntry)); 
+                ServerConsole.AddOutputEntry(default); 
                 yield break;
             }
             ServerStatic.StopNextRound = ServerStatic.NextRoundAction.Restart;
-            ServerConsole.AddOutputEntry(default(ServerOutput.ExitActionRestartEntry));
+            ServerConsole.AddOutputEntry(default);
         }
         public static IEnumerator<float> AirSupportBomb(bool stop, int timewait = 0, float TimeEnd = -1f)
         {
@@ -65,13 +65,16 @@ namespace SanyaRemastered.Functions
                 Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stoped", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
                 try
                 {
-                    Methods.DiscordLog(":airplane_arriving: Arrêt  du bombardement\n");
+                    Methods.DiscordLogPlayer(":airplane_arriving: Arrêt  du bombardement\n");
                 }
                 catch { }
                 yield break;
             }
-
-            DiscordLog.DiscordLog.Instance.LOG += $":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n";
+            try
+            {
+                Methods.DiscordLogPlayer($":airplane_departure: Départ du bombardement dans {AirBombWait / 60:00}min {AirBombWait % 60:00}sec\n");
+            }
+            catch { }
 
             IsAirBombGoing = true;
             while (AirBombWait > 0)
@@ -92,7 +95,12 @@ namespace SanyaRemastered.Functions
                 if (!IsAirBombGoing)
                 {
                     Cassie.MessageTranslated("The Outside Zone emergency termination sequence as been stop", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStop);
-                    DiscordLog.DiscordLog.Instance.LOG += ":airplane_arriving: Arrêt  du bombardement\n";
+                    try
+                    {
+                        Methods.DiscordLogPlayer(":airplane_arriving: Arrêt  du bombardement\n");
+                    }
+                    catch { }
+
                     Log.Debug($"[AirSupportBomb] The AirBomb as stop");
                     yield break;
                 }
@@ -105,13 +113,13 @@ namespace SanyaRemastered.Functions
             Log.Debug($"[AirSupportBomb] booting...");
             try
             {
-                Methods.DiscordLog(":airplane: Bombardement en cours\n");
+                Methods.DiscordLogPlayer(":airplane: Bombardement en cours\n");
             }
             catch { }
 
             try
             {
-                Methods.PlaySirenAudio();
+                // Methods.PlaySirenAudio();
             }
             catch { }
             Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
@@ -150,13 +158,13 @@ namespace SanyaRemastered.Functions
             IsActuallyBombGoing = false;
             try
             {
-                Methods.DiscordLog(":airplane_arriving: Arrêt  du bombardement\n");
+                Methods.DiscordLogPlayer(":airplane_arriving: Arrêt  du bombardement\n");
             }
             catch { }
             Log.Debug($"[AirSupportBomb] Ended.");
             try
             {
-                Methods.StopSirenAudio();
+                // Methods.StopSirenAudio();
             }
             catch { }
             yield break;
@@ -237,9 +245,10 @@ namespace SanyaRemastered.Functions
                 return Vector3.zero;
             }
         }
-        public static void DiscordLog(string message)
-    => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10, id: Server.Host.Id);
+        public static void DiscordLogPlayer(string message) => DiscordLog.DiscordLog.Instance.LOG += message;
+        public static void DiscordLogStaff(string message) => DiscordLog.DiscordLog.Instance.LOGStaff += message;
 
+        /*
         public static void PlaySirenAudio() 
             => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10, id: Server.Host.Id);
         public static void StopSirenAudio() => AudioPlayer.API.AudioController.LoopAudio(false, Server.Host.Id);
@@ -278,7 +287,7 @@ namespace SanyaRemastered.Functions
                 Log.Error("Error In create Dummy " + ex);
                 return null;
             }
-        }
+        }*/
         public static bool IsStuck(Vector3 pos)
         {
             bool result = false;

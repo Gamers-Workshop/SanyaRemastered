@@ -18,7 +18,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -81,28 +81,20 @@
     <Compile Include="Commands\StaffCommands\List.cs" />
     <Compile Include="Commands\StaffCommands\Ping.cs" />
     <Compile Include="Commands\StaffCommands\Redirect.cs" />
-    <Compile Include="Components\ContainScpComponent.cs" />
-    <Compile Include="Components\FakeConnection.cs" />
-    <Compile Include="Components\GateTimerClose.cs" />
-    <Compile Include="Components\Scp914.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="EventHandlers\PlayerHandlers.cs" />
     <Compile Include="EventHandlers\ScpHandlers.cs" />
     <Compile Include="EventHandlers\ServerHandlers.cs" />
     <Compile Include="Function.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Patches\BreakableDoorPatches.cs" />
-    <Compile Include="Patches\FallDamagePatch.cs" />
     <Compile Include="Patches\HintDisplayPatches.cs" />
-    <Compile Include="Patches\InteractPatches.cs" />
-    <Compile Include="Patches\DoorInteractPatch.cs" />
     <Compile Include="Patches\CommandPatches\KillCommandPatches.cs" />
     <Compile Include="Patches\PatchHint.cs" />
     <Compile Include="Patches\PocketDimensionFix.cs" />
     <Compile Include="Patches\ProcessCollisionPatches.cs" />
+    <Compile Include="Patches\RoundInProgressFix.cs" />
     <Compile Include="Patches\ScpPatches\Scp079Patches.cs" />
     <Compile Include="Patches\IntercomPatches.cs" />
-    <Compile Include="Patches\RespawnPatches.cs" />
     <Compile Include="Patches\ScpPatches\Scp096Patches.cs" />
     <Compile Include="Patches\ScpPatches\Scp173Patches.cs" />
     <Compile Include="Patches\ServerDisconnectPatches.cs" />

@@ -11,7 +11,7 @@ namespace SanyaRemastered.Patches
         public static bool Prefix(CollisionDetectionPickup __instance, Collision collision)
         {
             float sqrMagnitude = collision.relativeVelocity.sqrMagnitude;
-            float num = __instance.Info.Weight * sqrMagnitude / 2f;
+            float num = __instance.Info.WeightKg * sqrMagnitude / 2f;
             __instance.MakeCollisionSound(sqrMagnitude);
 
             if (num <= 30f || !collision.collider.TryGetComponent(out BreakableWindow breakableWindow)) return false;
