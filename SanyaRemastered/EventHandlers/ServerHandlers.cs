@@ -57,7 +57,7 @@ namespace SanyaRemastered.EventHandlers
                     if (SanyaRemastered.Instance.Config.RamInfo)
                         try
                         {
-                            Methods.DiscordLogPlayer($"Total Ram Usage: {metrics.Used / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((metrics.Used / metrics.Total) * 100):0.##}%]\n");
+                            Methods.DiscordLogStaff($"Total Ram Usage: {metrics.Used / 1024:0.##}/{metrics.Total / 1024:0.##} Go [{((metrics.Used / metrics.Total) * 100):0.##}%]\n");
                         }
                         catch (Exception ex){
 

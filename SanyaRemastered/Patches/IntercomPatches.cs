@@ -122,7 +122,7 @@ namespace SanyaRemastered.Patches
 
         public static string SpeakIntercom() => Intercom.State switch
         {
-            IntercomState.Ready => VoiceChatMuteIndicator.ReceivedFlags > VcMuteFlags.None ? "<color=#ff0000>Accréditation insuffisante.</color>" : "Intercom prêt à l'emploi.",
+            IntercomState.Ready => "Intercom prêt à l'emploi.",
             IntercomState.Starting => "Attendez que l'intercom soit en ligne",
             IntercomState.InUse => IntercomDisplay._singleton._icom.BypassMode ? 
                                       $"{ExiledIntercom.Speaker?.DisplayNickname ?? "(null)"} à une diffusion prioritaire" 
