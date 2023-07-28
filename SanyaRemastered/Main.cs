@@ -25,6 +25,7 @@ using System.Diagnostics;
 
 using SanyaRemastered.Configs;
 using DiscordLog;
+using PlayerRoles.Ragdolls;
 
 namespace SanyaRemastered
 {
@@ -119,11 +120,12 @@ namespace SanyaRemastered
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.ChangingRole += PlayerHandlers.OnChangingRole;
+			PlayerEvents.Spawned += PlayerHandlers.OnSpawned;
             PlayerEvents.Destroying += PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurting;
 
 			PlayerEvents.Died += PlayerHandlers.OnDied;
-			PlayerEvents.SpawningRagdoll += PlayerHandlers.OnSpawningRagdoll;
+			RagdollManager.OnRagdollSpawned += PlayerHandlers.OnSpawningRagdoll;
 
 			ItemEvents.ChangingAmmo += PlayerHandlers.OnChangingAmmo;
 			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
@@ -147,11 +149,12 @@ namespace SanyaRemastered
 			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
 			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
-            PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
+			PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
+            PlayerEvents.Spawned -= PlayerHandlers.OnSpawned;
             PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
-			PlayerEvents.SpawningRagdoll -= PlayerHandlers.OnSpawningRagdoll;
+            RagdollManager.OnRagdollSpawned -= PlayerHandlers.OnSpawningRagdoll;
 
             ItemEvents.ChangingAmmo -= PlayerHandlers.OnChangingAmmo;
             PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;

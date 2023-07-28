@@ -135,8 +135,6 @@ namespace SanyaRemastered
 			string curText = _hudTemplate;
 			//[LEFT_UP]
 			string info = string.Empty;
-			if (_player.Role is FpcRole fpcRole1)
-				info += $"<alpha=#44>{fpcRole1.FirstPersonController.FpcModule.JumpSpeed}/{fpcRole1.FirstPersonController.FpcModule.Motor._maxFallSpeed}/{Mathf.Pow(fpcRole1.FirstPersonController.FpcModule.Motor._maxFallSpeed - 14.5f, 0.8f) * 31.4f + 10f}<alpha=#FF>\n";
             if (_player.Role is FpcRole fpcRole && fpcRole.IsInvisible)
 				info += $"<b>vous êtes invisible</b> ";
 			curText = curText.Replace("([STATS])", info);

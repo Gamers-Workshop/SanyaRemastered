@@ -32,6 +32,11 @@ namespace SanyaRemastered.EventHandlers
             {
                 ev.Player.CustomName = ev.Player.Nickname;
             }
+            if (plugin.Config.StaffMaxPlayer && ev.Player.RemoteAdminAccess)
+            {
+                Server.MaxPlayerCount++;
+            }
+
             //Component
             if (!ev.Player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out _))
                 ev.Player.GameObject.AddComponent<SanyaRemasteredComponent>();
@@ -63,6 +68,10 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerDestroying(DestroyingEventArgs ev)
         {
             Log.Debug($"[OnPlayerLeave] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
+            if (plugin.Config.StaffMaxPlayer && ev.Player.RemoteAdminAccess)
+            {
+                Server.MaxPlayerCount--;
+            }
             foreach (Player player in Player.List)
             {
                 if (player.Role is Scp049Role scp049 && scp049.IsRecalling)
@@ -123,14 +132,12 @@ namespace SanyaRemastered.EventHandlers
                 ev.Player.Inventory.UserInventory.ReserveAmmo.Clear();
             }
         }
-        public void OnSpawningRagdoll(SpawningRagdollEventArgs ev)
+        public void OnSpawningRagdoll(BasicRagdoll basicRagdoll)
         {
-            ev.IsAllowed = false;
-            Ragdoll ragdoll = Ragdoll.CreateAndSpawn(ev.Info);
-
-            ragdoll.Scale = new Vector3(ev.Player.Scale.x * ragdoll.Scale.x,
-                                              ev.Player.Scale.y * ragdoll.Scale.y,
-                                              ev.Player.Scale.z * ragdoll.Scale.z);
+            Ragdoll ragdoll = Ragdoll.Get(basicRagdoll);
+            ragdoll.Scale = new Vector3(ragdoll.Owner.Scale.x * ragdoll.Scale.x,
+                                              ragdoll.Owner.Scale.y * ragdoll.Scale.y,
+                                              ragdoll.Owner.Scale.z * ragdoll.Scale.z);
         }
         public void OnChangingAmmo(ChangingAmmoEventArgs ev)
         {

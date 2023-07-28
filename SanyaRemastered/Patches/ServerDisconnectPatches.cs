@@ -1,6 +1,7 @@
 ﻿using Exiled.API.Features;
 using HarmonyLib;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
 using System;
 
@@ -16,9 +17,9 @@ namespace SanyaRemastered.Patches
                 if (__instance._disconnectDrop)
                 {
                     NetworkIdentity identity = conn.identity;
-                    if (identity is not null && ReferenceHub.TryGetHubNetID(identity.netId, out ReferenceHub referenceHub))
+                    if (identity is not null && ReferenceHub.TryGetHubNetID(identity.netId, out ReferenceHub referenceHub) && referenceHub.IsAlive())
                     {
-                        referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Disconect"));
+                        referenceHub.playerStats.DealDamage(new CustomReasonDamageHandler("Disconnect"));
                     }
                 }
             }

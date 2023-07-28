@@ -30,6 +30,9 @@ namespace SanyaRemastered.Configs
 
         [Description("Affiche une étoile pour tous les joueurs (comme le setnick)")]
         public bool AllStar { get; set; } = false;
+        [Description("Permet de faire en sorte que quand un Staff est connecté il modifie le nombre de joueur MAX")]
+        public bool StaffMaxPlayer { get; set; } = false;
+
         [Description("\n  # Serveur Config\n  # Localisation des données des joueurs")]
         public string DataDirectory { get; private set; } = string.Empty;
         public string AudioSoundAirBomb { get; private set; } = "/home/scp/.config/EXILED/Configs/AudioAPI/Siren.ogg";
