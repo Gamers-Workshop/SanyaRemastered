@@ -131,6 +131,10 @@ namespace SanyaRemastered.EventHandlers
                 ev.Player.Inventory.UserInventory.Items.Clear();
                 ev.Player.Inventory.UserInventory.ReserveAmmo.Clear();
             }
+            if (ev.DamageHandler.ServerLogsText.Remove(0, 30) is "Disconnect" && ev.Player.Role.Type is RoleTypeId.Scp0492)
+            {
+                Scp0492UserID.Add(ev.Player.UserId, ev.Player.RelativePosition);
+            }
         }
         public void OnSpawningRagdoll(BasicRagdoll basicRagdoll)
         {
