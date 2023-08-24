@@ -1,4 +1,5 @@
-﻿using CustomPlayerEffects;
+﻿using AudioPlayer;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.DamageHandlers;
@@ -32,27 +33,28 @@ namespace SanyaRemastered.EventHandlers
             {
                 ev.Player.CustomName = ev.Player.Nickname;
             }
-            if (plugin.Config.StaffMaxPlayer && ev.Player.RemoteAdminAccess)
+            if (plugin.Config.StaffMaxPlayer && ReservedSlot.Users.Contains(ev.Player.UserId))
             {
                 Server.MaxPlayerCount++;
             }
-
             //Component
             if (!ev.Player.GameObject.TryGetComponent<SanyaRemasteredComponent>(out _))
                 ev.Player.GameObject.AddComponent<SanyaRemasteredComponent>();
             try
             {
-                // Methods.AddPlayerAudio(ev.Player);
+                Methods.AddPlayerAudio(ev.Player);
             }
             catch { }
         }
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            if (ev.Reason is SpawnReason.LateJoin && Scp0492UserID.ContainsKey(ev.Player.UserId))
+            if (ev.Reason is SpawnReason.LateJoin)
             {
-                ev.NewRole = RoleTypeId.Scp0492;
-                Scp0492UserID.Remove(ev.Player.UserId);
-                ev.Player.Broadcast(10, "Vous avez été réscucité par Scp049 avant votre déconnexion\n Attention si vous étes repris a faire ça il y auras des sanction");
+
+                if (Scp0492UserID.ContainsKey(ev.Player.UserId))
+                {
+                    ev.NewRole = RoleTypeId.Scp0492;
+                }
             }
         }
         public void OnSpawned(SpawnedEventArgs ev)
@@ -81,6 +83,9 @@ namespace SanyaRemastered.EventHandlers
                     Scp0492UserID.Add(ev.Player.UserId, scp049.RelativePosition);
                 }
             }
+            if (ev.Player.Role.Type is RoleTypeId.Scp0492)
+                Scp0492UserID.Add(ev.Player.UserId, ev.Player.RelativePosition);
+
             if ((Round.IsLocked || Round.IsLobbyLocked) && ev.Player.RemoteAdminAccess && !Player.List.Any(x => x != ev.Player && x.RemoteAdminAccess))
             {
                 Round.IsLocked = false;
@@ -88,7 +93,7 @@ namespace SanyaRemastered.EventHandlers
             }
             try
             {
-                // Methods.RemovePlayerAudio(ev.Player);
+                Methods.RemovePlayerAudio(ev.Player);
             }
             catch { }
         }

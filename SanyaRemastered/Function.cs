@@ -1,5 +1,6 @@
 ﻿using AudioPlayer;
 using Exiled.API.Features;
+using Exiled.API.Features.Components;
 using Exiled.API.Features.Items;
 using Footprinting;
 using Hints;
@@ -119,7 +120,7 @@ namespace SanyaRemastered.Functions
 
             try
             {
-                // Methods.PlaySirenAudio();
+                Methods.PlaySirenAudio();
             }
             catch { }
             Cassie.MessageTranslated("danger . the outside zone emergency termination sequence activated \n the air bomb cant be Avoid", SanyaRemastered.Instance.Translation.CustomSubtitles.AirbombStarting);
@@ -164,7 +165,7 @@ namespace SanyaRemastered.Functions
             Log.Debug($"[AirSupportBomb] Ended.");
             try
             {
-                // Methods.StopSirenAudio();
+                Methods.StopSirenAudio();
             }
             catch { }
             yield break;
@@ -189,6 +190,7 @@ namespace SanyaRemastered.Functions
                         Primitive.transform.position = block.Position;
                         Primitive.transform.rotation = Quaternion.Euler(block.Rotation);
                         Primitive.transform.localScale = block.Scale;
+                        Primitive.GetComponent<Collider>().enabled = false;
                         SurfaceBombArea.Add(block.Scale.x * block.Scale.z, Primitive);
                         MaxChance += block.Scale.x * block.Scale.z;
                     }
@@ -248,46 +250,12 @@ namespace SanyaRemastered.Functions
         public static void DiscordLogPlayer(string message) => DiscordLog.DiscordLog.Instance.LOG += message;
         public static void DiscordLogStaff(string message) => DiscordLog.DiscordLog.Instance.LOGStaff += message;
 
-        /*
         public static void PlaySirenAudio() 
-            => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10, id: Server.Host.Id);
-        public static void StopSirenAudio() => AudioPlayer.API.AudioController.LoopAudio(false, Server.Host.Id);
-        public static void AddPlayerAudio(Player player)
-        {
-            FakeConnectionList fakeConnection = new()
-            {
-                fakeConnection = new(player.Id),
-                audioplayer = AudioPlayerBase.Get(player.ReferenceHub),
-                hubPlayer = player.ReferenceHub,
-            };
-
-            fakeConnection.audioplayer.Volume = 1f;
-            Plugin.plugin.FakeConnectionsIds.Add(player.Id, fakeConnection);
-        }
+            => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10);
+        public static void StopSirenAudio() => AudioPlayer.API.AudioController.LoopAudio(false);
+        public static void AddPlayerAudio(Player player) => Plugin.plugin.FakeConnectionsIds.Add(player.Id, new());
         public static void RemovePlayerAudio(Player player) => Plugin.plugin.FakeConnectionsIds.Remove(player.Id);
-        public static ReferenceHub SpawnDummyModel(Vector3 position, RoleTypeId role, string nick, Vector3 rotation, Vector3 scale)
-        {
-            try
-            {
-                GameObject newPlayer = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-                FakeConnection fakeConnection = new();
-                ReferenceHub hubPlayer = newPlayer.GetComponent<ReferenceHub>();
-                NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
-                hubPlayer.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
-                hubPlayer.characterClassManager._hub.roleManager.ServerSetRole(role, RoleChangeReason.RemoteAdmin);
-                hubPlayer.characterClassManager.GodMode = true;
-                newPlayer.GetComponent<NicknameSync>().Network_myNickSync = nick;
-                newPlayer.transform.localScale = scale;
-                newPlayer.transform.rotation = Quaternion.Euler(rotation);
-                newPlayer.transform.position = position;
-                return hubPlayer;
-            }
-            catch (Exception ex)
-            { 
-                Log.Error("Error In create Dummy " + ex);
-                return null;
-            }
-        }*/
+
         public static bool IsStuck(Vector3 pos)
         {
             bool result = false;
@@ -332,6 +300,8 @@ namespace SanyaRemastered.Functions
         }
         public static void Explode(Vector3 position, ReferenceHub hub = null)
         {
+            hub ??= Server.Host.ReferenceHub;
+
             if (!InventoryItemLoader.TryGetItem(ItemType.GrenadeHE, out ThrowableItem throwableItem)
                 || throwableItem.Projectile is not ExplosionGrenade explosionGrenade)
             {
