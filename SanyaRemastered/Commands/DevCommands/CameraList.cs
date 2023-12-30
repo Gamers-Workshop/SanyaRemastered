@@ -31,9 +31,21 @@ namespace SanyaRemastered.Commands.DevCommands
             response = $"CameraList : {Camera.List.Count()}";
             foreach (Camera camera in Camera.List)
             {
-                response += $"{camera.Type} : {camera.Name} : {camera.Room}";
+                response += $"{camera.Type} : {camera.Name} : {camera.Room}\n";
             }
+            response += "--------------------------------------\n";
 
+            foreach (Camera camera in Camera.List.Where(x => x.Type is CameraType.Unknown))
+            {
+                response += $"{camera.Type} : {camera.Name} : {camera.Room}\n";
+            }
+            response += "--------------------------------------\n";
+
+            foreach (CameraType type in Enum.GetValues(typeof(CameraType)).Cast<CameraType>())
+            {
+                if (!response.Contains(type.ToString()))
+                    response += type.ToString();
+            }
             return true;
         }
     }

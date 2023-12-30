@@ -29,6 +29,15 @@ namespace SanyaRemastered.EventHandlers
         public void OnPlayerVerified(VerifiedEventArgs ev)
         {
             Log.Info($"[OnPlayerJoin] {ev.Player.Nickname} ({ev.Player.ReferenceHub.queryProcessor._ipAddress}:{ev.Player.UserId})");
+            if (Player.List.Any(x => x.Nickname == ev.Player.Nickname && x != ev.Player))
+            {
+                if (!ReservedSlot.Users.Contains(ev.Player.UserId) )
+                {
+                    ev.Player.Kick("AutoKick par SanyaRemasteredPlugin : Ce pseudo est déjà utilisé sur ce serveur");
+                    return;
+                }
+                Player.List.First(x => x.Nickname == ev.Player.Nickname && ev.Player != x).Ban(System.TimeSpan.FromDays(10), "AutoBan par SanyaRemasteredPlugin: Usurpation du pseudo d'un staff");
+            }
             if (plugin.Config.AllStar && !ev.Player.HasCustomName)
             {
                 ev.Player.CustomName = ev.Player.Nickname;
@@ -140,13 +149,6 @@ namespace SanyaRemastered.EventHandlers
             {
                 Scp0492UserID.Add(ev.Player.UserId, ev.Player.RelativePosition);
             }
-        }
-        public void OnSpawningRagdoll(BasicRagdoll basicRagdoll)
-        {
-            Ragdoll ragdoll = Ragdoll.Get(basicRagdoll);
-            ragdoll.Scale = new Vector3(ragdoll.Owner.Scale.x * ragdoll.Scale.x,
-                                              ragdoll.Owner.Scale.y * ragdoll.Scale.y,
-                                              ragdoll.Owner.Scale.z * ragdoll.Scale.z);
         }
         public void OnChangingAmmo(ChangingAmmoEventArgs ev)
         {

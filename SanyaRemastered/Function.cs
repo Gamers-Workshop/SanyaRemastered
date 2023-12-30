@@ -387,7 +387,7 @@ namespace SanyaRemastered.Functions
     }
     internal static class Extensions
     {
-        public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarker(player.Connection, size);
+        public static void SendHitmarker(this Player player, float size = 1f) => Hitmarker.SendHitmarkerDirectly(player.Connection, size);
 
         public static float GetHealthAmountPercent(this Player player) => 100f - player.Health / player.MaxHealth * 100f;
         public static bool IsExmode(this Player player) => player.SessionVariables.ContainsKey("scp079_advanced_mode");

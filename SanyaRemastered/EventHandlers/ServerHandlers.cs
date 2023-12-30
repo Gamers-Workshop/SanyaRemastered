@@ -3,6 +3,7 @@ using AudioPlayer;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Pickups.Projectiles;
 using Exiled.Events.EventArgs;
@@ -30,6 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using BasicDoor = Interactables.Interobjects.BasicDoor;
 
 namespace SanyaRemastered.EventHandlers
 {
@@ -194,14 +196,14 @@ namespace SanyaRemastered.EventHandlers
                 RoundCoroutines.Add(Timing.RunCoroutine(Coroutines.AirSupportBomb(false, SanyaRemastered.Instance.Config.OutsidezoneTerminationTimeAfterNuke), Segment.FixedUpdate));
             }
         }
-        public void OnGeneratorFinish(GeneratorActivatedEventArgs ev)
+        public void OnGeneratorFinish(GeneratorActivatingEventArgs ev)
         {
             Log.Debug($"[OnGeneratorFinish] {ev.Generator.Room.Type}");
 
             if (SanyaRemastered.Instance.Config.GeneratorFinishLock)
                 ev.Generator.Base.ServerSetFlag(Scp079Generator.GeneratorFlags.Open, false);
         }
-        public void OnPlacingBulletHole(PlacingBulletHole ev)
+        public void OnPlacingBulletHole(PlacingBulletHoleEventArgs ev)
         {
             // Smoke Grenade Pickup ButtonDoor
             if (ev.Position == Vector3.zero || !Physics.Linecast(ev.Player.Position, ev.Position, out RaycastHit raycastHit, 0b11000000000001000001000))

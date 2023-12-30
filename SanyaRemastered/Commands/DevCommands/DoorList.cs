@@ -3,6 +3,7 @@ using System.Linq;
 using CommandSystem;
 using Exiled.API.Enums;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using Exiled.Permissions.Extensions;
 using Mirror;
 using RemoteAdmin;
@@ -31,12 +32,6 @@ namespace SanyaRemastered.Commands.DevCommands
 			foreach (var door in Door.List)
 			{
 				response += $"{door.Type} : {door.Zone} : {door.Nametag} : {door.GameObject.name}\n";
-            }
-            response += "--------------------------------------\n";
-
-            foreach (var door in Door.List.Where(x => x.Type is DoorType.Scp049Gate))
-            {
-                response += $"{door.Position.y}\n";
             }
 
             response += "--------------------------------------\n";

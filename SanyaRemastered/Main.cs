@@ -26,6 +26,8 @@ using System.Diagnostics;
 using SanyaRemastered.Configs;
 using DiscordLog;
 using PlayerRoles.Ragdolls;
+using MEC;
+using CustomPlayerEffects;
 
 namespace SanyaRemastered
 {
@@ -36,7 +38,8 @@ namespace SanyaRemastered
 		public override string Author => "sanyae2439";
 		public override PluginPriority Priority => (PluginPriority) (-1);
 
-		public static SanyaRemastered Instance { get; private set; }
+        public static SanyaRemastered Instance { get; private set; }
+		public static bool IsEnable => Instance.Config.Debug;
         public EventHandlers.ServerHandlers ServerHandlers { get; private set; }
 		public EventHandlers.PlayerHandlers PlayerHandlers { get; private set; }
 		public EventHandlers.ScpHandlers ScpHandlers { get; private set; }
@@ -109,14 +112,21 @@ namespace SanyaRemastered
 
 			//
 			ServerEvents.WaitingForPlayers += ServerHandlers.OnWaintingForPlayers;
-			ServerEvents.RoundEnded += ServerHandlers.OnRoundEnd;
+			ServerEvents.RoundStarted += () => Timing.CallDelayed(1f, () =>
+			{
+				foreach (Player player in Player.List)
+					if (player.ReferenceHub.playerEffectsController.GetEffect<Scp207>().IsEnabled)
+						player.EnableEffect<AntiScp207>();
+
+			});
+            ServerEvents.RoundEnded += ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound += ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam += ServerHandlers.OnTeamRespawn;
 			
 			WarheadEvents.Stopping += ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated += ServerHandlers.OnDetonated;
 			
-			MapEvents.GeneratorActivated += ServerHandlers.OnGeneratorFinish;
+			MapEvents.GeneratorActivating += ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole += ServerHandlers.OnPlacingBulletHole;
 			PlayerEvents.Verified += PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.ChangingRole += PlayerHandlers.OnChangingRole;
@@ -125,7 +135,6 @@ namespace SanyaRemastered
 			PlayerEvents.Hurting += PlayerHandlers.OnPlayerHurting;
 
 			PlayerEvents.Died += PlayerHandlers.OnDied;
-			RagdollManager.OnRagdollSpawned += PlayerHandlers.OnSpawningRagdoll;
 
 			ItemEvents.ChangingAmmo += PlayerHandlers.OnChangingAmmo;
 			PlayerEvents.UsingMicroHIDEnergy += PlayerHandlers.OnUsingMicroHIDEnergy;
@@ -146,7 +155,7 @@ namespace SanyaRemastered
 			WarheadEvents.Stopping -= ServerHandlers.OnWarheadCancel;
 			WarheadEvents.Detonated -= ServerHandlers.OnDetonated;
 			
-			MapEvents.GeneratorActivated -= ServerHandlers.OnGeneratorFinish;
+			MapEvents.GeneratorActivating -= ServerHandlers.OnGeneratorFinish;
 			MapEvents.PlacingBulletHole -= ServerHandlers.OnPlacingBulletHole;
 			PlayerEvents.Verified -= PlayerHandlers.OnPlayerVerified;
 			PlayerEvents.ChangingRole -= PlayerHandlers.OnChangingRole;
@@ -154,7 +163,6 @@ namespace SanyaRemastered
             PlayerEvents.Destroying -= PlayerHandlers.OnPlayerDestroying;
 			PlayerEvents.Hurting -= PlayerHandlers.OnPlayerHurting;
 			PlayerEvents.Died -= PlayerHandlers.OnDied;
-            RagdollManager.OnRagdollSpawned -= PlayerHandlers.OnSpawningRagdoll;
 
             ItemEvents.ChangingAmmo -= PlayerHandlers.OnChangingAmmo;
             PlayerEvents.UsingMicroHIDEnergy -= PlayerHandlers.OnUsingMicroHIDEnergy;
