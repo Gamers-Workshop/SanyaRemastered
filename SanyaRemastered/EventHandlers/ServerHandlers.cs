@@ -1,5 +1,4 @@
 ﻿using AdminToys;
-using AudioPlayer;
 using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Features;
@@ -24,7 +23,6 @@ using Mirror;
 using PlayerRoles;
 using SanyaRemastered.Data;
 using SanyaRemastered.Functions;
-using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

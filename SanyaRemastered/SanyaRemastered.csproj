@@ -98,6 +98,7 @@
     <Compile Include="Patches\ScpPatches\Scp096Patches.cs" />
     <Compile Include="Patches\ScpPatches\Scp173Patches.cs" />
     <Compile Include="Patches\ServerDisconnectPatches.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ram.cs" />
     <Compile Include="Configs\SanyaConfig.cs" />
@@ -109,76 +110,24 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="Accessibility" />
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-Publicized">
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-Publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="AudioPlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\AudioPlayer\AudioPlayer\bin\Debug\AudioPlayer.dll</HintPath>
-    </Reference>
-    <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="CustomMarshalers" />
-    <Reference Include="DiscordLog, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="DiscordLog">
       <HintPath>..\..\DiscordLog\DiscordLog\bin\Debug\DiscordLog.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API, Version=5.3.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\Exiled.API.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CreditTags">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.CreditTags.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CustomItems">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.CustomItems.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Events, Version=3.3.1.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Events.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Loader">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Exiled.Loader.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Permissions">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Permissions.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Updater">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\Exiled.Updater.dll</HintPath>
-    </Reference>
     <Reference Include="MapEditorReborn">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\MapEditorReborn.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\MapEditorReborn.dll</HintPath>
     </Reference>
     <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\Mirror.dll</HintPath>
     </Reference>
     <Reference Include="Mirror.Components">
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Mirror.Components.dll</HintPath>
-    </Reference>
-    <Reference Include="NorthwoodLib, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
-    </Reference>
-    <Reference Include="PluginAPI">
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\PluginAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="SCPSLAudioApi, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\SCPSLAudioApi.dll</HintPath>
-    </Reference>
-    <Reference Include="SemVer">
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\SemVer.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\Mirror.Components.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -188,29 +137,28 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\jeux\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet, Version=9.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\louismonneyronpc\AppData\Roaming\EXILED\Plugins\dependencies\YamlDotNet.dll</HintPath>
+      <HintPath>$(EXILED_REFERENCES)\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="EXILED">
+      <Version>8.7.3</Version>
+    </PackageReference>
+    <PackageReference Include="Lib.Harmony">
+      <Version>2.2.2</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

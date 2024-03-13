@@ -1,5 +1,4 @@
-﻿using AudioPlayer;
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.API.Features.Components;
 using Exiled.API.Features.Items;
 using Footprinting;
@@ -16,7 +15,6 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079.Cameras;
 using RemoteAdmin;
 using RoundRestarting;
-using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -250,11 +248,25 @@ namespace SanyaRemastered.Functions
         public static void DiscordLogPlayer(string message) => DiscordLog.DiscordLog.Instance.LOG += message;
         public static void DiscordLogStaff(string message) => DiscordLog.DiscordLog.Instance.LOGStaff += message;
 
-        public static void PlaySirenAudio() 
-            => AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10);
-        public static void StopSirenAudio() => AudioPlayer.API.AudioController.LoopAudio(false);
-        public static void AddPlayerAudio(Player player) => Plugin.plugin.FakeConnectionsIds.Add(player.Id, new());
-        public static void RemovePlayerAudio(Player player) => Plugin.plugin.FakeConnectionsIds.Remove(player.Id);
+        public static void PlaySirenAudio()
+        {
+            // AudioPlayer.API.AudioController.PlayAudioFromFile(SanyaRemastered.Instance.Config.AudioSoundAirBomb, true, 10);
+        }
+
+        public static void StopSirenAudio()
+        {
+            // AudioPlayer.API.AudioController.LoopAudio(false);
+        }
+
+        public static void AddPlayerAudio(Player player)
+        {
+            // Plugin.plugin.FakeConnectionsIds.Add(player.Id, new());
+        }
+
+        public static void RemovePlayerAudio(Player player)
+        {
+            // Plugin.plugin.FakeConnectionsIds.Remove(player.Id);
+        }
 
         public static bool IsStuck(Vector3 pos)
         {
