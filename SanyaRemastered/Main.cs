@@ -112,13 +112,7 @@ namespace SanyaRemastered
 
 			//
 			ServerEvents.WaitingForPlayers += ServerHandlers.OnWaintingForPlayers;
-			ServerEvents.RoundStarted += () => Timing.CallDelayed(1f, () =>
-			{
-				foreach (Player player in Player.List)
-					if (player.ReferenceHub.playerEffectsController.GetEffect<Scp207>().IsEnabled)
-						player.EnableEffect<AntiScp207>();
-
-			});
+			ServerEvents.RoundStarted += ServerHandlers.OnRoundStart;
             ServerEvents.RoundEnded += ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound += ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam += ServerHandlers.OnTeamRespawn;
@@ -148,7 +142,8 @@ namespace SanyaRemastered
         private void UnRegistEvents()
 		{
 			ServerEvents.WaitingForPlayers -= ServerHandlers.OnWaintingForPlayers;
-			ServerEvents.RoundEnded -= ServerHandlers.OnRoundEnd;
+            ServerEvents.RoundStarted -= ServerHandlers.OnRoundStart;
+            ServerEvents.RoundEnded -= ServerHandlers.OnRoundEnd;
 			ServerEvents.RestartingRound -= ServerHandlers.OnRoundRestart;
 			ServerEvents.RespawningTeam -= ServerHandlers.OnTeamRespawn;
 

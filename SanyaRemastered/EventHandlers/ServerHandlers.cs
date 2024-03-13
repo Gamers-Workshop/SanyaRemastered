@@ -122,12 +122,17 @@ namespace SanyaRemastered.EventHandlers
         /** Flag Params **/
         public bool StopRespawn = false;
 
-        public List<CoroutineHandle> RoundCoroutines { get => roundCoroutines; set => roundCoroutines = value; }
+        public List<CoroutineHandle> RoundCoroutines 
+        { 
+            get => roundCoroutines; 
+            set => roundCoroutines = value;
+        }
 
         public void OnWaintingForPlayers()
         {
             if (plugin.Config.RamRestartNoPlayer > 0 || plugin.Config.RamRestartWithPlayer > 0 || plugin.Config.RamInfo)
                 RoundCoroutines.Add(Timing.RunCoroutine(Every30minute(), Segment.RealtimeUpdate));
+
             loaded = true;
 
             Coroutines.IsAirBombGoing = false;
@@ -137,7 +142,10 @@ namespace SanyaRemastered.EventHandlers
             SanyaRemastered.Instance.PlayerHandlers.Scp0492UserID.Clear();
             Log.Info($"[OnWaintingForPlayers] Waiting for Players...");
         }
-
+        
+        public void OnRoundStart()
+        {
+        }
         public void OnRoundEnd(RoundEndedEventArgs ev)
         {
             Log.Info($"[OnRoundEnd] Round Ended.{ev.TimeToRestart}");
