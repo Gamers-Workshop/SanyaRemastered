@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SanyaRemastered.Patches
 {
-    [HarmonyPatch(typeof(PocketDimensionGenerator), nameof(PocketDimensionGenerator.GenerateRandom))]
+    [HarmonyPatch(typeof(PocketDimensionGenerator), nameof(PocketDimensionGenerator.RandomizeTeleports))]
     public static class PocketDimensionFix
     {
         public static bool Prefix()
