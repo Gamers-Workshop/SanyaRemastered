@@ -320,7 +320,7 @@ namespace SanyaRemastered.Functions
                 return;
             }
             ExplosionUtils.ServerSpawnEffect(position, ItemType.GrenadeHE);
-            ExplosionGrenade.Explode(new Footprint(hub), position, explosionGrenade);
+            ExplosionGrenade.Explode(new Footprint(hub), position, explosionGrenade, ExplosionType.Grenade);
         }
         public static void SetParentAndOffset(this Transform target, Transform parent, Vector3 local)
         {

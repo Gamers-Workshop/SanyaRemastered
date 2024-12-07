@@ -153,8 +153,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="EXILED">
-      <Version>8.9.6</Version>
+    <PackageReference Include="ExMod.Exiled">
+      <Version>9.0.0-alpha.3</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

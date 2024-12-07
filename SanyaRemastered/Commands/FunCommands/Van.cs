@@ -27,7 +27,7 @@ namespace SanyaRemastered.Commands.FunCommands
 				return false;
 			}
 
-			Respawn.SummonChaosInsurgencyVan(false);
+			Respawn.SummonChaosInsurgencyVan();
 			response = "Van as comming";
 			return true;
 		}

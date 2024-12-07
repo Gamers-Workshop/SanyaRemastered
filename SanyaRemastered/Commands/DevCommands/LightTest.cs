@@ -40,7 +40,9 @@ namespace SanyaRemastered.Commands.DevCommands
             targetLight.transform.position = new UnityEngine.Vector3(float.Parse(arguments.At(0)), float.Parse(arguments.At(1)), float.Parse(arguments.At(2)));
             targetLight.NetworkLightIntensity = float.Parse(arguments.At(3));
             targetLight.NetworkLightRange = float.Parse(arguments.At(4));
-            targetLight.NetworkLightShadows = bool.Parse(arguments.At(5));
+            targetLight.NetworkShadowStrength = float.Parse(arguments.At(5));
+            targetLight.NetworkShadowType = (LightShadows)Enum.Parse(typeof(LightShadows), arguments.At(6), true);
+            targetLight.NetworkSpotAngle = float.Parse(arguments.At(7));
 
             response = "ok.";
             return true;

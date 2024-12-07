@@ -41,7 +41,7 @@ namespace SanyaRemastered.Patches
                 }
 
                 int leftdecont = (int)Math.Truncate(DecontaminationController.Singleton.DecontaminationPhases[DecontaminationController.Singleton.DecontaminationPhases.Length - 1].TimeTrigger - Math.Truncate(DecontaminationController.GetServerTime));
-                int respawntime = (int)Math.Truncate(RespawnManager.CurrentSequence() is RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
+                int respawntime = 0;// (int)Math.Truncate(RespawnManager.CurrentSequence() is RespawnManager.RespawnSequencePhase.RespawnCooldown ? RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds : 0);
                 int TimeWarhead = (int)Math.Truncate(Warhead.DetonationTimer);
 
                 leftdecont = Mathf.Clamp(leftdecont, 0, leftdecont);
@@ -98,15 +98,12 @@ namespace SanyaRemastered.Patches
                 }
 
                 //Prochain spawn + durée MTF
-
-                if (RespawnManager.Singleton.NextKnownTeam is SpawnableTeamType.ChaosInsurgency)
+                /*
+                if (Respawn.NextKnownTeam is SpawnableTeamType.ChaosInsurgency or SpawnableTeamType.NineTailedFox)
                     stringBuilder.Append($"Les renforts se préparent\n");
-                else if (RespawnManager.SpawnableTeams.TryGetValue(SpawnableTeamType.NineTailedFox, out SpawnableTeamHandlerBase spawnableTeamHandlerBase) 
-                    && spawnableTeamHandlerBase.StartTokens <= 0)
-                    stringBuilder.Append($"Aucun renforts prévus pour le site\n");
                 else
                     stringBuilder.Append($"Prochains renforts : {respawntime / 60:00}:{respawntime % 60:00}\n");
-
+                */
                 //Speak Intercom
                 stringBuilder.Append(SpeakIntercom());
 

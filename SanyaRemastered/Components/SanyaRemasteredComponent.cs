@@ -102,13 +102,14 @@ namespace SanyaRemastered
 		}
 
 		private void UpdateRespawnCounter()
-		{
+        {
+			/*
 			if(!RoundSummary.RoundInProgress() || Warhead.IsDetonated || _player.Role.Team is not Team.Dead) return;
 			if(RespawnManager.CurrentSequence() == RespawnManager.RespawnSequencePhase.RespawnCooldown)
 				_respawnCounter = (int)Math.Truncate(RespawnManager.Singleton._timeForNextSequence - RespawnManager.Singleton._stopwatch.Elapsed.TotalSeconds);
 			else
-				_respawnCounter = 0;
-		}
+				_respawnCounter = 0;*/
+        }
 
 		public void UpdateHint()
 		{
