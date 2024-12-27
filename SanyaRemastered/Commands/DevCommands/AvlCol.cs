@@ -28,7 +28,7 @@ namespace SanyaRemastered.Commands.DevCommands
 			}
 
 			response = "Available colors:\n";
-			foreach (var i in ReferenceHub.HostHub.serverRoles.NamedColors.OrderBy(x => x.Restricted))
+			foreach (var i in ReferenceHub._hostHub.serverRoles.NamedColors.OrderBy(x => x.Restricted))
 				response += $"[#{i.ColorHex}] {i.Name,-13} {(i.Restricted ? "Restricted" : "Not Restricted")}\n";
 			return true;
 		}
