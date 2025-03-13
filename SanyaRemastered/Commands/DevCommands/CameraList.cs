@@ -44,7 +44,7 @@ namespace SanyaRemastered.Commands.DevCommands
             foreach (CameraType type in Enum.GetValues(typeof(CameraType)).Cast<CameraType>())
             {
                 if (!response.Contains(type.ToString()))
-                    response += type.ToString();
+                    response += type.ToString() + "\n";
             }
             return true;
         }
